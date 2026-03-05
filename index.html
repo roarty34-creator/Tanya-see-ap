@@ -190,6 +190,10 @@ function renderLog(){
 
 renderLog()
 
+<script>
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js");
+}
 </script>
 
 </body>
