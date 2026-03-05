@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-sea-app-v2";
+const CACHE_NAME = "tanya-sea-app-v3";
 
 const FILES_TO_CACHE = [
   "./",
