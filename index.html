@@ -1,30 +1,26 @@
 <!DOCTYPE html>
-<html lang="af">
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tanya Sea App V16</title>
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tanya Sea App</title>
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0b1220">
-
-  <!-- Leaflet + Heat -->
+  <!-- Leaflet -->
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
   <style>
     :root{
       --bg:#0b1220;
       --card:#101a2e;
-      --card2:#0e1730;
       --text:#e8eefc;
       --muted:#9fb0d0;
       --accent:#4f8cff;
       --border:#20304d;
-      --danger:#ef4444;
+      --good:#1dd1a1;
+      --warn:#feca57;
+      --bad:#ff6b6b;
     }
-
+    *{box-sizing:border-box}
     body{
       margin:0;
       font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -32,54 +28,61 @@
       color:var(--text);
       padding:16px;
     }
-
-    h2{ margin:0 0 12px; }
-    h3{ margin:0 0 10px; }
-
+    h2{margin:0 0 10px}
     .topnav{
       display:flex;
-      gap:8px;
       flex-wrap:wrap;
-      background:var(--card2);
-      padding:10px;
-      border-radius:14px;
+      gap:8px;
+      background:#0e1730;
+      padding:8px;
+      border-radius:999px;
       border:1px solid var(--border);
       margin-bottom:14px;
+      align-items:center;
     }
-
     .navbtn{
-      border:1px solid var(--border);
+      border:none;
       background:transparent;
-      color:var(--text);
       padding:10px 14px;
       border-radius:999px;
-      font-weight:1000;
+      font-weight:900;
+      color:var(--text);
       cursor:pointer;
     }
     .navbtn.active{
-      background: rgba(79,140,255,0.18);
-      border-color: var(--accent);
-      box-shadow: 0 0 0 3px rgba(79,140,255,0.12);
+      background:var(--accent);
+      color:#071022;
     }
-
+    button{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 900;
+      transition: transform .06s ease, border-color .2s ease;
+    }
+    button:hover{ border-color: var(--accent); }
+    button:active{ transform: scale(0.98); }
+    .danger{border-color:rgba(255,107,107,.55); color:var(--bad)}
     .card{
       background: linear-gradient(180deg, #122042 0%, var(--card) 100%);
       border: 1px solid var(--border);
       border-radius: 18px;
       padding: 14px;
-      margin: 12px 0;
+      margin: 10px 0;
       box-shadow: 0 10px 25px rgba(0,0,0,.25);
     }
-
+    .mini{font-size:12px;color:var(--muted)}
     label.small{
       display:block;
       margin: 10px 0 6px;
       color: var(--muted);
       font-size: 12px;
-      font-weight: 1000;
+      font-weight: 900;
       letter-spacing:.2px;
     }
-
     input, select, textarea{
       width:100%;
       padding: 10px;
@@ -90,172 +93,109 @@
       margin-bottom:10px;
       outline:none;
     }
-    textarea{ min-height: 80px; resize: vertical; }
-
-    .row{ display:flex; gap:10px; flex-wrap:wrap; align-items:center; }
-    .row > * { flex: 1 1 140px; }
-
-    .btn{
-      border:none;
-      border-radius: 12px;
-      padding: 12px 14px;
-      font-weight: 1100;
-      cursor:pointer;
-      color:#071022;
-      background: var(--accent);
-    }
-    .btn.secondary{
-      background: transparent;
-      color: var(--text);
-      border: 1px solid var(--border);
-    }
-    .btn.danger{
-      background: var(--danger);
-      color:#fff;
-      border:none;
-    }
-
-    .mini{ color: var(--muted); font-size: 12px; }
-
+    textarea{min-height:72px; resize:vertical}
+    section{ display:none; }
+    .row{display:flex; gap:10px; flex-wrap:wrap; align-items:center}
     .chip{
       display:inline-block;
       padding:6px 10px;
       border-radius:999px;
       border:1px solid var(--border);
-      background: rgba(255,255,255,0.04);
+      background:#0e1730;
+      font-weight:900;
+      font-size:12px;
+      color:var(--text);
       margin-right:6px;
       margin-top:6px;
-      font-size:12px;
-      font-weight:1100;
     }
-
-    section{ display:none; }
-    #map{ height: 420px; border-radius: 16px; overflow:hidden; border:1px solid var(--border); }
-    img.preview{ width:100%; border-radius:14px; margin-top:10px; border:1px solid var(--border); }
-    .entryTitle{ font-weight:1100; font-size:16px; margin-bottom:4px; }
-    .entryMeta{ color: var(--muted); font-size: 12px; margin-bottom:8px; }
-
-    .grid2{ display:grid; grid-template-columns:1fr; gap:12px; }
-    @media (min-width: 760px){ .grid2{ grid-template-columns:1fr 1fr; } }
-
-    .scoreBox{
-      display:flex;
-      gap:10px;
-      flex-wrap:wrap;
-      align-items:center;
-      margin-top:8px;
-    }
-    .scorePill{
-      display:inline-flex;
-      gap:8px;
-      align-items:center;
-      padding:8px 12px;
-      border-radius:999px;
-      border:1px solid var(--border);
-      background: rgba(255,255,255,0.04);
-      font-weight:1100;
-    }
+    .chip.good{border-color:rgba(29,209,161,.5); color:var(--good)}
+    .chip.warn{border-color:rgba(254,202,87,.5); color:var(--warn)}
+    .chip.bad{border-color:rgba(255,107,107,.5); color:var(--bad)}
+    .entryTitle{font-weight:1000; font-size:16px}
+    .entryMeta{color:var(--muted); font-size:13px; margin-top:6px}
+    .entryActions{display:flex; gap:10px; flex-wrap:wrap; margin-top:10px}
+    img.preview{width:100%; border-radius:14px; margin-top:8px; border:1px solid var(--border)}
+    #map, #heatMap{height:360px;border-radius:18px;border:1px solid var(--border); overflow:hidden}
   </style>
 </head>
 
 <body>
-  <h2>🎣 Tanya Sea App V16</h2>
+  <h2>Tanya Sea App</h2>
 
   <div class="topnav">
-    <button class="navbtn" id="tabAdd"   onclick="showTab('add')">Add</button>
-    <button class="navbtn" id="tabLog"   onclick="showTab('log')">Log</button>
-    <button class="navbtn" id="tabMap"   onclick="showTab('mapSec')">Map</button>
-    <button class="navbtn" id="tabSea"   onclick="showTab('sea')">Sea Days</button>
-    <button class="navbtn" id="tabStats" onclick="showTab('stats')">Stats</button>
-    <button class="navbtn" id="tabSpots" onclick="showTab('spots')">Spots ⭐</button>
+    <button class="navbtn" id="btnAdd"  onclick="showTab('add')">➕ Add</button>
+    <button class="navbtn" id="btnLog"  onclick="showTab('log')">📒 Log</button>
+    <button class="navbtn" id="btnMap"  onclick="showTab('map')">🗺 Map</button>
+    <button class="navbtn" id="btnHeat" onclick="showTab('heat')">🔥 Heatmap</button>
+    <button class="navbtn" id="btnSea"  onclick="showTab('sea')">🌊 Sea Days</button>
+    <button class="navbtn" id="btnStats" onclick="showTab('stats')">📊 Stats</button>
+    <button class="navbtn" id="btnGuide" onclick="showTab('guide')">🐟 Guide</button>
   </div>
 
   <!-- ADD -->
   <section id="add">
-    <div class="card" style="max-width:820px;">
-      <h3>Add vang</h3>
+    <div class="card" style="max-width:560px;">
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Add Catch</div>
+        <div class="mini" id="minSizeHint"></div>
+      </div>
 
-      <label class="small">Spesie</label>
-      <select id="species" autocomplete="off">
-        <option value="">Kies spesie...</option>
-        <option>Kaapse Kabeljou</option>
-        <option>Geelstert</option>
+      <label class="small">Species</label>
+      <select id="species" autocomplete="off" onchange="updateMinHint()">
+        <option value="">Choose species...</option>
+        <option>Dusky Kob (Kabeljou)</option>
+        <option>Yellowtail (Geelstert)</option>
         <option>Bonnie</option>
-        <option>Rooi Roman</option>
+        <option>Red Roman (Rooi Roman)</option>
         <option>Snapper</option>
         <option>Silver (Bastermeid)</option>
-        <option>Rooi Steenbras</option>
-        <option>Yellow Belly (Rockod)</option>
+        <option>Red Steenbras (Rooi Steenbras)</option>
+        <option>Yellow Belly (Rockcod)</option>
         <option>Galjoen</option>
         <option>Hottentot</option>
       </select>
 
-      <div class="grid2">
-        <div>
-          <label class="small">Plek</label>
-          <input id="place" placeholder="bv. Stilbaai / Die Punt" autocomplete="off">
-        </div>
-        <div>
-          <label class="small">Trip / Sessie</label>
-          <input id="trip" placeholder="bv. Oggend boot / Punt" autocomplete="off">
-        </div>
-      </div>
-
-      <label class="small">Koördinate</label>
-      <div class="row">
-        <button class="btn secondary" type="button" onclick="getGPS()">📍 Kry GPS</button>
-        <input id="coords" placeholder="-34.370000, 20.850000" autocomplete="off">
-      </div>
-      <div class="mini">Tip: Gaan Map tab toe en TAP op map om coords te kies.</div>
-
-      <div class="grid2">
-        <div>
-          <label class="small">Lengte (cm)</label>
-          <input id="length" placeholder="bv. 65" inputmode="numeric" autocomplete="off">
-        </div>
-        <div>
-          <label class="small">Gewig (kg)</label>
-          <input id="weight" placeholder="bv. 4.2" inputmode="decimal" autocomplete="off">
-        </div>
-      </div>
-
-      <label class="small">Gety tye (opsioneel)</label>
-      <div class="row">
-        <button class="btn secondary" type="button" onclick="openTideTable()">🌊 Open tide table</button>
-        <input id="tideNote" placeholder="bv. High 06:10 / Low 12:30" autocomplete="off">
-      </div>
-      <div class="mini">Gety-tipe word outomaties (Spring/Neap) uit die maan bereken.</div>
-
-      <label class="small">Wind rigting (opsioneel)</label>
-      <select id="windDir" autocomplete="off">
-        <option value="">Kies...</option>
-        <option>N</option><option>NE</option><option>E</option><option>SE</option>
-        <option>S</option><option>SW</option><option>W</option><option>NW</option>
+      <label class="small">Trip</label>
+      <select id="trip">
+        <option value="">Choose trip...</option>
       </select>
+      <div class="mini">Trips auto-fill from your saved catches.</div>
 
-      <label class="small">Water temp °C (opsioneel)</label>
-      <input id="waterTemp" placeholder="bv. 18" inputmode="decimal" autocomplete="off">
+      <label class="small">Place</label>
+      <input id="place" placeholder="e.g. Stilbaai / The Point" autocomplete="off">
 
-      <div class="scoreBox">
-        <div class="scorePill" id="bitePill">⭐ Bite score: —</div>
-        <div class="mini" id="autoInfo"></div>
+      <label class="small">Coordinates</label>
+      <div class="row">
+        <button type="button" onclick="getGPS()">📍 Get GPS</button>
+        <input id="coords" placeholder="-34.370000, 20.850000" readonly autocomplete="off">
       </div>
 
-      <label class="small">Foto</label>
-      <div class="row" style="align-items:stretch;">
-        <button class="btn secondary" type="button" onclick="document.getElementById('photoCamera').click()">📷 Kamera</button>
-        <button class="btn secondary" type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
+      <label class="small">Length (cm)</label>
+      <input id="length" placeholder="e.g. 65" inputmode="numeric" autocomplete="off">
+
+      <label class="small">Wind direction (optional)</label>
+      <input id="windDir" placeholder="e.g. SE / NW / Calm" autocomplete="off">
+
+      <label class="small">Water temp °C (optional)</label>
+      <input id="waterTemp" placeholder="e.g. 18.5" inputmode="decimal" autocomplete="off">
+
+      <label class="small">Photo</label>
+      <div class="row">
+        <button type="button" onclick="document.getElementById('photoCamera').click()">📷 Camera</button>
+        <button type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
+        <button type="button" onclick="openLens()">🔎 Google Lens</button>
       </div>
       <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;">
       <input id="photoGallery" type="file" accept="image/*" style="display:none;">
       <div id="photoPreview"></div>
+      <div class="mini">Lens opens in a new tab. Upload your fish photo there to identify it.</div>
 
-      <label class="small">Notas</label>
-      <textarea id="notes" placeholder="bv. aas / water kleur / tyd / gety..."></textarea>
+      <label class="small">Notes (optional)</label>
+      <textarea id="notes" placeholder="e.g. bait, tide, moon, conditions..."></textarea>
 
-      <div class="row">
-        <button class="btn" type="button" onclick="saveCatch()">💾 Save</button>
-        <button class="btn secondary" type="button" onclick="saveSpotFromAdd()">⭐ Save spot</button>
+      <div class="row" style="margin-top:6px;">
+        <button class="navbtn active" type="button" onclick="saveCatch()">✅ Save</button>
+        <button type="button" class="danger" onclick="resetForm()">↩️ Clear form</button>
       </div>
     </div>
   </section>
@@ -263,1041 +203,848 @@
   <!-- LOG -->
   <section id="log">
     <div class="card">
-      <div class="grid2">
-        <div>
-          <h3 style="margin:0;">Logboek</h3>
-          <div class="mini">Trip filter werk vir Log + Map + Stats.</div>
-        </div>
-        <div>
-          <label class="small">Trip filter</label>
-          <select id="tripFilter" onchange="loadLog()">
-            <option value="ALL">All trips</option>
-          </select>
-        </div>
+      <div class="row" style="justify-content:space-between; align-items:center;">
+        <div style="font-weight:1000;">Catch Log</div>
+        <button class="danger" onclick="clearAll()">🗑 Reset Fish Log</button>
       </div>
 
       <div class="row" style="margin-top:10px;">
-        <button class="btn danger" type="button" onclick="resetAllData()">🗑 Reset All</button>
+        <div style="flex:1; min-width:220px;">
+          <label class="small">Trip filter</label>
+          <select id="tripFilter" onchange="setTripFilter(this.value)">
+            <option value="ALL">ALL trips</option>
+          </select>
+          <div class="mini" id="tripNow"></div>
+        </div>
       </div>
     </div>
 
-    <div id="logList"></div>
+    <div id="list"></div>
   </section>
 
   <!-- MAP -->
-  <section id="mapSec">
+  <section id="mapTab">
     <div class="card">
-      <div class="grid2">
-        <div>
-          <h3>Catch Map + Heatmap</h3>
-          <div class="mini">TAP op die map → “Use coords / Save spot”.</div>
-        </div>
-        <div>
-          <label class="small">Trip filter</label>
-          <select id="tripFilterMap" onchange="renderMap(true)">
-            <option value="ALL">All trips</option>
-          </select>
-        </div>
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Catch Map</div>
+        <button type="button" onclick="toggleSatellite()">🛰 Satellite: <span id="satState">OFF</span></button>
       </div>
-
-      <div id="map"></div>
-
-      <div class="row" style="margin-top:10px;">
-        <button class="btn secondary" type="button" onclick="toggleHeat()">🔥 Toggle heatmap</button>
-        <button class="btn secondary" type="button" onclick="fitAll()">🧭 Zoom to all</button>
-        <button class="btn secondary" type="button" onclick="useStilbaai()">📌 Stilbaai coords</button>
-      </div>
+      <div class="mini" id="mapTripLabel"></div>
     </div>
+    <div id="map"></div>
   </section>
 
-  <!-- SEA -->
+  <!-- HEATMAP -->
+  <section id="heat">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Fishing Spot Heatmap</div>
+        <button type="button" onclick="toggleHeatSatellite()">🛰 Satellite: <span id="heatSatState">OFF</span></button>
+      </div>
+      <div class="mini" id="heatTripLabel"></div>
+      <div class="mini">Heatmap uses your saved GPS catches. No GPS = no heat.</div>
+    </div>
+    <div id="heatMap"></div>
+  </section>
+
+  <!-- SEA DAYS -->
   <section id="sea">
     <div class="card">
-      <h3>⭐ Best Bite Time (volgende 48 uur)</h3>
-      <div class="mini">Gebruik golf + swell + wind + dawn/dusk bonus + maan/gety-tipe (approx). Internet nodig.</div>
+      <div style="font-weight:1000;">Best Sea Days (Next 14 Days)</div>
+      <div class="mini">Auto rating uses wave + swell + wind. Tide type is approximate (spring/neap from moon).</div>
       <div class="row" style="margin-top:10px;">
-        <button class="btn" type="button" onclick="fetchBiteTimes()">⭐ Bereken beste ure</button>
-        <button class="btn secondary" type="button" onclick="useStilbaai()">📌 Gebruik Stilbaai coords</button>
+        <button type="button" onclick="fetchSeaDays()">🔄 Refresh</button>
+        <button type="button" onclick="useStilbaai()">📍 Use Stilbaai</button>
       </div>
-      <div id="biteBox" class="mini" style="margin-top:10px;"></div>
+      <div class="mini">Tip: To use a different spot, go Add → Get GPS first, then come back here.</div>
     </div>
-
-    <div class="card">
-      <h3>14-dae Sea Days (Stilbaai / jou coords)</h3>
-      <div class="mini">Score gebruik golf + swell + wind (hoe hoër = kalmer). Internet nodig.</div>
-      <div class="row">
-        <button class="btn" type="button" onclick="fetchSeaDays()">🌊 Refresh 14 dae</button>
-        <button class="btn secondary" type="button" onclick="useStilbaai()">📌 Gebruik Stilbaai coords</button>
-      </div>
-      <div id="seaBox" class="mini" style="margin-top:10px;"></div>
-    </div>
+    <div id="seaBox"></div>
   </section>
 
   <!-- STATS -->
   <section id="stats">
     <div class="card">
-      <div class="grid2">
-        <div>
-          <h3>Species Stats</h3>
-          <div class="mini">Stats volg Trip filter.</div>
-        </div>
-        <div>
-          <label class="small">Trip filter</label>
-          <select id="tripFilterStats" onchange="renderStats()">
-            <option value="ALL">All trips</option>
-          </select>
-        </div>
-      </div>
-      <div id="statsBox"></div>
+      <div style="font-weight:1000;">Stats</div>
+      <div class="mini" id="statsTripLabel" style="margin-top:6px;"></div>
+      <div id="statsBox" style="margin-top:10px;"></div>
     </div>
   </section>
 
-  <!-- SPOTS -->
-  <section id="spots">
+  <!-- GUIDE -->
+  <section id="guide">
     <div class="card">
-      <h3>Favourite Spots ⭐</h3>
-      <div class="mini">Stoor jou beste spots en open maps met 1 tik.</div>
-      <div class="row">
-        <input id="spotName" placeholder="Spot naam (bv. Die Punt 1)" autocomplete="off">
-        <button class="btn" type="button" onclick="saveSpotManual()">⭐ Save</button>
-      </div>
-      <div class="mini">Gebruik coords uit Add vorm (of tik self in). Hierdie gebruik die “coords” veld.</div>
+      <div style="font-weight:1000;">Stilbaai Fish Guide</div>
+      <div class="mini">Quick reference: min size + bag limit + tips.</div>
     </div>
-    <div id="spotList"></div>
+    <div id="guideList"></div>
   </section>
 
-<script>
-(() => {
-  const KEY_CATCH = "tanyaSeaApp_catches_v16";
-  const KEY_SPOTS = "tanyaSeaApp_spots_v16";
-  const STILBAAI = { lat: -34.37, lon: 20.85 };
+  <!-- JS libs -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-  const el = (id) => document.getElementById(id);
+  <script>
+  (() => {
+    const KEY = "tanya-sea-app-v16";
+    const STILBAAI = { lat: -34.37, lon: 20.85 };
 
-  const species   = el("species");
-  const place     = el("place");
-  const trip      = el("trip");
-  const coords    = el("coords");
-  const length    = el("length");
-  const weight    = el("weight");
-  const tideNote  = el("tideNote");
-  const windDir   = el("windDir");
-  const waterTemp = el("waterTemp");
-  const notes     = el("notes");
+    // Min sizes (cm) – adjust anytime
+    const MIN_SIZE_CM = {
+      "Dusky Kob (Kabeljou)": 60,
+      "Red Roman (Rooi Roman)": 30,
+      "Galjoen": 35,
+      "Yellow Belly (Rockcod)": 60,
+      "Red Steenbras (Rooi Steenbras)": 60,
+      "Silver (Bastermeid)": 35,
+      "Snapper": 40,
+      "Hottentot": 22
+    };
 
-  const camInput  = el("photoCamera");
-  const galInput  = el("photoGallery");
-  const photoPreview = el("photoPreview");
+    // Simple guide (no API)
+    const FISH_GUIDE = [
+      { name:"Dusky Kob (Kabeljou)", min:"60 cm", bag:"5 / day", tip:"Often near river mouths & sandbanks. Great on chokka/sardine." },
+      { name:"Yellowtail (Geelstert)", min:"No min", bag:"10 / day", tip:"School fish. Works well on spoons, plugs, live bait." },
+      { name:"Galjoen", min:"35 cm", bag:"2 / day", tip:"Best in white water. Classic bait: redbait." },
+      { name:"Red Roman (Rooi Roman)", min:"30 cm", bag:"5 / day", tip:"Reef fish. Squid/chokka works well." },
+      { name:"Hottentot", min:"22 cm", bag:"10 / day", tip:"Common reef fish. Small bait, small hooks." },
+      { name:"Red Steenbras (Rooi Steenbras)", min:"60 cm", bag:"1 / day", tip:"Strong fish. Often on sandbanks." }
+    ];
 
-  const autoInfo  = el("autoInfo");
-  const bitePill  = el("bitePill");
+    const el = (id) => document.getElementById(id);
+    const esc = (s) => String(s || "")
+      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;").replaceAll('"',"&quot;").replaceAll("'","&#39;");
 
-  const logList   = el("logList");
-  const statsBox  = el("statsBox");
-  const seaBox    = el("seaBox");
-  const biteBox   = el("biteBox");
+    // Elements (Add)
+    const species   = el("species");
+    const trip      = el("trip");
+    const place     = el("place");
+    const coords    = el("coords");
+    const length    = el("length");
+    const windDir   = el("windDir");
+    const waterTemp = el("waterTemp");
+    const notes     = el("notes");
+    const minHint   = el("minSizeHint");
 
-  const spotName  = el("spotName");
-  const spotList  = el("spotList");
+    // Photo
+    const photoPreview = el("photoPreview");
+    const camInput = el("photoCamera");
+    const galInput = el("photoGallery");
+    let photoDataUrl = "";
 
-  const tripFilter = el("tripFilter");
-  const tripFilterMap = el("tripFilterMap");
-  const tripFilterStats = el("tripFilterStats");
+    // Trip UI
+    const tripFilter = el("tripFilter");
+    const tripNow = el("tripNow");
+    const mapTripLabel = el("mapTripLabel");
+    const heatTripLabel = el("heatTripLabel");
+    const statsTripLabel = el("statsTripLabel");
 
-  let mapInstance = null;
-  let mapMarkers = [];
-  let heatLayer = null;
-  let heatOn = true;
-  let mapClickMarker = null;
+    // Log/Stats
+    const list = el("list");
+    const statsBox = el("statsBox");
 
-  const esc = (s) => String(s || "")
-    .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    // Sea box
+    const seaBox = el("seaBox");
 
-  function getAll(){
-    try { return JSON.parse(localStorage.getItem(KEY_CATCH) || "[]"); }
-    catch { return []; }
-  }
-  function saveAll(data){
-    localStorage.setItem(KEY_CATCH, JSON.stringify(data));
-  }
+    // Satellite labels
+    const satState = el("satState");
+    const heatSatState = el("heatSatState");
 
-  function getSpots(){
-    try { return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }
-    catch { return []; }
-  }
-  function saveSpots(data){
-    localStorage.setItem(KEY_SPOTS, JSON.stringify(data));
-  }
+    let activeTrip = "ALL";
+    let currentTab = "add";
 
-  function parseCoords(str){
-    const t = String(str || "").trim();
-    if(!t) return null;
-    const parts = t.includes(",") ? t.split(",") : t.split(" ");
-    if(parts.length < 2) return null;
-    const lat = Number(String(parts[0]).trim());
-    const lon = Number(String(parts[1]).trim());
-    if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-    return { lat, lon };
-  }
-
-  function fmt(n, d=1){
-    if(!Number.isFinite(n)) return "—";
-    const p = Math.pow(10,d);
-    return String(Math.round(n*p)/p);
-  }
-
-  function fileToDataUrl(file){
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-
-  function moonInfo(date = new Date()){
-    const lp = 2551443;
-    const newMoon = new Date(1970,0,7,20,35,0);
-    const phase = ((date.getTime() - newMoon.getTime())/1000) % lp;
-    const day = Math.floor(phase / (24*3600));
-    let name = "Waning";
-    if(day <= 1) name = "New Moon";
-    else if(day <= 6) name = "Waxing";
-    else if(day <= 8) name = "First Quarter";
-    else if(day <= 14) name = "Waxing Gibbous";
-    else if(day <= 16) name = "Full Moon";
-    else if(day <= 22) name = "Waning";
-    else if(day <= 24) name = "Last Quarter";
-    else name = "Waning Crescent";
-
-    let tide = "Mid (medium)";
-    if(day <= 2 || (day >= 14 && day <= 17)) tide = "Spring (sterk)";
-    else if((day >= 6 && day <= 9) || (day >= 22 && day <= 25)) tide = "Neap (swak)";
-    return { day, name, tide };
-  }
-
-  function biteScoreSimple(){
-    const mi = moonInfo(new Date());
-    let score = 50;
-
-    if(mi.tide.includes("Spring")) score += 15;
-    if(mi.name.includes("Full") || mi.name.includes("New")) score += 10;
-
-    const wd = (windDir.value || "").trim();
-    if(wd === "E" || wd === "SE") score += 8;
-    if(wd === "W" || wd === "NW") score -= 8;
-
-    const t = Number(String(waterTemp.value || "").replace(",","."));
-    if(Number.isFinite(t)){
-      if(t >= 17 && t <= 21) score += 7;
-      else score -= 3;
+    function getAll(){
+      return JSON.parse(localStorage.getItem(KEY) || "[]");
+    }
+    function saveAll(data){
+      localStorage.setItem(KEY, JSON.stringify(data));
     }
 
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    bitePill.textContent = `⭐ Bite score: ${score}/100`;
-  }
-
-  function refreshAutoInfo(){
-    const mi = moonInfo(new Date());
-    autoInfo.innerHTML = `🌙 Moon: <b>${esc(mi.name)}</b> • 🌊 Tide (approx): <b>${esc(mi.tide)}</b>`;
-    biteScoreSimple();
-  }
-
-  windDir.addEventListener("change", biteScoreSimple);
-  waterTemp.addEventListener("input", biteScoreSimple);
-
-  function setActiveTab(id){
-    const map = { add:"tabAdd", log:"tabLog", mapSec:"tabMap", sea:"tabSea", stats:"tabStats", spots:"tabSpots" };
-    Object.keys(map).forEach(k => el(map[k])?.classList.toggle("active", k===id));
-  }
-
-  function showTab(id){
-    ["add","log","mapSec","sea","stats","spots"].forEach(s => el(s).style.display="none");
-    el(id).style.display="block";
-    setActiveTab(id);
-
-    if(id==="log") loadLog();
-    if(id==="mapSec") renderMap(true);
-    if(id==="stats") renderStats();
-    if(id==="spots") renderSpots();
-    if(id==="sea") refreshAutoInfo();
-    if(id==="add") refreshAutoInfo();
-  }
-
-  function getGPS(){
-    if(!navigator.geolocation){
-      alert("GPS word nie ondersteun op hierdie browser nie.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lon = pos.coords.longitude.toFixed(6);
-        coords.value = lat + ", " + lon;
-      },
-      (err) => {
-        alert("Kon nie GPS kry nie: " + (err && err.message ? err.message : "Onbekend"));
-      },
-      { enableHighAccuracy:true, timeout: 12000, maximumAge: 0 }
-    );
-  }
-
-  function useStilbaai(){
-    coords.value = `${STILBAAI.lat}, ${STILBAAI.lon}`;
-    alert("Stilbaai coords ingevul ✅");
-  }
-
-  function openTideTable(){
-    const q = encodeURIComponent("Stilbaai tide times today");
-    window.open(`https://www.google.com/search?q=${q}`, "_blank");
-  }
-
-  function openMap(coordStr){
-    const p = parseCoords(coordStr);
-    if(!p){ alert("Koördinate lyk nie reg nie."); return; }
-    window.open(`https://www.google.com/maps?q=${encodeURIComponent(p.lat + "," + p.lon)}`, "_blank");
-  }
-  function directionsTo(coordStr){
-    const p = parseCoords(coordStr);
-    if(!p){ alert("Koördinate lyk nie reg nie."); return; }
-    window.open(`https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.lat + "," + p.lon)}`, "_blank");
-  }
-
-  function buildShareText(c){
-    const lines = [];
-    lines.push(`🎣 Tanya Sea App`);
-    lines.push(`🐟 Spesie: ${c.species || ""}`);
-    if(c.place) lines.push(`📍 Plek: ${c.place}`);
-    if(c.coords) lines.push(`🧭 Coords: ${c.coords}`);
-    if(c.length) lines.push(`📏 Lengte: ${c.length} cm`);
-    if(c.weight) lines.push(`⚖️ Gewig: ${c.weight} kg`);
-    if(c.trip) lines.push(`🧳 Trip: ${c.trip}`);
-    if(c.tideNote) lines.push(`🌊 Gety: ${c.tideNote}`);
-    if(c.windDir) lines.push(`🌬 Wind: ${c.windDir}`);
-    if(c.waterTemp) lines.push(`🌡 Water: ${c.waterTemp}°C`);
-    if(c.moon) lines.push(`🌙 Moon: ${c.moon}`);
-    if(c.tideType) lines.push(`🌊 Tide type: ${c.tideType}`);
-    if(c.date) lines.push(`📅 Datum: ${c.date}`);
-    if(c.coords) lines.push(`🗺 Maps: https://www.google.com/maps?q=${encodeURIComponent(c.coords)}`);
-    if(c.notes) lines.push(`📝 Notes: ${c.notes}`);
-    return lines.join("\n");
-  }
-
-  async function shareCatch(id){
-    const data = getAll();
-    const c = data.find(x => String(x.id)===String(id));
-    if(!c){ alert("Catch nie gevind nie."); return; }
-
-    const text = buildShareText(c);
-
-    if(navigator.share){
-      try{
-        if(c.photo){
-          const blob = await (await fetch(c.photo)).blob();
-          const file = new File([blob], "catch.jpg", { type: blob.type || "image/jpeg" });
-          await navigator.share({ title:"Tanya Sea App", text, files:[file] });
-        }else{
-          await navigator.share({ title:"Tanya Sea App", text });
-        }
-        return;
-      }catch{}
+    function parseCoords(s){
+      if(!s) return null;
+      const parts = String(s).split(",").map(x=>x.trim());
+      if(parts.length < 2) return null;
+      const lat = Number(parts[0]);
+      const lon = Number(parts[1]);
+      if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return {lat, lon};
     }
 
-    const wa = `https://wa.me/?text=${encodeURIComponent(text)}`;
-    window.open(wa, "_blank");
-  }
+    function getTripsFromData(all){
+      const set = new Set();
+      all.forEach(c=>{
+        const t = (c.trip || "").trim();
+        if(t) set.add(t);
+      });
+      return Array.from(set).sort((a,b)=>a.localeCompare(b));
+    }
 
-  async function handlePhotoPreview(e){
-    const file = e?.target?.files?.[0];
-    if(!file) return;
-    try{
-      const url = await fileToDataUrl(file);
-      photoPreview.innerHTML = `<img class="preview" src="${url}" alt="preview">`;
-    }catch{
+    function filteredData(){
+      const all = getAll();
+      if(activeTrip === "ALL") return all;
+      return all.filter(c => String(c.trip || "No Trip") === String(activeTrip));
+    }
+
+    function updateTripLabels(){
+      const label = (activeTrip === "ALL") ? "ALL trips" : `Trip: ${activeTrip}`;
+      if(tripNow) tripNow.textContent = label;
+      if(mapTripLabel) mapTripLabel.textContent = "Filter: " + label;
+      if(heatTripLabel) heatTripLabel.textContent = "Filter: " + label;
+      if(statsTripLabel) statsTripLabel.textContent = "Filter: " + label;
+    }
+
+    function fillTripUI(){
+      const all = getAll();
+      const trips = getTripsFromData(all);
+
+      // Add dropdown
+      if(trip){
+        let html = `<option value="">Choose trip...</option>`;
+        trips.forEach(t => { html += `<option value="${esc(t)}">${esc(t)}</option>`; });
+        trip.innerHTML = html;
+      }
+
+      // Filter dropdown
+      if(tripFilter){
+        const current = activeTrip;
+        let html = `<option value="ALL">ALL trips</option>`;
+        trips.forEach(t => { html += `<option value="${esc(t)}">${esc(t)}</option>`; });
+        tripFilter.innerHTML = html;
+
+        if(current === "ALL") tripFilter.value = "ALL";
+        else if(trips.includes(current)) tripFilter.value = current;
+        else { activeTrip = "ALL"; tripFilter.value = "ALL"; }
+      }
+
+      updateTripLabels();
+    }
+
+    function setTripFilter(val){
+      activeTrip = val || "ALL";
+      updateTripLabels();
+      if(currentTab === "log") loadLog();
+      if(currentTab === "mapTab") renderMap();
+      if(currentTab === "heat") renderHeat();
+      if(currentTab === "stats") renderStats();
+    }
+
+    function updateMinHint(){
+      const sp = species.value;
+      const min = MIN_SIZE_CM[sp];
+      minHint.innerHTML = Number.isFinite(min)
+        ? `Min size: <span class="chip warn">${min}cm</span>`
+        : `Min size: <span class="chip">—</span>`;
+    }
+
+    function resetForm(){
+      species.value = "";
+      trip.value = "";
+      place.value = "";
+      coords.value = "";
+      length.value = "";
+      windDir.value = "";
+      waterTemp.value = "";
+      notes.value = "";
+      photoDataUrl = "";
       photoPreview.innerHTML = "";
-    }
-  }
-  camInput.addEventListener("change", handlePhotoPreview);
-  galInput.addEventListener("change", handlePhotoPreview);
-
-  function rebuildTripFilters(){
-    const data = getAll();
-    const trips = Array.from(new Set(
-      data.map(c => String(c.trip || "").trim()).filter(Boolean)
-    )).sort();
-
-    const fill = (sel) => {
-      const current = sel.value || "ALL";
-      sel.innerHTML = `<option value="ALL">All trips</option>` + trips.map(t => `<option value="${esc(t)}">${esc(t)}</option>`).join("");
-      sel.value = trips.includes(current) ? current : "ALL";
-    };
-
-    fill(tripFilter);
-    fill(tripFilterMap);
-    fill(tripFilterStats);
-  }
-
-  function filteredData(which){
-    const data = getAll();
-    const f = which === "log" ? tripFilter.value
-            : which === "map" ? tripFilterMap.value
-            : which === "stats" ? tripFilterStats.value
-            : "ALL";
-    if(!f || f==="ALL") return data;
-    return data.filter(c => String(c.trip || "").trim() === f);
-  }
-
-  async function saveCatch(){
-    const s = species.value.trim();
-    if(!s){
-      alert("Kies eers 'n spesie.");
-      return;
+      if(camInput) camInput.value = "";
+      if(galInput) galInput.value = "";
+      updateMinHint();
     }
 
-    const mi = moonInfo(new Date());
-    const data = getAll();
-
-    let photo = "";
-    try{
-      const f = camInput.files?.[0] || galInput.files?.[0] || null;
-      if(f) photo = await fileToDataUrl(f);
-    }catch{ photo=""; }
-
-    const entry = {
-      id: String(Date.now()),
-      species: s,
-      place: place.value.trim(),
-      trip: trip.value.trim(),
-      coords: coords.value.trim(),
-      length: length.value.trim(),
-      weight: weight.value.trim(),
-      tideNote: tideNote.value.trim(),
-      windDir: (windDir.value || "").trim(),
-      waterTemp: waterTemp.value.trim(),
-      notes: notes.value.trim(),
-      photo,
-      moon: mi.name,
-      tideType: mi.tide,
-      date: new Date().toLocaleDateString()
-    };
-
-    data.push(entry);
-    saveAll(data);
-
-    species.value = "";
-    place.value = "";
-    trip.value = "";
-    coords.value = "";
-    length.value = "";
-    weight.value = "";
-    tideNote.value = "";
-    windDir.value = "";
-    waterTemp.value = "";
-    notes.value = "";
-    photoPreview.innerHTML = "";
-    camInput.value = "";
-    galInput.value = "";
-
-    alert("Saved ✅");
-    rebuildTripFilters();
-    showTab("log");
-  }
-
-  function loadLog(){
-    rebuildTripFilters();
-    const data = filteredData("log").slice().reverse();
-
-    if(!data.length){
-      logList.innerHTML = `<div class="card"><div class="mini">Nog geen vangste vir hierdie filter nie.</div></div>`;
-      return;
+    function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
     }
 
-    let html = "";
-    data.forEach(c => {
-      const title = esc(c.species || "Spesie");
-      const placeTxt = esc(c.place || "");
-      const tripTxt  = esc(c.trip || "");
-      const coordTxt = esc(c.coords || "");
-      const lenTxt   = esc(c.length || "");
-      const wTxt     = esc(c.weight || "");
-      const dTxt     = esc(c.date || "");
-      const moonTxt  = esc(c.moon || "");
-      const tideTxt  = esc(c.tideType || "");
-      const tideNoteTxt = esc(c.tideNote || "");
-      const windTxt = esc(c.windDir || "");
-      const tempTxt = esc(c.waterTemp || "");
-      const notesTxt = esc(c.notes || "");
+    async function handlePhotoPick(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        photoDataUrl = await fileToDataUrl(file);
+        photoPreview.innerHTML = `<img class="preview" src="${photoDataUrl}" alt="Photo preview">`;
+      }catch{
+        alert("Could not load photo.");
+      }
+    }
 
-      const metaPieces = [];
-      if(placeTxt) metaPieces.push(placeTxt);
-      if(lenTxt) metaPieces.push(`${lenTxt} cm`);
-      if(wTxt) metaPieces.push(`${wTxt} kg`);
-      if(tripTxt) metaPieces.push(`Trip: ${tripTxt}`);
-      metaPieces.push(dTxt);
+    camInput.addEventListener("change", handlePhotoPick);
+    galInput.addEventListener("change", handlePhotoPick);
 
-      html += `<div class="card">
-        <div class="entryTitle">${title}</div>
-        <div class="entryMeta">${metaPieces.join(" • ")}</div>
+    function openLens(){
+      // We can't auto-upload your photo to Lens (browser limitation),
+      // so we open Lens and you upload/pick the photo there.
+      window.open("https://lens.google.com/", "_blank");
+    }
 
-        <div>
-          ${moonTxt ? `<span class="chip">🌙 ${moonTxt}</span>` : ``}
-          ${tideTxt ? `<span class="chip">🌊 ${tideTxt}</span>` : ``}
-          ${tideNoteTxt ? `<span class="chip">⏱ ${tideNoteTxt}</span>` : ``}
-          ${windTxt ? `<span class="chip">🌬 ${windTxt}</span>` : ``}
-          ${tempTxt ? `<span class="chip">🌡 ${tempTxt}°C</span>` : ``}
-        </div>
+    function saveCatch(){
+      const sp = species.value.trim();
+      if(!sp){ alert("Please choose a species first."); return; }
 
-        ${coordTxt ? `
-          <div style="margin-top:10px;">
-            <div class="mini">📍 ${coordTxt}</div>
-            <div class="row" style="margin-top:8px;">
-              <button class="btn secondary" type="button" onclick="openMap('${esc(coordTxt).replaceAll("'","%27")}')">Maps</button>
-              <button class="btn secondary" type="button" onclick="directionsTo('${esc(coordTxt).replaceAll("'","%27")}')">Directions</button>
+      const lenNum = Number(String(length.value).replace(",", "."));
+      const min = MIN_SIZE_CM[sp];
+
+      if(Number.isFinite(min) && Number.isFinite(lenNum) && lenNum > 0 && lenNum < min){
+        const ok = confirm(`⚠️ ${sp} is ${lenNum}cm. Minimum is ${min}cm.\nSave anyway?`);
+        if(!ok) return;
+      }
+
+      const t = (trip.value || "").trim();
+      const data = getAll();
+
+      data.push({
+        id: Date.now(),
+        species: sp,
+        trip: t ? t : "No Trip",
+        place: place.value.trim(),
+        coords: coords.value.trim(),
+        length: length.value.trim(),
+        windDir: windDir.value.trim(),
+        waterTemp: waterTemp.value.trim(),
+        notes: notes.value.trim(),
+        photo: photoDataUrl,
+        date: new Date().toLocaleDateString()
+      });
+
+      saveAll(data);
+      fillTripUI();
+      resetForm();
+      showTab("log");
+    }
+
+    function deleteCatch(id){
+      const ok = confirm("Delete this catch?");
+      if(!ok) return;
+      const data = getAll().filter(c => String(c.id) !== String(id));
+      saveAll(data);
+      fillTripUI();
+      loadLog();
+      renderStats();
+      renderMap();
+      renderHeat();
+    }
+
+    function editCatch(id){
+      const data = getAll();
+      const idx = data.findIndex(c => String(c.id) === String(id));
+      if(idx === -1) return;
+      const c = data[idx];
+
+      const nSp = prompt("Species:", c.species || "");
+      if(nSp === null) return;
+
+      const nTrip = prompt("Trip:", c.trip || "No Trip");
+      if(nTrip === null) return;
+
+      const nPlace = prompt("Place:", c.place || "");
+      if(nPlace === null) return;
+
+      const nCoords = prompt("Coordinates (lat, lon):", c.coords || "");
+      if(nCoords === null) return;
+
+      const nLen = prompt("Length (cm):", c.length || "");
+      if(nLen === null) return;
+
+      c.species = String(nSp).trim();
+      c.trip    = (String(nTrip).trim() || "No Trip");
+      c.place   = String(nPlace).trim();
+      c.coords  = String(nCoords).trim();
+      c.length  = String(nLen).trim();
+
+      saveAll(data);
+      fillTripUI();
+      loadLog();
+      renderStats();
+      renderMap();
+      renderHeat();
+    }
+
+    function openMap(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){ alert("No valid coordinates."); return; }
+      const url = `https://www.google.com/maps?q=${encodeURIComponent(p.lat + "," + p.lon)}`;
+      window.open(url, "_blank");
+    }
+
+    function loadLog(){
+      const data = filteredData().slice().reverse();
+      list.innerHTML = "";
+
+      if(!data.length){
+        list.innerHTML = `<div class="card"><div class="mini">No catches for this Trip yet.</div></div>`;
+        return;
+      }
+
+      data.forEach(c => {
+        const title = esc(c.species);
+        const t = esc(c.trip || "No Trip");
+        const placeTxt = esc(c.place);
+        const lenTxt = esc(c.length);
+        const dateTxt = esc(c.date);
+        const coord = esc(c.coords);
+
+        list.innerHTML += `
+          <div class="card">
+            <div class="entryTitle">${title}</div>
+            <div class="entryMeta">
+              <span class="chip">${t}</span>
+              ${placeTxt ? placeTxt + " • " : ""}${lenTxt ? lenTxt + " cm • " : ""}${dateTxt}
             </div>
-          </div>
-        ` : ``}
 
-        ${c.photo ? `<img class="preview" src="${c.photo}" alt="photo">` : ``}
-        ${notesTxt ? `<div style="margin-top:10px;" class="mini">📝 ${notesTxt}</div>` : ``}
+            ${coord ? `<div class="mini" style="margin-top:8px;">📍 ${coord}</div>` : ``}
 
-        <div class="row" style="margin-top:12px;">
-          <button class="btn secondary" type="button" onclick="shareCatch('${c.id}')">📤 Share</button>
-          <button class="btn danger" type="button" onclick="deleteCatch('${c.id}')">Delete</button>
-        </div>
-      </div>`;
-    });
+            ${c.photo ? `<img class="preview" src="${c.photo}" alt="Photo">` : ""}
 
-    logList.innerHTML = html;
-  }
-
-  function deleteCatch(id){
-    const ok = confirm("Delete hierdie vang?");
-    if(!ok) return;
-    const data = getAll().filter(x => String(x.id) !== String(id));
-    saveAll(data);
-    rebuildTripFilters();
-    loadLog();
-    if(el("mapSec").style.display === "block") renderMap(true);
-    if(el("stats").style.display === "block") renderStats();
-  }
-
-  function resetAllData(){
-    const ok = confirm("Is jy seker? Dit delete AL jou data.");
-    if(!ok) return;
-    saveAll([]);
-    saveSpots([]);
-    rebuildTripFilters();
-    alert("Reset klaar ✅");
-    loadLog();
-    renderStats();
-    renderSpots();
-    if(mapInstance) renderMap(true);
-  }
-
-  // ===== MAP =====
-  function ensureMap(){
-    if(mapInstance) return;
-
-    mapInstance = L.map("map", { zoomControl:true }).setView([STILBAAI.lat, STILBAAI.lon], 11);
-    L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(mapInstance);
-
-    mapInstance.on("click", (e) => {
-      const lat = e.latlng.lat.toFixed(6);
-      const lon = e.latlng.lng.toFixed(6);
-
-      if(mapClickMarker){
-        try{ mapInstance.removeLayer(mapClickMarker); }catch{}
-      }
-
-      const popupHtml = `
-        <div style="font-weight:1000;margin-bottom:6px;">📍 Gekies</div>
-        <div style="font-size:12px;opacity:.85;margin-bottom:8px;">${lat}, ${lon}</div>
-        <button onclick="useCoordsFromMap('${lat}','${lon}')">Use coords</button>
-        <button onclick="saveSpotFromMap('${lat}','${lon}')">Save spot ⭐</button>
-      `;
-
-      mapClickMarker = L.marker([lat, lon]).addTo(mapInstance).bindPopup(popupHtml).openPopup();
-    });
-  }
-
-  function renderMap(force=false){
-    rebuildTripFilters();
-    ensureMap();
-
-    const data = filteredData("map");
-
-    mapMarkers.forEach(m => { try{ mapInstance.removeLayer(m); }catch{} });
-    mapMarkers = [];
-
-    if(heatLayer){ try{ mapInstance.removeLayer(heatLayer); }catch{} heatLayer=null; }
-
-    const heatPts = [];
-
-    data.forEach(c => {
-      const p = parseCoords(c.coords);
-      if(!p) return;
-
-      const popup =
-        `<div style="font-weight:1000;margin-bottom:6px;">${esc(c.species||"")}</div>
-         <div style="font-size:12px;opacity:.85;margin-bottom:8px;">${esc(c.place||"")} • ${esc(c.length||"")} cm • ${esc(c.date||"")}</div>
-         <button onclick="openMap('${esc(c.coords).replaceAll("'","%27")}')">Maps</button>
-         <button onclick="directionsTo('${esc(c.coords).replaceAll("'","%27")}')">Directions</button>`;
-
-      const m = L.marker([p.lat, p.lon]).addTo(mapInstance).bindPopup(popup);
-      mapMarkers.push(m);
-
-      let intensity = 0.6;
-      const Lcm = Number(String(c.length || "").replace(",","."));
-      if(Number.isFinite(Lcm) && Lcm > 0) intensity = Math.min(1.0, 0.4 + (Lcm / 150));
-      heatPts.push([p.lat, p.lon, intensity]);
-    });
-
-    if(heatPts.length){
-      heatLayer = L.heatLayer(heatPts, { radius: 28, blur: 20, maxZoom: 17 });
-      if(heatOn) heatLayer.addTo(mapInstance);
-    }
-
-    if(force) fitAll();
-  }
-
-  function toggleHeat(){
-    heatOn = !heatOn;
-    if(!heatLayer){ renderMap(true); return; }
-    if(heatOn) heatLayer.addTo(mapInstance);
-    else { try{ mapInstance.removeLayer(heatLayer); }catch{} }
-  }
-
-  function fitAll(){
-    if(!mapInstance) return;
-    const data = filteredData("map");
-    const pts = data.map(c => parseCoords(c.coords)).filter(Boolean);
-    if(!pts.length){
-      mapInstance.setView([STILBAAI.lat, STILBAAI.lon], 11);
-      return;
-    }
-    const bounds = L.latLngBounds(pts.map(p => [p.lat, p.lon]));
-    mapInstance.fitBounds(bounds.pad(0.25));
-  }
-
-  function useCoordsFromMap(lat, lon){
-    coords.value = `${lat}, ${lon}`;
-    alert("Coords ingevul ✅");
-    showTab("add");
-  }
-
-  function saveSpotFromMap(lat, lon){
-    const name = prompt("Spot naam (bv. Die Punt 1):", place.value.trim() || "My Spot");
-    if(name === null) return;
-
-    const spots = getSpots();
-    spots.push({ id: String(Date.now()), name: String(name).trim() || "My Spot", coords: `${lat}, ${lon}` });
-    saveSpots(spots);
-
-    alert("Spot saved ⭐");
-  }
-
-  function renderStats(){
-    rebuildTripFilters();
-    const data = filteredData("stats");
-    if(!data.length){
-      statsBox.innerHTML = `<div class="mini">Nog geen data vir hierdie filter nie.</div>`;
-      return;
-    }
-
-    const bySpecies = {};
-    data.forEach(c => {
-      const s = (c.species || "Onbekend").trim();
-      if(!bySpecies[s]) bySpecies[s] = { count:0, best:0, sum:0, n:0 };
-      bySpecies[s].count++;
-      const Lcm = Number(String(c.length || "").replace(",","."));
-      if(Number.isFinite(Lcm) && Lcm > 0){
-        bySpecies[s].sum += Lcm;
-        bySpecies[s].n += 1;
-        if(Lcm > bySpecies[s].best) bySpecies[s].best = Lcm;
-      }
-    });
-
-    const rows = Object.keys(bySpecies).map(s => {
-      const x = bySpecies[s];
-      const avg = x.n ? (x.sum/x.n) : NaN;
-      return { s, count:x.count, best:x.best, avg };
-    }).sort((a,b)=> b.count - a.count);
-
-    let html = "";
-    rows.forEach(r => {
-      const avgTxt = Number.isFinite(r.avg) ? `${fmt(r.avg,1)} cm avg` : "—";
-      const bestTxt = r.best ? `${fmt(r.best,0)} cm best` : "—";
-      html += `<div class="card" style="margin:10px 0;">
-        <div style="font-weight:1100;">🐟 ${esc(r.s)}</div>
-        <div class="mini" style="margin-top:6px;">
-          Catches: <b>${r.count}</b> • ${avgTxt} • ${bestTxt}
-        </div>
-      </div>`;
-    });
-
-    statsBox.innerHTML = html;
-  }
-
-  function saveSpotFromAdd(){
-    const p = parseCoords(coords.value);
-    if(!p){ alert("Vul coords eers (Kry GPS) of tik coords in."); return; }
-    const name = (place.value.trim() || trip.value.trim() || "My Spot").trim();
-    const spots = getSpots();
-    spots.push({ id: String(Date.now()), name, coords: `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}` });
-    saveSpots(spots);
-    alert("Spot saved ⭐");
-  }
-
-  function saveSpotManual(){
-    const p = parseCoords(coords.value);
-    if(!p){ alert("Vul coords in die coords veld (of druk Kry GPS)."); return; }
-    const name = (spotName.value || place.value || "My Spot").trim();
-    if(!name){ alert("Gee spot 'n naam."); return; }
-    const spots = getSpots();
-    spots.push({ id: String(Date.now()), name, coords: `${p.lat.toFixed(6)}, ${p.lon.toFixed(6)}` });
-    saveSpots(spots);
-    spotName.value = "";
-    renderSpots();
-    alert("Spot saved ⭐");
-  }
-
-  function renderSpots(){
-    const spots = getSpots().slice().reverse();
-    if(!spots.length){
-      spotList.innerHTML = `<div class="card"><div class="mini">Nog geen favourite spots nie.</div></div>`;
-      return;
-    }
-
-    let html = "";
-    spots.forEach(s=>{
-      html += `<div class="card">
-        <div class="entryTitle">⭐ ${esc(s.name)}</div>
-        <div class="mini">📍 ${esc(s.coords)}</div>
-        <div class="row" style="margin-top:10px;">
-          <button class="btn secondary" type="button" onclick="openMap('${esc(s.coords).replaceAll("'","%27")}')">Maps</button>
-          <button class="btn secondary" type="button" onclick="directionsTo('${esc(s.coords).replaceAll("'","%27")}')">Directions</button>
-          <button class="btn danger" type="button" onclick="deleteSpot('${esc(s.id).replaceAll("'","%27")}')">Delete</button>
-        </div>
-      </div>`;
-    });
-
-    spotList.innerHTML = html;
-  }
-
-  function deleteSpot(id){
-    const ok = confirm("Delete hierdie spot?");
-    if(!ok) return;
-    const spots = getSpots().filter(x => String(x.id) !== String(id));
-    saveSpots(spots);
-    renderSpots();
-  }
-
-  function maxOf(arr){
-    let m = -Infinity;
-    for(const v of arr){ if(Number.isFinite(v) && v > m) m = v; }
-    return (m === -Infinity) ? NaN : m;
-  }
-  function avgOf(arr){
-    let s = 0, n = 0;
-    for(const v of arr){ if(Number.isFinite(v)){ s += v; n++; } }
-    return n ? (s/n) : NaN;
-  }
-  function seaScore(waveMax, swellMax, windMax){
-    const w = Number.isFinite(waveMax) ? waveMax : 2;
-    const s = Number.isFinite(swellMax) ? swellMax : 2;
-    const wi = Number.isFinite(windMax) ? windMax : 40;
-    const penalty = (w*35) + (s*25) + (wi*1.2);
-    return Math.round(Math.max(0, Math.min(100, 100 - penalty)));
-  }
-
-  async function fetchSeaDays(){
-    const p = parseCoords(coords.value) || STILBAAI;
-    seaBox.innerHTML = `<div class="mini">Laai 14-dae see forecast...</div>`;
-
-    try{
-      const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
-
-      const weatherUrl =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
-
-      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if(!mRes.ok) throw new Error("Marine fetch fail");
-      if(!wRes.ok) throw new Error("Wind fetch fail");
-
-      const m = await mRes.json();
-      const w = await wRes.json();
-
-      const time  = m?.hourly?.time || [];
-      const wave  = m?.hourly?.wave_height || [];
-      const swell = m?.hourly?.swell_wave_height || [];
-      const sst   = m?.hourly?.sea_surface_temperature || [];
-      const wind  = w?.hourly?.windspeed_10m || [];
-
-      const days = {};
-      for(let i=0;i<time.length;i++){
-        const day = String(time[i]).slice(0,10);
-        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[] };
-        if(Number.isFinite(wave[i]))  days[day].wave.push(wave[i]);
-        if(Number.isFinite(swell[i])) days[day].swell.push(swell[i]);
-        if(Number.isFinite(wind[i]))  days[day].wind.push(wind[i]);
-        if(Number.isFinite(sst[i]))   days[day].sst.push(sst[i]);
-      }
-
-      const rows = Object.keys(days).map(day => {
-        const d = days[day];
-        const waveMax  = maxOf(d.wave);
-        const swellMax = maxOf(d.swell);
-        const windMax  = maxOf(d.wind);
-        const sstAvg   = avgOf(d.sst);
-        const score    = seaScore(waveMax, swellMax, windMax);
-        return { day, waveMax, swellMax, windMax, sstAvg, score };
-      }).sort((a,b)=>b.score - a.score);
-
-      let html = "";
-      rows.forEach((r, idx) => {
-        const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
-        const grade = r.score >= 80 ? "✅ Kalm" : r.score >= 65 ? "👌 OK" : r.score >= 50 ? "⚠️ Rough" : "❌ Sleg";
-        html += `
-          <div class="card" style="margin:10px 0;">
-            <div style="font-weight:1100;">
-              ${medal} ${esc(r.day)} • <span class="chip">${grade}</span> <span class="chip">Score ${r.score}</span>
-            </div>
-            <div style="margin-top:8px;">
-              🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
-              💨 Wind max: <b>${fmt(r.windMax)} km/h</b>
-              ${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
+            <div class="entryActions">
+              ${c.coords ? `<button type="button" onclick="openMap('${esc(c.coords)}')">🧭 Maps</button>` : ""}
+              <button type="button" onclick="editCatch(${c.id})">✏️ Edit</button>
+              <button type="button" class="danger" onclick="deleteCatch(${c.id})">🗑 Delete</button>
             </div>
           </div>
         `;
       });
-
-      seaBox.innerHTML = html || `<div class="mini">Geen data terug nie.</div>`;
-    }catch{
-      seaBox.innerHTML = `<div class="mini">Kon nie forecast laai nie. Check internet en probeer weer.</div>`;
     }
-  }
 
-  // ===== V16: BEST BITE TIMES =====
-  function hourKey(iso){ return String(iso||"").replace("T"," ").slice(0,16); }
-
-  function dawnDuskBonus(hour){
-    // bonus vir 05:00-08:00 en 17:00-20:00
-    if(hour >= 5 && hour <= 8) return 10;
-    if(hour >= 17 && hour <= 20) return 10;
-    return 0;
-  }
-
-  function tideMoonBonus(){
-    const mi = moonInfo(new Date());
-    let b = 0;
-    if(mi.tide.includes("Spring")) b += 10;
-    if(mi.name.includes("Full") || mi.name.includes("New")) b += 6;
-    return b;
-  }
-
-  function biteHourlyScore(wave, swell, wind, hour){
-    // begin met 100 en trek penalties af
-    const w = Number.isFinite(wave) ? wave : 2;
-    const s = Number.isFinite(swell) ? swell : 2;
-    const wi = Number.isFinite(wind) ? wind : 35;
-
-    let score = 100;
-    score -= w * 30;     // wave penalty
-    score -= s * 22;     // swell penalty
-    score -= wi * 1.0;   // wind penalty
-
-    score += dawnDuskBonus(hour);
-    score += tideMoonBonus();
-
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    return score;
-  }
-
-  function groupWindows(items){
-    // items: [{t:Date, score, wave, swell, wind}]
-    // maak windows waar score>=70
-    const good = items.filter(x => x.score >= 70).sort((a,b)=>a.t-b.t);
-    const out = [];
-    let cur = null;
-
-    for(const it of good){
-      if(!cur){
-        cur = { start: it.t, end: it.t, best: it.score, avg: it.score, n:1 };
-      }else{
-        const diffH = (it.t - cur.end) / (1000*60*60);
-        if(diffH <= 1.01){
-          cur.end = it.t;
-          cur.best = Math.max(cur.best, it.score);
-          cur.avg += it.score; cur.n += 1;
-        }else{
-          cur.avg = Math.round(cur.avg / cur.n);
-          out.push(cur);
-          cur = { start: it.t, end: it.t, best: it.score, avg: it.score, n:1 };
-        }
-      }
+    function clearAll(){
+      const ok = confirm("This will delete ALL catches. Continue?");
+      if(!ok) return;
+      saveAll([]);
+      activeTrip = "ALL";
+      fillTripUI();
+      loadLog();
+      renderStats();
+      renderMap();
+      renderHeat();
+      alert("Fish log cleared ✅");
     }
-    if(cur){
-      cur.avg = Math.round(cur.avg / cur.n);
-      out.push(cur);
-    }
-    // sorteer op best/avg en lengte
-    out.sort((a,b)=> (b.best - a.best) || (b.avg - a.avg) || ((b.n) - (a.n)));
-    return out;
-  }
 
-  function fmtHM(d){
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mm = String(d.getMinutes()).padStart(2,"0");
-    return `${hh}:${mm}`;
-  }
-  function fmtDay(d){
-    const y = d.getFullYear();
-    const m = String(d.getMonth()+1).padStart(2,"0");
-    const dd = String(d.getDate()).padStart(2,"0");
-    return `${y}-${m}-${dd}`;
-  }
-
-  async function fetchBiteTimes(){
-    const p = parseCoords(coords.value) || STILBAAI;
-    biteBox.innerHTML = `<div class="mini">Bereken beste bite times (48 uur)…</div>`;
-
-    try{
-      const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=wave_height,swell_wave_height&timezone=Africa%2FJohannesburg&forecast_days=3`;
-
-      const weatherUrl =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=3`;
-
-      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if(!mRes.ok) throw new Error("Marine fetch fail");
-      if(!wRes.ok) throw new Error("Wind fetch fail");
-
-      const m = await mRes.json();
-      const w = await wRes.json();
-
-      const time  = m?.hourly?.time || [];
-      const wave  = m?.hourly?.wave_height || [];
-      const swell = m?.hourly?.swell_wave_height || [];
-      const wind  = w?.hourly?.windspeed_10m || [];
-
-      const now = new Date();
-      const end = new Date(now.getTime() + 48*60*60*1000);
-
-      const items = [];
-      for(let i=0;i<time.length;i++){
-        const t = new Date(String(time[i]));
-        if(t < now) continue;
-        if(t > end) break;
-
-        const hour = t.getHours();
-        const sc = biteHourlyScore(wave[i], swell[i], wind[i], hour);
-
-        items.push({ t, score: sc, wave: wave[i], swell: swell[i], wind: wind[i] });
-      }
-
-      if(!items.length){
-        biteBox.innerHTML = `<div class="mini">Geen hourly data terug nie.</div>`;
+    function renderStats(){
+      const data = filteredData();
+      if(!data.length){
+        statsBox.innerHTML = `<div class="mini">No stats for this Trip.</div>`;
         return;
       }
 
-      // Top 6 hours
-      const topHours = items.slice().sort((a,b)=>b.score-a.score).slice(0,6);
+      const counts = {};
+      let biggest = {len: -1, species:"", place:""};
 
-      // Best windows
-      const windows = groupWindows(items).slice(0,3);
+      data.forEach(c=>{
+        const sp = c.species || "Unknown";
+        counts[sp] = (counts[sp] || 0) + 1;
 
-      const mi = moonInfo(new Date());
-      let html = `
-        <div class="chip">🌙 ${esc(mi.name)}</div>
-        <div class="chip">🌊 ${esc(mi.tide)}</div>
-        <div class="mini" style="margin-top:8px;">Top ure is bereken vir jou coords.</div>
+        const ln = Number(String(c.length||"").replace(",","."));
+        if(Number.isFinite(ln) && ln > biggest.len){
+          biggest = {len: ln, species: sp, place: c.place || ""};
+        }
+      });
+
+      const lines = Object.keys(counts)
+        .sort((a,b)=>counts[b]-counts[a])
+        .map(sp => `<div class="chip">${esc(sp)}: ${counts[sp]}</div>`)
+        .join(" ");
+
+      statsBox.innerHTML = `
+        <div><span class="chip good">Total: ${data.length}</span></div>
+        <div style="margin-top:10px;">${lines}</div>
+        <div style="margin-top:12px;" class="mini">
+          Biggest: <b>${esc(biggest.species)}</b> ${Number.isFinite(biggest.len)?`(${biggest.len}cm)`:""} ${biggest.place?`• ${esc(biggest.place)}`:""}
+        </div>
       `;
+    }
 
-      if(windows.length){
-        html += `<div style="margin-top:12px;font-weight:1100;">🏆 Beste windows</div>`;
-        windows.forEach((w, idx) => {
-          const sameDay = fmtDay(w.start) === fmtDay(w.end);
-          const range = sameDay
-            ? `${fmtDay(w.start)} • ${fmtHM(w.start)}–${fmtHM(new Date(w.end.getTime()+60*60*1000))}`
-            : `${fmtDay(w.start)} ${fmtHM(w.start)} → ${fmtDay(w.end)} ${fmtHM(new Date(w.end.getTime()+60*60*1000))}`;
-          const medal = idx===0?"🥇":idx===1?"🥈":"🥉";
+    // --- MAP + Satellite toggle ---
+    let mapInstance = null;
+    let layerOSM = null;
+    let layerSAT = null;
+    let isSat = false;
+    let markers = [];
+
+    function ensureMap(){
+      if(mapInstance) return;
+      mapInstance = L.map("map", { zoomControl: true }).setView([STILBAAI.lat, STILBAAI.lon], 10);
+
+      layerOSM = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, attribution: "© OpenStreetMap"
+      });
+
+      layerSAT = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, attribution: "Tiles © Esri" }
+      );
+
+      layerOSM.addTo(mapInstance);
+      isSat = false;
+      satState.textContent = "OFF";
+    }
+
+    function clearMarkers(){
+      markers.forEach(m => m.remove());
+      markers = [];
+    }
+
+    function renderMap(){
+      ensureMap();
+      clearMarkers();
+
+      const data = filteredData();
+      const points = [];
+
+      data.forEach(c=>{
+        const p = parseCoords(c.coords);
+        if(!p) return;
+
+        const label = `${c.species || ""}${c.trip ? " • " + c.trip : ""}${c.place ? " • " + c.place : ""}${c.length ? " • " + c.length + "cm" : ""}`;
+        const m = L.marker([p.lat, p.lon]).addTo(mapInstance).bindPopup(esc(label));
+        markers.push(m);
+        points.push([p.lat, p.lon]);
+      });
+
+      if(points.length){
+        const b = L.latLngBounds(points);
+        mapInstance.fitBounds(b.pad(0.2));
+      }
+    }
+
+    function toggleSatellite(){
+      ensureMap();
+      if(!isSat){
+        mapInstance.removeLayer(layerOSM);
+        layerSAT.addTo(mapInstance);
+        isSat = true;
+        satState.textContent = "ON";
+      }else{
+        mapInstance.removeLayer(layerSAT);
+        layerOSM.addTo(mapInstance);
+        isSat = false;
+        satState.textContent = "OFF";
+      }
+    }
+
+    // --- HEATMAP ---
+    let heatMapInstance = null;
+    let heatLayerOSM = null;
+    let heatLayerSAT = null;
+    let heatIsSat = false;
+    let heatLayer = null;
+
+    function ensureHeatMap(){
+      if(heatMapInstance) return;
+      heatMapInstance = L.map("heatMap", { zoomControl: true }).setView([STILBAAI.lat, STILBAAI.lon], 10);
+
+      heatLayerOSM = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19, attribution: "© OpenStreetMap"
+      });
+
+      heatLayerSAT = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19, attribution: "Tiles © Esri" }
+      );
+
+      heatLayerOSM.addTo(heatMapInstance);
+      heatIsSat = false;
+      heatSatState.textContent = "OFF";
+    }
+
+    function renderHeat(){
+      ensureHeatMap();
+      if(heatLayer){
+        heatLayer.remove();
+        heatLayer = null;
+      }
+
+      const data = filteredData();
+      const points = [];
+
+      data.forEach(c=>{
+        const p = parseCoords(c.coords);
+        if(!p) return;
+        // intensity: make longer fish "hotter" if length is present
+        const ln = Number(String(c.length||"").replace(",","."));
+        const intensity = Number.isFinite(ln) ? Math.min(1, Math.max(0.35, ln / 120)) : 0.55;
+        points.push([p.lat, p.lon, intensity]);
+      });
+
+      if(!points.length){
+        // no points: keep view at Stilbaai
+        heatMapInstance.setView([STILBAAI.lat, STILBAAI.lon], 10);
+        return;
+      }
+
+      heatLayer = L.heatLayer(points, { radius: 28, blur: 20, maxZoom: 17 }).addTo(heatMapInstance);
+
+      const b = L.latLngBounds(points.map(p => [p[0], p[1]]));
+      heatMapInstance.fitBounds(b.pad(0.2));
+    }
+
+    function toggleHeatSatellite(){
+      ensureHeatMap();
+      if(!heatIsSat){
+        heatMapInstance.removeLayer(heatLayerOSM);
+        heatLayerSAT.addTo(heatMapInstance);
+        heatIsSat = true;
+        heatSatState.textContent = "ON";
+      }else{
+        heatMapInstance.removeLayer(heatLayerSAT);
+        heatLayerOSM.addTo(heatMapInstance);
+        heatIsSat = false;
+        heatSatState.textContent = "OFF";
+      }
+    }
+
+    // --- GPS ---
+    function getGPS(){
+      if(!navigator.geolocation){
+        alert("GPS is not supported on this browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude.toFixed(6);
+          const lon = pos.coords.longitude.toFixed(6);
+          coords.value = `${lat}, ${lon}`;
+        },
+        (err) => {
+          alert("Could not get GPS: " + (err && err.message ? err.message : "Unknown error"));
+        },
+        { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
+      );
+    }
+
+    function useStilbaai(){
+      coords.value = `${STILBAAI.lat.toFixed(6)}, ${STILBAAI.lon.toFixed(6)}`;
+      alert("Set to Stilbaai ✅");
+    }
+
+    // --- Moon phase (simple but reliable enough) ---
+    function getMoonPhaseName(date){
+      // Simple moon phase approximation
+      const lp = 2551443; // lunar period seconds
+      const newMoon = new Date(Date.UTC(1970,0,7,20,35,0));
+      const phase = ((date.getTime() - newMoon.getTime())/1000) % lp;
+      const day = Math.floor(phase / (24*3600)) + 1;
+
+      if(day <= 1) return "New Moon";
+      if(day < 7)  return "Waxing Crescent";
+      if(day < 9)  return "First Quarter";
+      if(day < 15) return "Waxing Gibbous";
+      if(day < 17) return "Full Moon";
+      if(day < 22) return "Waning Gibbous";
+      if(day < 24) return "Last Quarter";
+      return "Waning Crescent";
+    }
+
+    function tideTypeFromMoon(phaseName){
+      // Approx tide strength:
+      // New/Full => Spring; Quarters => Neap; others => Mid
+      if(phaseName === "New Moon" || phaseName === "Full Moon") return "Spring Tide (strong)";
+      if(phaseName === "First Quarter" || phaseName === "Last Quarter") return "Neap Tide (weaker)";
+      return "Mid Tide (average)";
+    }
+
+    // --- Sea day scoring helpers ---
+    const fmt = (n) => Number.isFinite(n) ? (Math.round(n*10)/10).toString() : "—";
+
+    function maxOf(arr){
+      let m = -Infinity;
+      arr.forEach(x => { if(Number.isFinite(x) && x > m) m = x; });
+      return (m === -Infinity) ? NaN : m;
+    }
+    function avgOf(arr){
+      let s = 0, c = 0;
+      arr.forEach(x => { if(Number.isFinite(x)) { s += x; c++; } });
+      return c ? (s/c) : NaN;
+    }
+
+    // Score 0-100. Higher is calmer/better.
+    function seaScore(waveMax, swellMax, windMaxKmh){
+      // Weight waves & wind
+      // wave/swell: lower is better; wind: lower is better
+      const wavePenalty  = Number.isFinite(waveMax)  ? Math.min(60, waveMax  * 35) : 30;
+      const swellPenalty = Number.isFinite(swellMax) ? Math.min(40, swellMax * 22) : 20;
+      const windPenalty  = Number.isFinite(windMaxKmh) ? Math.min(60, windMaxKmh * 2.2) : 30;
+
+      // Base 100 - penalties (clamp)
+      let score = 100 - (wavePenalty * 0.55 + swellPenalty * 0.25 + windPenalty * 0.45);
+      score = Math.max(0, Math.min(100, Math.round(score)));
+      return score;
+    }
+
+    function gradeFromScore(score){
+      if(score >= 80) return { label:"✅ Calm", cls:"good" };
+      if(score >= 65) return { label:"👌 OK", cls:"warn" };
+      if(score >= 50) return { label:"⚠️ Rough", cls:"warn" };
+      return { label:"❌ Bad", cls:"bad" };
+    }
+
+    async function fetchSeaDays(){
+      const p = parseCoords(coords.value) || STILBAAI;
+      seaBox.innerHTML = `<div class="card"><div class="mini">Loading 14-day sea forecast...</div></div>`;
+
+      try{
+        const marineUrl =
+          `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+          `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+        const weatherUrl =
+          `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+          `&hourly=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+        const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+        if(!mRes.ok) throw new Error("Marine fetch failed");
+        if(!wRes.ok) throw new Error("Wind fetch failed");
+
+        const m = await mRes.json();
+        const w = await wRes.json();
+
+        const time  = m?.hourly?.time || [];
+        const wave  = m?.hourly?.wave_height || [];
+        const swell = m?.hourly?.swell_wave_height || [];
+        const sst   = m?.hourly?.sea_surface_temperature || [];
+        const wind  = w?.hourly?.windspeed_10m || [];
+        const wdir  = w?.hourly?.winddirection_10m || [];
+
+        const days = {};
+        for(let i=0;i<time.length;i++){
+          const day = String(time[i]).slice(0,10);
+          if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[], wdir:[] };
+          if(Number.isFinite(wave[i]))  days[day].wave.push(wave[i]);
+          if(Number.isFinite(swell[i])) days[day].swell.push(swell[i]);
+          if(Number.isFinite(wind[i]))  days[day].wind.push(wind[i]);
+          if(Number.isFinite(sst[i]))   days[day].sst.push(sst[i]);
+          if(Number.isFinite(wdir[i]))  days[day].wdir.push(wdir[i]);
+        }
+
+        const rows = Object.keys(days).map(day => {
+          const d = days[day];
+          const waveMax  = maxOf(d.wave);
+          const swellMax = maxOf(d.swell);
+          const windMax  = maxOf(d.wind);
+          const sstAvg   = avgOf(d.sst);
+          const score    = seaScore(waveMax, swellMax, windMax);
+
+          // Moon + approximate tide type
+          const moon = getMoonPhaseName(new Date(day + "T12:00:00"));
+          const tideType = tideTypeFromMoon(moon);
+
+          // wind direction rough (avg)
+          const wdirAvg = avgOf(d.wdir);
+          const windDirTxt = Number.isFinite(wdirAvg) ? degToCompass(wdirAvg) : "—";
+
+          return { day, waveMax, swellMax, windMax, sstAvg, score, moon, tideType, windDirTxt };
+        }).sort((a,b)=>b.score - a.score);
+
+        let html = "";
+        rows.forEach((r, idx) => {
+          const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
+          const g = gradeFromScore(r.score);
           html += `
-            <div class="card" style="margin:10px 0;">
-              <div style="font-weight:1100;">${medal} ${range}</div>
-              <div class="mini" style="margin-top:6px;">
-                Best score: <b>${w.best}</b> • Avg: <b>${w.avg}</b> • Ure: <b>${w.n}</b>
+            <div class="card">
+              <div style="font-weight:1000;">
+                ${medal} ${esc(r.day)}
+                <span class="chip ${g.cls}">${g.label}</span>
+                <span class="chip">Score ${r.score}</span>
+              </div>
+              <div style="margin-top:10px;">
+                🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
+                💨 Wind max: <b>${fmt(r.windMax)} km/h</b> • 🧭 Dir: <b>${esc(r.windDirTxt)}</b><br>
+                ${Number.isFinite(r.sstAvg) ? `🌡 Sea temp: <b>${fmt(r.sstAvg)}°C</b><br>` : ``}
+                🌙 Moon: <b>${esc(r.moon)}</b><br>
+                🌊 Tide (approx): <b>${esc(r.tideType)}</b>
               </div>
             </div>
           `;
         });
-      }else{
-        html += `<div class="mini" style="margin-top:10px;">Geen “kalm” windows (score ≥ 70) in 48 uur nie—kyk die Top ure hieronder.</div>`;
-      }
 
-      html += `<div style="margin-top:12px;font-weight:1100;">⏱ Top ure</div>`;
-      topHours.forEach(h => {
-        html += `
-          <div class="card" style="margin:10px 0;">
-            <div style="font-weight:1100;">${fmtDay(h.t)} • ${fmtHM(h.t)} <span class="chip">Score ${h.score}</span></div>
-            <div class="mini" style="margin-top:6px;">
-              🌊 Wave ${fmt(h.wave)}m • 🌀 Swell ${fmt(h.swell)}m • 💨 Wind ${fmt(h.wind,0)}km/h
+        seaBox.innerHTML = html || `<div class="card"><div class="mini">No forecast returned.</div></div>`;
+      }catch(e){
+        seaBox.innerHTML = `<div class="card"><div class="mini">Could not load forecast. Check internet and try again.</div></div>`;
+      }
+    }
+
+    function degToCompass(deg){
+      const dirs = ["N","NNE","NE","ENE","E","ESE","SE","SSE","S","SSW","SW","WSW","W","WNW","NW","NNW"];
+      const i = Math.round(((deg % 360) / 22.5)) % 16;
+      return dirs[i];
+    }
+
+    // --- Guide render ---
+    function renderGuide(){
+      const box = el("guideList");
+      if(!box) return;
+      box.innerHTML = "";
+      FISH_GUIDE.forEach(f=>{
+        box.innerHTML += `
+          <div class="card">
+            <div style="font-weight:1000;">${esc(f.name)}</div>
+            <div>
+              <span class="chip warn">Min: ${esc(f.min)}</span>
+              <span class="chip good">Bag: ${esc(f.bag)}</span>
             </div>
+            <div class="mini" style="margin-top:8px;">${esc(f.tip)}</div>
           </div>
         `;
       });
-
-      biteBox.innerHTML = html;
-    }catch{
-      biteBox.innerHTML = `<div class="mini">Kon nie bite times laai nie. Check internet en probeer weer.</div>`;
     }
-  }
 
-  // Exports for onclick
-  window.showTab = showTab;
-  window.getGPS = getGPS;
-  window.useStilbaai = useStilbaai;
-  window.openTideTable = openTideTable;
-  window.openMap = openMap;
-  window.directionsTo = directionsTo;
-
-  window.saveCatch = saveCatch;
-  window.deleteCatch = deleteCatch;
-  window.shareCatch = shareCatch;
-  window.resetAllData = resetAllData;
-
-  window.renderMap = renderMap;
-  window.toggleHeat = toggleHeat;
-  window.fitAll = fitAll;
-
-  window.fetchSeaDays = fetchSeaDays;
-  window.fetchBiteTimes = fetchBiteTimes;
-
-  window.saveSpotFromAdd = saveSpotFromAdd;
-  window.saveSpotManual = saveSpotManual;
-  window.renderSpots = renderSpots;
-  window.deleteSpot = deleteSpot;
-
-  window.useCoordsFromMap = useCoordsFromMap;
-  window.saveSpotFromMap = saveSpotFromMap;
-
-  // Start
-  refreshAutoInfo();
-  rebuildTripFilters();
-  showTab("add");
-
-  // service worker (optional)
-  try{
-    if("serviceWorker" in navigator){
-      navigator.serviceWorker.register("./sw.js").catch(()=>{});
+    // --- Tabs ---
+    function setActiveBtn(id){
+      const map = {
+        add:"btnAdd", log:"btnLog", mapTab:"btnMap", heat:"btnHeat",
+        sea:"btnSea", stats:"btnStats", guide:"btnGuide"
+      };
+      Object.keys(map).forEach(tab=>{
+        const b = el(map[tab]);
+        if(b) b.classList.toggle("active", tab === id);
+      });
     }
-  }catch{}
-})();
-</script>
 
+    function showTab(id){
+      currentTab = id;
+      // Hide all
+      ["add","log","mapTab","heat","sea","stats","guide"].forEach(t=>{
+        const sec = el(t);
+        if(sec) sec.style.display = "none";
+      });
+
+      const target = el(id);
+      if(target) target.style.display = "block";
+
+      setActiveBtn(id);
+      fillTripUI();
+
+      if(id === "log") loadLog();
+      if(id === "stats") renderStats();
+      if(id === "mapTab") renderMap();
+      if(id === "heat") renderHeat();
+      if(id === "guide") renderGuide();
+      if(id === "sea") fetchSeaDays();
+    }
+
+    // Expose for HTML onclick
+    window.showTab = showTab;
+    window.saveCatch = saveCatch;
+    window.deleteCatch = deleteCatch;
+    window.editCatch = editCatch;
+    window.clearAll = clearAll;
+    window.getGPS = getGPS;
+    window.openMap = openMap;
+    window.toggleSatellite = toggleSatellite;
+    window.toggleHeatSatellite = toggleHeatSatellite;
+    window.updateMinHint = updateMinHint;
+    window.resetForm = resetForm;
+    window.setTripFilter = setTripFilter;
+    window.fetchSeaDays = fetchSeaDays;
+    window.useStilbaai = useStilbaai;
+    window.openLens = openLens;
+
+    // Init
+    updateMinHint();
+    fillTripUI();
+    showTab("add");
+  })();
+  </script>
 </body>
-</html>
+        </html>
