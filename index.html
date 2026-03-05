@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<meta name="viewport" content="width=device-width,initial-scale=1" />
 <title>Tanya Sea App</title>
 
 <link rel="manifest" href="manifest.webmanifest">
@@ -18,7 +18,11 @@
   --muted:#9fb0d0;
   --accent:#4f8cff;
   --border:#20304d;
+  --danger:#ff4f6d;
+  --ok:#32d583;
+  --warn:#fdb022;
 }
+*{box-sizing:border-box}
 body{
   margin:0;
   font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
@@ -26,9 +30,31 @@ body{
   color:var(--text);
   padding:16px;
 }
-h2{margin:0 0 10px}
-h3{margin:0 0 10px}
-hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:14px 0}
+h1{margin:0 0 10px;font-size:18px}
+.small{font-size:12px;color:var(--muted)}
+.topnav{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  background:#0e1730;
+  padding:8px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  margin: 0 0 14px;
+}
+.navbtn{
+  border:none;
+  background:transparent;
+  padding:9px 14px;
+  border-radius:999px;
+  font-weight:900;
+  color:var(--text);
+  cursor:pointer;
+}
+.navbtn.active{
+  background:var(--accent);
+  color:#071022;
+}
 .card{
   background: linear-gradient(180deg, #122042 0%, var(--card) 100%);
   border: 1px solid var(--border);
@@ -42,470 +68,763 @@ label.small{
   margin: 10px 0 6px;
   color: var(--muted);
   font-size: 12px;
-  font-weight: 1000;
-  letter-spacing: .2px;
+  font-weight: 900;
+  letter-spacing:.2px;
 }
-input, select, textarea{
+input,select,textarea{
   width:100%;
   padding: 10px;
   border-radius: 12px;
   border: 1px solid var(--border);
   background: #0e1730;
   color: var(--text);
-  margin-bottom:10px;
-  box-sizing:border-box;
 }
-textarea{min-height:84px; resize:vertical}
-button{
+textarea{min-height:72px;resize:vertical}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row > *{flex:1}
+.btn{
   background: transparent;
   color: var(--text);
   border: 1px solid var(--border);
   padding: 10px 14px;
   border-radius: 999px;
   cursor: pointer;
-  font-weight: 1000;
+  font-weight: 900;
   transition: transform .06s ease, background .2s ease, border-color .2s ease;
+  user-select:none;
 }
-button:hover{ border-color: var(--accent); }
-button:active{ transform: scale(0.98); }
-.topnav{
+.btn:hover{border-color: var(--accent)}
+.btn:active{transform: scale(0.98)}
+.btn.primary{
+  background: rgba(79,140,255,0.18);
+  border-color: rgba(79,140,255,0.6);
+}
+.btn.danger{border-color: rgba(255,79,109,0.6); background: rgba(255,79,109,.10)}
+.chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.chip{
   display:inline-flex;
-  flex-wrap:wrap;
-  background:#0e1730;
-  padding:6px;
+  gap:6px;
+  align-items:center;
+  padding:6px 10px;
   border-radius:999px;
   border:1px solid var(--border);
-  gap:6px;
-  margin: 10px 0 16px;
-}
-.navbtn{
-  border:none;
-  background:transparent;
-  padding:8px 14px;
-  border-radius:999px;
-  font-weight:1100;
+  background: rgba(255,255,255,0.03);
+  font-size:12px;
+  font-weight:900;
   color:var(--text);
 }
-.navbtn.active{
-  background:var(--accent);
-  color:#071022;
-}
-.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
-.chipRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.chip{
-  display:inline-flex;align-items:center;gap:6px;
-  padding:6px 10px;border-radius:999px;
-  background: rgba(255,255,255,.06);
-  border:1px solid rgba(255,255,255,.10);
-  font-weight:1000;
-  font-size:12px;
-}
-.mini{color:var(--muted);font-size:12px;font-weight:900}
-.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
-@media (min-width:740px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
-img{max-width:100%;border-radius:12px}
+.chip.ok{border-color: rgba(50,213,131,.6); background: rgba(50,213,131,.10)}
+.chip.warn{border-color: rgba(253,176,34,.6); background: rgba(253,176,34,.10)}
+.chip.bad{border-color: rgba(255,79,109,.6); background: rgba(255,79,109,.10)}
+hr{border:none;border-top:1px solid rgba(255,255,255,.08);margin:12px 0}
 section{display:none}
-#map,#mapHeat{height:430px;border-radius:18px;border:1px solid var(--border);overflow:hidden}
-.entryTitle{font-weight:1100;font-size:16px}
-.entryMeta{color:var(--muted);font-size:12px;font-weight:900;margin-top:4px}
-.kpi{font-size:28px;font-weight:1100}
+#mapAdd,#mapMain{height:360px;border-radius:16px;overflow:hidden;border:1px solid var(--border)}
+.photo{
+  width:100%;
+  border-radius:14px;
+  border:1px solid rgba(255,255,255,.08);
+  margin-top:10px;
+}
+.grid{
+  display:grid;
+  grid-template-columns: repeat(2, minmax(0,1fr));
+  gap:10px;
+}
+.grid img{width:100%;height:160px;object-fit:cover;border-radius:14px;border:1px solid rgba(255,255,255,.08)}
+@media (min-width:720px){
+  body{max-width:980px;margin:0 auto;padding:20px}
+  .grid{grid-template-columns: repeat(3, minmax(0,1fr))}
+}
 </style>
 </head>
 
 <body>
-<h2>Tanya Sea App — V25 Pro Fishing Edition</h2>
+<h1>Tanya Sea App <span class="small">• Deep Sea Intelligence</span></h1>
 
 <div class="topnav">
-  <button class="navbtn" id="btnAdd" onclick="show('add')">Add Catch</button>
-  <button class="navbtn" id="btnLog" onclick="show('log')">Log</button>
-  <button class="navbtn" id="btnMap" onclick="show('map')">Map</button>
-  <button class="navbtn" id="btnHeat" onclick="show('heat')">Heatmap</button>
-  <button class="navbtn" id="btnTide" onclick="show('tide')">Tide</button>
-  <button class="navbtn" id="btnSea" onclick="show('sea')">Sea Days</button>
-  <button class="navbtn" id="btnGallery" onclick="show('gallery')">Gallery</button>
-  <button class="navbtn" id="btnIdentify" onclick="show('identify')">Identifier</button>
-  <button class="navbtn" id="btnStats" onclick="show('stats')">Stats</button>
+  <button class="navbtn" id="tAdd" onclick="showTab('add')">Add Catch</button>
+  <button class="navbtn" id="tLog" onclick="showTab('log')">Logbook</button>
+  <button class="navbtn" id="tMap" onclick="showTab('map')">Map</button>
+  <button class="navbtn" id="tSea" onclick="showTab('sea')">Sea</button>
+  <button class="navbtn" id="tSpots" onclick="showTab('spots')">Spots ⭐</button>
+  <button class="navbtn" id="tGallery" onclick="showTab('gallery')">Gallery</button>
+  <button class="navbtn" id="tAnalytics" onclick="showTab('analytics')">Analytics</button>
 </div>
 
 <section id="add">
   <div class="card">
-    <h3>Add Deep-Sea Catch</h3>
+    <div class="row" style="align-items:center">
+      <div>
+        <div style="font-weight:1000;font-size:16px">Add Deep Sea Catch</div>
+        <div class="small">Auto depth (GEBCO), swell/water temp (marine), wind (weather), tide/mood/drift estimates</div>
+      </div>
+      <div style="text-align:right">
+        <button class="btn" type="button" onclick="toggleSatellite()">🛰 Satellite: <span id="satStateA">OFF</span></button>
+      </div>
+    </div>
 
     <label class="small">Species</label>
-    <select id="species">
+    <select id="species" autocomplete="off" onchange="onSpeciesChange()">
       <option value="">Choose species…</option>
-      <option>Cape Kob</option>
-      <option>Yellowtail</option>
-      <option>Bonito</option>
-      <option>Red Roman</option>
+      <option>Kaapse Kabeljou</option>
+      <option>Geelstert</option>
+      <option>Bonnie</option>
+      <option>Rooi Roman</option>
       <option>Snapper</option>
       <option>Silver (Bastermeid)</option>
-      <option>Red Steenbras</option>
+      <option>Rooi Steenbras</option>
       <option>Yellow Belly (Rockod)</option>
       <option>Galjoen</option>
       <option>Hottentot</option>
-      <option>Geelbek</option>
-      <option>Tuna</option>
+      <option>Other</option>
     </select>
 
-    <label class="small">Length (cm)</label>
-    <input id="length" inputmode="decimal" placeholder="e.g. 65" autocomplete="off">
-    <div class="mini" id="minHint" style="margin:-6px 0 10px;"></div>
+    <label class="small">Where caught</label>
+    <input id="place" value="Deep Sea" readonly>
 
-    <label class="small">Boat name</label>
-    <input id="boat" placeholder="e.g. Nicoleen 🚤" autocomplete="off">
-
-    <label class="small">Launch site</label>
-    <input id="launch" placeholder="e.g. Stilbaai harbour" autocomplete="off">
-
-    <label class="small">Where caught (reef / bank / canyon / river mouth)</label>
-    <input id="place" placeholder="e.g. 45m Bank / River mouth / 12 Mile" autocomplete="off">
-
+    <label class="small">Coords</label>
     <div class="row">
-      <div style="flex:1;min-width:160px">
-        <label class="small">Depth (m)</label>
-        <input id="depth" inputmode="decimal" placeholder="e.g. 38" autocomplete="off">
-      </div>
-      <div style="flex:1;min-width:160px">
-        <label class="small">Swell height (m)</label>
-        <input id="swell" inputmode="decimal" placeholder="optional" autocomplete="off">
-      </div>
-    </div>
-
-    <label class="small">Method</label>
-    <select id="method">
-      <option>Drift</option>
-      <option>Anchor</option>
-      <option>Trolling</option>
-      <option>Bottom fishing</option>
-      <option>Jigging</option>
-    </select>
-
-    <label class="small">Bait / Lure</label>
-    <input id="bait" placeholder="e.g. sardine / chokka / jig" autocomplete="off">
-
-    <label class="small">Current strength</label>
-    <select id="current">
-      <option>Weak</option>
-      <option>Medium</option>
-      <option>Strong</option>
-    </select>
-
-    <label class="small">Coordinates</label>
-    <div class="row">
-      <button type="button" onclick="getGPS()">📍 Get GPS</button>
-      <input id="coords" placeholder="-34.37, 20.85" readonly autocomplete="off">
+      <button class="btn primary" type="button" onclick="getGPS()">📍 Get GPS</button>
+      <input id="coords" placeholder="-34.370000, 21.418000" readonly autocomplete="off">
     </div>
 
     <div class="row">
-      <button type="button" onclick="autoConditions()">🌬 Auto wind + 🌡 water temp</button>
-      <span class="mini">No API key</span>
+      <div>
+        <label class="small">Length (cm)</label>
+        <input id="length" inputmode="numeric" placeholder="e.g. 65" autocomplete="off" oninput="updateMinCheck()">
+      </div>
+      <div>
+        <label class="small">Min legal size (cm)</label>
+        <input id="minSize" inputmode="numeric" placeholder="auto" autocomplete="off" readonly>
+      </div>
+    </div>
+
+    <div class="chips" id="minChipRow" style="margin-top:0"></div>
+
+    <div class="row">
+      <div>
+        <label class="small">Depth (m) • auto</label>
+        <input id="depth" placeholder="auto" autocomplete="off" readonly>
+      </div>
+      <div>
+        <label class="small">Current strength • auto</label>
+        <input id="current" placeholder="auto" autocomplete="off" readonly>
+      </div>
     </div>
 
     <div class="row">
-      <div style="flex:1;min-width:160px">
-        <label class="small">Wind direction</label>
-        <input id="windDir" placeholder="Auto / optional" autocomplete="off">
+      <div>
+        <label class="small">Swell/Wave (m) • auto</label>
+        <input id="swell" placeholder="auto" autocomplete="off" readonly>
       </div>
-      <div style="flex:1;min-width:160px">
-        <label class="small">Wind speed (km/h)</label>
-        <input id="windSpeed" placeholder="Auto / optional" autocomplete="off">
-      </div>
-      <div style="flex:1;min-width:160px">
-        <label class="small">Water / Sea temp (°C)</label>
-        <input id="waterTemp" placeholder="Auto / optional" autocomplete="off">
+      <div>
+        <label class="small">Wind direction • auto</label>
+        <input id="windDir" placeholder="auto" autocomplete="off" readonly>
       </div>
     </div>
+
+    <div class="row">
+      <div>
+        <label class="small">Wind speed (km/h) • auto</label>
+        <input id="windSpeed" placeholder="auto" autocomplete="off" readonly>
+      </div>
+      <div>
+        <label class="small">Water temp (°C) • auto</label>
+        <input id="waterTemp" placeholder="auto" autocomplete="off" readonly>
+      </div>
+    </div>
+
+    <div class="row">
+      <div>
+        <label class="small">Tide phase • estimated</label>
+        <input id="tidePhase" placeholder="auto" autocomplete="off" readonly>
+      </div>
+      <div>
+        <label class="small">Moon phase • auto</label>
+        <input id="moon" placeholder="auto" autocomplete="off" readonly>
+      </div>
+    </div>
+
+    <label class="small">Notes</label>
+    <textarea id="notes" placeholder="Bait, rig, drift, etc…"></textarea>
 
     <label class="small">Photo</label>
     <div class="row">
-      <button type="button" onclick="document.getElementById('photoCamera').click()">📷 Camera</button>
-      <button type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
+      <button class="btn" type="button" onclick="document.getElementById('photoCamera').click()">📷 Camera</button>
+      <button class="btn" type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
     </div>
     <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;">
     <input id="photoGallery" type="file" accept="image/*" style="display:none;">
-    <div id="photoPreview"></div>
 
-    <label class="small">Notes</label>
-    <textarea id="notes" placeholder="drift speed, bite time, rig, etc…"></textarea>
+    <img id="photoPreview" class="photo" style="display:none" alt="Fish photo preview">
 
-    <div class="row">
-      <button type="button" onclick="saveCatch()">✅ Save</button>
-      <button type="button" onclick="clearForm()">🧼 Clear</button>
+    <div class="chips" id="autoChips"></div>
+
+    <div class="row" style="margin-top:12px">
+      <button class="btn primary" type="button" onclick="saveCatch()">✅ Save Catch</button>
+      <button class="btn danger" type="button" onclick="resetAll()">🗑 Reset All Data</button>
     </div>
+
+    <div class="small" style="margin-top:10px">
+      “AI Fish Identifier” without an API key can’t truly identify species. This build focuses on **fishing intelligence** + **pro logging**.
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="row" style="align-items:center">
+      <div>
+        <div style="font-weight:1000">Map Preview</div>
+        <div class="small">Satellite + Reef overlay helps you see structure better.</div>
+      </div>
+      <div style="text-align:right">
+        <button class="btn" type="button" onclick="toggleReef()">🪸 Reef overlay: <span id="reefStateA">OFF</span></button>
+      </div>
+    </div>
+    <div id="mapAdd"></div>
   </div>
 </section>
 
 <section id="log">
   <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <h3 style="margin:0">Catch Log</h3>
-      <button type="button" onclick="clearAll()">🗑 Reset All Data</button>
-    </div>
-    <div class="mini">Navigate opens Google Maps directions.</div>
+    <div style="font-weight:1000">Logbook</div>
+    <div class="small">Each catch has Maps + Directions + photo.</div>
   </div>
   <div id="list"></div>
 </section>
 
 <section id="map">
   <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <h3 style="margin:0">Catch Map</h3>
-      <button type="button" onclick="toggleSatellite()">🛰 Satellite ON/OFF</button>
+    <div class="row" style="align-items:center">
+      <div>
+        <div style="font-weight:1000">Deep Sea Map</div>
+        <div class="small">Shows drift arrow (estimated) on most recent catch.</div>
+      </div>
+      <div style="text-align:right;display:flex;gap:10px;justify-content:flex-end;flex-wrap:wrap">
+        <button class="btn" type="button" onclick="toggleSatellite()">🛰 Satellite: <span id="satStateM">OFF</span></button>
+        <button class="btn" type="button" onclick="toggleReef()">🪸 Reef overlay: <span id="reefStateM">OFF</span></button>
+      </div>
     </div>
-    <div class="mini">Pins show only for catches with coordinates.</div>
+    <div id="mapMain"></div>
   </div>
-  <div id="map"></div>
-</section>
-
-<section id="heat">
-  <div class="card">
-    <div class="row" style="justify-content:space-between">
-      <h3 style="margin:0">Heatmap</h3>
-      <button type="button" onclick="toggleSatellite()">🛰 Satellite ON/OFF</button>
-    </div>
-    <div class="mini">Heat = repeated catches in the same area.</div>
-  </div>
-  <div id="mapHeat"></div>
-</section>
-
-<section id="tide">
-  <div class="card">
-    <h3>Tide + Best Bite Times (Today)</h3>
-    <div class="mini">
-      No API key. You set a <b>Reference High Tide</b> time once (from any tide table / skipper). Then the app calculates the next tides using the standard semi-diurnal tide period (~12h 25m).
-    </div>
-
-    <hr>
-
-    <label class="small">Reference High Tide time (HH:MM)</label>
-    <input id="tideRefTime" placeholder="e.g. 06:40" autocomplete="off">
-
-    <div class="row">
-      <button type="button" onclick="saveTideRef()">💾 Save reference</button>
-      <button type="button" onclick="calcTidesToday()">🌊 Calculate today</button>
-      <button type="button" onclick="bestBiteToday()">🎣 Best bite times</button>
-    </div>
-
-    <div class="mini" id="tideRefHint"></div>
-  </div>
-
-  <div id="tideBox"></div>
 </section>
 
 <section id="sea">
   <div class="card">
-    <h3>Sea Days (14-day ranking)</h3>
-    <div class="mini">Wave + swell + wind → score (higher = better)</div>
-    <div class="row">
-      <button type="button" onclick="fetchSeaDays()">📡 Refresh 14-day forecast</button>
-      <span class="mini" id="seaHint"></span>
+    <div style="font-weight:1000">Bite Windows Today + 14-Day Sea Ranking</div>
+    <div class="small">Uses swell + wind forecasts (Open-Meteo) and estimated tide strength curve.</div>
+
+    <div class="row" style="margin-top:10px">
+      <button class="btn primary" type="button" onclick="loadSea()">🌊 Load Sea Intelligence</button>
+      <button class="btn" type="button" onclick="useStilbaai()">📍 Use Stilbaai coords</button>
     </div>
+
+    <hr>
+    <div id="biteBox"></div>
+
+    <hr>
+    <div id="seaBox"></div>
   </div>
-  <div id="seaBox"></div>
+</section>
+
+<section id="spots">
+  <div class="card">
+    <div class="row" style="align-items:center">
+      <div>
+        <div style="font-weight:1000">Saved Spots ⭐</div>
+        <div class="small">Every GPS save becomes a spot automatically. You can rename spots here.</div>
+      </div>
+      <div style="text-align:right">
+        <button class="btn" type="button" onclick="clearSpots()">Clear spots</button>
+      </div>
+    </div>
+
+    <div id="spotsList" style="margin-top:10px"></div>
+  </div>
 </section>
 
 <section id="gallery">
   <div class="card">
-    <h3>Photo Gallery</h3>
-    <div class="mini">All saved fish photos in one place.</div>
-  </div>
-  <div id="galleryBox" class="grid"></div>
-</section>
-
-<section id="identify">
-  <div class="card">
-    <h3>Fish Identifier (no API key)</h3>
-    <div class="mini">This tab shows your photo. For real ID, use Google Lens.</div>
-
-    <div class="row">
-      <button type="button" onclick="document.getElementById('idPhoto').click()">📸 Choose photo</button>
-      <input id="idPhoto" type="file" accept="image/*" style="display:none;">
-    </div>
-
-    <div id="idPreview" style="margin-top:12px;"></div>
-    <div id="idResult" class="mini" style="margin-top:10px;"></div>
+    <div style="font-weight:1000">Gallery</div>
+    <div class="small">All photos saved in your catches.</div>
+    <div id="galleryGrid" class="grid" style="margin-top:10px"></div>
   </div>
 </section>
 
-<section id="stats">
+<section id="analytics">
   <div class="card">
-    <h3>Stats + Depth Analysis</h3>
-    <div class="mini">Counts by species + biggest length + best depth bins.</div>
+    <div style="font-weight:1000">Catch Analytics</div>
+    <div class="small">Best depth per species + best tide phase + best moon phase + best drift speed.</div>
+    <div id="analyticsBox" style="margin-top:10px"></div>
   </div>
-  <div id="statsBox"></div>
 </section>
 
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
 <script>
 (() => {
-  const KEY = "tanyaSeaAppV25";
-  const STILBAAI = { lat: -34.3699, lon: 21.4136 };
+  // Storage keys
+  const KEY_CATCH = "tanya_sea_catches_v27";
+  const KEY_SPOTS = "tanya_sea_spots_v27";
 
-  const el = (id) => document.getElementById(id);
+  // Default Stilbaai
+  const STILBAAI = { lat: -34.3690, lon: 21.4180 };
 
-  // elements
+  // Min legal sizes (cm) — EDIT these if you want.
+  // If you don’t know a species min, leave null.
+  const MIN_CM = {
+    "Kaapse Kabeljou": 60,
+    "Geelstert": 65,
+    "Bonnie": null,
+    "Rooi Roman": null,
+    "Snapper": null,
+    "Silver (Bastermeid)": null,
+    "Rooi Steenbras": null,
+    "Yellow Belly (Rockod)": null,
+    "Galjoen": 35,
+    "Hottentot": null,
+    "Other": null
+  };
+
+  const el = id => document.getElementById(id);
   const species   = el("species");
-  const length    = el("length");
-  const minHint   = el("minHint");
-  const boat      = el("boat");
-  const launch    = el("launch");
   const place     = el("place");
+  const coords    = el("coords");
+  const length    = el("length");
+  const minSize   = el("minSize");
+  const minChipRow= el("minChipRow");
+
   const depth     = el("depth");
-  const method    = el("method");
-  const bait      = el("bait");
   const current   = el("current");
   const swell     = el("swell");
-  const coords    = el("coords");
   const windDir   = el("windDir");
   const windSpeed = el("windSpeed");
   const waterTemp = el("waterTemp");
+  const tidePhase = el("tidePhase");
+  const moon      = el("moon");
   const notes     = el("notes");
+
+  const photoCamera  = el("photoCamera");
+  const photoGallery = el("photoGallery");
+  const photoPreview = el("photoPreview");
+  const autoChips    = el("autoChips");
 
   const list       = el("list");
   const seaBox     = el("seaBox");
-  const seaHint    = el("seaHint");
-  const galleryBox = el("galleryBox");
-  const statsBox   = el("statsBox");
+  const biteBox    = el("biteBox");
+  const spotsList  = el("spotsList");
+  const galleryGrid= el("galleryGrid");
+  const analyticsBox = el("analyticsBox");
 
-  const tideRefTime = el("tideRefTime");
-  const tideRefHint = el("tideRefHint");
-  const tideBox     = el("tideBox");
+  // Maps
+  let mapAdd, mapMain;
+  let addMarker = null;
+  let markers = [];
+  let driftLine = null;
+  let satOn = false;
+  let reefOn = false;
 
-  const photoPreview = el("photoPreview");
-  const photoCamera  = el("photoCamera");
-  const photoGallery = el("photoGallery");
+  // Tile layers
+  let osmAdd, satAdd, oceanAdd;
+  let osmMain, satMain, oceanMain;
 
-  const idPhoto   = el("idPhoto");
-  const idPreview = el("idPreview");
-  const idResult  = el("idResult");
+  let _photoDataUrl = "";
 
-  // minimum sizes (example values; edit anytime)
-  const MIN_SIZES = {
-    "Cape Kob": 50,
-    "Yellowtail": 60,
-    "Galjoen": 35,
-    "Red Steenbras": 60,
-    "Red Roman": 30
-  };
+  // ---------- Helpers ----------
+  function safe(s){ return String(s ?? "").replaceAll("<","&lt;").replaceAll(">","&gt;"); }
+  function fmt(n, d=1){ const x=Number(n); return Number.isFinite(x) ? x.toFixed(d) : "—"; }
 
-  function updateMinHint(){
-    const sp = species.value;
-    const min = MIN_SIZES[sp];
-    minHint.textContent = min ? `Minimum legal size: ${min} cm` : "";
-  }
-  species.addEventListener("change", updateMinHint);
-  updateMinHint();
-
-  function getAll(){
-    return JSON.parse(localStorage.getItem(KEY) || "[]");
-  }
-  function saveAll(data){
-    localStorage.setItem(KEY, JSON.stringify(data));
+  function parseCoords(str){
+    if(!str) return null;
+    const parts = str.split(",").map(x=>x.trim());
+    if(parts.length<2) return null;
+    const lat = Number(parts[0]), lon = Number(parts[1]);
+    if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    return { lat, lon };
   }
 
-  function escapeHtml(s){
-    return String(s || "")
-      .replaceAll("&","&amp;")
-      .replaceAll("<","&lt;")
-      .replaceAll(">","&gt;");
+  function degToCompass(deg){
+    const d = Number(deg);
+    if(!Number.isFinite(d)) return "";
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    const idx = Math.round(((d % 360) / 45)) % 8;
+    return dirs[idx];
   }
 
-  function setActive(id){
-    const ids = ["add","log","map","heat","tide","sea","gallery","identify","stats"];
-    ids.forEach(x=>{
-      const b = el("btn" + x.charAt(0).toUpperCase() + x.slice(1));
-      if(b) b.classList.toggle("active", x === id);
+  function nowInSA(){
+    // Date in local browser time is fine; GitHub Pages uses your device time.
+    return new Date();
+  }
+
+  // Moon phase (simple)
+  function getMoonPhaseName(date){
+    const lp = 2551443; // lunar period in seconds
+    const newMoon = new Date(Date.UTC(1970,0,7,20,35,0));
+    const phase = ((date.getTime() - newMoon.getTime())/1000) % lp;
+    const day = Math.floor(phase / (24*3600));
+    if(day < 2) return "New";
+    if(day < 7) return "Waxing";
+    if(day < 9) return "First Quarter";
+    if(day < 15) return "Waxing Gibbous";
+    if(day < 17) return "Full";
+    if(day < 22) return "Waning";
+    if(day < 24) return "Last Quarter";
+    return "Waning Crescent";
+  }
+
+  // Tide estimate (no API key): sine wave with semi-diurnal period
+  function tideStrengthAt(date){
+    const periodMs = 12.42 * 3600 * 1000; // ~12h25m
+    // anchor arbitrary (midnight) – good enough for “strength curve”, not exact times
+    const t = date.getTime();
+    const phase = (t % periodMs) / periodMs; // 0..1
+    const s = Math.sin(phase * Math.PI * 2); // -1..1
+    const strength = Math.abs(s);            // 0..1
+    const rising = s > 0;
+    return { strength, phase, trend: rising ? "Rising" : "Falling" };
+  }
+
+  function tidePhaseLabel(date){
+    const ts = tideStrengthAt(date);
+    const label = ts.trend + " • " + (ts.strength > 0.66 ? "Strong" : ts.strength > 0.33 ? "Medium" : "Weak");
+    return { label, strength: ts.strength, trend: ts.trend };
+  }
+
+  // Current strength estimate from wind + tide strength
+  function estimateCurrent(windKmh, tideStrength){
+    const w = Number(windKmh);
+    const t = Number(tideStrength);
+    let score = 0;
+    if(Number.isFinite(w)) score += (w/18);
+    if(Number.isFinite(t)) score += (t*2.2);
+    if(score < 1.0) return { label:"Weak", driftKmh: 0.8 };
+    if(score < 1.8) return { label:"Medium", driftKmh: 1.6 };
+    return { label:"Strong", driftKmh: 2.6 };
+  }
+
+  // Drift direction arrow estimate:
+  // Use wind direction (blowing FROM). Drift tends to go WITH wind a bit + tide trend.
+  // We'll approximate “drift bearing” as wind-to (from+180) plus a small tide bias.
+  function driftBearingDeg(windDirDeg, tideTrend){
+    const wd = Number(windDirDeg);
+    const base = Number.isFinite(wd) ? (wd + 180) % 360 : 0;
+    const bias = tideTrend === "Rising" ? 15 : -15;
+    return (base + bias + 360) % 360;
+  }
+
+  function movePoint(lat, lon, bearingDeg, km){
+    // very small-distance equirectangular approximation
+    const R = 6371;
+    const br = bearingDeg * Math.PI/180;
+    const d = km / R;
+    const lat1 = lat * Math.PI/180;
+    const lon1 = lon * Math.PI/180;
+    const lat2 = Math.asin(Math.sin(lat1)*Math.cos(d) + Math.cos(lat1)*Math.sin(d)*Math.cos(br));
+    const lon2 = lon1 + Math.atan2(Math.sin(br)*Math.sin(d)*Math.cos(lat1), Math.cos(d)-Math.sin(lat1)*Math.sin(lat2));
+    return { lat: lat2*180/Math.PI, lon: lon2*180/Math.PI };
+  }
+
+  // ---------- Storage ----------
+  function getAll(){ return JSON.parse(localStorage.getItem(KEY_CATCH) || "[]"); }
+  function saveAll(data){ localStorage.setItem(KEY_CATCH, JSON.stringify(data)); }
+
+  function getSpots(){ return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }
+  function saveSpots(data){ localStorage.setItem(KEY_SPOTS, JSON.stringify(data)); }
+
+  // ---------- Tabs ----------
+  function setActive(tab){
+    const map = { add:"tAdd", log:"tLog", map:"tMap", sea:"tSea", spots:"tSpots", gallery:"tGallery", analytics:"tAnalytics" };
+    Object.values(map).forEach(id => el(id)?.classList.remove("active"));
+    el(map[tab])?.classList.add("active");
+  }
+
+  function showTab(tab){
+    document.querySelectorAll("section").forEach(s => s.style.display="none");
+    el(tab).style.display="block";
+    setActive(tab);
+
+    if(tab === "log") loadLog();
+    if(tab === "map") renderMap();
+    if(tab === "spots") renderSpots();
+    if(tab === "gallery") renderGallery();
+    if(tab === "analytics") renderAnalytics();
+
+    setTimeout(()=> { mapAdd?.invalidateSize(); mapMain?.invalidateSize(); }, 150);
+  }
+
+  // ---------- Species Min Size ----------
+  function onSpeciesChange(){
+    const sp = species.value || "";
+    const min = MIN_CM[sp] ?? null;
+    minSize.value = (min && Number.isFinite(min)) ? String(min) : "";
+    updateMinCheck();
+  }
+
+  function updateMinCheck(){
+    minChipRow.innerHTML = "";
+    const sp = species.value || "";
+    const min = MIN_CM[sp] ?? null;
+    const len = Number(length.value);
+
+    if(!sp) return;
+
+    if(min == null){
+      minChipRow.innerHTML = `<span class="chip warn">ℹ️ No min size set for this species</span>`;
+      return;
+    }
+
+    minChipRow.innerHTML = `<span class="chip">Min: <b>${min} cm</b></span>`;
+    if(Number.isFinite(len)){
+      if(len >= min){
+        minChipRow.innerHTML += `<span class="chip ok">✅ Legal size</span>`;
+      }else{
+        minChipRow.innerHTML += `<span class="chip bad">⚠️ Under size</span>`;
+      }
+    }else{
+      minChipRow.innerHTML += `<span class="chip">Enter length to check</span>`;
+    }
+  }
+
+  // ---------- Maps ----------
+  function initMaps(){
+    if(!mapAdd){
+      mapAdd = L.map("mapAdd").setView([STILBAAI.lat, STILBAAI.lon], 9);
+
+      osmAdd = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"&copy; OpenStreetMap" });
+      satAdd = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Tiles &copy; Esri" });
+      // Reef/Ocean overlay (bathymetry style)
+      oceanAdd = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Tiles &copy; Esri (Ocean)" });
+
+      osmAdd.addTo(mapAdd);
+    }
+    if(!mapMain){
+      mapMain = L.map("mapMain").setView([STILBAAI.lat, STILBAAI.lon], 8);
+
+      osmMain = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom:19, attribution:"&copy; OpenStreetMap" });
+      satMain = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Tiles &copy; Esri" });
+      oceanMain = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/Ocean/World_Ocean_Base/MapServer/tile/{z}/{y}/{x}", { maxZoom:19, attribution:"Tiles &copy; Esri (Ocean)" });
+
+      osmMain.addTo(mapMain);
+    }
+  }
+
+  function setAddMarker(lat, lon){
+    initMaps();
+    const ll = [lat, lon];
+    if(!addMarker) addMarker = L.marker(ll).addTo(mapAdd);
+    else addMarker.setLatLng(ll);
+    mapAdd.setView(ll, 11);
+  }
+
+  function toggleSatellite(){
+    initMaps();
+    satOn = !satOn;
+
+    const apply = (map, osm, sat) => {
+      if(satOn){
+        if(map.hasLayer(osm)) map.removeLayer(osm);
+        if(!map.hasLayer(sat)) sat.addTo(map);
+      }else{
+        if(map.hasLayer(sat)) map.removeLayer(sat);
+        if(!map.hasLayer(osm)) osm.addTo(map);
+      }
+    };
+
+    apply(mapAdd, osmAdd, satAdd);
+    apply(mapMain, osmMain, satMain);
+
+    el("satStateA").textContent = satOn ? "ON" : "OFF";
+    el("satStateM").textContent = satOn ? "ON" : "OFF";
+  }
+
+  function toggleReef(){
+    initMaps();
+    reefOn = !reefOn;
+
+    const apply = (map, ocean) => {
+      if(reefOn){
+        if(!map.hasLayer(ocean)) ocean.addTo(map);
+      }else{
+        if(map.hasLayer(ocean)) map.removeLayer(ocean);
+      }
+    };
+
+    apply(mapAdd, oceanAdd);
+    apply(mapMain, oceanMain);
+
+    el("reefStateA").textContent = reefOn ? "ON" : "OFF";
+    el("reefStateM").textContent = reefOn ? "ON" : "OFF";
+  }
+
+  function renderMap(){
+    initMaps();
+
+    // clear markers
+    markers.forEach(m => mapMain.removeLayer(m));
+    markers = [];
+    if(driftLine){ mapMain.removeLayer(driftLine); driftLine = null; }
+
+    const data = getAll();
+    const pts = [];
+    data.forEach(c => {
+      const p = parseCoords(c.coords);
+      if(!p) return;
+      pts.push([p.lat, p.lon]);
+      const label = `${safe(c.species||"Catch")} • ${safe(c.length||"")}cm • ${safe(c.depth||"")}m`;
+      const m = L.marker([p.lat, p.lon]).addTo(mapMain).bindPopup(label);
+      markers.push(m);
     });
+
+    if(pts.length){
+      mapMain.fitBounds(L.latLngBounds(pts).pad(0.25));
+    }
+
+    // drift arrow (most recent catch)
+    const latest = data.slice().sort((a,b)=>(b.ts||0)-(a.ts||0))[0];
+    if(latest){
+      const p = parseCoords(latest.coords);
+      if(p && Number.isFinite(Number(latest.windDirDeg))){
+        const br = driftBearingDeg(latest.windDirDeg, latest.tideTrend);
+        const end = movePoint(p.lat, p.lon, br, 1.4); // 1.4km line
+        driftLine = L.polyline([[p.lat,p.lon],[end.lat,end.lon]], { weight:4, opacity:0.9 }).addTo(mapMain);
+      }
+    }
   }
 
-  function show(id){
-    document.querySelectorAll("section").forEach(s => s.style.display = "none");
-    const sec = el(id);
-    if(sec) sec.style.display = "block";
-    setActive(id);
-
-    if(id === "log") loadLog();
-    if(id === "map") renderMap(false);
-    if(id === "heat") renderMap(true);
-    if(id === "gallery") renderGallery();
-    if(id === "stats") renderStats();
-    if(id === "tide") loadTideRefUI();
+  // ---------- External links ----------
+  function openMap(coordStr){
+    const url = `https://www.google.com/maps?q=${encodeURIComponent(coordStr)}`;
+    window.open(url, "_blank");
+  }
+  function directionsTo(coordStr){
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(coordStr)}`;
+    window.open(url, "_blank");
   }
 
-  // GPS
-  function getGPS(){
+  // ---------- Auto data fetch ----------
+  async function fetchDepthGEBCO(p){
+    // GEBCO bathymetry via OpenTopoData GEBCO2020 dataset
+    const url = `https://api.opentopodata.org/v1/gebco2020?locations=${encodeURIComponent(p.lat)},${encodeURIComponent(p.lon)}`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("Depth fetch failed");
+    const js = await res.json();
+    const elev = Number(js?.results?.[0]?.elevation);
+    return elev; // negative = below sea level
+  }
+
+  async function fetchMarine(p){
+    const url =
+      `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+      `&hourly=wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=2`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("Marine fetch failed");
+    const m = await res.json();
+    const t = m?.hourly?.time || [];
+    const wave = m?.hourly?.wave_height || [];
+    const sst  = m?.hourly?.sea_surface_temperature || [];
+    const idx = pickClosestIndex(t);
+    return { wave:Number(wave[idx]), sst:Number(sst[idx]) };
+  }
+
+  async function fetchWind(p){
+    const url =
+      `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+      `&hourly=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg&forecast_days=2`;
+    const res = await fetch(url);
+    if(!res.ok) throw new Error("Wind fetch failed");
+    const w = await res.json();
+    const t = w?.hourly?.time || [];
+    const sp = w?.hourly?.windspeed_10m || [];
+    const di = w?.hourly?.winddirection_10m || [];
+    const idx = pickClosestIndex(t);
+    return { speed:Number(sp[idx]), dir:Number(di[idx]) };
+  }
+
+  function pickClosestIndex(times){
+    const nowIso = new Date().toISOString().slice(0,13);
+    let best=0, bestDiff=1e9;
+    for(let i=0;i<times.length;i++){
+      const t = String(times[i]).slice(0,13);
+      const diff = Math.abs(t.localeCompare(nowIso));
+      if(diff<bestDiff){ bestDiff=diff; best=i; }
+    }
+    return best;
+  }
+
+  async function autoFillFromCoords(p){
+    autoChips.innerHTML = `<span class="chip">⏳ Loading…</span>`;
+    try{
+      const dNow = nowInSA();
+      const moonName = getMoonPhaseName(dNow);
+      const tide = tidePhaseLabel(dNow);
+
+      moon.value = moonName;
+      tidePhase.value = tide.label;
+
+      const [d, m, w] = await Promise.all([
+        fetchDepthGEBCO(p),
+        fetchMarine(p),
+        fetchWind(p)
+      ]);
+
+      if(Number.isFinite(d)) depth.value = String(Math.round(Math.abs(d)));
+      if(m){
+        if(Number.isFinite(m.wave)) swell.value = fmt(m.wave,1);
+        if(Number.isFinite(m.sst))  waterTemp.value = fmt(m.sst,1);
+      }
+      if(w){
+        if(Number.isFinite(w.speed)) windSpeed.value = fmt(w.speed,0);
+        if(Number.isFinite(w.dir)){
+          windDir.value = degToCompass(w.dir);
+          // store true degrees (for drift)
+          windDir.dataset.deg = String(w.dir);
+        }
+      }
+
+      const cur = estimateCurrent(Number(windSpeed.value), tide.strength);
+      current.value = cur.label;
+
+      autoChips.innerHTML = `
+        <span class="chip ok">✅ Auto filled</span>
+        <span class="chip">Depth: <b>${safe(depth.value||"—")}m</b></span>
+        <span class="chip">Swell: <b>${safe(swell.value||"—")}m</b></span>
+        <span class="chip">Wind: <b>${safe(windDir.value||"—")} ${safe(windSpeed.value||"—")}km/h</b></span>
+        <span class="chip">Water: <b>${safe(waterTemp.value||"—")}°C</b></span>
+        <span class="chip">Tide: <b>${safe(tide.label)}</b></span>
+        <span class="chip">Moon: <b>${safe(moonName)}</b></span>
+        <span class="chip">Current: <b>${safe(cur.label)}</b></span>
+      `;
+    }catch(e){
+      autoChips.innerHTML = `<span class="chip bad">❌ Auto failed</span><span class="chip">Check internet + try again</span>`;
+    }
+  }
+
+  // ---------- GPS ----------
+  async function getGPS(){
     if(!navigator.geolocation){
       alert("GPS not supported on this browser.");
       return;
     }
     navigator.geolocation.getCurrentPosition(
-      (pos) => {
+      async (pos) => {
         const lat = pos.coords.latitude.toFixed(6);
         const lon = pos.coords.longitude.toFixed(6);
         coords.value = lat + ", " + lon;
+        const p = { lat:Number(lat), lon:Number(lon) };
+        setAddMarker(p.lat, p.lon);
+        await autoFillFromCoords(p);
       },
-      (err) => {
-        alert("Could not get GPS: " + (err?.message || "Enable Location and try again."));
-      },
-      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+      (err) => alert("Could not get GPS: " + (err?.message || "unknown")),
+      { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
     );
   }
 
-  // parse "lat, lon"
-  function parseCoords(str){
-    if(!str) return null;
-    const s = String(str).replace(";",",").trim();
-    const parts = s.split(",").map(x=>x.trim()).filter(Boolean);
-    if(parts.length < 2) return null;
-    const lat = Number(parts[0]);
-    const lon = Number(parts[1]);
-    if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
-    return { lat, lon };
+  function useStilbaai(){
+    coords.value = STILBAAI.lat.toFixed(6) + ", " + STILBAAI.lon.toFixed(6);
+    setAddMarker(STILBAAI.lat, STILBAAI.lon);
+    autoFillFromCoords(STILBAAI);
   }
 
-  function toDegToDir(deg){
-    if(!Number.isFinite(deg)) return "";
-    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
-    const i = Math.round(((deg % 360) / 45)) % 8;
-    return dirs[i] + ` (${Math.round(deg)}°)`;
-  }
-
-  // ===== Weather/marine (no key) =====
-  async function autoConditions(){
-    const p = parseCoords(coords.value) || STILBAAI;
-    try{
-      const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=sea_surface_temperature,wave_height&timezone=Africa%2FJohannesburg&forecast_days=2`;
-
-      const weatherUrl =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg&forecast_days=2`;
-
-      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if(!mRes.ok) throw new Error("Marine fetch failed");
-      if(!wRes.ok) throw new Error("Wind fetch failed");
-
-      const m = await mRes.json();
-      const w = await wRes.json();
-
-      const sst = m?.hourly?.sea_surface_temperature?.[0];
-      const ws  = w?.hourly?.windspeed_10m?.[0];
-      const wd  = w?.hourly?.winddirection_10m?.[0];
-
-      if(Number.isFinite(sst)) waterTemp.value = String(sst.toFixed(1));
-      if(Number.isFinite(ws))  windSpeed.value = String(Math.round(ws));
-      if(Number.isFinite(wd))  windDir.value = toDegToDir(wd);
-
-      alert("Auto conditions loaded ✅");
-    }catch(e){
-      alert("Could not load conditions. Check internet and try again.");
-    }
-  }
-
-  // ===== Photos =====
+  // ---------- Photos ----------
   function fileToDataUrl(file){
     return new Promise((resolve, reject) => {
       const reader = new FileReader();
@@ -514,366 +833,449 @@ section{display:none}
       reader.readAsDataURL(file);
     });
   }
+  async function handlePhotoPick(e){
+    const f = e.target.files?.[0];
+    if(!f) return;
+    _photoDataUrl = await fileToDataUrl(f);
+    photoPreview.src = _photoDataUrl;
+    photoPreview.style.display = "block";
+  }
+  photoCamera.addEventListener("change", handlePhotoPick);
+  photoGallery.addEventListener("change", handlePhotoPick);
 
-  let currentPhotoDataUrl = "";
-
-  async function onPhotoPicked(file){
-    if(!file) return;
-    currentPhotoDataUrl = await fileToDataUrl(file);
-    photoPreview.innerHTML = `<img src="${currentPhotoDataUrl}" alt="Fish photo">`;
+  // ---------- Spots (auto) ----------
+  function distanceKm(lat1,lon1,lat2,lon2){
+    const R=6371;
+    const dLat=(lat2-lat1)*Math.PI/180;
+    const dLon=(lon2-lon1)*Math.PI/180;
+    const a=Math.sin(dLat/2)**2 + Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*Math.sin(dLon/2)**2;
+    return 2*R*Math.asin(Math.sqrt(a));
   }
 
-  if(photoCamera){
-    photoCamera.addEventListener("change", (e)=> onPhotoPicked(e.target.files?.[0]));
-  }
-  if(photoGallery){
-    photoGallery.addEventListener("change", (e)=> onPhotoPicked(e.target.files?.[0]));
+  function ensureSpotForCoords(p){
+    const spots = getSpots();
+    // if spot within 250m exists, bump it
+    const found = spots.find(s => distanceKm(p.lat,p.lon,s.lat,s.lon) < 0.25);
+    if(found){
+      found.lastUsed = Date.now();
+      found.uses = (found.uses||0) + 1;
+      saveSpots(spots);
+      return found.id;
+    }
+    const id = Date.now().toString();
+    spots.unshift({
+      id,
+      name: `Spot ${new Date().toLocaleDateString()} ${new Date().toLocaleTimeString().slice(0,5)}`,
+      lat: p.lat,
+      lon: p.lon,
+      created: Date.now(),
+      lastUsed: Date.now(),
+      uses: 1,
+      catches: 0
+    });
+    saveSpots(spots);
+    return id;
   }
 
-  // ===== Save catch =====
+  function bumpSpotCatch(p){
+    const spots = getSpots();
+    const found = spots.find(s => distanceKm(p.lat,p.lon,s.lat,s.lon) < 0.25);
+    if(found){
+      found.lastUsed = Date.now();
+      found.catches = (found.catches||0) + 1;
+      saveSpots(spots);
+    }
+  }
+
+  function renderSpots(){
+    const spots = getSpots();
+    if(!spots.length){
+      spotsList.innerHTML = `<div class="card"><div class="small">No spots yet. Save a catch with GPS and spots will appear.</div></div>`;
+      return;
+    }
+    let html = "";
+    spots.slice(0,60).forEach(s=>{
+      const coord = `${s.lat.toFixed(6)}, ${s.lon.toFixed(6)}`;
+      html += `
+        <div class="card">
+          <div style="font-weight:1000">${safe(s.name)}</div>
+          <div class="small">📍 ${safe(coord)}</div>
+          <div class="chips">
+            <span class="chip">Uses: ${safe(s.uses||0)}</span>
+            <span class="chip">Catches: ${safe(s.catches||0)}</span>
+          </div>
+          <div class="row" style="margin-top:10px">
+            <button class="btn" type="button" onclick="renameSpot('${safe(s.id)}')">Rename</button>
+            <button class="btn" type="button" onclick="useSpot('${safe(s.id)}')">Use coords</button>
+            <button class="btn" type="button" onclick="openMap('${safe(coord)}')">Maps</button>
+            <button class="btn danger" type="button" onclick="deleteSpot('${safe(s.id)}')">Delete</button>
+          </div>
+        </div>
+      `;
+    });
+    spotsList.innerHTML = html;
+  }
+
+  function useSpot(id){
+    const spots = getSpots();
+    const s = spots.find(x => String(x.id) === String(id));
+    if(!s) return;
+    coords.value = `${s.lat.toFixed(6)}, ${s.lon.toFixed(6)}`;
+    s.lastUsed = Date.now();
+    s.uses = (s.uses||0) + 1;
+    saveSpots(spots);
+    setAddMarker(s.lat, s.lon);
+    autoFillFromCoords({lat:s.lat, lon:s.lon});
+    showTab("add");
+  }
+
+  function renameSpot(id){
+    const spots = getSpots();
+    const s = spots.find(x => String(x.id) === String(id));
+    if(!s) return;
+    const nn = prompt("Spot name:", s.name || "");
+    if(nn === null) return;
+    s.name = nn.trim() || s.name;
+    saveSpots(spots);
+    renderSpots();
+  }
+
+  function deleteSpot(id){
+    const ok = confirm("Delete this spot?");
+    if(!ok) return;
+    const spots = getSpots().filter(x => String(x.id) !== String(id));
+    saveSpots(spots);
+    renderSpots();
+  }
+
+  function clearSpots(){
+    const ok = confirm("Clear ALL spots?");
+    if(!ok) return;
+    saveSpots([]);
+    renderSpots();
+  }
+
+  // ---------- Save Catch ----------
   function saveCatch(){
-    const data = getAll();
-    const obj = {
-      id: Date.now().toString(),
-      species: species.value.trim(),
-      length: length.value.trim(),
-      boat: boat.value.trim(),
-      launch: launch.value.trim(),
-      place: place.value.trim(),
-      depth: depth.value.trim(),
-      method: method.value,
-      bait: bait.value.trim(),
-      current: current.value,
-      swell: swell.value.trim(),
-      coords: coords.value.trim(),
-      windDir: windDir.value.trim(),
-      windSpeed: windSpeed.value.trim(),
-      waterTemp: waterTemp.value.trim(),
-      notes: notes.value.trim(),
-      photo: currentPhotoDataUrl || "",
-      date: new Date().toLocaleDateString()
-    };
-    data.push(obj);
-    saveAll(data);
-    clearForm();
-    show("log");
-  }
+    const p = parseCoords(coords.value);
+    if(!species.value){
+      alert("Choose a species.");
+      return;
+    }
+    if(!p){
+      alert("Tap Get GPS to fill coords.");
+      return;
+    }
 
-  function clearForm(){
+    // min size check
+    const min = MIN_CM[species.value] ?? null;
+    const len = Number(length.value);
+    if(min != null && Number.isFinite(len) && len < min){
+      const ok = confirm(`UNDER SIZE ⚠️\nLength ${len} cm < Min ${min} cm\nSave anyway?`);
+      if(!ok) return;
+    }
+
+    // auto spot
+    ensureSpotForCoords(p);
+
+    // tide/moon now
+    const dNow = nowInSA();
+    const tide = tidePhaseLabel(dNow);
+    const moonName = getMoonPhaseName(dNow);
+
+    // wind degrees for drift
+    const wdDeg = Number(windDir.dataset.deg);
+    const cur = estimateCurrent(Number(windSpeed.value), tide.strength);
+    const driftB = driftBearingDeg(wdDeg, tide.trend);
+
+    const data = getAll();
+    const id = Date.now().toString();
+
+    data.push({
+      id,
+      ts: Date.now(),
+      species: species.value,
+      place: "Deep Sea",
+      coords: coords.value.trim(),
+      length: String(length.value.trim() || ""),
+      minSize: (min != null ? String(min) : ""),
+      depth: String(depth.value||""),
+      swell: String(swell.value||""),
+      windDir: String(windDir.value||""),
+      windSpeed: String(windSpeed.value||""),
+      windDirDeg: Number.isFinite(wdDeg) ? wdDeg : null,
+      waterTemp: String(waterTemp.value||""),
+      tideLabel: tide.label,
+      tideStrength: tide.strength,
+      tideTrend: tide.trend,
+      moon: moonName,
+      current: cur.label,
+      driftKmh: cur.driftKmh,
+      driftBearing: driftB,
+      notes: notes.value.trim(),
+      photo: _photoDataUrl || ""
+    });
+
+    saveAll(data);
+    bumpSpotCatch(p);
+
+    // clear
     species.value = "";
     length.value = "";
-    updateMinHint();
-
-    boat.value = "";
-    launch.value = "";
-    place.value = "";
-    depth.value = "";
-    method.value = "Drift";
-    bait.value = "";
-    current.value = "Weak";
-    swell.value = "";
-
+    minSize.value = "";
     coords.value = "";
+    depth.value = "";
+    current.value = "";
+    swell.value = "";
     windDir.value = "";
+    windDir.dataset.deg = "";
     windSpeed.value = "";
     waterTemp.value = "";
+    tidePhase.value = "";
+    moon.value = "";
     notes.value = "";
-
-    currentPhotoDataUrl = "";
-    photoPreview.innerHTML = "";
+    _photoDataUrl = "";
+    photoPreview.style.display = "none";
+    photoPreview.src = "";
     if(photoCamera) photoCamera.value = "";
     if(photoGallery) photoGallery.value = "";
+    autoChips.innerHTML = "";
+    minChipRow.innerHTML = "";
+
+    showTab("log");
   }
 
-  function openMap(coordStr){
-    const p = parseCoords(coordStr);
-    if(!p){ alert("No valid coords."); return; }
-    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.lat + "," + p.lon)}`;
-    window.open(url, "_blank");
-  }
-
-  function deleteCatch(id){
-    const ok = confirm("Delete this catch?");
-    if(!ok) return;
-    const data = getAll().filter(c => String(c.id) !== String(id));
-    saveAll(data);
-    loadLog();
-  }
-
-  function editCatch(id){
-    const data = getAll();
-    const idx = data.findIndex(c => String(c.id) === String(id));
-    if(idx === -1) return;
-
-    const c = data[idx];
-
-    const ns = prompt("Species:", c.species || "");
-    if(ns === null) return;
-    const nl = prompt("Length (cm):", c.length || "");
-    if(nl === null) return;
-    const np = prompt("Where caught:", c.place || "");
-    if(np === null) return;
-    const nd = prompt("Depth (m):", c.depth || "");
-    if(nd === null) return;
-    const nc = prompt("Coords (lat, lon):", c.coords || "");
-    if(nc === null) return;
-
-    c.species = ns.trim();
-    c.length  = nl.trim();
-    c.place   = np.trim();
-    c.depth   = nd.trim();
-    c.coords  = nc.trim();
-
-    saveAll(data);
-    loadLog();
-  }
-
-  // ===== Drift predictor (simple) =====
-  function driftGuess(windDirText, windKmhText){
-    const spd = Number(String(windKmhText||"").replace(",","."));
-    const dir = String(windDirText||"");
-    if(!Number.isFinite(spd) || !dir) return "—";
-    let strength = spd >= 35 ? "Strong" : spd >= 20 ? "Medium" : "Light";
-    return `${strength} drift (wind-based): ${dir}`;
-  }
-
+  // ---------- Logbook ----------
   function loadLog(){
-    const data = getAll().slice().reverse();
-
+    const data = getAll().slice().sort((a,b)=>(b.ts||0)-(a.ts||0));
     if(!data.length){
-      list.innerHTML = `<div class="card"><div class="mini">No catches yet.</div></div>`;
+      list.innerHTML = `<div class="card"><div class="small">No catches yet.</div></div>`;
+      renderMap();
       return;
     }
 
     let html = "";
     data.forEach(c=>{
-      const title = escapeHtml(c.species || "Unknown species");
-      const len   = escapeHtml(c.length);
-      const where = escapeHtml(c.place);
-      const dpth  = escapeHtml(c.depth);
-      const boatN = escapeHtml(c.boat);
-      const lnch  = escapeHtml(c.launch);
-      const meth  = escapeHtml(c.method);
-      const baitT = escapeHtml(c.bait);
-      const curr  = escapeHtml(c.current);
-      const swl   = escapeHtml(c.swell);
-      const coord = escapeHtml(c.coords);
-      const wind  = escapeHtml(c.windDir);
-      const wspd  = escapeHtml(c.windSpeed);
-      const temp  = escapeHtml(c.waterTemp);
-      const noteT = escapeHtml(c.notes);
-      const date  = escapeHtml(c.date);
-      const drift = escapeHtml(driftGuess(c.windDir, c.windSpeed));
+      const coord = safe(c.coords || "");
+      const title = safe(c.species || "Catch");
+      const date  = new Date(c.ts||Date.now()).toLocaleString();
+
+      const len   = safe(c.length||"");
+      const min   = safe(c.minSize||"");
+      const dep   = safe(c.depth||"");
+      const sw    = safe(c.swell||"");
+      const wi    = safe((c.windDir||"") + (c.windSpeed ? " " + c.windSpeed + "km/h" : ""));
+      const wt    = safe(c.waterTemp||"");
+      const ti    = safe(c.tideLabel||"");
+      const mo    = safe(c.moon||"");
+      const cur   = safe(c.current||"");
+      const dr    = Number.isFinite(Number(c.driftKmh)) ? `${c.driftKmh} km/h` : "";
+
+      let minBadge = "";
+      if(min && len && Number(len) && Number(min)){
+        minBadge = Number(len) >= Number(min)
+          ? `<span class="chip ok">✅ Legal</span>`
+          : `<span class="chip bad">⚠️ Under</span>`;
+      }
 
       html += `
         <div class="card">
-          <div class="entryTitle">${title}</div>
-          <div class="entryMeta">
-            ${len ? len + " cm • " : ""}${where ? where + " • " : ""}${date}
+          <div style="font-weight:1000;font-size:15px">${title}</div>
+          <div class="small">Deep Sea • ${safe(date)}</div>
+
+          <div class="chips">
+            ${len ? `<span class="chip">${len} cm</span>` : ``}
+            ${min ? `<span class="chip">Min ${min} cm</span>` : ``}
+            ${minBadge}
+            ${dep ? `<span class="chip">Depth ${dep} m</span>` : ``}
+            ${sw ? `<span class="chip">Swell ${sw} m</span>` : ``}
+            ${wi.trim() ? `<span class="chip">Wind ${wi}</span>` : ``}
+            ${wt ? `<span class="chip">Water ${wt}°C</span>` : ``}
+            ${ti ? `<span class="chip">Tide ${ti}</span>` : ``}
+            ${mo ? `<span class="chip">Moon ${mo}</span>` : ``}
+            ${cur ? `<span class="chip">Current ${cur}</span>` : ``}
+            ${dr ? `<span class="chip">Drift ${safe(dr)}</span>` : ``}
           </div>
-
-          ${c.photo ? `<img src="${c.photo}" style="width:100%;border-radius:12px;margin-top:10px">` : ""}
-
-          <div class="chipRow">
-            ${boatN ? `<span class="chip">🚤 ${boatN}</span>` : ""}
-            ${lnch ? `<span class="chip">🛟 ${lnch}</span>` : ""}
-            ${dpth ? `<span class="chip">⬇️ ${dpth} m</span>` : ""}
-            ${meth ? `<span class="chip">🎣 ${meth}</span>` : ""}
-            ${curr ? `<span class="chip">🌊 ${curr} current</span>` : ""}
-            ${swl ? `<span class="chip">🌀 ${swl} m swell</span>` : ""}
-          </div>
-
-          ${(baitT) ? `<div class="mini" style="margin-top:8px">🪝 Bait/Lure: <b>${baitT}</b></div>` : ""}
-
-          ${(wind || wspd || temp) ? `
-            <div class="chipRow">
-              ${wind ? `<span class="chip">🌬 ${wind}</span>` : ""}
-              ${wspd ? `<span class="chip">💨 ${wspd} km/h</span>` : ""}
-              ${temp ? `<span class="chip">🌡 ${temp}°C</span>` : ""}
-            </div>
-          ` : ""}
-
-          ${drift !== "—" ? `<div class="mini" style="margin-top:8px">🧭 ${drift}</div>` : ""}
 
           ${coord ? `
-            <div class="chipRow">
-              <span class="chip">📍 ${coord}</span>
-              <button type="button" onclick="openMap('${c.coords}')">🧭 Navigate</button>
+            <div style="margin-top:10px">
+              <div class="small">📍 ${coord}</div>
+              <div class="row" style="margin-top:8px">
+                <button class="btn" type="button" onclick="openMap('${safe(c.coords)}')">Maps</button>
+                <button class="btn" type="button" onclick="directionsTo('${safe(c.coords)}')">Directions</button>
+              </div>
             </div>
-          ` : ""}
+          ` : ``}
 
-          ${noteT ? `<div class="mini" style="margin-top:8px">📝 ${noteT}</div>` : ""}
+          ${c.photo ? `<img src="${c.photo}" class="photo" alt="Fish photo">` : ``}
 
-          <div class="chipRow" style="margin-top:12px">
-            <button type="button" onclick="editCatch('${c.id}')">✏️ Edit</button>
-            <button type="button" onclick="deleteCatch('${c.id}')">🗑 Delete</button>
+          ${c.notes ? `<div class="small" style="margin-top:10px">${safe(c.notes)}</div>` : ``}
+
+          <div class="row" style="margin-top:12px">
+            <button class="btn" type="button" onclick="editCatch('${safe(c.id)}')">Edit</button>
+            <button class="btn danger" type="button" onclick="deleteCatch('${safe(c.id)}')">Delete</button>
           </div>
         </div>
       `;
     });
 
     list.innerHTML = html;
+    renderMap();
   }
 
-  function clearAll(){
-    const ok = confirm("Delete ALL catches?");
+  function deleteCatch(id){
+    const ok = confirm("Delete this catch?");
     if(!ok) return;
-    saveAll([]);
+    const data = getAll().filter(x => String(x.id) !== String(id));
+    saveAll(data);
     loadLog();
-    renderGallery();
-    renderStats();
-    renderMap(false);
-    renderMap(true);
   }
 
-  // ===== Gallery =====
+  function editCatch(id){
+    const data = getAll();
+    const idx = data.findIndex(x => String(x.id) === String(id));
+    if(idx === -1) return;
+    const c = data[idx];
+
+    const ns = prompt("Species:", c.species || "");
+    if(ns === null) return;
+
+    const nl = prompt("Length (cm):", c.length || "");
+    if(nl === null) return;
+
+    const nn = prompt("Notes:", c.notes || "");
+    if(nn === null) return;
+
+    c.species = ns.trim();
+    c.length = nl.trim();
+    c.notes = nn.trim();
+
+    // update min size if species changed
+    const min = MIN_CM[c.species] ?? null;
+    c.minSize = (min != null ? String(min) : "");
+
+    saveAll(data);
+    loadLog();
+  }
+
+  function resetAll(){
+    const ok = confirm("RESET ALL DATA? This deletes catches + spots.");
+    if(!ok) return;
+    localStorage.removeItem(KEY_CATCH);
+    localStorage.removeItem(KEY_SPOTS);
+    markers = [];
+    renderMap();
+    renderSpots();
+    renderGallery();
+    renderAnalytics();
+    loadLog();
+    alert("All data cleared ✅");
+  }
+
+  // ---------- Gallery ----------
   function renderGallery(){
-    const data = getAll().slice().reverse();
-    const photos = data.filter(c=>c.photo);
-    if(!photos.length){
-      galleryBox.innerHTML = `<div class="card"><div class="mini">No photos yet.</div></div>`;
+    const data = getAll().filter(c => c.photo);
+    if(!data.length){
+      galleryGrid.innerHTML = `<div class="small">No photos yet.</div>`;
       return;
     }
-    galleryBox.innerHTML = photos.map(c=>`
-      <div class="card">
-        <div style="font-weight:1100;margin-bottom:8px">${escapeHtml(c.species || "Unknown")}</div>
-        <img src="${c.photo}" alt="Fish photo">
-        <div class="mini" style="margin-top:8px">${escapeHtml(c.place || "")}</div>
-      </div>
-    `).join("");
+    galleryGrid.innerHTML = data.slice().reverse().map(c =>
+      `<img src="${c.photo}" alt="fish photo" title="${safe(c.species||"")}" />`
+    ).join("");
   }
 
-  // ===== Stats + Depth analysis =====
-  function toNum(x){
-    const n = Number(String(x||"").replace(",","."));
-    return Number.isFinite(n) ? n : NaN;
+  // ---------- Analytics ----------
+  function mode(arr){
+    const m = new Map();
+    arr.forEach(x => m.set(x, (m.get(x)||0)+1));
+    let best=null, bestN=0;
+    for(const [k,v] of m.entries()){
+      if(v>bestN){ bestN=v; best=k; }
+    }
+    return best;
   }
 
-  function depthBin(m){
-    if(!Number.isFinite(m)) return "Unknown";
-    if(m < 20) return "0–19m";
-    if(m < 40) return "20–39m";
-    if(m < 60) return "40–59m";
-    if(m < 80) return "60–79m";
-    return "80m+";
+  function binDepth(d){
+    const x = Number(d);
+    if(!Number.isFinite(x)) return null;
+    const b = Math.round(x/10)*10;
+    return `${b}-${b+9}m`;
   }
 
-  function renderStats(){
+  function renderAnalytics(){
     const data = getAll();
     if(!data.length){
-      statsBox.innerHTML = `<div class="card"><div class="mini">No catches yet.</div></div>`;
+      analyticsBox.innerHTML = `<div class="small">No catches yet.</div>`;
       return;
     }
 
-    // counts
     const by = {};
-    let biggest = {len: -1, species:"", place:""};
-    const depthCounts = {};
-    const depthBySpecies = {};
-
     data.forEach(c=>{
-      const sp = c.species || "Unknown";
-      by[sp] = (by[sp] || 0) + 1;
-
-      const nLen = toNum(c.length);
-      if(Number.isFinite(nLen) && nLen > biggest.len){
-        biggest = {len:nLen, species:sp, place:c.place||""};
-      }
-
-      const d = toNum(c.depth);
-      const bin = depthBin(d);
-      depthCounts[bin] = (depthCounts[bin] || 0) + 1;
-
-      if(!depthBySpecies[sp]) depthBySpecies[sp] = {};
-      depthBySpecies[sp][bin] = (depthBySpecies[sp][bin] || 0) + 1;
+      const sp = c.species || "Other";
+      if(!by[sp]) by[sp] = { depths:[], tides:[], moons:[], drifts:[] , count:0};
+      by[sp].count++;
+      const bd = binDepth(c.depth);
+      if(bd) by[sp].depths.push(bd);
+      if(c.tideLabel) by[sp].tides.push(c.tideLabel.split(" • ")[0] || c.tideLabel);
+      if(c.moon) by[sp].moons.push(c.moon);
+      if(Number.isFinite(Number(c.driftKmh))) by[sp].drifts.push(Number(c.driftKmh));
     });
 
-    // best depth overall
-    const bestDepth = Object.keys(depthCounts).sort((a,b)=>depthCounts[b]-depthCounts[a])[0] || "Unknown";
+    const rows = Object.keys(by).sort((a,b)=>by[b].count-by[a].count).map(sp=>{
+      const r = by[sp];
+      const bestDepth = mode(r.depths) || "—";
+      const bestTide = mode(r.tides) || "—";
+      const bestMoon = mode(r.moons) || "—";
+      const avgDrift = r.drifts.length ? (r.drifts.reduce((s,x)=>s+x,0)/r.drifts.length).toFixed(1) : "—";
 
-    // top species
-    const speciesCards = Object.keys(by)
-      .sort((a,b)=>by[b]-by[a])
-      .map(sp=>`
+      return `
         <div class="card">
-          <div style="font-weight:1100">${escapeHtml(sp)}</div>
-          <div class="mini">Catches: <b>${by[sp]}</b></div>
-          <div class="mini">Best depth: <b>${bestBinFor(depthBySpecies[sp])}</b></div>
+          <div style="font-weight:1000">${safe(sp)}</div>
+          <div class="chips">
+            <span class="chip">Catches: ${r.count}</span>
+            <span class="chip">Best depth: ${safe(bestDepth)}</span>
+            <span class="chip">Best tide: ${safe(bestTide)}</span>
+            <span class="chip">Best moon: ${safe(bestMoon)}</span>
+            <span class="chip">Avg drift: ${safe(avgDrift)} km/h</span>
+          </div>
         </div>
-      `).join("");
+      `;
+    }).join("");
 
-    statsBox.innerHTML = `
-      <div class="grid">
-        <div class="card">
-          <div class="mini">Total catches</div>
-          <div class="kpi">${data.length}</div>
-        </div>
-        <div class="card">
-          <div class="mini">Biggest length</div>
-          <div style="font-weight:1100">${biggest.len > 0 ? `${escapeHtml(biggest.species)} • ${biggest.len} cm` : "—"}</div>
-          <div class="mini">${escapeHtml(biggest.place || "")}</div>
-        </div>
-        <div class="card">
-          <div class="mini">Best depth (overall)</div>
-          <div class="kpi">${escapeHtml(bestDepth)}</div>
-        </div>
-      </div>
-      <div class="card">
-        <div style="font-weight:1100;margin-bottom:6px">Depth bins</div>
-        ${Object.keys(depthCounts).sort((a,b)=>depthCounts[b]-depthCounts[a]).map(k=>`
-          <div class="mini">${escapeHtml(k)}: <b>${depthCounts[k]}</b></div>
-        `).join("")}
-      </div>
-      ${speciesCards}
-    `;
+    analyticsBox.innerHTML = rows;
   }
 
-  function bestBinFor(obj){
-    if(!obj) return "—";
-    const k = Object.keys(obj).sort((a,b)=>(obj[b]||0)-(obj[a]||0))[0];
-    return k || "—";
-  }
-
-  // ===== Sea days (14) =====
+  // ---------- Sea intelligence ----------
   function maxOf(arr){
-    let m = -Infinity;
-    for(const x of arr){ if(Number.isFinite(x) && x>m) m=x; }
-    return Number.isFinite(m) ? m : NaN;
+    const a = arr.filter(Number.isFinite);
+    return a.length ? Math.max(...a) : NaN;
   }
   function avgOf(arr){
-    let s=0,c=0;
-    for(const x of arr){ if(Number.isFinite(x)){ s+=x; c++; } }
-    return c ? (s/c) : NaN;
+    const a = arr.filter(Number.isFinite);
+    return a.length ? (a.reduce((s,x)=>s+x,0)/a.length) : NaN;
   }
-  function fmt(x){
-    return Number.isFinite(x) ? (Math.round(x*10)/10).toString() : "—";
-  }
-  function seaScore(waveMax, swellMax, windMax){
-    const wave = Number.isFinite(waveMax) ? waveMax : 9;
-    const swell= Number.isFinite(swellMax) ? swellMax: 9;
-    const wind = Number.isFinite(windMax) ? windMax : 80;
-
-    const waveS = Math.max(0, 1 - (wave/2.5));
-    const swellS= Math.max(0, 1 - (swell/3.0));
-    const windS = Math.max(0, 1 - (wind/50));
-
-    const score = Math.round((waveS*0.45 + swellS*0.30 + windS*0.25) * 100);
-    return Math.max(0, Math.min(100, score));
+  function seaScore(waveMax, windMax){
+    // Higher better (calmer)
+    let score = 100;
+    if(Number.isFinite(waveMax)) score -= waveMax * 22;
+    if(Number.isFinite(windMax)) score -= windMax * 1.2;
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    return score;
   }
 
-  async function fetchSeaDays(){
+  async function loadSea(){
     const p = parseCoords(coords.value) || STILBAAI;
-    seaHint.textContent = `Using: ${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}`;
-    seaBox.innerHTML = `<div class="card"><div class="mini">Loading 14-day marine forecast…</div></div>`;
+    biteBox.innerHTML = `<div class="small">Loading bite windows…</div>`;
+    seaBox.innerHTML = `<div class="small">Loading 14-day sea ranking…</div>`;
 
     try{
       const marineUrl =
         `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
+        `&hourly=wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
 
       const weatherUrl =
         `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
+        `&hourly=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
 
       const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
       if(!mRes.ok) throw new Error("Marine fetch fail");
@@ -882,378 +1284,136 @@ section{display:none}
       const m = await mRes.json();
       const w = await wRes.json();
 
-      const time  = m?.hourly?.time || [];
-      const wave  = m?.hourly?.wave_height || [];
-      const swellArr = m?.hourly?.swell_wave_height || [];
-      const sst   = m?.hourly?.sea_surface_temperature || [];
-      const wind  = w?.hourly?.windspeed_10m || [];
+      const time = m?.hourly?.time || [];
+      const wave = m?.hourly?.wave_height || [];
+      const sst  = m?.hourly?.sea_surface_temperature || [];
+      const wind = w?.hourly?.windspeed_10m || [];
+      const wdir = w?.hourly?.winddirection_10m || [];
 
+      // Bite windows today (next 24h)
+      const today = String(time[0] || "").slice(0,10);
+      const rowsToday = [];
+      for(let i=0;i<time.length;i++){
+        const day = String(time[i]).slice(0,10);
+        if(day !== today) continue;
+
+        const hr = String(time[i]).slice(11,16);
+        const waveM = Number(wave[i]);
+        const windK = Number(wind[i]);
+        const wd = Number(wdir[i]);
+
+        const tide = tideStrengthAt(new Date(time[i]));
+        const cur = estimateCurrent(windK, tide.strength);
+
+        // bite score: calm + strong tide
+        let score = 100;
+        if(Number.isFinite(waveM)) score -= waveM * 25;
+        if(Number.isFinite(windK)) score -= windK * 1.1;
+        score += tide.strength * 18;
+
+        score = Math.max(0, Math.min(100, Math.round(score)));
+        rowsToday.push({ hr, score, waveM, windK, wd, tide, cur });
+      }
+      rowsToday.sort((a,b)=>b.score-a.score);
+
+      const top = rowsToday.slice(0,6);
+      biteBox.innerHTML = top.map((r, idx)=>{
+        const badge = r.score >= 80 ? "✅ HOT" : r.score >= 65 ? "👌 OK" : "⚠️ Meh";
+        return `
+          <div class="card" style="margin:10px 0">
+            <div style="font-weight:1000">${idx===0?"🥇":idx===1?"🥈":idx===2?"🥉":""} ${safe(today)} ${safe(r.hr)} • <span class="chip">${badge}</span> <span class="chip">Score ${r.score}</span></div>
+            <div style="margin-top:8px">
+              🌊 Wave: <b>${fmt(r.waveM)}m</b> • 💨 Wind: <b>${fmt(r.windK,0)}km/h</b> (${safe(degToCompass(r.wd))})<br>
+              🌊 Tide: <b>${r.tide.trend}</b> • Strength: <b>${fmt(r.tide.strength,2)}</b> • Current: <b>${safe(r.cur.label)}</b>
+            </div>
+          </div>
+        `;
+      }).join("") || `<div class="small">No today data.</div>`;
+
+      // 14-day daily ranking
       const days = {};
       for(let i=0;i<time.length;i++){
         const day = String(time[i]).slice(0,10);
-        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[] };
-        if(Number.isFinite(wave[i]))      days[day].wave.push(wave[i]);
-        if(Number.isFinite(swellArr[i]))  days[day].swell.push(swellArr[i]);
-        if(Number.isFinite(wind[i]))      days[day].wind.push(wind[i]);
-        if(Number.isFinite(sst[i]))       days[day].sst.push(sst[i]);
+        if(!days[day]) days[day] = { wave:[], wind:[], sst:[] };
+        if(Number.isFinite(Number(wave[i]))) days[day].wave.push(Number(wave[i]));
+        if(Number.isFinite(Number(wind[i]))) days[day].wind.push(Number(wind[i]));
+        if(Number.isFinite(Number(sst[i])))  days[day].sst.push(Number(sst[i]));
       }
 
-      const rows = Object.keys(days).map(day => {
+      const daily = Object.keys(days).map(day=>{
         const d = days[day];
-        const waveMax  = maxOf(d.wave);
-        const swellMax = maxOf(d.swell);
-        const windMax  = maxOf(d.wind);
-        const sstAvg   = avgOf(d.sst);
-        const score    = seaScore(waveMax, swellMax, windMax);
-        return { day, waveMax, swellMax, windMax, sstAvg, score };
-      }).sort((a,b)=>b.score - a.score);
+        const waveMax = maxOf(d.wave);
+        const windMax = maxOf(d.wind);
+        const sstAvg  = avgOf(d.sst);
+        const score = seaScore(waveMax, windMax);
+        return { day, waveMax, windMax, sstAvg, score };
+      }).sort((a,b)=>b.score-a.score);
 
-      let html = "";
-      rows.forEach((r, idx) => {
-        const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
+      seaBox.innerHTML = daily.map((r, idx)=>{
+        const medal = idx<3 ? (idx===0?"🥇":idx===1?"🥈":"🥉") : "";
         const grade = r.score >= 80 ? "✅ Calm" : r.score >= 65 ? "👌 OK" : r.score >= 50 ? "⚠️ Rough" : "❌ Bad";
-        html += `
+        return `
           <div class="card" style="margin:10px 0;">
-            <div style="font-weight:1100;">
-              ${medal} ${r.day} • <span class="chip">${grade}</span> <span class="chip">Score ${r.score}</span>
+            <div style="font-weight:1000;">
+              ${medal} ${safe(r.day)} • <span class="chip">${grade}</span> <span class="chip">Score ${r.score}</span>
             </div>
             <div style="margin-top:8px;">
-              🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
-              💨 Wind max: <b>${fmt(r.windMax)} km/h</b>
+              🌊 Wave max: <b>${fmt(r.waveMax)} m</b><br>
+              💨 Wind max: <b>${fmt(r.windMax,0)} km/h</b>
               ${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
             </div>
           </div>
         `;
-      });
+      }).join("");
 
-      seaBox.innerHTML = html || `<div class="card"><div class="mini">No data returned.</div></div>`;
     }catch(e){
-      seaBox.innerHTML = `<div class="card"><div class="mini">Could not load forecast. Check internet and try again.</div></div>`;
+      biteBox.innerHTML = `<div class="small">Could not load bite windows. Check internet.</div>`;
+      seaBox.innerHTML = `<div class="small">Could not load 14-day forecast. Check internet.</div>`;
     }
   }
 
-  // ===== Tide (reference-based real times, no key) =====
-  // semi-diurnal tidal period:
-  const TIDE_HIGH_PERIOD_MIN = 12 * 60 + 25; // 12h25m between highs
-  const TIDE_LOW_OFFSET_MIN  = Math.round(TIDE_HIGH_PERIOD_MIN / 2); // ~6h12m after high = low
+  // ---------- Init ----------
+  initMaps();
+  showTab("add");
+  onSpeciesChange();
 
-  const TIDE_REF_KEY = "tanyaSeaAppV25_tideRef"; // store HH:MM
-  function loadTideRefUI(){
-    const saved = localStorage.getItem(TIDE_REF_KEY) || "";
-    if(saved && !tideRefTime.value) tideRefTime.value = saved;
-    tideRefHint.textContent = saved
-      ? `Saved reference: ${saved} (High tide). Tap “Calculate today”.`
-      : `Tip: Set the high tide time from any tide table (Stilbaai), then the app calculates the next tides.`;
-  }
+  // Exports for onclick
+  window.showTab = showTab;
+  window.onSpeciesChange = onSpeciesChange;
+  window.updateMinCheck = updateMinCheck;
 
-  function saveTideRef(){
-    const v = String(tideRefTime.value || "").trim();
-    if(!/^\d{1,2}:\d{2}$/.test(v)){
-      alert("Enter time like 06:40");
-      return;
-    }
-    localStorage.setItem(TIDE_REF_KEY, v);
-    loadTideRefUI();
-    alert("Reference saved ✅");
-  }
-
-  function minutesFromHHMM(hhmm){
-    const [h,m] = hhmm.split(":").map(Number);
-    if(!Number.isFinite(h) || !Number.isFinite(m)) return null;
-    return h*60 + m;
-  }
-
-  function fmtTime(d){
-    const hh = String(d.getHours()).padStart(2,"0");
-    const mm = String(d.getMinutes()).padStart(2,"0");
-    return `${hh}:${mm}`;
-  }
-
-  function addMinutes(date, mins){
-    return new Date(date.getTime() + mins*60000);
-  }
-
-  // Build tide events for today and tomorrow around reference
-  function calcTidesToday(){
-    const ref = (localStorage.getItem(TIDE_REF_KEY) || "").trim();
-    if(!ref){
-      alert("Set Reference High Tide time first (HH:MM).");
-      return;
-    }
-    const refMin = minutesFromHHMM(ref);
-    if(refMin == null) return;
-
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const baseHigh = addMinutes(start, refMin);
-
-    // Generate around today: we need enough events to cover today
-    // We'll step highs backward/forward by 12h25m and derive lows
-    const events = [];
-
-    // Create a range of highs around today
-    for(let k=-2;k<=4;k++){
-      const high = addMinutes(baseHigh, k*TIDE_HIGH_PERIOD_MIN);
-      const low  = addMinutes(high, TIDE_LOW_OFFSET_MIN);
-
-      events.push({ type:"High", time: high });
-      events.push({ type:"Low",  time: low  });
-    }
-
-    // Filter to today only
-    const dayKey = start.toDateString();
-    const todays = events
-      .filter(e => e.time.toDateString() === dayKey)
-      .sort((a,b)=>a.time-b.time);
-
-    // Next events
-    const next = events
-      .filter(e => e.time >= now)
-      .sort((a,b)=>a.time-b.time)
-      .slice(0,4);
-
-    tideBox.innerHTML = `
-      <div class="card">
-        <div style="font-weight:1100">Today’s tide times (estimated from reference)</div>
-        <div class="mini">Reference high: <b>${escapeHtml(ref)}</b> • Period: 12h 25m</div>
-        <hr>
-        ${todays.length ? todays.map(e=>`
-          <div class="mini">🌊 <b>${e.type}</b> — ${fmtTime(e.time)}</div>
-        `).join("") : `<div class="mini">No events found for today (check reference time).</div>`}
-      </div>
-
-      <div class="card">
-        <div style="font-weight:1100">Next tides</div>
-        ${next.map(e=>`
-          <div class="mini">⏭️ <b>${e.type}</b> — ${fmtTime(e.time)} (${e.time.toLocaleDateString()})</div>
-        `).join("")}
-      </div>
-    `;
-  }
-
-  async function bestBiteToday(){
-    // Uses: tide windows + (optional) auto marine/wind score from Open-Meteo
-    const ref = (localStorage.getItem(TIDE_REF_KEY) || "").trim();
-    if(!ref){
-      alert("Set Reference High Tide time first (HH:MM).");
-      return;
-    }
-    const refMin = minutesFromHHMM(ref);
-    if(refMin == null) return;
-
-    const now = new Date();
-    const start = new Date(now.getFullYear(), now.getMonth(), now.getDate(), 0, 0, 0);
-    const baseHigh = addMinutes(start, refMin);
-
-    // build today events
-    const events = [];
-    for(let k=-2;k<=4;k++){
-      const high = addMinutes(baseHigh, k*TIDE_HIGH_PERIOD_MIN);
-      const low  = addMinutes(high, TIDE_LOW_OFFSET_MIN);
-      if(high.toDateString() === start.toDateString()) events.push({type:"High", time:high});
-      if(low.toDateString()  === start.toDateString()) events.push({type:"Low",  time:low});
-    }
-    events.sort((a,b)=>a.time-b.time);
-
-    // bite windows:
-    // High tide: -2h to +1h
-    // Low tide:  -1h to +1h (often ok on some reefs)
-    const windows = [];
-    events.forEach(e=>{
-      if(e.type==="High"){
-        windows.push({ label:"High tide bite", start:addMinutes(e.time,-120), end:addMinutes(e.time,60) });
-      }else{
-        windows.push({ label:"Low tide bite", start:addMinutes(e.time,-60), end:addMinutes(e.time,60) });
-      }
-    });
-
-    // marine score (try)
-    let seaScoreNow = null;
-    try{
-      const p = parseCoords(coords.value) || STILBAAI;
-      const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=wave_height,swell_wave_height&timezone=Africa%2FJohannesburg&forecast_days=1`;
-      const weatherUrl =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=1`;
-      const [mRes,wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if(mRes.ok && wRes.ok){
-        const m = await mRes.json();
-        const w = await wRes.json();
-        const wave  = m?.hourly?.wave_height?.[0];
-        const swell = m?.hourly?.swell_wave_height?.[0];
-        const wind  = w?.hourly?.windspeed_10m?.[0];
-        seaScoreNow = seaScore(wave, swell, wind);
-      }
-    }catch(_){}
-
-    const scoreText = (seaScoreNow==null) ? "—" : String(seaScoreNow);
-    const grade = (seaScoreNow==null) ? "Unknown" :
-      seaScoreNow>=80 ? "✅ Calm" : seaScoreNow>=65 ? "👌 OK" : seaScoreNow>=50 ? "⚠️ Rough" : "❌ Bad";
-
-    tideBox.innerHTML = `
-      <div class="card">
-        <div style="font-weight:1100">Best bite times (today)</div>
-        <div class="mini">Sea score now: <b>${escapeHtml(scoreText)}</b> • ${escapeHtml(grade)}</div>
-        <hr>
-        ${windows.map(w=>`
-          <div class="mini">🎣 <b>${escapeHtml(w.label)}</b> — ${fmtTime(w.start)} to ${fmtTime(w.end)}</div>
-        `).join("")}
-        <div class="mini" style="margin-top:10px">
-          Tip: Best often = <b>2h before High</b> + <b>1h after High</b> (especially deep-sea drift).
-        </div>
-      </div>
-    `;
-  }
-
-  // ===== Maps + satellite toggle (works) =====
-  let mapNormal = null, mapHeat = null;
-  let osmLayer = null, satLayer = null;
-  let osmLayerHeat = null, satLayerHeat = null;
-  let satelliteOn = false;
-
-  function makeLayers(){
-    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-      maxZoom: 19, attribution: "© OpenStreetMap"
-    });
-    const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
-      maxZoom: 19, attribution: "Tiles © Esri"
-    });
-    return { osm, sat };
-  }
-
-  function setSatellite(map, osm, sat){
-    if(!map || !osm || !sat) return;
-    if(satelliteOn){
-      if(map.hasLayer(osm)) map.removeLayer(osm);
-      if(!map.hasLayer(sat)) sat.addTo(map);
-    }else{
-      if(map.hasLayer(sat)) map.removeLayer(sat);
-      if(!map.hasLayer(osm)) osm.addTo(map);
-    }
-  }
-
-  function toggleSatellite(){
-    satelliteOn = !satelliteOn;
-    setSatellite(mapNormal, osmLayer, satLayer);
-    setSatellite(mapHeat, osmLayerHeat, satLayerHeat);
-  }
-
-  function renderMap(isHeat){
-    const data = getAll();
-    const targetId = isHeat ? "mapHeat" : "map";
-    const container = el(targetId);
-    if(!container) return;
-
-    if(isHeat && !mapHeat){
-      mapHeat = L.map(targetId);
-      const layers = makeLayers();
-      osmLayerHeat = layers.osm;
-      satLayerHeat = layers.sat;
-      osmLayerHeat.addTo(mapHeat);
-      mapHeat.setView([STILBAAI.lat, STILBAAI.lon], 11);
-    }
-    if(!isHeat && !mapNormal){
-      mapNormal = L.map(targetId);
-      const layers = makeLayers();
-      osmLayer = layers.osm;
-      satLayer = layers.sat;
-      osmLayer.addTo(mapNormal);
-      mapNormal.setView([STILBAAI.lat, STILBAAI.lon], 11);
-    }
-
-    const map = isHeat ? mapHeat : mapNormal;
-
-    // apply current satellite mode
-    if(isHeat) setSatellite(mapHeat, osmLayerHeat, satLayerHeat);
-    else setSatellite(mapNormal, osmLayer, satLayer);
-
-    // clear overlays
-    map.eachLayer(layer=>{
-      if(layer === osmLayer || layer === satLayer || layer === osmLayerHeat || layer === satLayerHeat) return;
-      map.removeLayer(layer);
-    });
-
-    let points = [];
-    data.forEach(c=>{
-      const p = parseCoords(c.coords);
-      if(!p) return;
-      points.push(p);
-
-      if(!isHeat){
-        const label = `${c.species || ""} • ${c.place || ""} • ${c.depth || ""}m`;
-        L.marker([p.lat, p.lon]).addTo(map).bindPopup(escapeHtml(label));
-      }
-    });
-
-    if(isHeat){
-      const bucket = {};
-      points.forEach(p=>{
-        const k = `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`;
-        bucket[k] = (bucket[k] || 0) + 1;
-      });
-      Object.keys(bucket).forEach(k=>{
-        const [lat, lon] = k.split(",").map(Number);
-        const count = bucket[k];
-        const radius = 120 + Math.min(900, count * 180);
-        L.circle([lat, lon], {
-          radius,
-          color: "rgba(79,140,255,.65)",
-          fillColor: "rgba(79,140,255,.35)",
-          fillOpacity: 0.6,
-          weight: 1
-        }).addTo(map).bindPopup(`Spot intensity: ${count}`);
-      });
-    }
-
-    if(points.length){
-      const bounds = L.latLngBounds(points.map(p=>[p.lat,p.lon]));
-      map.fitBounds(bounds, { padding:[20,20] });
-    }
-  }
-
-  // ===== Identifier photo preview =====
-  if(idPhoto){
-    idPhoto.addEventListener("change", async (e)=>{
-      const file = e.target.files?.[0];
-      if(!file) return;
-      const dataUrl = await fileToDataUrl(file);
-      idPreview.innerHTML = `<img src="${dataUrl}" style="width:100%;border-radius:12px">`;
-      idResult.innerHTML = `
-        <b>Real fish ID:</b> Open this photo in Google Photos → tap <b>Lens</b>.
-        <br>Or long-press → “Search image”.
-      `;
-    });
-  }
-
-  // expose for buttons
-  window.show = show;
   window.getGPS = getGPS;
-  window.autoConditions = autoConditions;
-  window.saveCatch = saveCatch;
-  window.clearForm = clearForm;
+  window.useStilbaai = useStilbaai;
+
+  window.toggleSatellite = toggleSatellite;
+  window.toggleReef = toggleReef;
+
   window.openMap = openMap;
+  window.directionsTo = directionsTo;
+
+  window.saveCatch = saveCatch;
+  window.loadLog = loadLog;
   window.deleteCatch = deleteCatch;
   window.editCatch = editCatch;
-  window.clearAll = clearAll;
-  window.toggleSatellite = toggleSatellite;
-  window.fetchSeaDays = fetchSeaDays;
+  window.resetAll = resetAll;
 
-  window.saveTideRef = saveTideRef;
-  window.calcTidesToday = calcTidesToday;
-  window.bestBiteToday = bestBiteToday;
+  window.renderSpots = renderSpots;
+  window.useSpot = useSpot;
+  window.renameSpot = renameSpot;
+  window.deleteSpot = deleteSpot;
+  window.clearSpots = clearSpots;
 
-  // start
-  show("add");
-  loadTideRefUI();
+  window.renderGallery = renderGallery;
+  window.renderAnalytics = renderAnalytics;
 
-  // Service Worker (PWA)
-  if ("serviceWorker" in navigator) {
+  window.loadSea = loadSea;
+
+  // PWA SW
+  if("serviceWorker" in navigator){
     navigator.serviceWorker.register("./sw.js").catch(()=>{});
   }
 })();
 </script>
 
 </body>
-      </html>
+          </html>
