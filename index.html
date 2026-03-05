@@ -43,6 +43,7 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
     <button class="secondary" onclick="show('map')">🗺 Map</button>
     <button class="secondary" onclick="show('stats')">📊 Stats</button>
     <button class="secondary" onclick="show('spots')">⭐ Spots</button>
+    <button onclick="showTab('sea')">🌊 Sea Days</button>
   </div>
 </div>
 
@@ -149,7 +150,18 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
   <hr>
   <button onclick="showSpeciesStats()">🐟 Species stats</button>
 </section>
+<section id="sea" style="display:none">
 
+<div class="card">
+<h3>🌊 Beste See Dae (14 dae)</h3>
+
+<button onclick="fetchSeaDays()">Refresh</button>
+
+<div id="seaBox"></div>
+
+</div>
+
+</section>
 <section id="spots" class="card" style="display:none">
   <h3 style="margin:0 0 10px">⭐ Favourite Spots</h3>
   <div id="spotsList"></div>
@@ -204,22 +216,22 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
   function saveSpots(spots){
     localStorage.setItem(SPOTS_KEY, JSON.stringify(spots));
   }
+function showTab(id){
 
-  function showTab(id){
-  const tabs = ["add","log","map","stats","spots","sea"];
+const tabs = ["add","log","map","stats","spots","sea"];
 
-  for(const t of tabs){
-    document.getElementById(t).style.display =
-      (t===id ? "block" : "none");
-  }
+tabs.forEach(t=>{
+document.getElementById(t).style.display =
+(t===id ? "block" : "none");
+});
 
-  if(id==="log") renderLog();
-  if(id==="map") renderMap(true);
-  if(id==="stats") renderStats();
-  if(id==="spots") renderSpots();
-  if(id==="sea") fetchSeaDays();
-  }
+if(id==="log") renderLog();
+if(id==="map") renderMap(true);
+if(id==="stats") renderStats();
+if(id==="spots") renderSpots();
+if(id==="sea") fetchSeaDays();
 
+}
   function getMoonPhase(date = new Date()){
     const lp = 2551443;
     const new_moon = new Date(1970,0,7,20,35,0);
