@@ -205,16 +205,19 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
     localStorage.setItem(SPOTS_KEY, JSON.stringify(spots));
   }
 
-  function show(tab){
-    ["add","log","map","stats","spots"].forEach(id => {
-      const s = el(id);
-      if(s) s.style.display = (id === tab) ? "block" : "none";
-    });
+  function showTab(id){
+  const tabs = ["add","log","map","stats","spots","sea"];
 
-    if(tab === "log") renderLog();
-    if(tab === "map") renderMap(false);
-    if(tab === "stats") renderStats();
-    if(tab === "spots") renderSpots();
+  for(const t of tabs){
+    document.getElementById(t).style.display =
+      (t===id ? "block" : "none");
+  }
+
+  if(id==="log") renderLog();
+  if(id==="map") renderMap(true);
+  if(id==="stats") renderStats();
+  if(id==="spots") renderSpots();
+  if(id==="sea") fetchSeaDays();
   }
 
   function getMoonPhase(date = new Date()){
@@ -552,6 +555,114 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
     renderSpots();
     alert("Alles skoon ✅");
   }
+  async function fetchSeaDays(){
+  const box = document.getElementById("seaBox");
+  if(!box) return;
+
+  // gebruik coords as jy dit ingevul het, anders Stilbaai default
+  const coordStr = (document.getElementById("coords")?.value || "").trim();
+  const p = parseCoords(coordStr) || STILBAAI;
+
+  box.innerHTML = `<small>Laai 14-dae see forecast...</small>`;
+
+  try{
+    // Marine (waves + swell + sea temp)
+    const marineUrl =
+      `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+      `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+    // Weather (wind speed)
+    const weatherUrl =
+      `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+      `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+    const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+    if(!mRes.ok) throw new Error("Marine fetch fail");
+    if(!wRes.ok) throw new Error("Wind fetch fail");
+
+    const m = await mRes.json();
+    const w = await wRes.json();
+
+    const time = m?.hourly?.time || [];
+    const wave = m?.hourly?.wave_height || [];
+    const swell = m?.hourly?.swell_wave_height || [];
+    const sst = m?.hourly?.sea_surface_temperature || [];
+    const wind = w?.hourly?.windspeed_10m || [];
+
+    // groepeer per dag
+    const days = {}; // yyyy-mm-dd -> arrays
+    for(let i=0;i<time.length;i++){
+      const day = String(time[i]).slice(0,10);
+      if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[] };
+      if(Number.isFinite(wave[i]))  days[day].wave.push(wave[i]);
+      if(Number.isFinite(swell[i])) days[day].swell.push(swell[i]);
+      if(Number.isFinite(wind[i]))  days[day].wind.push(wind[i]);
+      if(Number.isFinite(sst[i]))   days[day].sst.push(sst[i]);
+    }
+
+    const rows = Object.keys(days).map(day => {
+      const d = days[day];
+      const waveMax  = maxOf(d.wave);
+      const swellMax = maxOf(d.swell);
+      const windMax  = maxOf(d.wind);
+      const sstAvg   = avgOf(d.sst);
+
+      const score = seaScore(waveMax, swellMax, windMax);
+      return { day, waveMax, swellMax, windMax, sstAvg, score };
+    }).sort((a,b)=>b.score - a.score);
+
+    // wys top “beste”
+    let html = "";
+    rows.forEach((r, idx) => {
+      const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
+      const grade = r.score >= 80 ? "✅ Kalm" : r.score >= 65 ? "👌 OK" : r.score >= 50 ? "⚠️ Rough" : "❌ Sleg";
+      html += `
+        <div class="card" style="margin:10px 0;">
+          <div style="font-weight:1000;">
+            ${medal} ${r.day} • <span class="chip">Score ${r.score}</span> <span class="chip">${grade}</span>
+          </div>
+          <div style="margin-top:8px;">
+            🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
+            💨 Wind max: <b>${fmt(r.windMax)} km/h</b>${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
+          </div>
+        </div>
+      `;
+    });
+
+    box.innerHTML = html || `<small>Geen data terug nie.</small>`;
+  }catch(e){
+    box.innerHTML = `<small>Kon nie forecast laai nie. Check internet / probeer weer.</small>`;
+  }
+}
+
+function seaScore(waveMax, swellMax, windMax){
+  // score 0–100 (hoër = kalmer)
+  let score = 100;
+
+  // penalty’s (tune soos jy wil)
+  if(Number.isFinite(waveMax))  score -= waveMax * 22;   // golfhoogte tel baie
+  if(Number.isFinite(swellMax)) score -= swellMax * 12;  // swell
+  if(Number.isFinite(windMax))  score -= windMax * 1.2;  // wind km/h
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+  return score;
+}
+
+function maxOf(arr){
+  if(!arr || !arr.length) return NaN;
+  let m = -Infinity;
+  for(const v of arr) if(v > m) m = v;
+  return m;
+}
+function avgOf(arr){
+  if(!arr || !arr.length) return NaN;
+  let s = 0;
+  for(const v of arr) s += v;
+  return s / arr.length;
+}
+function fmt(x){
+  return Number.isFinite(x) ? (Math.round(x*10)/10) : "—";
+              }
 
   function escapeHtml(str){
     return String(str || "")
