@@ -1,576 +1,195 @@
 <!DOCTYPE html>
 <html lang="af">
 <head>
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1"/>
-  <title>Tanya Sea App</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tanya Sea App</title>
 
-  <!-- Leaflet -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <!-- Heatmap plugin -->
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<style>
+body{
+  font-family:Arial;
+  background:#0b1320;
+  color:white;
+  margin:0;
+  padding:20px;
+}
 
-  <style>
-    :root{
-      --bg:#0b1320;
-      --card:#101b2d;
-      --text:#eaf1ff;
-      --muted:#a9b7d4;
-      --btn:#2d6cdf;
-      --btn2:#1f2f4e;
-      --danger:#d84b4b;
-      --ok:#36c38a;
-      --radius:16px;
-    }
-    *{box-sizing:border-box}
-    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Roboto,Arial;background:var(--bg);color:var(--text)}
-    h1,h2,h3{margin:0 0 12px 0}
-    .wrap{max-width:980px;margin:0 auto;padding:16px}
-    .top{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:14px}
-    .pill{background:rgba(255,255,255,.06);padding:8px 12px;border-radius:999px;color:var(--muted);font-size:13px}
-    .nav{display:flex;gap:10px;flex-wrap:wrap;margin:10px 0 18px}
-    button{border:none;border-radius:14px;padding:12px 14px;font-weight:700;color:white;background:var(--btn);cursor:pointer}
-    button.secondary{background:var(--btn2);color:var(--text)}
-    button.danger{background:var(--danger)}
-    button:disabled{opacity:.55;cursor:not-allowed}
-    .grid{display:grid;grid-template-columns:1fr;gap:14px}
-    @media(min-width:860px){.grid{grid-template-columns:1.1fr .9fr}}
-    .card{background:var(--card);border-radius:var(--radius);padding:16px;box-shadow:0 10px 30px rgba(0,0,0,.25)}
-    label{display:block;margin:10px 0 6px;color:var(--muted);font-size:13px}
-    input,select,textarea{
-      width:100%;padding:12px;border-radius:14px;border:1px solid rgba(255,255,255,.08);
-      background:rgba(255,255,255,.05);color:var(--text);outline:none
-    }
-    textarea{min-height:88px;resize:vertical}
-    .row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
-    .small{font-size:12px;color:var(--muted)}
-    .kpi{display:flex;gap:10px;flex-wrap:wrap;margin-top:10px}
-    .kpi > div{background:rgba(255,255,255,.05);padding:10px 12px;border-radius:14px}
-    .list{display:flex;flex-direction:column;gap:10px}
-    .entry{background:rgba(255,255,255,.05);border-radius:14px;padding:12px}
-    .entryTop{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap}
-    .chips{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
-    .chip{background:rgba(255,255,255,.06);padding:7px 10px;border-radius:999px;font-size:12px;color:var(--muted)}
-    .chip.ok{color:#bfffe7;border:1px solid rgba(54,195,138,.3)}
-    .chip.warn{color:#ffe3b5;border:1px solid rgba(255,190,90,.25)}
-    #map{height:420px;border-radius:16px;overflow:hidden}
-    .sep{height:1px;background:rgba(255,255,255,.07);margin:12px 0}
-  </style>
+.card{
+  background:#101b2d;
+  padding:20px;
+  border-radius:14px;
+  margin-bottom:20px;
+}
+
+input,select{
+  width:100%;
+  padding:10px;
+  margin-top:6px;
+  margin-bottom:14px;
+  border-radius:10px;
+  border:none;
+}
+
+button{
+  padding:12px;
+  border:none;
+  border-radius:10px;
+  background:#2d6cdf;
+  color:white;
+  font-weight:bold;
+  margin-right:6px;
+}
+
+.log{
+  background:#18243b;
+  padding:10px;
+  border-radius:10px;
+  margin-top:10px;
+}
+</style>
 </head>
 
 <body>
-<div class="wrap">
-  <div class="top">
-    <div>
-      <h2>Tanya Sea App 🎣🌊</h2>
-      <div class="small">Werk offline (localStorage). Heatmap + Map + Stats.</div>
-    </div>
-    <div class="pill" id="todayInfo">...</div>
-  </div>
 
-  <div class="nav">
-    <button class="secondary" onclick="showTab('add')">Add</button>
-    <button class="secondary" onclick="showTab('log')">Log</button>
-    <button class="secondary" onclick="showTab('map')">Map / Heatmap</button>
-    <button class="secondary" onclick="showTab('stats')">Stats</button>
-    <button class="danger" onclick="wipeAll()">Delete Alles</button>
-  </div>
+<h2>🎣 Tanya Sea App</h2>
 
-  <div class="grid">
+<div class="card">
 
-    <!-- ADD -->
-    <div class="card" id="tab-add">
-      <h3>➕ Add Catch</h3>
+<label>Species</label>
+<select id="species">
+<option>Kaapse Kabeljou</option>
+<option>Geelstert</option>
+<option>Bonito</option>
+<option>Elf</option>
+<option>Galjoen</option>
+<option>Steenbras</option>
+<option>Raggy</option>
+<option>Bronze Whaler</option>
+</select>
 
-      <label>Species</label>
-      <select id="species"></select>
-      <div class="row">
-        <div>
-          <label>Plek</label>
-          <input id="place" placeholder="Bv: Stilbaai harbour / Die Punt" />
-        </div>
-        <div>
-          <label>Lengte (cm)</label>
-          <input id="length" type="number" inputmode="numeric" placeholder="Bv: 72" />
-        </div>
-      </div>
+<label>Plek</label>
+<input id="place" placeholder="Stilbaai harbour">
 
-      <label>GPS coords (lat,lng)</label>
-      <input id="coords" placeholder="-34.37,21.42" />
+<label>Lengte (cm)</label>
+<input id="length" type="number">
 
-      <div class="row">
-        <button onclick="getGPS()">📍 Get GPS</button>
-        <button class="secondary" onclick="openInGoogleMaps()">🗺️ Open Google Maps</button>
-      </div>
+<label>GPS coords</label>
+<input id="coords" placeholder="-34.37,21.42">
 
-      <label>Foto</label>
-      <input type="file" id="photo" accept="image/*" />
+<button type="button" onclick="getGPS()">📍 Get GPS</button>
+<button type="button" onclick="openMaps()">🗺 Open Google Maps</button>
 
-      <label>Notes</label>
-      <textarea id="notes" placeholder="Bv: aas, gety, wind, tyd, waterkleur..."></textarea>
+<br><br>
 
-      <div class="sep"></div>
+<button type="button" onclick="saveCatch()">💾 Save Catch</button>
 
-      <div class="row">
-        <button onclick="saveCatch()">💾 Save Catch</button>
-        <button class="secondary" onclick="fillAuto()">🌙🌊 Auto Moon + Gety</button>
-      </div>
+</div>
 
-      <div class="kpi">
-        <div><div class="small">Moon</div><div id="moonOut">-</div></div>
-        <div><div class="small">Gety (Stilbaai)</div><div id="tideOut">-</div></div>
-      </div>
-
-      <div class="small" style="margin-top:10px;">
-        🌊 “Auto getye” hier beteken: <b>Spring / Neap</b> (maan gebaseer), nie amptelike tide tye nie.
-      </div>
-    </div>
-
-    <!-- RIGHT SIDE -->
-    <div class="card" id="tab-log">
-      <h3>📒 Log</h3>
-      <div class="small">Tik “Open” by ’n catch om op Map te zoom + Google Maps oop te maak.</div>
-      <div class="sep"></div>
-      <div class="list" id="logList"></div>
-    </div>
-
-    <!-- MAP -->
-    <div class="card" id="tab-map" style="display:none;">
-      <h3>🗺️ Map + 🔥 Heatmap</h3>
-      <div class="row">
-        <button class="secondary" onclick="renderMap(false)">🧷 Markers</button>
-        <button class="secondary" onclick="renderMap(true)">🔥 Heatmap</button>
-      </div>
-      <div class="sep"></div>
-      <div id="map"></div>
-      <div class="small" style="margin-top:10px;">
-        Tip: Heatmap word beter as jy baie logs het. Hoe meer catches op ’n plek, hoe “hotter”.
-      </div>
-    </div>
-
-    <!-- STATS -->
-    <div class="card" id="tab-stats" style="display:none;">
-      <h3>📊 Stats</h3>
-      <div id="statsOut" class="small">-</div>
-    </div>
-
-  </div>
+<div class="card">
+<h3>📒 Log</h3>
+<div id="log"></div>
 </div>
 
 <script>
-/* -------------------------
-   Storage
---------------------------*/
-const KEY = "tanya_sea_catches_v1";
 
-function getAll(){
-  try { return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  catch(e){ return []; }
-}
-function saveAll(arr){
-  localStorage.setItem(KEY, JSON.stringify(arr));
+const KEY="tanya_catches"
+
+function getData(){
+  return JSON.parse(localStorage.getItem(KEY)||"[]")
 }
 
-/* -------------------------
-   Species list
---------------------------*/
-const SPECIES = [
-  "Kaapse Kabeljou","Geelstert","Bonnie","Rooi Roman","Steenbras","Galjoen",
-  "Kob (Kabeljou)","Leervis","Elf (Shad)","Bonito","Skipjack","Tuna","Yellowfin",
-  "Hake","Kreef","Kalmari",
-  "Raggy","Bronze Whaler","Hammerhead","Spotted Gully Shark",
-  "Ray","Skate"
-];
-
-function loadSpecies(){
-  const sel = document.getElementById("species");
-  sel.innerHTML = "";
-  const opt0 = document.createElement("option");
-  opt0.value = "";
-  opt0.textContent = "Select species";
-  sel.appendChild(opt0);
-
-  SPECIES.forEach(s=>{
-    const o=document.createElement("option");
-    o.value=s; o.textContent=s;
-    sel.appendChild(o);
-  });
+function saveData(d){
+  localStorage.setItem(KEY,JSON.stringify(d))
 }
 
-/* -------------------------
-   Moon phase (simple)
---------------------------*/
-function moonInfo(date = new Date()){
-  // Simple approximation: days since known new moon (2000-01-06)
-  const knownNewMoon = new Date(Date.UTC(2000,0,6,18,14,0));
-  const synodic = 29.53058867; // days
-  const days = (date.getTime() - knownNewMoon.getTime()) / 86400000;
-  let age = days % synodic; if(age < 0) age += synodic;
-
-  let name = "";
-  if(age < 1.5) name="New Moon";
-  else if(age < 7.4) name="Waxing Crescent";
-  else if(age < 9.2) name="First Quarter";
-  else if(age < 14.8) name="Waxing Gibbous";
-  else if(age < 16.2) name="Full Moon";
-  else if(age < 22.1) name="Waning Gibbous";
-  else if(age < 23.9) name="Last Quarter";
-  else name="Waning Crescent";
-
-  return { name, age: Math.round(age*10)/10 };
-}
-
-/* -------------------------
-   “Auto getye” for Stilbaai (moon-based)
-   Spring tides near New/Full, Neap near quarters
---------------------------*/
-function tideTypeFromMoon(moonName){
-  // Spring: New or Full; Neap: First/Last Quarter; else “building”
-  if(moonName === "New Moon" || moonName === "Full Moon"){
-    return { type:"Spring tide", af:"Springgety (sterk stroom)", level:"ok" };
-  }
-  if(moonName === "First Quarter" || moonName === "Last Quarter"){
-    return { type:"Neap tide", af:"Doodwater (swakker stroom)", level:"warn" };
-  }
-  return { type:"Between", af:"Bou-gety (tussen-in)", level:"" };
-}
-
-function fillAuto(){
-  const m = moonInfo(new Date());
-  const t = tideTypeFromMoon(m.name);
-  document.getElementById("moonOut").textContent = `${m.name} (age ${m.age}d)`;
-  document.getElementById("tideOut").textContent = t.af;
-}
-
-/* -------------------------
-   GPS + Google Maps open
---------------------------*/
 function getGPS(){
-  // MUST be called from a user click (it is)
+
   if(!navigator.geolocation){
-    alert("GPS word nie ondersteun op hierdie browser nie.");
-    return;
+    alert("GPS nie beskikbaar nie")
+    return
   }
 
   navigator.geolocation.getCurrentPosition(
-    (pos)=>{
-      const lat = pos.coords.latitude;
-      const lng = pos.coords.longitude;
-      document.getElementById("coords").value = `${lat.toFixed(6)},${lng.toFixed(6)}`;
-      alert("GPS OK ✅");
+    pos=>{
+      const lat=pos.coords.latitude
+      const lng=pos.coords.longitude
+
+      document.getElementById("coords").value=
+      lat.toFixed(6)+","+lng.toFixed(6)
+
+      alert("GPS OK")
     },
-    (err)=>{
-      // Most common: permission denied, timeout, or location off
-      alert("Kon nie GPS kry nie: " + err.message);
+
+    err=>{
+      alert("GPS error: "+err.message)
     },
-    { enableHighAccuracy:true, timeout:15000, maximumAge:0 }
-  );
+
+    {enableHighAccuracy:true,timeout:15000}
+  )
 }
 
-function openInGoogleMaps(){
-  const c = (document.getElementById("coords").value || "").trim();
-  if(!c.includes(",")) return alert("Tik eers coords soos: -34.370000,21.420000");
-  const [lat,lng] = c.split(",").map(x=>x.trim());
+function openMaps(){
 
-  // Works everywhere:
-  const url = `https://www.google.com/maps?q=${encodeURIComponent(lat + "," + lng)}`;
+  const coords=document.getElementById("coords").value
 
-  // Android “geo:” sometimes works better in Google Maps app:
-  const geo = `geo:${lat},${lng}?q=${lat},${lng}(Fishing%20Spot)`;
-
-  // Try geo first, fallback to https
-  try{
-    window.location.href = geo;
-    setTimeout(()=>{ window.open(url, "_blank"); }, 300);
-  }catch(e){
-    window.open(url, "_blank");
+  if(!coords.includes(",")){
+    alert("Geen coords")
+    return
   }
+
+  window.open(
+  "https://www.google.com/maps?q="+coords,
+  "_blank")
 }
 
-/* -------------------------
-   Save + Log
---------------------------*/
-async function fileToBase64(file){
-  return new Promise((resolve,reject)=>{
-    const r=new FileReader();
-    r.onload=()=>resolve(r.result);
-    r.onerror=reject;
-    r.readAsDataURL(file);
-  });
-}
+function saveCatch(){
 
-async function saveCatch(){
-  const species = document.getElementById("species").value.trim();
-  const place = document.getElementById("place").value.trim();
-  const length = Number(document.getElementById("length").value || 0) || 0;
-  const coords = document.getElementById("coords").value.trim();
-  const notes = document.getElementById("notes").value.trim();
+  const species=document.getElementById("species").value
+  const place=document.getElementById("place").value
+  const length=document.getElementById("length").value
+  const coords=document.getElementById("coords").value
 
-  if(!species) return alert("Kies species.");
-  const now = new Date();
-  const m = moonInfo(now);
-  const t = tideTypeFromMoon(m.name);
+  const data=getData()
 
-  let photo = "";
-  const f = document.getElementById("photo").files?.[0];
-  if(f) photo = await fileToBase64(f);
-
-  const data = getAll();
   data.unshift({
-    id: crypto?.randomUUID?.() || String(Date.now()),
-    species, place, length,
+    species,
+    place,
+    length,
     coords,
-    notes,
-    photo,
-    ts: now.toISOString(),
-    moon: { name: m.name, age: m.age },
-    tide: t
-  });
-  saveAll(data);
+    date:new Date().toLocaleString()
+  })
 
-  document.getElementById("photo").value = "";
-  alert("Saved ✅");
-  renderLog();
-  renderStats();
-}
+  saveData(data)
 
-function deleteCatch(id){
-  const data = getAll().filter(x=>x.id !== id);
-  saveAll(data);
-  renderLog();
-  renderStats();
-  renderMap(lastHeat);
-}
+  renderLog()
 
-function wipeAll(){
-  if(confirm("SEKER? Dit delete ALLES.")){
-    localStorage.removeItem(KEY);
-    renderLog();
-    renderStats();
-    renderMap(lastHeat);
-  }
-}
-
-function parseCoords(coords){
-  if(!coords || !coords.includes(",")) return null;
-  const [a,b]=coords.split(",").map(s=>parseFloat(s.trim()));
-  if(Number.isFinite(a) && Number.isFinite(b)) return {lat:a, lng:b};
-  return null;
+  alert("Saved")
 }
 
 function renderLog(){
-  const list = document.getElementById("logList");
-  const data = getAll();
-  if(!data.length){
-    list.innerHTML = `<div class="small">Nog geen catches nie.</div>`;
-    return;
-  }
-  list.innerHTML = "";
-  data.slice(0,60).forEach((c)=>{
-    const d = new Date(c.ts);
-    const has = !!parseCoords(c.coords);
-    const tideTxt = c.tide?.af || "-";
-    const moonTxt = c.moon ? `${c.moon.name}` : "-";
 
-    const div = document.createElement("div");
-    div.className = "entry";
-    div.innerHTML = `
-      <div class="entryTop">
-        <div><b>${c.species}</b> <span class="small">• ${d.toLocaleString()}</span></div>
-        <div class="small">${c.length ? (c.length+"cm") : ""}</div>
-      </div>
-      <div class="small">${c.place || ""}</div>
-      <div class="chips">
-        <span class="chip">${moonTxt}</span>
-        <span class="chip ${c.tide?.level || ""}">${tideTxt}</span>
-        ${has ? `<span class="chip ok">📍 coords</span>` : `<span class="chip warn">no coords</span>`}
-      </div>
-      <div class="chips" style="margin-top:10px;">
-        ${has ? `<button class="secondary" onclick="zoomTo('${c.id}')">Open</button>` : ``}
-        <button class="danger" onclick="deleteCatch('${c.id}')">Delete</button>
-      </div>
-    `;
-    list.appendChild(div);
-  });
-}
+  const log=document.getElementById("log")
 
-/* -------------------------
-   Map + Heatmap
---------------------------*/
-let map, markerLayer, heatLayer;
-let lastHeat = false;
+  const data=getData()
 
-function ensureMap(){
-  if(map) return;
-  map = L.map("map").setView([-34.37, 21.42], 11); // Stilbaai area
-  L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-    maxZoom: 19,
-    attribution: "© OpenStreetMap"
-  }).addTo(map);
-  markerLayer = L.layerGroup().addTo(map);
-}
-
-function renderMap(heat=false){
-  lastHeat = heat;
-  showTab("map");
-  ensureMap();
-
-  markerLayer.clearLayers();
-  if(heatLayer){ map.removeLayer(heatLayer); heatLayer = null; }
-
-  const data = getAll();
-  const pts = [];
-  const bounds = [];
-
-  // Build heat points with weight by “repeat spots”
-  const bucket = new Map();
-  data.forEach(c=>{
-    const p = parseCoords(c.coords);
-    if(!p) return;
-    // small rounding groups close catches
-    const key = `${p.lat.toFixed(3)},${p.lng.toFixed(3)}`;
-    bucket.set(key, (bucket.get(key) || 0) + 1);
-  });
+  log.innerHTML=""
 
   data.forEach(c=>{
-    const p = parseCoords(c.coords);
-    if(!p) return;
 
-    bounds.push([p.lat,p.lng]);
-
-    if(!heat){
-      const pop = `
-        <b>${c.species}</b><br/>
-        ${c.place || ""}<br/>
-        ${c.length ? (c.length+"cm") : ""}<br/>
-        <span style="opacity:.8">${new Date(c.ts).toLocaleString()}</span>
-      `;
-      L.marker([p.lat,p.lng]).bindPopup(pop).addTo(markerLayer);
-    }
-  });
-
-  if(heat){
-    bucket.forEach((count,key)=>{
-      const [lat,lng] = key.split(",").map(Number);
-      // weight: 0.3 -> 1.0
-      const w = Math.min(1, 0.25 + count*0.15);
-      pts.push([lat, lng, w]);
-    });
-    heatLayer = L.heatLayer(pts, { radius: 25, blur: 18, maxZoom: 17 }).addTo(map);
-  }
-
-  if(bounds.length){
-    map.fitBounds(bounds, { padding:[20,20] });
-  }else{
-    map.setView([-34.37, 21.42], 11);
-  }
-  setTimeout(()=>map.invalidateSize(), 250);
-}
-
-function zoomTo(id){
-  const data = getAll();
-  const c = data.find(x=>x.id===id);
-  const p = c ? parseCoords(c.coords) : null;
-  if(!p) return;
-  renderMap(false);
-  map.setView([p.lat,p.lng], 15);
-  // Open Google Maps too
-  const url = `https://www.google.com/maps?q=${encodeURIComponent(p.lat + "," + p.lng)}`;
-  window.open(url, "_blank");
-}
-
-/* -------------------------
-   Stats
---------------------------*/
-function renderStats(){
-  const out = document.getElementById("statsOut");
-  const data = getAll();
-  if(!data.length){
-    out.innerHTML = "Nog geen data nie.";
-    return;
-  }
-  const by = new Map();
-  data.forEach(c=>{
-    const s = c.species || "Unknown";
-    const cur = by.get(s) || {count:0, totalLen:0, lenCount:0};
-    cur.count++;
-    if(c.length && Number.isFinite(c.length)){
-      cur.totalLen += c.length;
-      cur.lenCount++;
-    }
-    by.set(s, cur);
-  });
-
-  const rows = [...by.entries()]
-    .sort((a,b)=>b[1].count - a[1].count)
-    .map(([s,v])=>{
-      const avg = v.lenCount ? (v.totalLen/v.lenCount).toFixed(1) : "-";
-      return `<div class="entry">
-        <div class="entryTop">
-          <div><b>${s}</b></div>
-          <div class="small">${v.count} catches</div>
-        </div>
-        <div class="small">Avg lengte: ${avg}</div>
-      </div>`;
-    }).join("");
-
-  out.innerHTML = `
-    <div class="kpi">
-      <div><div class="small">Total catches</div><div><b>${data.length}</b></div></div>
-      <div><div class="small">Met coords</div><div><b>${data.filter(x=>parseCoords(x.coords)).length}</b></div></div>
+    log.innerHTML+=`
+    <div class="log">
+    <b>${c.species}</b><br>
+    ${c.place}<br>
+    ${c.length} cm<br>
+    ${c.coords}<br>
+    <small>${c.date}</small>
     </div>
-    <div class="sep"></div>
-    <div class="list">${rows}</div>
-  `;
+    `
+  })
 }
 
-/* -------------------------
-   Tabs + init
---------------------------*/
-function showTab(name){
-  const tabs = ["add","log","map","stats"];
-  tabs.forEach(t=>{
-    const el = document.getElementById("tab-"+t);
-    if(!el) return;
-    el.style.display = (t===name) ? "" : "none";
-  });
-  if(name==="map"){ setTimeout(()=>map?.invalidateSize(), 200); }
-}
+renderLog()
 
-function updateToday(){
-  const now = new Date();
-  const m = moonInfo(now);
-  const t = tideTypeFromMoon(m.name);
-  document.getElementById("todayInfo").textContent =
-    `${now.toLocaleDateString()} • 🌙 ${m.name} • 🌊 ${t.type}`;
-  document.getElementById("moonOut").textContent = `${m.name} (age ${m.age}d)`;
-  document.getElementById("tideOut").textContent = t.af;
-}
-
-async function registerSW(){
-  if("serviceWorker" in navigator){
-    try{ await navigator.serviceWorker.register("./sw.js"); }catch(e){}
-  }
-}
-
-loadSpecies();
-renderLog();
-renderStats();
-updateToday();
-registerSW();
-
-// Export for inline onclick safety
-window.getGPS = getGPS;
-window.openInGoogleMaps = openInGoogleMaps;
-window.saveCatch = saveCatch;
-window.renderMap = renderMap;
-window.showTab = showTab;
-window.wipeAll = wipeAll;
-window.fillAuto = fillAuto;
-window.zoomTo = zoomTo;
-window.deleteCatch = deleteCatch;
 </script>
 
 </body>
