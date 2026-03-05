@@ -1,4 +1,4 @@
-const CACHE = "tanya-sea-v27";
+const CACHE = "tanya-sea-v29";
 const ASSETS = [
   "./",
   "./index.html",
