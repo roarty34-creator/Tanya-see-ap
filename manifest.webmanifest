@@ -1,12 +1,13 @@
 {
   "name": "Tanya Sea App",
   "short_name": "SeaApp",
-  "start_url": "./?source=pwa",
+  "start_url": "./?v=19",
+  "scope": "./",
   "display": "standalone",
-  "background_color": "#0b1320",
-  "theme_color": "#0b1320",
+  "background_color": "#0b1220",
+  "theme_color": "#0b1220",
   "icons": [
-    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
-    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
+    { "src": "./icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "./icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
