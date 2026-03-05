@@ -1,1225 +1,340 @@
 <!DOCTYPE html>
 <html lang="af">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tanya Sea App V7</title>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tanya Sea App</title>
 
-  <link rel="manifest" href="manifest.webmanifest">
-  <meta name="theme-color" content="#0b1320">
+<link rel="manifest" href="manifest.webmanifest">
 
-  <!-- Leaflet + Heat -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-  <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+<script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
-  <style>
-    :root{
-      --bg:#0b1320;
-      --card:#101b2d;
-      --text:#eaf1ff;
-      --muted:#a9b9dc;
-      --accent:#2d6cdf;
-      --border:rgba(255,255,255,.10);
-      --danger:#b22a2a;
-      --ok:#2da36a;
-      --warn:#caa12a;
-    }
-    body{
-      margin:0;
-      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
-      background: var(--bg);
-      color: var(--text);
-      padding: 16px;
-    }
-    h2{ margin:0 0 12px; font-weight: 900; letter-spacing: .2px; }
-    .card{
-      background: linear-gradient(180deg, rgba(18,32,66,.7) 0%, var(--card) 100%);
-      border: 1px solid var(--border);
-      border-radius: 14px;
-      padding: 14px;
-      margin-bottom: 12px;
-      box-shadow: 0 10px 25px rgba(0,0,0,.25);
-    }
-    .topnav{
-      display:flex; gap:8px; flex-wrap:wrap;
-      background:#0e1730;
-      padding:8px;
-      border-radius: 999px;
-      border:1px solid var(--border);
-    }
-    .navbtn{
-      border:none;
-      background: transparent;
-      color: var(--text);
-      padding: 10px 14px;
-      border-radius: 999px;
-      font-weight: 900;
-      cursor: pointer;
-      white-space:nowrap;
-    }
-    .navbtn.active{
-      background: var(--accent);
-      color: #071022;
-    }
-    button.btn{
-      width:100%;
-      padding: 11px 12px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: var(--accent);
-      color: white;
-      font-weight: 900;
-      cursor:pointer;
-    }
-    button.btn.secondary{ background:#24304b; }
-    button.btn.danger{ background: var(--danger); }
-    .row{ display:flex; gap:10px; flex-wrap:wrap; }
-    .row > *{ flex:1; min-width: 120px; }
-    label.small{
-      display:block;
-      margin: 10px 0 6px;
-      color: var(--muted);
-      font-size: 12px;
-      font-weight: 900;
-      letter-spacing: .2px;
-    }
-    input, select, textarea{
-      width:100%;
-      padding: 11px 10px;
-      border-radius: 12px;
-      border: 1px solid var(--border);
-      background: #0e1730;
-      color: var(--text);
-      box-sizing: border-box;
-      outline:none;
-    }
-    textarea{ min-height: 70px; resize: vertical; }
-    section{ display:none; }
-    .mini{ font-size: 12px; color: var(--muted); }
-    .chip{
-      display:inline-block;
-      padding: 6px 10px;
-      border-radius: 999px;
-      background:#0e1730;
-      border:1px solid var(--border);
-      margin:6px 6px 0 0;
-      font-size: 12px;
-      color: var(--text);
-    }
-    .chip.ok{ border-color: rgba(45,163,106,.55); }
-    .chip.warn{ border-color: rgba(202,161,42,.55); }
-    .chip.bad{ border-color: rgba(178,42,42,.55); }
-    .photo{
-      width:100%;
-      border-radius: 12px;
-      margin-top: 10px;
-      border: 1px solid var(--border);
-    }
-    #leafletMap{
-      height: 380px;
-      border-radius: 12px;
-      overflow:hidden;
-      border:1px solid var(--border);
-      margin-top:10px;
-    }
-    hr{ border:none; border-top:1px solid var(--border); margin: 12px 0; }
-  </style>
+<style>
+body{background:#0b1320;color:white;font-family:Arial;padding:20px;margin:0}
+.card{background:#101b2d;padding:15px;border-radius:12px;margin-bottom:15px}
+button{padding:10px;border:none;border-radius:10px;background:#2d6cdf;color:white;margin-top:6px;width:100%}
+button.secondary{background:#24304b}
+button.danger{background:#b22a2a}
+.row{display:flex;gap:10px;flex-wrap:wrap}
+.row>*{flex:1}
+input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;border:1px solid #333;background:#0e1730;color:white}
+#map{height:380px;border-radius:12px}
+.photo{width:100%;border-radius:12px;margin-top:8px}
+.chip{display:inline-block;padding:6px 10px;background:#0e1730;border-radius:999px;margin:4px}
+</style>
 </head>
 
 <body>
-  <h2>🎣 Tanya Sea App</h2>
 
-  <div class="card">
-    <div class="topnav">
-      <button class="navbtn" id="btnAdd"   onclick="showTab('add')">➕ Add</button>
-      <button class="navbtn" id="btnLog"   onclick="showTab('log')">📒 Log</button>
-      <button class="navbtn" id="btnMap"   onclick="showTab('map')">🗺 Map</button>
-      <button class="navbtn" id="btnStats" onclick="showTab('stats')">📊 Stats</button>
-      <button class="navbtn" id="btnSpots" onclick="showTab('spots')">⭐ Spots</button>
-      <button class="navbtn" id="btnSea"   onclick="showTab('sea')">🌊 Sea Days</button>
-    </div>
-  </div>
+<h2>🎣 Tanya Sea App</h2>
 
-  <!-- ADD -->
-  <section id="add">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">Add Catch</div>
+<div class="card">
+<div class="row">
+<button onclick="show('add')">Add</button>
+<button onclick="show('log')">Log</button>
+<button onclick="show('map')">Map</button>
+<button onclick="show('stats')">Stats</button>
+<button onclick="show('sea')">Sea Days</button>
+</div>
+</div>
 
-      <label class="small">Spesie</label>
-      <select id="species">
-        <option value="">Kies spesie...</option>
-        <option>Kaapse Kabeljou</option>
-        <option>Geelstert</option>
-        <option>Bonnie</option>
-        <option>Rooi Roman</option>
-        <option>Snapper</option>
-        <option>Silver (Bastermeid)</option>
-        <option>Rooi Steenbras</option>
-        <option>Yellow Belly (Rockod)</option>
-        <option>Galjoen</option>
-        <option>Hottentot</option>
-        <option>Elf</option>
-        <option>Leervis</option>
-      </select>
+<section id="add" class="card">
 
-      <label class="small">Plek</label>
-      <input id="place" placeholder="bv. Stilbaai / Die Punt" autocomplete="off">
+<label>Spesie</label>
+<select id="species">
+<option>Kaapse Kabeljou</option>
+<option>Geelstert</option>
+<option>Bonnie</option>
+<option>Rooi Roman</option>
+<option>Snapper</option>
+<option>Silver</option>
+<option>Rooi Steenbras</option>
+<option>Yellow Belly</option>
+<option>Galjoen</option>
+<option>Hottentot</option>
+</select>
 
-      <div class="row">
-        <div>
-          <label class="small">Lengte (cm)</label>
-          <input id="length" type="number" placeholder="bv. 65" autocomplete="off">
-        </div>
-        <div>
-          <label class="small">Water temp (°C)</label>
-          <input id="waterTemp" type="number" step="0.1" placeholder="bv. 18.5" autocomplete="off">
-        </div>
-      </div>
+<label>Plek</label>
+<input id="place">
 
-      <div class="row">
-        <div>
-          <label class="small">Wind rigting</label>
-          <select id="windDir">
-            <option value="">Kies...</option>
-            <option>N</option><option>NE</option><option>E</option><option>SE</option>
-            <option>S</option><option>SW</option><option>W</option><option>NW</option>
-          </select>
-        </div>
-        <div>
-          <label class="small">See / Swell (opsioneel)</label>
-          <input id="seaState" placeholder="bv. plat / choppy / swell 2m" autocomplete="off">
-        </div>
-      </div>
+<label>Lengte (cm)</label>
+<input id="length" type="number">
 
-      <label class="small">Koördinate</label>
-      <div class="row">
-        <button class="btn secondary" type="button" onclick="getGPS()">📍 Kry GPS</button>
-        <input id="coords" placeholder="-34.37, 21.42" readonly autocomplete="off">
-      </div>
+<label>Koördinate</label>
+<div class="row">
+<button onclick="getGPS()">📍 GPS</button>
+<input id="coords" readonly>
+</div>
 
-      <div class="row">
-        <button class="btn secondary" type="button" onclick="autoWeather()">🌦 Auto Weather</button>
-        <button class="btn secondary" type="button" onclick="autoTides()">🌊 Auto Getye</button>
-      </div>
+<label>Foto</label>
+<input id="photo" type="file" accept="image/*">
 
-      <label class="small">Gety tye (High/Low)</label>
-      <div class="row">
-        <input id="tideHigh" placeholder="High tide bv. 06:20" autocomplete="off">
-        <input id="tideLow"  placeholder="Low tide bv. 12:45" autocomplete="off">
-      </div>
-      <div class="mini" id="tideHint" style="margin-top:6px;">
-        Tip: Druk “🌊 Auto Getye” (as jy 'n tide API key het) of tik dit handmatig.
-      </div>
+<div id="preview"></div>
 
-      <label class="small">Foto</label>
-      <div class="row">
-        <button class="btn" type="button" onclick="document.getElementById('photoCamera').click()">📷 Kamera</button>
-        <button class="btn secondary" type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
-      </div>
-      <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;">
-      <input id="photoGallery" type="file" accept="image/*" style="display:none;">
-      <div id="preview"></div>
+<label>Notas</label>
+<textarea id="notes"></textarea>
 
-      <label class="small">Notas</label>
-      <textarea id="notes" placeholder="bv. gety, aas, tyd, ens"></textarea>
+<button onclick="saveCatch()">Save Catch</button>
 
-      <div class="card" style="margin-top:12px;">
-        <div style="font-weight:1000;">🎣 Fish Chance (V7)</div>
-        <div class="mini" id="chanceBox" style="margin-top:8px;">Druk Auto Weather of Save om 'n score te kry.</div>
-      </div>
+</section>
 
-      <button class="btn" onclick="saveCatch()">💾 Save Catch</button>
-      <button class="btn danger" onclick="resetAll()">🗑 Reset All Data</button>
+<section id="log" class="card"></section>
 
-      <div class="mini" style="margin-top:10px;">
-        Moon + Tide type word outomaties ingevul wanneer jy Save druk.
-      </div>
-    </div>
-  </section>
+<section id="map" class="card">
+<div id="leafletMap"></div>
+</section>
 
-  <!-- LOG -->
-  <section id="log">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">📒 Log</div>
-      <div id="logList" style="margin-top:10px;"></div>
-    </div>
-  </section>
+<section id="stats" class="card">
+<div id="statsBox"></div>
+</section>
 
-  <!-- MAP -->
-  <section id="map">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">🗺 Map + Heatmap</div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn secondary" type="button" onclick="renderMap(true)">🔄 Refresh map</button>
-      </div>
-      <div id="leafletMap"></div>
-      <div class="mini" style="margin-top:10px;">
-        Pins = jou catches. Heatmap = jou “hot spots”.
-      </div>
-    </div>
-  </section>
-
-  <!-- STATS -->
-  <section id="stats">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">📊 Stats</div>
-      <div id="statsBox" class="mini" style="margin-top:10px;"></div>
-      <hr>
-      <div class="row">
-        <button class="btn secondary" onclick="showSpeciesStats()">🐟 Species stats</button>
-      </div>
-
-      <hr>
-      <div class="row">
-        <button class="btn secondary" type="button" onclick="exportJSON()">⬇️ Export JSON</button>
-        <button class="btn secondary" type="button" onclick="document.getElementById('importFile').click()">⬆️ Import JSON</button>
-      </div>
-      <input id="importFile" type="file" accept="application/json" style="display:none;">
-      <div class="row" style="margin-top:10px;">
-        <button class="btn secondary" type="button" onclick="exportCSV()">⬇️ Export CSV</button>
-      </div>
-    </div>
-  </section>
-
-  <!-- SPOTS -->
-  <section id="spots">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">⭐ Favourite Spots</div>
-      <div id="spotsList" style="margin-top:10px;"></div>
-    </div>
-  </section>
-
-  <!-- SEA DAYS -->
-  <section id="sea">
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">🌊 Beste see dae (14 dae)</div>
-      <div class="mini" style="margin-top:6px;">
-        Score = hoe kalmer die see (golfhoogte + swell + wind). Hoër = beter.
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn secondary" type="button" onclick="fetchSeaDays()">🔄 Refresh</button>
-      </div>
-      <div id="seaBox" style="margin-top:12px;"></div>
-    </div>
-
-    <div class="card">
-      <div style="font-weight:1000; font-size:16px;">🌙 Solunar (approx)</div>
-      <div class="mini" style="margin-top:6px;">
-        Simplified bite windows: rondom Sunrise & Sunset (major) + Midday/Midnight (minor).
-      </div>
-      <div class="row" style="margin-top:10px;">
-        <button class="btn secondary" type="button" onclick="fetchSolunar()">🔄 Refresh Solunar</button>
-      </div>
-      <div id="solunarBox" style="margin-top:12px;"></div>
-    </div>
-  </section>
+<section id="sea" class="card">
+<button onclick="fetchSeaDays()">Refresh Sea Days</button>
+<div id="seaBox"></div>
+</section>
 
 <script>
-(() => {
-  // ========= CONFIG =========
-  const KEY = "tanyaSeaAppV7";
-  const SPOTS_KEY = "tanyaSeaSpotsV7";
-  const STILBAAI = { lat: -34.3700, lon: 21.4200 };
 
-  // Tide API (opsioneel): sit jou key hier as jy dit het
-  // Example: const TIDE_API_KEY = "YOUR_KEY_HERE";
-  const TIDE_API_KEY = ""; // <-- los leeg as jy nie het nie
-
-  // ========= DOM =========
-  const el = (id) => document.getElementById(id);
-
-  const species   = el("species");
-  const place     = el("place");
-  const length    = el("length");
-  const coords    = el("coords");
-  const notes     = el("notes");
-  const windDir   = el("windDir");
-  const waterTemp = el("waterTemp");
-  const seaState  = el("seaState");
-  const tideHigh  = el("tideHigh");
-  const tideLow   = el("tideLow");
-
-  const logList   = el("logList");
-  const statsBox  = el("statsBox");
-  const spotsList = el("spotsList");
-  const seaBox    = el("seaBox");
-  const solunarBox= el("solunarBox");
-  const chanceBox = el("chanceBox");
-  const tideHint  = el("tideHint");
-
-  let photoData = "";
-
-  // ========= STORAGE =========
-  function getAll(){ return JSON.parse(localStorage.getItem(KEY) || "[]"); }
-  function saveAll(data){ localStorage.setItem(KEY, JSON.stringify(data)); }
-
-  function getSpots(){ return JSON.parse(localStorage.getItem(SPOTS_KEY) || "[]"); }
-  function saveSpots(spots){ localStorage.setItem(SPOTS_KEY, JSON.stringify(spots)); }
-
-  // ========= TABS =========
-  function setActive(tab){
-    const ids = ["add","log","map","stats","spots","sea"];
-    ids.forEach(t => {
-      const b = el("btn" + t.charAt(0).toUpperCase() + t.slice(1));
-      if(b) b.classList.toggle("active", t === tab);
-    });
-  }
-
-  function showTab(tab){
-    const tabs = ["add","log","map","stats","spots","sea"];
-    tabs.forEach(t => {
-      const s = el(t);
-      if(s) s.style.display = (t === tab ? "block" : "none");
-    });
-    setActive(tab);
-
-    if(tab === "log")   renderLog();
-    if(tab === "map")   renderMap(false);
-    if(tab === "stats") renderStats();
-    if(tab === "spots") renderSpots();
-    if(tab === "sea"){ fetchSeaDays(); fetchSolunar(); }
-  }
-
-  // ========= HELPERS =========
-  function escapeHtml(str){
-    return String(str || "")
-      .replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;")
-      .replaceAll('"',"&quot;").replaceAll("'","&#039;");
-  }
-
-  function parseCoords(str){
-    const s = String(str || "").trim();
-    if(!s) return null;
-    const parts = s.split(",").map(x => Number(String(x).trim()));
-    if(parts.length !== 2) return null;
-    if(isNaN(parts[0]) || isNaN(parts[1])) return null;
-    return { lat: parts[0], lon: parts[1] };
-  }
-
-  function fmt(x){ return Number.isFinite(x) ? (Math.round(x*10)/10) : "—"; }
-
-  // ========= MOON + TIDE TYPE =========
-  function getMoonPhase(date = new Date()){
-    const lp = 2551443;
-    const new_moon = new Date(1970,0,7,20,35,0);
-    const phase = ((date.getTime() - new_moon.getTime())/1000) % lp;
-    const moon = Math.floor(phase / (24*3600)) + 1;
-
-    if(moon < 2) return "New Moon";
-    if(moon < 7) return "Waxing";
-    if(moon < 9) return "First Quarter";
-    if(moon < 15) return "Waxing Gibbous";
-    if(moon < 17) return "Full Moon";
-    if(moon < 22) return "Waning";
-    if(moon < 24) return "Last Quarter";
-    return "Waning Crescent";
-  }
-  function getTideType(moon){
-    if(moon==="New Moon" || moon==="Full Moon") return "Spring Tide";
-    if(moon==="First Quarter" || moon==="Last Quarter") return "Neap Tide";
-    return "Normal Tide";
-  }
-
-  // ========= GPS =========
-  function getGPS(){
-    if(!navigator.geolocation){
-      alert("GPS word nie ondersteun op hierdie browser nie.");
-      return;
-    }
-    navigator.geolocation.getCurrentPosition(
-      (pos) => {
-        const lat = pos.coords.latitude.toFixed(6);
-        const lng = pos.coords.longitude.toFixed(6);
-        coords.value = lat + "," + lng;
-      },
-      (err) => {
-        alert("Kon nie GPS kry nie: " + (err && err.message ? err.message : "unknown error"));
-      },
-      { enableHighAccuracy:true, timeout:10000, maximumAge:0 }
-    );
-  }
-
-  function openMapsByCoords(coordStr){
-    const c = (coordStr || "").trim();
-    if(!c){ alert("Geen koördinate nie."); return; }
-    window.open("https://www.google.com/maps?q=" + encodeURIComponent(c));
-  }
-  function openMapsByCatch(id){
-    const c = getAll().find(x => String(x.id) === String(id));
-    if(c && c.coords) openMapsByCoords(c.coords);
-    else alert("Geen koördinate vir hierdie vang nie.");
-  }
-  function directionsToCatch(id){
-    const c = getAll().find(x => String(x.id) === String(id));
-    if(c && c.coords){
-      window.open("https://www.google.com/maps/dir/?api=1&destination=" + encodeURIComponent(c.coords));
-    } else alert("Geen koördinate vir hierdie vang nie.");
-  }
-
-  // ========= PHOTO =========
-  function fileToDataUrl(file){
-    return new Promise((resolve, reject) => {
-      const reader = new FileReader();
-      reader.onload = () => resolve(String(reader.result || ""));
-      reader.onerror = reject;
-      reader.readAsDataURL(file);
-    });
-  }
-  async function handlePhotoChange(e){
-    const file = e.target.files && e.target.files[0];
-    if(!file) return;
-    photoData = await fileToDataUrl(file);
-    el("preview").innerHTML = '<img class="photo" src="'+photoData+'">';
-  }
-  el("photoCamera").addEventListener("change", handlePhotoChange);
-  el("photoGallery").addEventListener("change", handlePhotoChange);
-
-  // ========= AUTO WEATHER (Open-Meteo) =========
-  // Vul: waterTemp + seaState + notes (wind speed/dir degrees)
-  async function autoWeather(){
-    const p = parseCoords(coords.value) || STILBAAI;
-
-    try{
-      const wUrl = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lon}&current=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg`;
-      const mUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${p.lat}&longitude=${p.lon}&current=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg`;
-
-      const [wRes, mRes] = await Promise.all([fetch(wUrl), fetch(mUrl)]);
-      if(!wRes.ok || !mRes.ok) throw new Error("fetch failed");
-
-      const w = await wRes.json();
-      const m = await mRes.json();
-
-      const ws = w?.current?.windspeed_10m;
-      const wd = w?.current?.winddirection_10m;
-      const wave  = m?.current?.wave_height;
-      const swell = m?.current?.swell_wave_height;
-      const sst   = m?.current?.sea_surface_temperature;
-
-      if(Number.isFinite(sst)) waterTemp.value = String(Math.round(sst*10)/10);
-
-      if(Number.isFinite(wave) || Number.isFinite(swell)){
-        const wv = Number.isFinite(wave) ? `${Math.round(wave*10)/10}m` : "—";
-        const sw = Number.isFinite(swell)? `${Math.round(swell*10)/10}m` : "—";
-        seaState.value = `Wave ${wv} / Swell ${sw}`;
-      }
-
-      let extra = [];
-      if(Number.isFinite(ws)) extra.push(`Wind: ${Math.round(ws)} km/h`);
-      if(Number.isFinite(wd)) extra.push(`Wind dir: ${Math.round(wd)}°`);
-
-      if(extra.length){
-        notes.value = (notes.value ? notes.value + "\n" : "") + extra.join(" • ");
-      }
-
-      // update chance preview
-      const chance = computeFishChance({
-        windKmh: Number.isFinite(ws) ? ws : NaN,
-        waveM: Number.isFinite(wave) ? wave : NaN,
-        swellM: Number.isFinite(swell) ? swell : NaN,
-        tempC: Number.isFinite(sst) ? sst : NaN,
-        tideType: getTideType(getMoonPhase(new Date()))
-      });
-      renderChanceBox(chance);
-
-      alert("Weather ingevul ✅");
-    }catch(e){
-      alert("Kon nie weather laai nie. Check internet en probeer weer.");
-    }
-  }
-
-  // ========= AUTO TIDES (V7) =========
-  // NOTE: Real high/low tides needs a tide API key. If no key → manual.
-  async function autoTides(){
-    const p = parseCoords(coords.value) || STILBAAI;
-
-    if(!TIDE_API_KEY){
-      tideHint.innerHTML = "Geen API key gestel nie — tik High/Low handmatig. (As jy later 'n key het, sit dit by TIDE_API_KEY in die code.)";
-      alert("Auto getye: Geen API key. Tik High/Low handmatig 🙂");
-      return;
-    }
-
-    try{
-      // Placeholder example for a tide API that needs a key.
-      // If you use a provider, replace URL + parsing below with that provider's format.
-      //
-      // Example pattern (NOT guaranteed):
-      // const url = `https://www.worldtides.info/api/v3?heights&lat=${p.lat}&lon=${p.lon}&key=${TIDE_API_KEY}`;
-      //
-      // Because providers differ, we keep it safe: you can swap this easily later.
-      const url = `https://www.worldtides.info/api/v3?extremes&lat=${p.lat}&lon=${p.lon}&days=1&key=${encodeURIComponent(TIDE_API_KEY)}`;
-
-      const res = await fetch(url);
-      if(!res.ok) throw new Error("tide fetch fail");
-      const data = await res.json();
-
-      // Expected: data.extremes array with type High/Low + dt
-      const extremes = Array.isArray(data?.extremes) ? data.extremes : [];
-      const highs = extremes.filter(x => String(x.type||"").toLowerCase().includes("high"));
-      const lows  = extremes.filter(x => String(x.type||"").toLowerCase().includes("low"));
-
-      const toHHMM = (dt) => {
-        const d = new Date(dt * 1000);
-        const hh = String(d.getHours()).padStart(2,"0");
-        const mm = String(d.getMinutes()).padStart(2,"0");
-        return `${hh}:${mm}`;
-      };
-
-      if(highs[0]?.dt) tideHigh.value = toHHMM(highs[0].dt);
-      if(lows[0]?.dt)  tideLow.value  = toHHMM(lows[0].dt);
-
-      tideHint.innerHTML = "Auto getye ingevul ✅ (High/Low vandag).";
-      alert("Getye ingevul ✅");
-    }catch(e){
-      alert("Kon nie getye laai nie (API/CORS). Tik High/Low handmatig vir nou.");
-    }
-  }
-
-  // ========= FISH CHANCE (V7) =========
-  // Simple scoring: calmer sea + moderate wind + spring tide gets boost.
-  function computeFishChance({ windKmh, waveM, swellM, tempC, tideType }){
-    let score = 50;
-
-    // Sea state influence
-    if(Number.isFinite(waveM))  score += (waveM <= 1.2 ? 12 : waveM <= 2.0 ? 4 : -10);
-    if(Number.isFinite(swellM)) score += (swellM <= 1.6 ? 8 : swellM <= 2.4 ? 2 : -8);
-
-    // Wind influence
-    if(Number.isFinite(windKmh)) score += (windKmh <= 18 ? 10 : windKmh <= 28 ? 2 : -12);
-
-    // Temp influence (very light; species differ)
-    if(Number.isFinite(tempC)) score += (tempC >= 16 && tempC <= 21 ? 6 : 0);
-
-    // Tide type influence
-    if(tideType === "Spring Tide") score += 10;
-    if(tideType === "Neap Tide") score -= 6;
-
-    // clamp
-    score = Math.max(5, Math.min(95, Math.round(score)));
-
-    let label = "OK";
-    if(score >= 80) label = "🔥 Baie goed";
-    else if(score >= 65) label = "✅ Goed";
-    else if(score >= 50) label = "👌 So-so";
-    else label = "⚠️ Moeilik";
-
-    return { score, label };
-  }
-
-  function renderChanceBox(chance){
-    const cls = chance.score >= 80 ? "ok" : chance.score >= 60 ? "warn" : "bad";
-    chanceBox.innerHTML = `
-      <span class="chip ${cls}">Chance: <b>${chance.score}%</b> • ${escapeHtml(chance.label)}</span>
-      <div class="mini" style="margin-top:8px;">
-        Gebaseer op: wind/wave/swell/temp + tide type. (Dis 'n “smart guide”, nie magie nie 😄)
-      </div>
-    `;
-  }
-
-  // ========= SAVE / CLEAR =========
-  function clearForm(){
-    species.value = "";
-    place.value = "";
-    length.value = "";
-    coords.value = "";
-    notes.value = "";
-    windDir.value = "";
-    waterTemp.value = "";
-    seaState.value = "";
-    tideHigh.value = "";
-    tideLow.value = "";
-
-    const cam = el("photoCamera");
-    const gal = el("photoGallery");
-    if(cam) cam.value = "";
-    if(gal) gal.value = "";
-    el("preview").innerHTML = "";
-    photoData = "";
-  }
-
-  function saveCatch(){
-    const sp = (species.value || "").trim();
-    if(!sp){ alert("Kies asseblief 'n spesie."); return; }
-
-    const moon = getMoonPhase(new Date());
-    const tideType = getTideType(moon);
-
-    // Try to estimate chance using current known fields (best effort)
-    const chance = computeFishChance({
-      windKmh: NaN,
-      waveM: NaN,
-      swellM: NaN,
-      tempC: Number(waterTemp.value),
-      tideType
-    });
-
-    renderChanceBox(chance);
-
-    const data = getAll();
-    data.unshift({
-      id: Date.now(),
-      species: sp,
-      place: (place.value || "").trim(),
-      length: (length.value || "").trim(),
-      coords: (coords.value || "").trim(),
-      notes: (notes.value || "").trim(),
-      windDir: (windDir.value || "").trim(),
-      waterTemp: (waterTemp.value || "").trim(),
-      seaState: (seaState.value || "").trim(),
-      tideHigh: (tideHigh.value || "").trim(),
-      tideLow: (tideLow.value || "").trim(),
-      moon,
-      tideType,
-      chance: chance.score,
-      photo: photoData,
-      date: new Date().toLocaleDateString()
-    });
-    saveAll(data);
-    clearForm();
-    showTab("log");
-  }
-
-  function deleteCatch(id){
-    const ok = confirm("Delete hierdie vang?");
-    if(!ok) return;
-    const data = getAll().filter(c => String(c.id) !== String(id));
-    saveAll(data);
-    renderLog();
-    renderStats();
-    if(el("map").style.display === "block") renderMap(true);
-  }
-
-  function editCatch(id){
-    const data = getAll();
-    const idx = data.findIndex(c => String(c.id) === String(id));
-    if(idx === -1) return;
-    const c = data[idx];
-
-    const ns = prompt("Spesie:", c.species || ""); if(ns === null) return;
-    const np = prompt("Plek:", c.place || ""); if(np === null) return;
-    const nl = prompt("Lengte (cm):", c.length || ""); if(nl === null) return;
-    const ncoords = prompt("Koördinate:", c.coords || ""); if(ncoords === null) return;
-    const nHigh = prompt("High tide (HH:MM):", c.tideHigh || ""); if(nHigh === null) return;
-    const nLow  = prompt("Low tide (HH:MM):", c.tideLow || ""); if(nLow === null) return;
-    const nwind = prompt("Wind rigting:", c.windDir || ""); if(nwind === null) return;
-    const nwt   = prompt("Water temp (°C):", c.waterTemp || ""); if(nwt === null) return;
-    const nsea  = prompt("See / Swell:", c.seaState || ""); if(nsea === null) return;
-    const nnotes= prompt("Notas:", c.notes || ""); if(nnotes === null) return;
-
-    c.species = ns.trim();
-    c.place = np.trim();
-    c.length = nl.trim();
-    c.coords = ncoords.trim();
-    c.tideHigh = nHigh.trim();
-    c.tideLow = nLow.trim();
-    c.windDir = nwind.trim();
-    c.waterTemp = nwt.trim();
-    c.seaState = nsea.trim();
-    c.notes = nnotes.trim();
-
-    saveAll(data);
-    renderLog();
-    renderStats();
-    if(el("map").style.display === "block") renderMap(true);
-  }
-
-  // ========= RENDER LOG =========
-  function renderLog(){
-    const data = getAll();
-    logList.innerHTML = "";
-
-    if(!data.length){
-      logList.innerHTML = `<div class="mini">Geen catches nog nie.</div>`;
-      return;
-    }
-
-    data.forEach(c => {
-      const meta = [
-        c.place ? c.place : "",
-        c.length ? (c.length + " cm") : "",
-        c.date ? c.date : ""
-      ].filter(Boolean).join(" • ");
-
-      const chanceChip = (c.chance != null) ? `<span class="chip ok">🎣 ${escapeHtml(String(c.chance))}%</span>` : "";
-
-      logList.innerHTML += `
-        <div class="card">
-          <div style="font-weight:1000; font-size:16px;">${escapeHtml(c.species || "")}</div>
-          <div class="mini" style="margin-top:6px;">${escapeHtml(meta)}</div>
-
-          <div style="margin-top:6px;">
-            ${c.moon ? `<span class="chip">🌙 ${escapeHtml(c.moon)}</span>` : ""}
-            ${c.tideType ? `<span class="chip">🌊 ${escapeHtml(c.tideType)}</span>` : ""}
-            ${c.tideHigh ? `<span class="chip">⬆️ High ${escapeHtml(c.tideHigh)}</span>` : ""}
-            ${c.tideLow ? `<span class="chip">⬇️ Low ${escapeHtml(c.tideLow)}</span>` : ""}
-            ${c.windDir ? `<span class="chip">🌬 ${escapeHtml(c.windDir)}</span>` : ""}
-            ${c.waterTemp ? `<span class="chip">🌡 ${escapeHtml(String(c.waterTemp))}°C</span>` : ""}
-            ${c.seaState ? `<span class="chip">🌊 ${escapeHtml(c.seaState)}</span>` : ""}
-            ${chanceChip}
-          </div>
-
-          ${c.coords ? `<div class="mini" style="margin-top:8px;">📍 ${escapeHtml(c.coords)}</div>` : ""}
-          ${c.photo ? `<img class="photo" src="${c.photo}">` : ""}
-
-          ${c.notes ? `<div class="mini" style="margin-top:8px;">📝 ${escapeHtml(c.notes)}</div>` : ""}
-
-          <div class="row" style="margin-top:10px;">
-            <button class="btn secondary" onclick="openMapsByCatch('${c.id}')">Maps</button>
-            <button class="btn secondary" onclick="directionsToCatch('${c.id}')">Directions</button>
-            <button class="btn secondary" onclick="editCatch('${c.id}')">Edit</button>
-            <button class="btn danger" onclick="deleteCatch('${c.id}')">Delete</button>
-          </div>
-        </div>
-      `;
-    });
-  }
-
-  // ========= STATS =========
-  function renderStats(){
-    const data = getAll();
-    if(!data.length){
-      statsBox.innerHTML = "Geen data nog nie.";
-      return;
-    }
-
-    const total = data.length;
-    let biggest = 0;
-    let biggestSpecies = "";
-    data.forEach(c => {
-      const n = Number(c.length);
-      if(!isNaN(n) && n > biggest){
-        biggest = n; biggestSpecies = c.species || "";
-      }
-    });
-
-    statsBox.innerHTML = `
-      <div class="chip">Total catches: ${total}</div>
-      ${biggest ? `<div class="chip">Biggest: ${biggest} cm (${escapeHtml(biggestSpecies)})</div>` : ""}
-      <div class="mini" style="margin-top:10px;">Druk “Species stats” vir breakdown.</div>
-    `;
-  }
-
-  function showSpeciesStats(){
-    const data = getAll();
-    const stats = {};
-    data.forEach(c => {
-      const s = c.species || "Onbekend";
-      stats[s] = (stats[s] || 0) + 1;
-    });
-
-    const lines = Object.keys(stats)
-      .sort((a,b)=>stats[b]-stats[a])
-      .map(s => `${s}: ${stats[s]}`);
-
-    alert(lines.join("\n") || "Geen data");
-  }
-
-  // ========= SPOTS =========
-  function saveSpotFromAdd(){
-    const c = (coords.value || "").trim();
-    if(!c){ alert("Geen koördinate nie. Druk eers Kry GPS."); return; }
-    const name = prompt("Spot naam (bv. Die Punt / Stilbaai):");
-    if(!name) return;
-
-    const spots = getSpots();
-    spots.unshift({ id: Date.now(), name: name.trim(), coords: c });
-    saveSpots(spots);
-    alert("Spot saved ⭐");
-  }
-
-  function renderSpots(){
-    const spots = getSpots();
-    spotsList.innerHTML = "";
-
-    if(!spots.length){
-      spotsList.innerHTML = `<div class="mini">Geen spots nog nie. Gebruik ⭐ Save Spot in Add (jy kan ook coords in Maps open).</div>`;
-      return;
-    }
-
-    spots.forEach(s => {
-      spotsList.innerHTML += `
-        <div class="card">
-          <div style="font-weight:1000;">${escapeHtml(s.name || "Spot")}</div>
-          <div class="mini" style="margin-top:6px;">📍 ${escapeHtml(s.coords || "")}</div>
-          <div class="row" style="margin-top:10px;">
-            <button class="btn secondary" onclick="openSpot('${s.id}')">Open Maps</button>
-            <button class="btn danger" onclick="deleteSpot('${s.id}')">Delete</button>
-          </div>
-        </div>
-      `;
-    });
-  }
-
-  function openSpot(id){
-    const s = getSpots().find(x => String(x.id) === String(id));
-    if(!s) return;
-    openMapsByCoords(s.coords);
-  }
-
-  function deleteSpot(id){
-    const ok = confirm("Delete hierdie spot?");
-    if(!ok) return;
-    const spots = getSpots().filter(s => String(s.id) !== String(id));
-    saveSpots(spots);
-    renderSpots();
-  }
-
-  // ========= RESET =========
-  function resetAll(){
-    const ok = confirm("Reset ALLES? (catches + spots)");
-    if(!ok) return;
-    localStorage.removeItem(KEY);
-    localStorage.removeItem(SPOTS_KEY);
-    clearForm();
-    renderLog();
-    renderStats();
-    renderSpots();
-    alert("Alles skoon ✅");
-  }
-
-  // ========= MAP + HEAT =========
-  let mapInstance = null;
-  let markerGroup = null;
-  let heatLayer = null;
-
-  function renderMap(force){
-    const mapEl = el("leafletMap");
-    if(!mapEl) return;
-
-    if(!mapInstance){
-      mapInstance = L.map("leafletMap").setView([STILBAAI.lat, STILBAAI.lon], 11);
-      L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
-        maxZoom: 19,
-        attribution: ""
-      }).addTo(mapInstance);
-      markerGroup = L.layerGroup().addTo(mapInstance);
-    } else if(force){
-      if(markerGroup) markerGroup.clearLayers();
-      if(heatLayer) mapInstance.removeLayer(heatLayer);
-    }
-
-    const data = getAll();
-    const heatPoints = [];
-    let first = null;
-
-    data.forEach(c => {
-      if(!c.coords) return;
-      const p = parseCoords(c.coords);
-      if(!p) return;
-
-      if(!first) first = [p.lat, p.lon];
-
-      const label = `${c.species || ""} • ${c.place || ""}`;
-      const m = L.marker([p.lat, p.lon]).addTo(markerGroup);
-      m.bindPopup(escapeHtml(label) + `<br><span class="mini">${escapeHtml(c.coords)}</span>`);
-      heatPoints.push([p.lat, p.lon, 0.55]);
-    });
-
-    if(heatLayer) mapInstance.removeLayer(heatLayer);
-    heatLayer = L.heatLayer(heatPoints, { radius: 25, blur: 18, maxZoom: 14 }).addTo(mapInstance);
-
-    if(first) mapInstance.setView(first, 12);
-
-    setTimeout(() => { mapInstance && mapInstance.invalidateSize(); }, 250);
-  }
-
-  // ========= SEA DAYS (14) =========
-  function seaScore(waveMax, swellMax, windMax){
-    let score = 100;
-    if(Number.isFinite(waveMax))  score -= waveMax * 22;
-    if(Number.isFinite(swellMax)) score -= swellMax * 12;
-    if(Number.isFinite(windMax))  score -= windMax * 1.2;
-    score = Math.max(0, Math.min(100, Math.round(score)));
-    return score;
-  }
-  function maxOf(arr){
-    if(!arr || !arr.length) return NaN;
-    let m = -Infinity;
-    for(const v of arr) if(v > m) m = v;
-    return m;
-  }
-  function avgOf(arr){
-    if(!arr || !arr.length) return NaN;
-    let s = 0;
-    for(const v of arr) s += v;
-    return s / arr.length;
-  }
-  function hhmm(isoTime){
-  // isoTime soos "2026-03-05T14:00"
-  return String(isoTime || "").slice(11,16);
+const KEY="fishlog";
+const el=id=>document.getElementById(id);
+
+function getAll(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
+function saveAll(d){localStorage.setItem(KEY,JSON.stringify(d))}
+
+function show(id){
+["add","log","map","stats","sea"].forEach(s=>{
+document.getElementById(s).style.display=(s===id?"block":"none")
+})
+if(id==="log")renderLog()
+if(id==="map")renderMap()
+if(id==="stats")renderStats()
 }
 
-// Vind 1 high + 1 low per dag (uit model sea level)
-function findDayHighLow(times, levels){
-  // times[] en levels[] is net vir 1 dag se ure
-  if(!times || !levels || times.length < 3) return { hi:null, lo:null };
-
-  let hi = null; // {t, v}
-  let lo = null;
-
-  for(let i=1;i<levels.length-1;i++){
-    const a = levels[i-1], b = levels[i], c = levels[i+1];
-    if(!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c)) continue;
-
-    // local max
-    if(b > a && b > c){
-      if(!hi || b > hi.v) hi = { t: times[i], v: b };
-    }
-    // local min
-    if(b < a && b < c){
-      if(!lo || b < lo.v) lo = { t: times[i], v: b };
-    }
-  }
-
-  // fallback as geen peaks gevind is nie:
-  if(!hi){
-    let maxV = -Infinity, maxI = -1;
-    for(let i=0;i<levels.length;i++){
-      if(Number.isFinite(levels[i]) && levels[i] > maxV){ maxV = levels[i]; maxI = i; }
-    }
-    if(maxI >= 0) hi = { t: times[maxI], v: maxV };
-  }
-
-  if(!lo){
-    let minV = Infinity, minI = -1;
-    for(let i=0;i<levels.length;i++){
-      if(Number.isFinite(levels[i]) && levels[i] < minV){ minV = levels[i]; minI = i; }
-    }
-    if(minI >= 0) lo = { t: times[minI], v: minV };
-  }
-
-  return { hi, lo };
+function getGPS(){
+navigator.geolocation.getCurrentPosition(p=>{
+el("coords").value=p.coords.latitude+","+p.coords.longitude
+})
 }
 
-  async function fetchSeaDays(){
-    const p = parseCoords(coords.value) || STILBAAI;
-    seaBox.innerHTML = `<div class="mini">Laai 14-dae see forecast...</div>`;
+function getMoonPhase(date){
+const lp=2551443
+const new_moon=new Date(1970,0,7,20,35,0)
+const phase=((date.getTime()-new_moon.getTime())/1000)%lp
+const moon=Math.floor(phase/(24*3600))+1
+if(moon<2)return"New Moon"
+if(moon<7)return"Waxing"
+if(moon<9)return"First Quarter"
+if(moon<15)return"Waxing Gibbous"
+if(moon<17)return"Full Moon"
+if(moon<22)return"Waning"
+if(moon<24)return"Last Quarter"
+return"Waning Crescent"
+}
 
-    try{
-    const marineUrl =
-  `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-  `&hourly=wave_height,swell_wave_height,sea_surface_temperature,sea_level_height_msl` +
-  `&timezone=Africa%2FJohannesburg&forecast_days=14&cell_selection=sea`;
-        
-      const weatherUrl =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
+function saveCatch(){
 
-      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
-      if(!mRes.ok) throw new Error("Marine fetch fail");
-      if(!wRes.ok) throw new Error("Wind fetch fail");
+let data=getAll()
 
-      const m = await mRes.json();
-      const w = await wRes.json();
+let obj={
+id:Date.now(),
+species:el("species").value,
+place:el("place").value,
+length:el("length").value,
+coords:el("coords").value,
+notes:el("notes").value,
+moon:getMoonPhase(new Date()),
+date:new Date().toLocaleDateString()
+}
 
-      const time  = m?.hourly?.time || [];
-      const wave  = m?.hourly?.wave_height || [];
-      const swell = m?.hourly?.swell_wave_height || [];
-      const sst   = m?.hourly?.sea_surface_temperature || [];
-      const tide  = m?.hourly?.sea_level_height_msl || [];
-      const wind  = w?.hourly?.windspeed_10m || [];
+data.unshift(obj)
 
-      const days = {};
-      for(let i=0;i<time.length;i++){
-        const day = String(time[i]).slice(0,10);
-        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[], tide:[], tideTime:[] };
-        if(Number.isFinite(wave[i]))  days[day].wave.push(wave[i]);
-        if(Number.isFinite(swell[i])) days[day].swell.push(swell[i]);
-        if(Number.isFinite(wind[i]))  days[day].wind.push(wind[i]);
-        if(Number.isFinite(sst[i]))   days[day].sst.push(sst[i]);
-        if(Number.isFinite(tide[i])) { 
-  days[day].tide.push(tide[i]); 
-  days[day].tideTime.push(time[i]); 
-        }
-      }
+saveAll(data)
 
-      const rows = Object.keys(days).map(day => {
-        const d = days[day];
-        const waveMax  = maxOf(d.wave);
-        const swellMax = maxOf(d.swell);
-        const windMax  = maxOf(d.wind);
-        const sstAvg   = avgOf(d.sst);
-const score    = seaScore(waveMax, swellMax, windMax);
+renderLog()
+}
 
-// High/Low tyd vir daai dag (uit tide model)
-const ex = findDayHighLow(d.tideTime, d.tide);
-const highT = ex.hi ? hhmm(ex.hi.t) : "";
-const lowT  = ex.lo ? hhmm(ex.lo.t) : "";
+function renderLog(){
 
-return { day, waveMax, swellMax, windMax, sstAvg, score, highT, lowT };
+let data=getAll()
 
-      let html = "";
-      rows.forEach((r, idx) => {
-        const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
-        const grade = r.score >= 80 ? "✅ Kalm" : r.score >= 65 ? "👌 OK" : r.score >= 50 ? "⚠️ Rough" : "❌ Sleg";
-        html += `
-          <div class="card" style="margin:10px 0;">
-            <div style="font-weight:1000;">
-              ${medal} ${r.day} • <span class="chip">${grade}</span> <span class="chip">Score ${r.score}</span>
-            </div>
-            <div style="margin-top:8px;">
-              🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
-              💨 Wind max: <b>${fmt(r.windMax)} km/h</b>
-              ${(r.highT || r.lowT) ? `<br>🌊 High: <b>${r.highT || "—"}</b> • Low: <b>${r.lowT || "—"}</b>` : ""}
-              ${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
-            </div>
-          </div>
-        `;
-      });
+let html=""
 
-      seaBox.innerHTML = html || `<div class="mini">Geen data terug nie.</div>`;
-    }catch(e){
-      seaBox.innerHTML = `<div class="mini">Kon nie forecast laai nie. Check internet en probeer weer.</div>`;
-    }
-  }
+data.forEach(c=>{
 
-  // ========= SOLUNAR (APPROX) =========
-  function pad2(n){ return String(n).padStart(2,"0"); }
-  function addMinutesToHHMM(hhmm, mins){
-    const [h,m] = hhmm.split(":").map(Number);
-    const d = new Date();
-    d.setHours(h, m, 0, 0);
-    d.setMinutes(d.getMinutes() + mins);
-    return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`;
-  }
+html+=`
+<div class="card">
+<b>${c.species}</b><br>
+${c.place} • ${c.length}cm • ${c.date}
 
-  // Uses sunrise/sunset from Open-Meteo; builds “bite windows”
-  async function fetchSolunar(){
-    const p = parseCoords(coords.value) || STILBAAI;
-    solunarBox.innerHTML = `<div class="mini">Laai sunrise/sunset...</div>`;
+<div>
+<span class="chip">🌙 ${c.moon}</span>
+</div>
 
-    try{
-      const url =
-        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&daily=sunrise,sunset&timezone=Africa%2FJohannesburg&forecast_days=14`;
+<div class="row">
+<button onclick="deleteCatch('${c.id}')">Delete</button>
+<button onclick="openMap('${c.coords}')">Maps</button>
+</div>
 
-      const res = await fetch(url);
-      if(!res.ok) throw new Error("sun fetch fail");
-      const data = await res.json();
+</div>
+`
+})
 
-      const days = data?.daily?.time || [];
-      const sunrise = data?.daily?.sunrise || [];
-      const sunset  = data?.daily?.sunset || [];
+el("log").innerHTML=html
+}
 
-      let html = "";
-      for(let i=0;i<days.length;i++){
-        const sr = String(sunrise[i] || "").slice(11,16);
-        const ss = String(sunset[i]  || "").slice(11,16);
-        const major1 = sr ? `${addMinutesToHHMM(sr,-60)}–${addMinutesToHHMM(sr,60)}` : "—";
-        const major2 = ss ? `${addMinutesToHHMM(ss,-60)}–${addMinutesToHHMM(ss,60)}` : "—";
-        const minor1 = "11:00–13:00";
-        const minor2 = "23:00–01:00";
+function deleteCatch(id){
 
-        html += `
-          <div class="card" style="margin:10px 0;">
-            <div style="font-weight:1000;">${days[i]}</div>
-            <div style="margin-top:8px;">
-              🌅 Sunrise: <b>${sr || "—"}</b> • 🌇 Sunset: <b>${ss || "—"}</b><br><br>
-              ⭐ Major: <b>${major1}</b><br>
-              ⭐ Major: <b>${major2}</b><br>
-              • Minor: <b>${minor1}</b><br>
-              • Minor: <b>${minor2}</b>
-            </div>
-          </div>
-        `;
-      }
+let data=getAll().filter(c=>c.id!=id)
+saveAll(data)
+renderLog()
 
-      solunarBox.innerHTML = html || `<div class="mini">Geen data terug nie.</div>`;
-    }catch(e){
-      solunarBox.innerHTML = `<div class="mini">Kon nie Solunar laai nie. Check internet en probeer weer.</div>`;
-    }
-  }
+}
 
-  // ========= EXPORT / IMPORT =========
-  function exportJSON(){
-    const data = localStorage.getItem(KEY) || "[]";
-    const blob = new Blob([data], {type:"application/json"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tanya-sea-log.json";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+function openMap(coords){
+window.open("https://maps.google.com/?q="+coords)
+}
 
-  el("importFile").addEventListener("change", (e)=>{
-    const file = e.target.files && e.target.files[0];
-    if(!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      try{
-        const arr = JSON.parse(String(reader.result || "[]"));
-        if(!Array.isArray(arr)) throw new Error("not array");
-        saveAll(arr);
-        alert("Import sukses ✅");
-        renderLog(); renderStats();
-      }catch{
-        alert("Daai file lyk nie reg nie.");
-      }
-    };
-    reader.readAsText(file);
-  });
+let map
+let markers=[]
+let heat
 
-  function exportCSV(){
-    const data = getAll();
-    const header = ["date","species","place","length","coords","moon","tideType","tideHigh","tideLow","windDir","waterTemp","seaState","chance","notes"];
-    const rows = data.map(c => header.map(k => {
-      const v = (c && c[k] != null) ? String(c[k]) : "";
-      return `"${v.replaceAll('"','""')}"`;
-    }).join(","));
-    const csv = header.join(",") + "\n" + rows.join("\n");
+function renderMap(){
 
-    const blob = new Blob([csv], {type:"text/csv"});
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = "tanya-sea-log.csv";
-    a.click();
-    URL.revokeObjectURL(url);
-  }
+let data=getAll()
 
-  // ========= SERVICE WORKER =========
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js").catch(()=>{});
-  }
+if(!map){
+map=L.map('leafletMap').setView([-34.37,21.42],11)
+L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+}
 
-  // ========= EXPORTS for onclick =========
-  window.showTab = showTab;
-  window.getGPS = getGPS;
-  window.autoWeather = autoWeather;
-  window.autoTides = autoTides;
-  window.saveCatch = saveCatch;
-  window.editCatch = editCatch;
-  window.deleteCatch = deleteCatch;
-  window.openMapsByCatch = openMapsByCatch;
-  window.directionsToCatch = directionsToCatch;
-  window.resetAll = resetAll;
+markers.forEach(m=>map.removeLayer(m))
+markers=[]
 
-  window.renderMap = renderMap;
-  window.renderStats = renderStats;
-  window.showSpeciesStats = showSpeciesStats;
+let heatPoints=[]
 
-  window.fetchSeaDays = fetchSeaDays;
-  window.fetchSolunar = fetchSolunar;
+data.forEach(c=>{
 
-  window.exportJSON = exportJSON;
-  window.exportCSV = exportCSV;
+if(!c.coords)return
 
-  window.saveSpotFromAdd = saveSpotFromAdd;
-  window.openSpot = openSpot;
-  window.deleteSpot = deleteSpot;
+let parts=c.coords.split(",")
 
-  // ========= START =========
-  // Nice: show Add by default and set tide hint
-  if(!TIDE_API_KEY){
-    tideHint.innerHTML = "Auto getye: Geen API key gestel nie — tik High/Low handmatig. (Later kan ons 'n key insit.)";
-  } else {
-    tideHint.innerHTML = "Auto getye: Druk 🌊 Auto Getye om High/Low in te vul.";
-  }
+let lat=parseFloat(parts[0])
+let lon=parseFloat(parts[1])
 
-  showTab("add");
-})();
+let m=L.marker([lat,lon]).addTo(map)
+
+markers.push(m)
+
+heatPoints.push([lat,lon,0.5])
+
+})
+
+if(heat)map.removeLayer(heat)
+
+heat=L.heatLayer(heatPoints,{radius:25}).addTo(map)
+
+}
+
+function renderStats(){
+
+let data=getAll()
+
+let species={}
+
+data.forEach(c=>{
+species[c.species]=(species[c.species]||0)+1
+})
+
+let html=""
+
+Object.keys(species).forEach(s=>{
+html+=`${s}: ${species[s]}<br>`
+})
+
+el("statsBox").innerHTML=html
+
+}
+
+function hhmm(t){
+return String(t).slice(11,16)
+}
+
+function findHighLow(times,levels){
+
+let hi=null
+let lo=null
+
+for(let i=1;i<levels.length-1;i++){
+
+let a=levels[i-1]
+let b=levels[i]
+let c=levels[i+1]
+
+if(b>a&&b>c)hi={t:times[i],v:b}
+if(b<a&&b<c)lo={t:times[i],v:b}
+
+}
+
+return{hi,lo}
+
+}
+
+async function fetchSeaDays(){
+
+seaBox.innerHTML="Loading sea forecast..."
+
+const url=`https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&hourly=wave_height,swell_wave_height,sea_surface_temperature,sea_level_height_msl&forecast_days=14&timezone=auto`
+
+let res=await fetch(url)
+let data=await res.json()
+
+let time=data.hourly.time
+let wave=data.hourly.wave_height
+let swell=data.hourly.swell_wave_height
+let tide=data.hourly.sea_level_height_msl
+
+let days={}
+
+for(let i=0;i<time.length;i++){
+
+let day=time[i].slice(0,10)
+
+if(!days[day])days[day]={wave:[],swell:[],tide:[],time:[]}
+
+days[day].wave.push(wave[i])
+days[day].swell.push(swell[i])
+days[day].tide.push(tide[i])
+days[day].time.push(time[i])
+
+}
+
+let html=""
+
+Object.keys(days).forEach(d=>{
+
+let hiLo=findHighLow(days[d].time,days[d].tide)
+
+let hi=hiLo.hi?hhmm(hiLo.hi.t):""
+let lo=hiLo.lo?hhmm(hiLo.lo.t):""
+
+html+=`
+<div class="card">
+${d}<br>
+🌊 High: ${hi} • Low: ${lo}
+</div>
+`
+
+})
+
+seaBox.innerHTML=html
+
+}
+
+show("add")
+
 </script>
 
 </body>
-      </html>
+</html>
