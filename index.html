@@ -944,16 +944,63 @@
     for(const v of arr) s += v;
     return s / arr.length;
   }
+  function hhmm(isoTime){
+  // isoTime soos "2026-03-05T14:00"
+  return String(isoTime || "").slice(11,16);
+}
+
+// Vind 1 high + 1 low per dag (uit model sea level)
+function findDayHighLow(times, levels){
+  // times[] en levels[] is net vir 1 dag se ure
+  if(!times || !levels || times.length < 3) return { hi:null, lo:null };
+
+  let hi = null; // {t, v}
+  let lo = null;
+
+  for(let i=1;i<levels.length-1;i++){
+    const a = levels[i-1], b = levels[i], c = levels[i+1];
+    if(!Number.isFinite(a) || !Number.isFinite(b) || !Number.isFinite(c)) continue;
+
+    // local max
+    if(b > a && b > c){
+      if(!hi || b > hi.v) hi = { t: times[i], v: b };
+    }
+    // local min
+    if(b < a && b < c){
+      if(!lo || b < lo.v) lo = { t: times[i], v: b };
+    }
+  }
+
+  // fallback as geen peaks gevind is nie:
+  if(!hi){
+    let maxV = -Infinity, maxI = -1;
+    for(let i=0;i<levels.length;i++){
+      if(Number.isFinite(levels[i]) && levels[i] > maxV){ maxV = levels[i]; maxI = i; }
+    }
+    if(maxI >= 0) hi = { t: times[maxI], v: maxV };
+  }
+
+  if(!lo){
+    let minV = Infinity, minI = -1;
+    for(let i=0;i<levels.length;i++){
+      if(Number.isFinite(levels[i]) && levels[i] < minV){ minV = levels[i]; minI = i; }
+    }
+    if(minI >= 0) lo = { t: times[minI], v: minV };
+  }
+
+  return { hi, lo };
+}
 
   async function fetchSeaDays(){
     const p = parseCoords(coords.value) || STILBAAI;
     seaBox.innerHTML = `<div class="mini">Laai 14-dae see forecast...</div>`;
 
     try{
-      const marineUrl =
-        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
-        `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
-
+    const marineUrl =
+  `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+  `&hourly=wave_height,swell_wave_height,sea_surface_temperature,sea_level_height_msl` +
+  `&timezone=Africa%2FJohannesburg&forecast_days=14&cell_selection=sea`;
+        
       const weatherUrl =
         `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
         `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
@@ -969,16 +1016,21 @@
       const wave  = m?.hourly?.wave_height || [];
       const swell = m?.hourly?.swell_wave_height || [];
       const sst   = m?.hourly?.sea_surface_temperature || [];
+      const tide  = m?.hourly?.sea_level_height_msl || [];
       const wind  = w?.hourly?.windspeed_10m || [];
 
       const days = {};
       for(let i=0;i<time.length;i++){
         const day = String(time[i]).slice(0,10);
-        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[] };
+        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[], tide:[], tideTime:[] };
         if(Number.isFinite(wave[i]))  days[day].wave.push(wave[i]);
         if(Number.isFinite(swell[i])) days[day].swell.push(swell[i]);
         if(Number.isFinite(wind[i]))  days[day].wind.push(wind[i]);
         if(Number.isFinite(sst[i]))   days[day].sst.push(sst[i]);
+        if(Number.isFinite(tide[i])) { 
+  days[day].tide.push(tide[i]); 
+  days[day].tideTime.push(time[i]); 
+        }
       }
 
       const rows = Object.keys(days).map(day => {
@@ -987,9 +1039,14 @@
         const swellMax = maxOf(d.swell);
         const windMax  = maxOf(d.wind);
         const sstAvg   = avgOf(d.sst);
-        const score    = seaScore(waveMax, swellMax, windMax);
-        return { day, waveMax, swellMax, windMax, sstAvg, score };
-      }).sort((a,b)=>b.score - a.score);
+const score    = seaScore(waveMax, swellMax, windMax);
+
+// High/Low tyd vir daai dag (uit tide model)
+const ex = findDayHighLow(d.tideTime, d.tide);
+const highT = ex.hi ? hhmm(ex.hi.t) : "";
+const lowT  = ex.lo ? hhmm(ex.lo.t) : "";
+
+return { day, waveMax, swellMax, windMax, sstAvg, score, highT, lowT };
 
       let html = "";
       rows.forEach((r, idx) => {
@@ -1003,6 +1060,7 @@
             <div style="margin-top:8px;">
               🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
               💨 Wind max: <b>${fmt(r.windMax)} km/h</b>
+              ${(r.highT || r.lowT) ? `<br>🌊 High: <b>${r.highT || "—"}</b> • Low: <b>${r.lowT || "—"}</b>` : ""}
               ${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
             </div>
           </div>
