@@ -1,29 +1,85 @@
 <!DOCTYPE html>
 <html lang="af">
 <head>
+
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
+
 <title>Tanya Sea App</title>
 
 <link rel="manifest" href="manifest.webmanifest">
 
-<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css">
 <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 <script src="https://unpkg.com/leaflet.heat/dist/leaflet-heat.js"></script>
 
 <style>
-body{background:#0b1320;color:white;font-family:Arial;padding:20px;margin:0}
-.card{background:#101b2d;padding:15px;border-radius:12px;margin-bottom:15px}
-button{padding:10px;border:none;border-radius:10px;background:#2d6cdf;color:white;margin-top:6px;width:100%}
-button.secondary{background:#24304b}
-button.danger{background:#b22a2a}
-.row{display:flex;gap:10px;flex-wrap:wrap}
-.row>*{flex:1}
-input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;border:1px solid #333;background:#0e1730;color:white}
-#map{height:380px;border-radius:12px}
-.photo{width:100%;border-radius:12px;margin-top:8px}
-.chip{display:inline-block;padding:6px 10px;background:#0e1730;border-radius:999px;margin:4px}
+
+body{
+background:#0b1220;
+color:white;
+font-family:Arial;
+padding:15px;
+margin:0;
+}
+
+.card{
+background:#111c32;
+padding:15px;
+border-radius:12px;
+margin-bottom:15px;
+}
+
+button{
+padding:10px;
+border-radius:10px;
+border:none;
+background:#2e6cff;
+color:white;
+margin-top:6px;
+width:100%;
+}
+
+input,select,textarea{
+width:100%;
+padding:10px;
+margin-top:6px;
+border-radius:10px;
+border:1px solid #333;
+background:#0f1730;
+color:white;
+}
+
+.row{
+display:flex;
+gap:10px;
+}
+
+.row>*{
+flex:1;
+}
+
+.chip{
+display:inline-block;
+background:#0f1730;
+padding:6px 10px;
+border-radius:20px;
+margin:3px;
+}
+
+.photo{
+width:100%;
+border-radius:10px;
+margin-top:8px;
+}
+
+#map{
+height:380px;
+border-radius:12px;
+}
+
 </style>
+
 </head>
 
 <body>
@@ -31,18 +87,23 @@ input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;
 <h2>🎣 Tanya Sea App</h2>
 
 <div class="card">
+
 <div class="row">
-<button onclick="show('add')">Add</button>
-<button onclick="show('log')">Log</button>
-<button onclick="show('map')">Map</button>
-<button onclick="show('stats')">Stats</button>
-<button onclick="show('sea')">Sea Days</button>
-</div>
+<button onclick="showTab('add')">Add</button>
+<button onclick="showTab('log')">Log</button>
+<button onclick="showTab('map')">Map</button>
+<button onclick="showTab('stats')">Stats</button>
+<button onclick="showTab('sea')">Sea</button>
 </div>
 
-<section id="add" class="card">
+</div>
+
+<section id="add">
+
+<div class="card">
 
 <label>Spesie</label>
+
 <select id="species">
 <option>Kaapse Kabeljou</option>
 <option>Geelstert</option>
@@ -54,6 +115,7 @@ input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;
 <option>Yellow Belly</option>
 <option>Galjoen</option>
 <option>Hottentot</option>
+<option>Elf</option>
 </select>
 
 <label>Plek</label>
@@ -63,13 +125,14 @@ input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;
 <input id="length" type="number">
 
 <label>Koördinate</label>
+
 <div class="row">
 <button onclick="getGPS()">📍 GPS</button>
 <input id="coords" readonly>
 </div>
 
 <label>Foto</label>
-<input id="photo" type="file" accept="image/*">
+<input type="file" id="photo" accept="image/*">
 
 <div id="preview"></div>
 
@@ -78,74 +141,165 @@ input,select,textarea{width:100%;padding:10px;margin-top:6px;border-radius:10px;
 
 <button onclick="saveCatch()">Save Catch</button>
 
+</div>
+
 </section>
 
-<section id="log" class="card"></section>
+<section id="log"></section>
 
-<section id="map" class="card">
-<div id="leafletMap"></div>
+<section id="mapSection">
+
+<div class="card">
+<div id="map"></div>
+</div>
+
 </section>
 
-<section id="stats" class="card">
+<section id="stats">
+
+<div class="card">
+
 <div id="statsBox"></div>
+
+</div>
+
 </section>
 
-<section id="sea" class="card">
-<button onclick="fetchSeaDays()">Refresh Sea Days</button>
+<section id="sea">
+
+<div class="card">
+
+<button onclick="fetchSea()">Refresh Sea Forecast</button>
+
 <div id="seaBox"></div>
+
+</div>
+
 </section>
 
 <script>
 
-const KEY="fishlog";
-const el=id=>document.getElementById(id);
+const KEY="tanya-sea-app"
 
-function getAll(){return JSON.parse(localStorage.getItem(KEY)||"[]")}
-function saveAll(d){localStorage.setItem(KEY,JSON.stringify(d))}
+function getAll(){
 
-function show(id){
-["add","log","map","stats","sea"].forEach(s=>{
-document.getElementById(s).style.display=(s===id?"block":"none")
+return JSON.parse(localStorage.getItem(KEY)||"[]")
+
+}
+
+function saveAll(d){
+
+localStorage.setItem(KEY,JSON.stringify(d))
+
+}
+
+function showTab(id){
+
+["add","log","mapSection","stats","sea"].forEach(s=>{
+document.getElementById(s).style.display="none"
 })
-if(id==="log")renderLog()
-if(id==="map")renderMap()
-if(id==="stats")renderStats()
+
+if(id=="map")id="mapSection"
+
+document.getElementById(id).style.display="block"
+
+if(id=="log")renderLog()
+if(id=="mapSection")renderMap()
+if(id=="stats")renderStats()
+
 }
 
 function getGPS(){
-navigator.geolocation.getCurrentPosition(p=>{
-el("coords").value=p.coords.latitude+","+p.coords.longitude
+
+navigator.geolocation.getCurrentPosition(
+
+p=>{
+
+let lat=p.coords.latitude
+let lon=p.coords.longitude
+
+document.getElementById("coords").value=lat+","+lon
+
+},
+
+e=>{
+
+alert("GPS kon nie kry nie")
+
 })
+
 }
 
-function getMoonPhase(date){
-const lp=2551443
-const new_moon=new Date(1970,0,7,20,35,0)
-const phase=((date.getTime()-new_moon.getTime())/1000)%lp
-const moon=Math.floor(phase/(24*3600))+1
-if(moon<2)return"New Moon"
-if(moon<7)return"Waxing"
-if(moon<9)return"First Quarter"
-if(moon<15)return"Waxing Gibbous"
-if(moon<17)return"Full Moon"
-if(moon<22)return"Waning"
-if(moon<24)return"Last Quarter"
-return"Waning Crescent"
+function getMoonPhase(){
+
+let lp=2551443
+let now=new Date()
+let new_moon=new Date(1970,0,7,20,35,0)
+
+let phase=((now-new_moon)/1000)%lp
+
+let day=Math.floor(phase/(24*3600))+1
+
+if(day<2)return"New"
+if(day<7)return"Waxing"
+if(day<9)return"Quarter"
+if(day<15)return"Gibbous"
+if(day<17)return"Full"
+if(day<22)return"Waning"
+return"Crescent"
+
 }
 
 function saveCatch(){
 
 let data=getAll()
 
+let photo=""
+
+let file=document.getElementById("photo").files[0]
+
+if(file){
+
+let reader=new FileReader()
+
+reader.onload=function(){
+
+photo=reader.result
+
+add()
+
+}
+
+reader.readAsDataURL(file)
+
+}else{
+
+add()
+
+}
+
+function add(){
+
 let obj={
+
 id:Date.now(),
-species:el("species").value,
-place:el("place").value,
-length:el("length").value,
-coords:el("coords").value,
-notes:el("notes").value,
-moon:getMoonPhase(new Date()),
+
+species:species.value,
+
+place:place.value,
+
+length:length.value,
+
+coords:coords.value,
+
+notes:notes.value,
+
+moon:getMoonPhase(),
+
+photo:photo,
+
 date:new Date().toLocaleDateString()
+
 }
 
 data.unshift(obj)
@@ -153,6 +307,9 @@ data.unshift(obj)
 saveAll(data)
 
 renderLog()
+
+}
+
 }
 
 function renderLog(){
@@ -164,40 +321,59 @@ let html=""
 data.forEach(c=>{
 
 html+=`
+
 <div class="card">
+
 <b>${c.species}</b><br>
+
 ${c.place} • ${c.length}cm • ${c.date}
 
 <div>
+
 <span class="chip">🌙 ${c.moon}</span>
+
 </div>
+
+${c.photo?`<img src="${c.photo}" class="photo">`:""}
 
 <div class="row">
-<button onclick="deleteCatch('${c.id}')">Delete</button>
+
 <button onclick="openMap('${c.coords}')">Maps</button>
+
+<button onclick="deleteCatch('${c.id}')">Delete</button>
+
 </div>
 
 </div>
+
 `
+
 })
 
-el("log").innerHTML=html
+document.getElementById("log").innerHTML=html
+
 }
 
 function deleteCatch(id){
 
 let data=getAll().filter(c=>c.id!=id)
+
 saveAll(data)
+
 renderLog()
 
 }
 
 function openMap(coords){
+
 window.open("https://maps.google.com/?q="+coords)
+
 }
 
 let map
+
 let markers=[]
+
 let heat
 
 function renderMap(){
@@ -205,11 +381,15 @@ function renderMap(){
 let data=getAll()
 
 if(!map){
-map=L.map('leafletMap').setView([-34.37,21.42],11)
+
+map=L.map('map').setView([-34.37,20.85],11)
+
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map)
+
 }
 
 markers.forEach(m=>map.removeLayer(m))
+
 markers=[]
 
 let heatPoints=[]
@@ -221,6 +401,7 @@ if(!c.coords)return
 let parts=c.coords.split(",")
 
 let lat=parseFloat(parts[0])
+
 let lon=parseFloat(parts[1])
 
 let m=L.marker([lat,lon]).addTo(map)
@@ -244,56 +425,38 @@ let data=getAll()
 let species={}
 
 data.forEach(c=>{
+
 species[c.species]=(species[c.species]||0)+1
+
 })
 
 let html=""
 
 Object.keys(species).forEach(s=>{
+
 html+=`${s}: ${species[s]}<br>`
+
 })
 
-el("statsBox").innerHTML=html
+document.getElementById("statsBox").innerHTML=html
 
 }
 
-function hhmm(t){
-return String(t).slice(11,16)
-}
+async function fetchSea(){
 
-function findHighLow(times,levels){
+seaBox.innerHTML="Loading..."
 
-let hi=null
-let lo=null
-
-for(let i=1;i<levels.length-1;i++){
-
-let a=levels[i-1]
-let b=levels[i]
-let c=levels[i+1]
-
-if(b>a&&b>c)hi={t:times[i],v:b}
-if(b<a&&b<c)lo={t:times[i],v:b}
-
-}
-
-return{hi,lo}
-
-}
-
-async function fetchSeaDays(){
-
-seaBox.innerHTML="Loading sea forecast..."
-
-const url=`https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&hourly=wave_height,swell_wave_height,sea_surface_temperature,sea_level_height_msl&forecast_days=14&timezone=auto`
+let url=`https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=20.85&hourly=wave_height,sea_surface_temperature&forecast_days=14&timezone=auto`
 
 let res=await fetch(url)
+
 let data=await res.json()
 
 let time=data.hourly.time
+
 let wave=data.hourly.wave_height
-let swell=data.hourly.swell_wave_height
-let tide=data.hourly.sea_level_height_msl
+
+let temp=data.hourly.sea_surface_temperature
 
 let days={}
 
@@ -301,12 +464,11 @@ for(let i=0;i<time.length;i++){
 
 let day=time[i].slice(0,10)
 
-if(!days[day])days[day]={wave:[],swell:[],tide:[],time:[]}
+if(!days[day])days[day]={wave:[],temp:[]}
 
 days[day].wave.push(wave[i])
-days[day].swell.push(swell[i])
-days[day].tide.push(tide[i])
-days[day].time.push(time[i])
+
+days[day].temp.push(temp[i])
 
 }
 
@@ -314,16 +476,22 @@ let html=""
 
 Object.keys(days).forEach(d=>{
 
-let hiLo=findHighLow(days[d].time,days[d].tide)
+let w=Math.max(...days[d].wave)
 
-let hi=hiLo.hi?hhmm(hiLo.hi.t):""
-let lo=hiLo.lo?hhmm(hiLo.lo.t):""
+let t=(days[d].temp.reduce((a,b)=>a+b,0)/days[d].temp.length).toFixed(1)
 
 html+=`
+
 <div class="card">
+
 ${d}<br>
-🌊 High: ${hi} • Low: ${lo}
+
+🌊 Wave: ${w} m<br>
+
+🌡 Sea: ${t}°C
+
 </div>
+
 `
 
 })
@@ -332,9 +500,9 @@ seaBox.innerHTML=html
 
 }
 
-show("add")
+showTab("add")
 
 </script>
 
 </body>
-</html>
+  </html>
