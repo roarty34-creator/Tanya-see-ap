@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tanya Sea App V15</title>
+  <title>Tanya Sea App V16</title>
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#0b1220">
@@ -23,8 +23,6 @@
       --accent:#4f8cff;
       --border:#20304d;
       --danger:#ef4444;
-      --ok:#22c55e;
-      --warn:#f59e0b;
     }
 
     body{
@@ -136,7 +134,6 @@
     img.preview{ width:100%; border-radius:14px; margin-top:10px; border:1px solid var(--border); }
     .entryTitle{ font-weight:1100; font-size:16px; margin-bottom:4px; }
     .entryMeta{ color: var(--muted); font-size: 12px; margin-bottom:8px; }
-    .chipRow{ display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
 
     .grid2{ display:grid; grid-template-columns:1fr; gap:12px; }
     @media (min-width: 760px){ .grid2{ grid-template-columns:1fr 1fr; } }
@@ -162,7 +159,7 @@
 </head>
 
 <body>
-  <h2>🎣 Tanya Sea App V15</h2>
+  <h2>🎣 Tanya Sea App V16</h2>
 
   <div class="topnav">
     <button class="navbtn" id="tabAdd"   onclick="showTab('add')">Add</button>
@@ -227,6 +224,7 @@
         <button class="btn secondary" type="button" onclick="openTideTable()">🌊 Open tide table</button>
         <input id="tideNote" placeholder="bv. High 06:10 / Low 12:30" autocomplete="off">
       </div>
+      <div class="mini">Gety-tipe word outomaties (Spring/Neap) uit die maan bereken.</div>
 
       <label class="small">Wind rigting (opsioneel)</label>
       <select id="windDir" autocomplete="off">
@@ -315,6 +313,16 @@
   <!-- SEA -->
   <section id="sea">
     <div class="card">
+      <h3>⭐ Best Bite Time (volgende 48 uur)</h3>
+      <div class="mini">Gebruik golf + swell + wind + dawn/dusk bonus + maan/gety-tipe (approx). Internet nodig.</div>
+      <div class="row" style="margin-top:10px;">
+        <button class="btn" type="button" onclick="fetchBiteTimes()">⭐ Bereken beste ure</button>
+        <button class="btn secondary" type="button" onclick="useStilbaai()">📌 Gebruik Stilbaai coords</button>
+      </div>
+      <div id="biteBox" class="mini" style="margin-top:10px;"></div>
+    </div>
+
+    <div class="card">
       <h3>14-dae Sea Days (Stilbaai / jou coords)</h3>
       <div class="mini">Score gebruik golf + swell + wind (hoe hoër = kalmer). Internet nodig.</div>
       <div class="row">
@@ -360,8 +368,8 @@
 
 <script>
 (() => {
-  const KEY_CATCH = "tanyaSeaApp_catches_v15";
-  const KEY_SPOTS = "tanyaSeaApp_spots_v15";
+  const KEY_CATCH = "tanyaSeaApp_catches_v16";
+  const KEY_SPOTS = "tanyaSeaApp_spots_v16";
   const STILBAAI = { lat: -34.37, lon: 20.85 };
 
   const el = (id) => document.getElementById(id);
@@ -387,6 +395,7 @@
   const logList   = el("logList");
   const statsBox  = el("statsBox");
   const seaBox    = el("seaBox");
+  const biteBox   = el("biteBox");
 
   const spotName  = el("spotName");
   const spotList  = el("spotList");
@@ -468,8 +477,6 @@
   }
 
   function biteScoreSimple(){
-    // eenvoudige “pro” score: moon/tide + windDir + temp ingevul
-    // (nie 'n wetenskap nie, net 'n helper)
     const mi = moonInfo(new Date());
     let score = 50;
 
@@ -477,7 +484,6 @@
     if(mi.name.includes("Full") || mi.name.includes("New")) score += 10;
 
     const wd = (windDir.value || "").trim();
-    // Stilbaai: NW/W kan rough wees; E/SE kan soms beter wees (baie rof guideline)
     if(wd === "E" || wd === "SE") score += 8;
     if(wd === "W" || wd === "NW") score -= 8;
 
@@ -678,7 +684,6 @@
     data.push(entry);
     saveAll(data);
 
-    // clear
     species.value = "";
     place.value = "";
     trip.value = "";
@@ -789,7 +794,7 @@
     if(mapInstance) renderMap(true);
   }
 
-  // ===== MAP V15: Tap → Use coords / Save spot =====
+  // ===== MAP =====
   function ensureMap(){
     if(mapInstance) return;
 
@@ -1075,6 +1080,183 @@
     }
   }
 
+  // ===== V16: BEST BITE TIMES =====
+  function hourKey(iso){ return String(iso||"").replace("T"," ").slice(0,16); }
+
+  function dawnDuskBonus(hour){
+    // bonus vir 05:00-08:00 en 17:00-20:00
+    if(hour >= 5 && hour <= 8) return 10;
+    if(hour >= 17 && hour <= 20) return 10;
+    return 0;
+  }
+
+  function tideMoonBonus(){
+    const mi = moonInfo(new Date());
+    let b = 0;
+    if(mi.tide.includes("Spring")) b += 10;
+    if(mi.name.includes("Full") || mi.name.includes("New")) b += 6;
+    return b;
+  }
+
+  function biteHourlyScore(wave, swell, wind, hour){
+    // begin met 100 en trek penalties af
+    const w = Number.isFinite(wave) ? wave : 2;
+    const s = Number.isFinite(swell) ? swell : 2;
+    const wi = Number.isFinite(wind) ? wind : 35;
+
+    let score = 100;
+    score -= w * 30;     // wave penalty
+    score -= s * 22;     // swell penalty
+    score -= wi * 1.0;   // wind penalty
+
+    score += dawnDuskBonus(hour);
+    score += tideMoonBonus();
+
+    score = Math.max(0, Math.min(100, Math.round(score)));
+    return score;
+  }
+
+  function groupWindows(items){
+    // items: [{t:Date, score, wave, swell, wind}]
+    // maak windows waar score>=70
+    const good = items.filter(x => x.score >= 70).sort((a,b)=>a.t-b.t);
+    const out = [];
+    let cur = null;
+
+    for(const it of good){
+      if(!cur){
+        cur = { start: it.t, end: it.t, best: it.score, avg: it.score, n:1 };
+      }else{
+        const diffH = (it.t - cur.end) / (1000*60*60);
+        if(diffH <= 1.01){
+          cur.end = it.t;
+          cur.best = Math.max(cur.best, it.score);
+          cur.avg += it.score; cur.n += 1;
+        }else{
+          cur.avg = Math.round(cur.avg / cur.n);
+          out.push(cur);
+          cur = { start: it.t, end: it.t, best: it.score, avg: it.score, n:1 };
+        }
+      }
+    }
+    if(cur){
+      cur.avg = Math.round(cur.avg / cur.n);
+      out.push(cur);
+    }
+    // sorteer op best/avg en lengte
+    out.sort((a,b)=> (b.best - a.best) || (b.avg - a.avg) || ((b.n) - (a.n)));
+    return out;
+  }
+
+  function fmtHM(d){
+    const hh = String(d.getHours()).padStart(2,"0");
+    const mm = String(d.getMinutes()).padStart(2,"0");
+    return `${hh}:${mm}`;
+  }
+  function fmtDay(d){
+    const y = d.getFullYear();
+    const m = String(d.getMonth()+1).padStart(2,"0");
+    const dd = String(d.getDate()).padStart(2,"0");
+    return `${y}-${m}-${dd}`;
+  }
+
+  async function fetchBiteTimes(){
+    const p = parseCoords(coords.value) || STILBAAI;
+    biteBox.innerHTML = `<div class="mini">Bereken beste bite times (48 uur)…</div>`;
+
+    try{
+      const marineUrl =
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=wave_height,swell_wave_height&timezone=Africa%2FJohannesburg&forecast_days=3`;
+
+      const weatherUrl =
+        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=3`;
+
+      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+      if(!mRes.ok) throw new Error("Marine fetch fail");
+      if(!wRes.ok) throw new Error("Wind fetch fail");
+
+      const m = await mRes.json();
+      const w = await wRes.json();
+
+      const time  = m?.hourly?.time || [];
+      const wave  = m?.hourly?.wave_height || [];
+      const swell = m?.hourly?.swell_wave_height || [];
+      const wind  = w?.hourly?.windspeed_10m || [];
+
+      const now = new Date();
+      const end = new Date(now.getTime() + 48*60*60*1000);
+
+      const items = [];
+      for(let i=0;i<time.length;i++){
+        const t = new Date(String(time[i]));
+        if(t < now) continue;
+        if(t > end) break;
+
+        const hour = t.getHours();
+        const sc = biteHourlyScore(wave[i], swell[i], wind[i], hour);
+
+        items.push({ t, score: sc, wave: wave[i], swell: swell[i], wind: wind[i] });
+      }
+
+      if(!items.length){
+        biteBox.innerHTML = `<div class="mini">Geen hourly data terug nie.</div>`;
+        return;
+      }
+
+      // Top 6 hours
+      const topHours = items.slice().sort((a,b)=>b.score-a.score).slice(0,6);
+
+      // Best windows
+      const windows = groupWindows(items).slice(0,3);
+
+      const mi = moonInfo(new Date());
+      let html = `
+        <div class="chip">🌙 ${esc(mi.name)}</div>
+        <div class="chip">🌊 ${esc(mi.tide)}</div>
+        <div class="mini" style="margin-top:8px;">Top ure is bereken vir jou coords.</div>
+      `;
+
+      if(windows.length){
+        html += `<div style="margin-top:12px;font-weight:1100;">🏆 Beste windows</div>`;
+        windows.forEach((w, idx) => {
+          const sameDay = fmtDay(w.start) === fmtDay(w.end);
+          const range = sameDay
+            ? `${fmtDay(w.start)} • ${fmtHM(w.start)}–${fmtHM(new Date(w.end.getTime()+60*60*1000))}`
+            : `${fmtDay(w.start)} ${fmtHM(w.start)} → ${fmtDay(w.end)} ${fmtHM(new Date(w.end.getTime()+60*60*1000))}`;
+          const medal = idx===0?"🥇":idx===1?"🥈":"🥉";
+          html += `
+            <div class="card" style="margin:10px 0;">
+              <div style="font-weight:1100;">${medal} ${range}</div>
+              <div class="mini" style="margin-top:6px;">
+                Best score: <b>${w.best}</b> • Avg: <b>${w.avg}</b> • Ure: <b>${w.n}</b>
+              </div>
+            </div>
+          `;
+        });
+      }else{
+        html += `<div class="mini" style="margin-top:10px;">Geen “kalm” windows (score ≥ 70) in 48 uur nie—kyk die Top ure hieronder.</div>`;
+      }
+
+      html += `<div style="margin-top:12px;font-weight:1100;">⏱ Top ure</div>`;
+      topHours.forEach(h => {
+        html += `
+          <div class="card" style="margin:10px 0;">
+            <div style="font-weight:1100;">${fmtDay(h.t)} • ${fmtHM(h.t)} <span class="chip">Score ${h.score}</span></div>
+            <div class="mini" style="margin-top:6px;">
+              🌊 Wave ${fmt(h.wave)}m • 🌀 Swell ${fmt(h.swell)}m • 💨 Wind ${fmt(h.wind,0)}km/h
+            </div>
+          </div>
+        `;
+      });
+
+      biteBox.innerHTML = html;
+    }catch{
+      biteBox.innerHTML = `<div class="mini">Kon nie bite times laai nie. Check internet en probeer weer.</div>`;
+    }
+  }
+
   // Exports for onclick
   window.showTab = showTab;
   window.getGPS = getGPS;
@@ -1093,6 +1275,7 @@
   window.fitAll = fitAll;
 
   window.fetchSeaDays = fetchSeaDays;
+  window.fetchBiteTimes = fetchBiteTimes;
 
   window.saveSpotFromAdd = saveSpotFromAdd;
   window.saveSpotManual = saveSpotManual;
@@ -1117,4 +1300,4 @@
 </script>
 
 </body>
-            </html>
+</html>
