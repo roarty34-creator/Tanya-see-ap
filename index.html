@@ -1,1 +1,970 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>Tanya Sea App</title>
 
+<link rel="manifest" href="manifest.webmanifest">
+<meta name="theme-color" content="#0b1220">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+<style>
+:root{
+  --bg:#0b1220;
+  --card:#101a2e;
+  --text:#e8eefc;
+  --muted:#9fb0d0;
+  --accent:#4f8cff;
+  --border:#20304d;
+}
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+  background: radial-gradient(1200px 800px at 20% 0%, #142040 0%, var(--bg) 55%);
+  color:var(--text);
+  padding:16px;
+}
+h2{margin:0 0 10px}
+h3{margin:0 0 10px}
+hr{border:0;border-top:1px solid rgba(255,255,255,.08);margin:14px 0}
+.card{
+  background: linear-gradient(180deg, #122042 0%, var(--card) 100%);
+  border: 1px solid var(--border);
+  border-radius: 18px;
+  padding: 14px;
+  margin: 10px 0;
+  box-shadow: 0 10px 25px rgba(0,0,0,.25);
+}
+label.small{
+  display:block;
+  margin: 10px 0 6px;
+  color: var(--muted);
+  font-size: 12px;
+  font-weight: 900;
+  letter-spacing: .2px;
+}
+input, select, textarea{
+  width:100%;
+  padding: 10px;
+  border-radius: 12px;
+  border: 1px solid var(--border);
+  background: #0e1730;
+  color: var(--text);
+  margin-bottom:10px;
+  box-sizing:border-box;
+}
+textarea{min-height:84px; resize:vertical}
+button{
+  background: transparent;
+  color: var(--text);
+  border: 1px solid var(--border);
+  padding: 10px 14px;
+  border-radius: 999px;
+  cursor: pointer;
+  font-weight: 900;
+  transition: transform .06s ease, background .2s ease, border-color .2s ease;
+}
+button:hover{ border-color: var(--accent); }
+button:active{ transform: scale(0.98); }
+.topnav{
+  display:inline-flex;
+  flex-wrap:wrap;
+  background:#0e1730;
+  padding:6px;
+  border-radius:999px;
+  border:1px solid var(--border);
+  gap:6px;
+  margin: 10px 0 16px;
+}
+.navbtn{
+  border:none;
+  background:transparent;
+  padding:8px 14px;
+  border-radius:999px;
+  font-weight:1000;
+  color:var(--text);
+}
+.navbtn.active{
+  background:var(--accent);
+  color:#071022;
+}
+.row{display:flex;gap:10px;flex-wrap:wrap;align-items:center}
+.chipRow{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
+.chip{
+  display:inline-flex;align-items:center;gap:6px;
+  padding:6px 10px;border-radius:999px;
+  background: rgba(255,255,255,.06);
+  border:1px solid rgba(255,255,255,.10);
+  font-weight:900;
+  font-size:12px;
+}
+.mini{color:var(--muted);font-size:12px;font-weight:800}
+.grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:10px}
+@media (min-width:740px){.grid{grid-template-columns:repeat(3,minmax(0,1fr));}}
+img{max-width:100%;border-radius:12px}
+section{display:none}
+#map,#mapHeat{height:430px;border-radius:18px;border:1px solid var(--border);overflow:hidden}
+.entryTitle{font-weight:1000;font-size:16px}
+.entryMeta{color:var(--muted);font-size:12px;font-weight:850;margin-top:4px}
+.divider{height:1px;background:rgba(255,255,255,.08);margin:10px 0}
+</style>
+</head>
+
+<body>
+<h2>Tanya Sea App — Deep-Sea Boat Edition</h2>
+
+<div class="topnav">
+  <button class="navbtn" id="btnAdd" onclick="show('add')">Add Catch</button>
+  <button class="navbtn" id="btnLog" onclick="show('log')">Log</button>
+  <button class="navbtn" id="btnMap" onclick="show('map')">Map</button>
+  <button class="navbtn" id="btnHeat" onclick="show('heat')">Heatmap</button>
+  <button class="navbtn" id="btnSea" onclick="show('sea')">Sea Days</button>
+  <button class="navbtn" id="btnGallery" onclick="show('gallery')">Gallery</button>
+  <button class="navbtn" id="btnIdentify" onclick="show('identify')">Identifier</button>
+  <button class="navbtn" id="btnStats" onclick="show('stats')">Stats</button>
+</div>
+
+<section id="add">
+  <div class="card">
+    <h3>Add Deep-Sea Catch</h3>
+
+    <label class="small">Species</label>
+    <select id="species">
+      <option value="">Choose species…</option>
+      <option>Cape Kob</option>
+      <option>Yellowtail</option>
+      <option>Bonito</option>
+      <option>Red Roman</option>
+      <option>Snapper</option>
+      <option>Silver (Bastermeid)</option>
+      <option>Red Steenbras</option>
+      <option>Yellow Belly (Rockod)</option>
+      <option>Galjoen</option>
+      <option>Hottentot</option>
+      <option>Geelbek</option>
+      <option>Tuna</option>
+    </select>
+
+    <label class="small">Length (cm)</label>
+    <input id="length" inputmode="decimal" placeholder="e.g. 65" autocomplete="off">
+    <div class="mini" id="minHint" style="margin:-6px 0 10px;"></div>
+
+    <label class="small">Boat name</label>
+    <input id="boat" placeholder="e.g. Nicoleen 🚤" autocomplete="off">
+
+    <label class="small">Launch site</label>
+    <input id="launch" placeholder="e.g. Stilbaai harbour" autocomplete="off">
+
+    <label class="small">Where caught (reef / bank / canyon / river mouth)</label>
+    <input id="place" placeholder="e.g. 45m Bank / River mouth / 12 Mile" autocomplete="off">
+
+    <label class="small">Depth (m)</label>
+    <input id="depth" inputmode="decimal" placeholder="e.g. 38" autocomplete="off">
+
+    <label class="small">Method</label>
+    <select id="method">
+      <option>Drift</option>
+      <option>Anchor</option>
+      <option>Trolling</option>
+      <option>Bottom fishing</option>
+      <option>Jigging</option>
+    </select>
+
+    <label class="small">Bait / Lure</label>
+    <input id="bait" placeholder="e.g. sardine / chokka / jig" autocomplete="off">
+
+    <label class="small">Current strength</label>
+    <select id="current">
+      <option>Weak</option>
+      <option>Medium</option>
+      <option>Strong</option>
+    </select>
+
+    <label class="small">Swell height (m)</label>
+    <input id="swell" inputmode="decimal" placeholder="optional" autocomplete="off">
+
+    <label class="small">Coordinates</label>
+    <div class="row">
+      <button type="button" onclick="getGPS()">📍 Get GPS</button>
+      <input id="coords" placeholder="-34.37, 20.85" readonly autocomplete="off">
+    </div>
+
+    <div class="row">
+      <button type="button" onclick="autoConditions()">🌬 Auto wind + 🌡 water temp</button>
+      <span class="mini">No API key</span>
+    </div>
+
+    <label class="small">Wind direction</label>
+    <input id="windDir" placeholder="Auto / optional" autocomplete="off">
+
+    <label class="small">Wind speed (km/h)</label>
+    <input id="windSpeed" placeholder="Auto / optional" autocomplete="off">
+
+    <label class="small">Water / Sea temp (°C)</label>
+    <input id="waterTemp" placeholder="Auto / optional" autocomplete="off">
+
+    <label class="small">Photo</label>
+    <div class="row">
+      <button type="button" onclick="document.getElementById('photoCamera').click()">📷 Camera</button>
+      <button type="button" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
+    </div>
+    <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;">
+    <input id="photoGallery" type="file" accept="image/*" style="display:none;">
+    <div id="photoPreview"></div>
+
+    <label class="small">Notes</label>
+    <textarea id="notes" placeholder="drift speed, bite time, rig, etc…"></textarea>
+
+    <div class="row">
+      <button type="button" onclick="saveCatch()">✅ Save</button>
+      <button type="button" onclick="clearForm()">🧼 Clear</button>
+    </div>
+  </div>
+</section>
+
+<section id="log">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h3 style="margin:0">Catch Log</h3>
+      <button type="button" onclick="clearAll()">🗑 Reset All Data</button>
+    </div>
+    <div class="mini">Navigate opens Google Maps directions.</div>
+  </div>
+  <div id="list"></div>
+</section>
+
+<section id="map">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h3 style="margin:0">Catch Map</h3>
+      <button type="button" onclick="toggleSatellite()">🛰 Satellite ON/OFF</button>
+    </div>
+    <div class="mini">Pins show only for catches with coordinates.</div>
+  </div>
+  <div id="map"></div>
+</section>
+
+<section id="heat">
+  <div class="card">
+    <div class="row" style="justify-content:space-between">
+      <h3 style="margin:0">Heatmap</h3>
+      <button type="button" onclick="toggleSatellite()">🛰 Satellite ON/OFF</button>
+    </div>
+    <div class="mini">Heat = repeated catches in the same area.</div>
+  </div>
+  <div id="mapHeat"></div>
+</section>
+
+<section id="sea">
+  <div class="card">
+    <h3>Sea Days (14-day ranking)</h3>
+    <div class="mini">Wave + swell + wind → score (higher = better)</div>
+    <div class="row">
+      <button type="button" onclick="fetchSeaDays()">📡 Refresh 14-day forecast</button>
+      <span class="mini" id="seaHint"></span>
+    </div>
+  </div>
+  <div id="seaBox"></div>
+</section>
+
+<section id="gallery">
+  <div class="card">
+    <h3>Photo Gallery</h3>
+    <div class="mini">All saved fish photos in one place.</div>
+  </div>
+  <div id="galleryBox" class="grid"></div>
+</section>
+
+<section id="identify">
+  <div class="card">
+    <h3>Fish Identifier (no API key)</h3>
+    <div class="mini">This tab shows your photo. For real ID, use Google Lens.</div>
+
+    <div class="row">
+      <button type="button" onclick="document.getElementById('idPhoto').click()">📸 Choose photo</button>
+      <input id="idPhoto" type="file" accept="image/*" style="display:none;">
+    </div>
+
+    <div id="idPreview" style="margin-top:12px;"></div>
+    <div id="idResult" class="mini" style="margin-top:10px;"></div>
+  </div>
+</section>
+
+<section id="stats">
+  <div class="card">
+    <h3>Stats</h3>
+    <div class="mini">Counts by species + biggest length.</div>
+  </div>
+  <div id="statsBox"></div>
+</section>
+
+<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+<script>
+(() => {
+  const KEY = "tanyaSeaAppV24";
+  const STILBAAI = { lat: -34.3699, lon: 21.4136 };
+
+  const el = (id) => document.getElementById(id);
+
+  // elements
+  const species   = el("species");
+  const length    = el("length");
+  const minHint   = el("minHint");
+  const boat      = el("boat");
+  const launch    = el("launch");
+  const place     = el("place");
+  const depth     = el("depth");
+  const method    = el("method");
+  const bait      = el("bait");
+  const current   = el("current");
+  const swell     = el("swell");
+  const coords    = el("coords");
+  const windDir   = el("windDir");
+  const windSpeed = el("windSpeed");
+  const waterTemp = el("waterTemp");
+  const notes     = el("notes");
+
+  const list       = el("list");
+  const seaBox     = el("seaBox");
+  const seaHint    = el("seaHint");
+  const galleryBox = el("galleryBox");
+  const statsBox   = el("statsBox");
+
+  const photoPreview = el("photoPreview");
+  const photoCamera  = el("photoCamera");
+  const photoGallery = el("photoGallery");
+
+  const idPhoto   = el("idPhoto");
+  const idPreview = el("idPreview");
+  const idResult  = el("idResult");
+
+  // minimum sizes (example values; edit anytime)
+  const MIN_SIZES = {
+    "Cape Kob": 50,
+    "Yellowtail": 60,
+    "Galjoen": 35,
+    "Red Steenbras": 60,
+    "Red Roman": 30
+  };
+
+  function updateMinHint(){
+    const sp = species.value;
+    const min = MIN_SIZES[sp];
+    minHint.textContent = min ? `Minimum legal size: ${min} cm` : "";
+  }
+  species.addEventListener("change", updateMinHint);
+  updateMinHint();
+
+  function getAll(){
+    return JSON.parse(localStorage.getItem(KEY) || "[]");
+  }
+  function saveAll(data){
+    localStorage.setItem(KEY, JSON.stringify(data));
+  }
+
+  function escapeHtml(s){
+    return String(s || "")
+      .replaceAll("&","&amp;")
+      .replaceAll("<","&lt;")
+      .replaceAll(">","&gt;");
+  }
+
+  function setActive(id){
+    const ids = ["add","log","map","heat","sea","gallery","identify","stats"];
+    ids.forEach(x=>{
+      const b = el("btn" + x.charAt(0).toUpperCase() + x.slice(1));
+      if(b) b.classList.toggle("active", x === id);
+    });
+  }
+
+  function show(id){
+    document.querySelectorAll("section").forEach(s => s.style.display = "none");
+    const sec = el(id);
+    if(sec) sec.style.display = "block";
+    setActive(id);
+
+    if(id === "log") loadLog();
+    if(id === "map") renderMap(false);
+    if(id === "heat") renderMap(true);
+    if(id === "gallery") renderGallery();
+    if(id === "stats") renderStats();
+  }
+
+  // GPS
+  function getGPS(){
+    if(!navigator.geolocation){
+      alert("GPS not supported on this browser.");
+      return;
+    }
+    navigator.geolocation.getCurrentPosition(
+      (pos) => {
+        const lat = pos.coords.latitude.toFixed(6);
+        const lon = pos.coords.longitude.toFixed(6);
+        coords.value = lat + ", " + lon;
+      },
+      (err) => {
+        alert("Could not get GPS: " + (err?.message || "Enable Location and try again."));
+      },
+      { enableHighAccuracy: true, timeout: 12000, maximumAge: 0 }
+    );
+  }
+
+  // parse "lat, lon"
+  function parseCoords(str){
+    if(!str) return null;
+    const s = String(str).replace(";",",").trim();
+    const parts = s.split(",").map(x=>x.trim()).filter(Boolean);
+    if(parts.length < 2) return null;
+    const lat = Number(parts[0]);
+    const lon = Number(parts[1]);
+    if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+    return { lat, lon };
+  }
+
+  function toDegToDir(deg){
+    if(!Number.isFinite(deg)) return "";
+    const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+    const i = Math.round(((deg % 360) / 45)) % 8;
+    return dirs[i] + ` (${Math.round(deg)}°)`;
+  }
+
+  // Auto wind + water temp (Open-Meteo, no key)
+  async function autoConditions(){
+    const p = parseCoords(coords.value) || STILBAAI;
+    try{
+      const marineUrl =
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=sea_surface_temperature,wave_height&timezone=Africa%2FJohannesburg&forecast_days=2`;
+
+      const weatherUrl =
+        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=windspeed_10m,winddirection_10m&timezone=Africa%2FJohannesburg&forecast_days=2`;
+
+      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+      if(!mRes.ok) throw new Error("Marine fetch failed");
+      if(!wRes.ok) throw new Error("Wind fetch failed");
+
+      const m = await mRes.json();
+      const w = await wRes.json();
+
+      const sst = m?.hourly?.sea_surface_temperature?.[0];
+      const ws  = w?.hourly?.windspeed_10m?.[0];
+      const wd  = w?.hourly?.winddirection_10m?.[0];
+
+      if(Number.isFinite(sst)) waterTemp.value = String(sst.toFixed(1));
+      if(Number.isFinite(ws))  windSpeed.value = String(Math.round(ws));
+      if(Number.isFinite(wd))  windDir.value = toDegToDir(wd);
+
+      alert("Auto conditions loaded ✅");
+    }catch(e){
+      alert("Could not load conditions. Check internet and try again.");
+    }
+  }
+
+  // Photo to DataURL
+  function fileToDataUrl(file){
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(String(reader.result || ""));
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  }
+
+  let currentPhotoDataUrl = "";
+
+  async function onPhotoPicked(file){
+    if(!file) return;
+    currentPhotoDataUrl = await fileToDataUrl(file);
+    photoPreview.innerHTML = `<img src="${currentPhotoDataUrl}" alt="Fish photo">`;
+  }
+
+  if(photoCamera){
+    photoCamera.addEventListener("change", (e)=> onPhotoPicked(e.target.files?.[0]));
+  }
+  if(photoGallery){
+    photoGallery.addEventListener("change", (e)=> onPhotoPicked(e.target.files?.[0]));
+  }
+
+  // Save catch
+  function saveCatch(){
+    const data = getAll();
+    const obj = {
+      id: Date.now().toString(),
+      species: species.value.trim(),
+      length: length.value.trim(),
+      boat: boat.value.trim(),
+      launch: launch.value.trim(),
+      place: place.value.trim(),
+      depth: depth.value.trim(),
+      method: method.value,
+      bait: bait.value.trim(),
+      current: current.value,
+      swell: swell.value.trim(),
+      coords: coords.value.trim(),
+      windDir: windDir.value.trim(),
+      windSpeed: windSpeed.value.trim(),
+      waterTemp: waterTemp.value.trim(),
+      notes: notes.value.trim(),
+      photo: currentPhotoDataUrl || "",
+      date: new Date().toLocaleDateString()
+    };
+    data.push(obj);
+    saveAll(data);
+    clearForm();
+    show("log");
+  }
+
+  function clearForm(){
+    species.value = "";
+    length.value = "";
+    updateMinHint();
+
+    boat.value = "";
+    launch.value = "";
+    place.value = "";
+    depth.value = "";
+    method.value = "Drift";
+    bait.value = "";
+    current.value = "Weak";
+    swell.value = "";
+
+    coords.value = "";
+    windDir.value = "";
+    windSpeed.value = "";
+    waterTemp.value = "";
+    notes.value = "";
+
+    currentPhotoDataUrl = "";
+    photoPreview.innerHTML = "";
+    if(photoCamera) photoCamera.value = "";
+    if(photoGallery) photoGallery.value = "";
+  }
+
+  function openMap(coordStr){
+    const p = parseCoords(coordStr);
+    if(!p){ alert("No valid coords."); return; }
+    // one-button directions (navigate)
+    const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.lat + "," + p.lon)}`;
+    window.open(url, "_blank");
+  }
+
+  function deleteCatch(id){
+    const ok = confirm("Delete this catch?");
+    if(!ok) return;
+    const data = getAll().filter(c => String(c.id) !== String(id));
+    saveAll(data);
+    loadLog();
+  }
+
+  function editCatch(id){
+    const data = getAll();
+    const idx = data.findIndex(c => String(c.id) === String(id));
+    if(idx === -1) return;
+
+    const c = data[idx];
+
+    const ns = prompt("Species:", c.species || "");
+    if(ns === null) return;
+    const nl = prompt("Length (cm):", c.length || "");
+    if(nl === null) return;
+    const np = prompt("Where caught:", c.place || "");
+    if(np === null) return;
+    const nd = prompt("Depth (m):", c.depth || "");
+    if(nd === null) return;
+    const nc = prompt("Coords (lat, lon):", c.coords || "");
+    if(nc === null) return;
+
+    c.species = ns.trim();
+    c.length  = nl.trim();
+    c.place   = np.trim();
+    c.depth   = nd.trim();
+    c.coords  = nc.trim();
+
+    saveAll(data);
+    loadLog();
+  }
+
+  function loadLog(){
+    const data = getAll().slice().reverse();
+
+    if(!data.length){
+      list.innerHTML = `<div class="card"><div class="mini">No catches yet.</div></div>`;
+      return;
+    }
+
+    let html = "";
+    data.forEach(c=>{
+      const title = escapeHtml(c.species || "Unknown species");
+      const len   = escapeHtml(c.length);
+      const where = escapeHtml(c.place);
+      const dpth  = escapeHtml(c.depth);
+      const boatN = escapeHtml(c.boat);
+      const lnch  = escapeHtml(c.launch);
+      const meth  = escapeHtml(c.method);
+      const baitT = escapeHtml(c.bait);
+      const curr  = escapeHtml(c.current);
+      const swl   = escapeHtml(c.swell);
+      const coord = escapeHtml(c.coords);
+      const wind  = escapeHtml(c.windDir);
+      const wspd  = escapeHtml(c.windSpeed);
+      const temp  = escapeHtml(c.waterTemp);
+      const noteT = escapeHtml(c.notes);
+      const date  = escapeHtml(c.date);
+
+      html += `
+        <div class="card">
+          <div class="entryTitle">${title}</div>
+          <div class="entryMeta">
+            ${len ? len + " cm • " : ""}${where ? where + " • " : ""}${date}
+          </div>
+
+          ${c.photo ? `<img src="${c.photo}" style="width:100%;border-radius:12px;margin-top:10px">` : ""}
+
+          <div class="chipRow">
+            ${boatN ? `<span class="chip">🚤 ${boatN}</span>` : ""}
+            ${lnch ? `<span class="chip">🛟 ${lnch}</span>` : ""}
+            ${dpth ? `<span class="chip">⬇️ ${dpth} m</span>` : ""}
+            ${meth ? `<span class="chip">🎣 ${meth}</span>` : ""}
+            ${curr ? `<span class="chip">🌊 ${curr} current</span>` : ""}
+            ${swl ? `<span class="chip">🌀 ${swl} m swell</span>` : ""}
+          </div>
+
+          ${(baitT) ? `<div class="mini" style="margin-top:8px">🪝 Bait/Lure: <b>${baitT}</b></div>` : ""}
+
+          ${(wind || wspd || temp) ? `
+            <div class="chipRow">
+              ${wind ? `<span class="chip">🌬 ${wind}</span>` : ""}
+              ${wspd ? `<span class="chip">💨 ${wspd} km/h</span>` : ""}
+              ${temp ? `<span class="chip">🌡 ${temp}°C</span>` : ""}
+            </div>
+          ` : ""}
+
+          ${coord ? `
+            <div class="chipRow">
+              <span class="chip">📍 ${coord}</span>
+              <button type="button" onclick="openMap('${c.coords}')">🧭 Navigate</button>
+            </div>
+          ` : ""}
+
+          ${noteT ? `<div class="mini" style="margin-top:8px">📝 ${noteT}</div>` : ""}
+
+          <div class="chipRow" style="margin-top:12px">
+            <button type="button" onclick="editCatch('${c.id}')">✏️ Edit</button>
+            <button type="button" onclick="deleteCatch('${c.id}')">🗑 Delete</button>
+          </div>
+        </div>
+      `;
+    });
+
+    list.innerHTML = html;
+  }
+
+  function clearAll(){
+    const ok = confirm("Delete ALL catches?");
+    if(!ok) return;
+    saveAll([]);
+    loadLog();
+    renderGallery();
+    renderStats();
+    renderMap(false);
+    renderMap(true);
+  }
+
+  // Gallery
+  function renderGallery(){
+    const data = getAll().slice().reverse();
+    const photos = data.filter(c=>c.photo);
+    if(!photos.length){
+      galleryBox.innerHTML = `<div class="card"><div class="mini">No photos yet.</div></div>`;
+      return;
+    }
+    galleryBox.innerHTML = photos.map(c=>`
+      <div class="card">
+        <div style="font-weight:1000;margin-bottom:8px">${escapeHtml(c.species || "Unknown")}</div>
+        <img src="${c.photo}" alt="Fish photo">
+        <div class="mini" style="margin-top:8px">${escapeHtml(c.place || "")}</div>
+      </div>
+    `).join("");
+  }
+
+  // Stats
+  function renderStats(){
+    const data = getAll();
+    if(!data.length){
+      statsBox.innerHTML = `<div class="card"><div class="mini">No catches yet.</div></div>`;
+      return;
+    }
+    const by = {};
+    let biggest = {len: -1, species:"", place:""};
+    data.forEach(c=>{
+      const sp = c.species || "Unknown";
+      by[sp] = (by[sp] || 0) + 1;
+      const n = Number(String(c.length||"").replace(",","."));
+      if(Number.isFinite(n) && n > biggest.len){
+        biggest = {len:n, species:sp, place:c.place||""};
+      }
+    });
+
+    const rows = Object.keys(by).sort((a,b)=>by[b]-by[a]).map(sp=>`
+      <div class="card">
+        <div style="font-weight:1000">${escapeHtml(sp)}</div>
+        <div class="mini">Catches: <b>${by[sp]}</b></div>
+      </div>
+    `).join("");
+
+    statsBox.innerHTML = `
+      <div class="card">
+        <div style="font-weight:1000">Biggest length</div>
+        <div class="mini">${biggest.len > 0 ? `${escapeHtml(biggest.species)} • ${biggest.len} cm • ${escapeHtml(biggest.place)}` : "No length captured"}</div>
+      </div>
+      ${rows}
+    `;
+  }
+
+  // Sea days helpers
+  function maxOf(arr){
+    let m = -Infinity;
+    for(const x of arr){ if(Number.isFinite(x) && x>m) m=x; }
+    return Number.isFinite(m) ? m : NaN;
+  }
+  function avgOf(arr){
+    let s=0,c=0;
+    for(const x of arr){ if(Number.isFinite(x)){ s+=x; c++; } }
+    return c ? (s/c) : NaN;
+  }
+  function fmt(x){
+    return Number.isFinite(x) ? (Math.round(x*10)/10).toString() : "—";
+  }
+  function seaScore(waveMax, swellMax, windMax){
+    const wave = Number.isFinite(waveMax) ? waveMax : 9;
+    const swell= Number.isFinite(swellMax) ? swellMax: 9;
+    const wind = Number.isFinite(windMax) ? windMax : 80;
+
+    const waveS = Math.max(0, 1 - (wave/2.5));
+    const swellS= Math.max(0, 1 - (swell/3.0));
+    const windS = Math.max(0, 1 - (wind/50));
+
+    const score = Math.round((waveS*0.45 + swellS*0.30 + windS*0.25) * 100);
+    return Math.max(0, Math.min(100, score));
+  }
+
+  async function fetchSeaDays(){
+    const p = parseCoords(coords.value) || STILBAAI;
+    seaHint.textContent = `Using: ${p.lat.toFixed(3)}, ${p.lon.toFixed(3)}`;
+    seaBox.innerHTML = `<div class="card"><div class="mini">Loading 14-day marine forecast…</div></div>`;
+
+    try{
+      const marineUrl =
+        `https://marine-api.open-meteo.com/v1/marine?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+      const weatherUrl =
+        `https://api.open-meteo.com/v1/forecast?latitude=${encodeURIComponent(p.lat)}&longitude=${encodeURIComponent(p.lon)}` +
+        `&hourly=windspeed_10m&timezone=Africa%2FJohannesburg&forecast_days=14`;
+
+      const [mRes, wRes] = await Promise.all([fetch(marineUrl), fetch(weatherUrl)]);
+      if(!mRes.ok) throw new Error("Marine fetch fail");
+      if(!wRes.ok) throw new Error("Wind fetch fail");
+
+      const m = await mRes.json();
+      const w = await wRes.json();
+
+      const time  = m?.hourly?.time || [];
+      const wave  = m?.hourly?.wave_height || [];
+      const swellArr = m?.hourly?.swell_wave_height || [];
+      const sst   = m?.hourly?.sea_surface_temperature || [];
+      const wind  = w?.hourly?.windspeed_10m || [];
+
+      const days = {};
+      for(let i=0;i<time.length;i++){
+        const day = String(time[i]).slice(0,10);
+        if(!days[day]) days[day] = { wave:[], swell:[], wind:[], sst:[] };
+        if(Number.isFinite(wave[i]))      days[day].wave.push(wave[i]);
+        if(Number.isFinite(swellArr[i]))  days[day].swell.push(swellArr[i]);
+        if(Number.isFinite(wind[i]))      days[day].wind.push(wind[i]);
+        if(Number.isFinite(sst[i]))       days[day].sst.push(sst[i]);
+      }
+
+      const rows = Object.keys(days).map(day => {
+        const d = days[day];
+        const waveMax  = maxOf(d.wave);
+        const swellMax = maxOf(d.swell);
+        const windMax  = maxOf(d.wind);
+        const sstAvg   = avgOf(d.sst);
+        const score    = seaScore(waveMax, swellMax, windMax);
+        return { day, waveMax, swellMax, windMax, sstAvg, score };
+      }).sort((a,b)=>b.score - a.score);
+
+      let html = "";
+      rows.forEach((r, idx) => {
+        const medal = idx < 3 ? (idx===0 ? "🥇" : idx===1 ? "🥈" : "🥉") : "";
+        const grade = r.score >= 80 ? "✅ Calm" : r.score >= 65 ? "👌 OK" : r.score >= 50 ? "⚠️ Rough" : "❌ Bad";
+        html += `
+          <div class="card" style="margin:10px 0;">
+            <div style="font-weight:1000;">
+              ${medal} ${r.day} • <span class="chip">${grade}</span> <span class="chip">Score ${r.score}</span>
+            </div>
+            <div style="margin-top:8px;">
+              🌊 Wave max: <b>${fmt(r.waveMax)} m</b> • 🌀 Swell max: <b>${fmt(r.swellMax)} m</b><br>
+              💨 Wind max: <b>${fmt(r.windMax)} km/h</b>
+              ${Number.isFinite(r.sstAvg) ? ` • 🌡 Sea: <b>${fmt(r.sstAvg)}°C</b>` : ""}
+            </div>
+          </div>
+        `;
+      });
+
+      seaBox.innerHTML = html || `<div class="card"><div class="mini">No data returned.</div></div>`;
+    }catch(e){
+      seaBox.innerHTML = `<div class="card"><div class="mini">Could not load forecast. Check internet and try again.</div></div>`;
+    }
+  }
+
+  // Maps + satellite toggle (works)
+  let mapNormal = null, mapHeat = null;
+  let osmLayer = null, satLayer = null;
+  let osmLayerHeat = null, satLayerHeat = null;
+  let satelliteOn = false;
+
+  function makeLayers(){
+    const osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+      maxZoom: 19, attribution: "© OpenStreetMap"
+    });
+    const sat = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}", {
+      maxZoom: 19, attribution: "Tiles © Esri"
+    });
+    return { osm, sat };
+  }
+
+  function setSatellite(map, osm, sat){
+    if(!map || !osm || !sat) return;
+    if(satelliteOn){
+      if(map.hasLayer(osm)) map.removeLayer(osm);
+      if(!map.hasLayer(sat)) sat.addTo(map);
+    }else{
+      if(map.hasLayer(sat)) map.removeLayer(sat);
+      if(!map.hasLayer(osm)) osm.addTo(map);
+    }
+  }
+
+  function toggleSatellite(){
+    satelliteOn = !satelliteOn;
+    setSatellite(mapNormal, osmLayer, satLayer);
+    setSatellite(mapHeat, osmLayerHeat, satLayerHeat);
+  }
+
+  function renderMap(isHeat){
+    const data = getAll();
+    const targetId = isHeat ? "mapHeat" : "map";
+    const container = el(targetId);
+    if(!container) return;
+
+    if(isHeat && !mapHeat){
+      mapHeat = L.map(targetId);
+      const layers = makeLayers();
+      osmLayerHeat = layers.osm;
+      satLayerHeat = layers.sat;
+      osmLayerHeat.addTo(mapHeat);
+      mapHeat.setView([STILBAAI.lat, STILBAAI.lon], 11);
+    }
+    if(!isHeat && !mapNormal){
+      mapNormal = L.map(targetId);
+      const layers = makeLayers();
+      osmLayer = layers.osm;
+      satLayer = layers.sat;
+      osmLayer.addTo(mapNormal);
+      mapNormal.setView([STILBAAI.lat, STILBAAI.lon], 11);
+    }
+
+    const map = isHeat ? mapHeat : mapNormal;
+
+    // apply current satellite mode
+    if(isHeat) setSatellite(mapHeat, osmLayerHeat, satLayerHeat);
+    else setSatellite(mapNormal, osmLayer, satLayer);
+
+    // clear overlays
+    map.eachLayer(layer=>{
+      if(layer === osmLayer || layer === satLayer || layer === osmLayerHeat || layer === satLayerHeat) return;
+      map.removeLayer(layer);
+    });
+
+    let points = [];
+    data.forEach(c=>{
+      const p = parseCoords(c.coords);
+      if(!p) return;
+      points.push(p);
+
+      if(!isHeat){
+        const label = `${c.species || ""} • ${c.place || ""} • ${c.depth || ""}m`;
+        L.marker([p.lat, p.lon]).addTo(map).bindPopup(escapeHtml(label));
+      }
+    });
+
+    if(isHeat){
+      const bucket = {};
+      points.forEach(p=>{
+        const k = `${p.lat.toFixed(3)},${p.lon.toFixed(3)}`;
+        bucket[k] = (bucket[k] || 0) + 1;
+      });
+      Object.keys(bucket).forEach(k=>{
+        const [lat, lon] = k.split(",").map(Number);
+        const count = bucket[k];
+        const radius = 120 + Math.min(900, count * 180);
+        L.circle([lat, lon], {
+          radius,
+          color: "rgba(79,140,255,.65)",
+          fillColor: "rgba(79,140,255,.35)",
+          fillOpacity: 0.6,
+          weight: 1
+        }).addTo(map).bindPopup(`Spot intensity: ${count}`);
+      });
+    }
+
+    if(points.length){
+      const bounds = L.latLngBounds(points.map(p=>[p.lat,p.lon]));
+      map.fitBounds(bounds, { padding:[20,20] });
+    }
+  }
+
+  // Identifier photo preview
+  if(idPhoto){
+    idPhoto.addEventListener("change", async (e)=>{
+      const file = e.target.files?.[0];
+      if(!file) return;
+      const dataUrl = await fileToDataUrl(file);
+      idPreview.innerHTML = `<img src="${dataUrl}" style="width:100%;border-radius:12px">`;
+      idResult.innerHTML = `
+        <b>Real fish ID:</b> Open this photo in Google Photos → tap <b>Lens</b>.
+        <br>Or long-press → “Search image”.
+      `;
+    });
+  }
+
+  // expose for buttons
+  window.show = show;
+  window.getGPS = getGPS;
+  window.autoConditions = autoConditions;
+  window.saveCatch = saveCatch;
+  window.clearForm = clearForm;
+  window.openMap = openMap;
+  window.deleteCatch = deleteCatch;
+  window.editCatch = editCatch;
+  window.clearAll = clearAll;
+  window.toggleSatellite = toggleSatellite;
+  window.fetchSeaDays = fetchSeaDays;
+
+  // start
+  show("add");
+
+  // Service Worker (PWA)
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(()=>{});
+  }
+})();
+</script>
+
+</body>
+    </html>
