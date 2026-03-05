@@ -1,23 +1,12 @@
 {
   "name": "Tanya Sea App",
   "short_name": "SeaApp",
-  "description": "Fishing log, GPS spots en heatmap vir Stilbaai.",
-  "start_url": "./",
-  "scope": "./",
+  "start_url": "./?source=pwa",
   "display": "standalone",
-  "orientation": "portrait",
   "background_color": "#0b1320",
   "theme_color": "#0b1320",
   "icons": [
-    {
-      "src": "icon-192.png",
-      "sizes": "192x192",
-      "type": "image/png"
-    },
-    {
-      "src": "icon-512.png",
-      "sizes": "512x512",
-      "type": "image/png"
-    }
+    { "src": "icon-192.png", "sizes": "192x192", "type": "image/png" },
+    { "src": "icon-512.png", "sizes": "512x512", "type": "image/png" }
   ]
 }
