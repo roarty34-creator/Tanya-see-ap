@@ -1,1 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1" />
+  <title>Tanya Fishing App</title>
 
+  <!-- Leaflet -->
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+
+  <style>
+    :root{
+      --bg:#0b1220;
+      --card:#101a2e;
+      --text:#e8eefc;
+      --muted:#9fb0d0;
+      --accent:#4f8cff;
+      --border:#20304d;
+      --danger:#ff4d4d;
+      --ok:#39d98a;
+    }
+
+    body{
+      margin:0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      background: radial-gradient(1200px 800px at 20% 0%, #142040 0%, var(--bg) 55%);
+      color:var(--text);
+      padding:18px;
+    }
+
+    .appTitle{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      margin:0 0 14px;
+      font-weight:900;
+      letter-spacing:.2px;
+    }
+    .titleIcon{
+      width:28px;height:28px;border-radius:8px;
+      border:1px solid rgba(255,255,255,.12);
+      background:#0e1730;
+      object-fit:cover;
+    }
+
+    .topnav{
+      display:inline-flex;
+      background:#0e1730;
+      padding:6px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      gap:6px;
+      margin-bottom:14px;
+      flex-wrap:wrap;
+    }
+
+    .navbtn{
+      border:none;
+      background:transparent;
+      padding:8px 16px;
+      border-radius:999px;
+      font-weight:800;
+      color:var(--text);
+      cursor:pointer;
+    }
+    .navbtn.active{
+      background:var(--accent);
+      color:#071022;
+    }
+
+    .card{
+      background: linear-gradient(180deg, #122042 0%, var(--card) 100%);
+      border: 1px solid var(--border);
+      border-radius: 18px;
+      padding: 14px;
+      margin: 10px 0;
+      box-shadow: 0 10px 25px rgba(0,0,0,.25);
+    }
+
+    label.small{
+      display:block;
+      margin: 10px 0 6px;
+      color: var(--muted);
+      font-size: 12px;
+      font-weight: 800;
+      letter-spacing:.2px;
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:10px;
+      border-radius:12px;
+      border:1px solid var(--border);
+      background:#0e1730;
+      color:var(--text);
+      margin-bottom:10px;
+      box-sizing:border-box;
+    }
+    textarea{ min-height:78px; resize:vertical; }
+
+    button{
+      background: transparent;
+      color: var(--text);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 999px;
+      cursor: pointer;
+      font-weight: 800;
+      transition: transform .06s ease, border-color .2s ease;
+    }
+    button:hover{ border-color: var(--accent); }
+    button:active{ transform: scale(0.98); }
+
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+    .chip{
+      display:inline-flex;
+      align-items:center;
+      gap:8px;
+      padding:6px 10px;
+      border-radius:999px;
+      border:1px solid var(--border);
+      background:#0e1730;
+      color:var(--muted);
+      font-size:12px;
+      font-weight:800;
+    }
+    .chip.bad{ color:#ffd0d0; border-color:rgba(255,77,77,.45); }
+    .chip.good{ color:#c8ffe7; border-color:rgba(57,217,138,.45); }
+
+    section{ display:none; }
+
+    #map{
+      height:360px;
+      border-radius:18px;
+      border:1px solid var(--border);
+      overflow:hidden;
+    }
+
+    .entryTitle{ font-weight:1000; }
+    .entryMeta{ margin-top:6px; color:var(--muted); font-size:12px; font-weight:800; }
+    .entryPhoto{
+      width:100%;
+      border-radius:14px;
+      margin-top:10px;
+      border:1px solid rgba(255,255,255,.10);
+    }
+    .mini{ color:var(--muted); font-size:12px; font-weight:800; }
+
+    .danger{ border-color: rgba(255,77,77,.55); color:#ffd0d0; }
+    .danger:hover{ border-color: var(--danger); }
+
+    .accent{ border-color: rgba(79,140,255,.65); }
+    .accent:hover{ border-color: var(--accent); }
+
+    .grid{
+      display:grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap:10px;
+    }
+    @media (max-width:520px){
+      .grid{ grid-template-columns: 1fr; }
+    }
+  </style>
+</head>
+
+<body>
+  <h2 class="appTitle">
+    <img src="icon-192.png" alt="boat" class="titleIcon">
+    Tanya Fishing App
+  </h2>
+
+  <div class="topnav">
+    <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add</button>
+    <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
+    <button class="navbtn" id="btnMap" onclick="showTab('map')">Map</button>
+    <button class="navbtn" id="btnGallery" onclick="showTab('gallery')">Gallery</button>
+  </div>
+
+  <!-- ADD -->
+  <section id="add">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Add Catch</div>
+        <div class="chip" id="minChip">Min size: —</div>
+      </div>
+
+      <label class="small">Species</label>
+      <select id="species" autocomplete="off">
+        <option value="">Choose species…</option>
+        <option>Kaapse Kabeljou</option>
+        <option>Geelstert</option>
+        <option>Bonnie</option>
+        <option>Rooi Roman</option>
+        <option>Snapper</option>
+        <option>Silver (Bastermeid)</option>
+        <option>Rooi Steenbras</option>
+        <option>Yellow Belly (Rockod)</option>
+        <option>Galjoen</option>
+        <option>Hottentot</option>
+      </select>
+
+      <label class="small">Where caught (auto)</label>
+      <input id="place" placeholder="Deep Sea" autocomplete="off">
+
+      <label class="small">Length (cm)</label>
+      <input id="length" inputmode="numeric" placeholder="e.g. 65" autocomplete="off">
+
+      <!-- Min size sits right under length (as requested) -->
+      <label class="small">Minimum legal size (cm) (auto)</label>
+      <input id="minSize" readonly placeholder="Auto" autocomplete="off">
+
+      <div class="row" style="margin-top:4px;">
+        <div class="chip" id="sizeStatus">Pick a species to load min size.</div>
+      </div>
+
+      <label class="small">Coordinates</label>
+      <div class="row">
+        <button type="button" class="accent" onclick="getGPS()">📍 Get GPS</button>
+        <input id="coords" placeholder="-34.37, 20.85" readonly autocomplete="off" style="flex:1; min-width:220px;">
+      </div>
+
+      <label class="small">Photo</label>
+      <div class="row">
+        <button type="button" onclick="document.getElementById('photoCamera').click()">📷 Camera</button>
+        <button type="button" class="accent" onclick="document.getElementById('photoGallery').click()">🖼 Gallery</button>
+      </div>
+      <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none;">
+      <input id="photoGallery" type="file" accept="image/*" style="display:none;">
+      <div id="photoPreview" class="mini" style="margin-top:8px;"></div>
+
+      <label class="small">Notes</label>
+      <textarea id="notes" placeholder="Anything about bait, drift, conditions…" autocomplete="off"></textarea>
+
+      <div class="row" style="margin-top:10px;">
+        <button class="accent" type="button" onclick="saveCatch()">💾 Save Catch</button>
+        <button type="button" onclick="clearForm()">Clear</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- LOG -->
+  <section id="log">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Catch Log</div>
+        <button class="danger" onclick="resetAll()">🗑 Reset All Data</button>
+      </div>
+      <div class="mini" style="margin-top:8px;">Tip: Tap “Maps” to open the exact spot.</div>
+    </div>
+
+    <div id="list"></div>
+  </section>
+
+  <!-- MAP -->
+  <section id="mapTab">
+    <div class="card">
+      <div class="row" style="justify-content:space-between;">
+        <div style="font-weight:1000;">Catch Map</div>
+        <button class="accent" onclick="toggleSatellite()">🛰 Satellite: <span id="satState">OFF</span></button>
+      </div>
+      <div class="mini" style="margin-top:8px;">Pins show only catches with coordinates.</div>
+    </div>
+
+    <div id="map"></div>
+  </section>
+
+  <!-- GALLERY -->
+  <section id="gallery">
+    <div class="card">
+      <div style="font-weight:1000;">Fish Photo Gallery</div>
+      <div class="mini" style="margin-top:8px;">All photos you saved, in one place.</div>
+    </div>
+    <div id="galleryBox" class="grid"></div>
+  </section>
+
+  <!-- Leaflet -->
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+
+  <script>
+  (() => {
+    const KEY = "tanya_fishing_v28";
+
+    const MIN_SIZE = {
+      "Kaapse Kabeljou": 60,
+      "Geelstert": 60,
+      "Bonnie": 0,
+      "Rooi Roman": 30,
+      "Snapper": 30,
+      "Silver (Bastermeid)": 25,
+      "Rooi Steenbras": 60,
+      "Yellow Belly (Rockod)": 30,
+      "Galjoen": 35,
+      "Hottentot": 22
+    };
+
+    const DEFAULT_PLACE = "Deep Sea";
+
+    const el = (id) => document.getElementById(id);
+
+    const species     = el("species");
+    const place       = el("place");
+    const length      = el("length");
+    const minSize     = el("minSize");
+    const coords      = el("coords");
+    const notes       = el("notes");
+    const list        = el("list");
+    const minChip     = el("minChip");
+    const sizeStatus  = el("sizeStatus");
+    const photoPrev   = el("photoPreview");
+    const galleryBox  = el("galleryBox");
+
+    const camInput = el("photoCamera");
+    const galInput = el("photoGallery");
+
+    let currentPhoto = ""; // dataURL
+    let mapInstance = null;
+    let osmLayer = null;
+    let satLayer = null;
+    let satOn = false;
+    let markers = [];
+
+    function getAll(){
+      try{ return JSON.parse(localStorage.getItem(KEY) || "[]"); }
+      catch{ return []; }
+    }
+
+    function saveAll(data){
+      localStorage.setItem(KEY, JSON.stringify(data));
+    }
+
+    function safe(s){
+      return String(s || "").replaceAll("&","&amp;").replaceAll("<","&lt;").replaceAll(">","&gt;");
+    }
+
+    function parseCoords(s){
+      const t = String(s||"").trim();
+      if(!t) return null;
+      const m = t.split(",").map(x=>x.trim());
+      if(m.length < 2) return null;
+      const lat = Number(m[0]);
+      const lon = Number(m[1]);
+      if(!Number.isFinite(lat) || !Number.isFinite(lon)) return null;
+      return {lat, lon};
+    }
+
+    function updateMinSizeUI(){
+      const sp = species.value;
+      const ms = (sp && (sp in MIN_SIZE)) ? Number(MIN_SIZE[sp]) : null;
+
+      if(ms === null){
+        minSize.value = "";
+        minChip.textContent = "Min size: —";
+        sizeStatus.textContent = "Pick a species to load min size.";
+        sizeStatus.className = "chip";
+        return;
+      }
+
+      minSize.value = String(ms);
+      minChip.textContent = "Min size: " + ms + " cm";
+
+      const len = Number(String(length.value||"").trim());
+      if(!Number.isFinite(len)){
+        sizeStatus.textContent = (ms>0) ? ("Minimum is " + ms + " cm") : "No minimum for this species.";
+        sizeStatus.className = "chip";
+        return;
+      }
+
+      if(ms === 0){
+        sizeStatus.textContent = "No minimum for this species.";
+        sizeStatus.className = "chip good";
+        return;
+      }
+
+      if(len >= ms){
+        sizeStatus.textContent = "✅ Length OK (≥ " + ms + " cm)";
+        sizeStatus.className = "chip good";
+      }else{
+        sizeStatus.textContent = "⚠️ Under minimum (" + ms + " cm)";
+        sizeStatus.className = "chip bad";
+      }
+    }
+
+    species.addEventListener("change", updateMinSizeUI);
+    length.addEventListener("input", updateMinSizeUI);
+
+    function showTab(id){
+      // sections
+      const sections = ["add","log","mapTab","gallery"];
+      sections.forEach(s => el(s).style.display = "none");
+
+      // nav active
+      ["btnAdd","btnLog","btnMap","btnGallery"].forEach(btn => el(btn).classList.remove("active"));
+      if(id === "add"){ el("add").style.display = "block"; el("btnAdd").classList.add("active"); }
+      if(id === "log"){ el("log").style.display = "block"; el("btnLog").classList.add("active"); loadLog(); }
+      if(id === "map"){ el("mapTab").style.display = "block"; el("btnMap").classList.add("active"); initMap(); renderMapPins(); }
+      if(id === "gallery"){ el("gallery").style.display = "block"; el("btnGallery").classList.add("active"); renderGallery(); }
+    }
+
+    function clearForm(){
+      species.value = "";
+      place.value = DEFAULT_PLACE;
+      length.value = "";
+      minSize.value = "";
+      coords.value = "";
+      notes.value = "";
+      currentPhoto = "";
+      photoPrev.innerHTML = "";
+
+      if(camInput) camInput.value = "";
+      if(galInput) galInput.value = "";
+
+      updateMinSizeUI();
+    }
+
+    async function fileToDataUrl(file){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(String(reader.result || ""));
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
+    async function handlePhotoInput(e){
+      const file = e.target.files && e.target.files[0];
+      if(!file) return;
+      try{
+        currentPhoto = await fileToDataUrl(file);
+        photoPrev.innerHTML = `<img class="entryPhoto" src="${currentPhoto}" alt="photo">`;
+      }catch{
+        alert("Could not load photo.");
+      }
+    }
+
+    camInput.addEventListener("change", handlePhotoInput);
+    galInput.addEventListener("change", handlePhotoInput);
+
+    function saveCatch(){
+      const sp = species.value.trim();
+      if(!sp){ alert("Please choose a species."); return; }
+
+      const lenVal = Number(String(length.value||"").trim());
+      const ms = (sp in MIN_SIZE) ? Number(MIN_SIZE[sp]) : null;
+
+      // Allow saving even if length empty, but warn if under min and provided
+      if(Number.isFinite(lenVal) && ms !== null && ms > 0 && lenVal < ms){
+        const ok = confirm("This is under the minimum size ("+ms+" cm). Save anyway?");
+        if(!ok) return;
+      }
+
+      const data = getAll();
+      data.push({
+        id: String(Date.now()),
+        species: sp,
+        place: (place.value.trim() || DEFAULT_PLACE),
+        length: String(length.value||"").trim(),
+        minSize: (ms !== null ? String(ms) : ""),
+        coords: coords.value.trim(),
+        notes: notes.value.trim(),
+        photo: currentPhoto || "",
+        date: new Date().toLocaleDateString()
+      });
+      saveAll(data);
+
+      // clear
+      clearForm();
+      showTab("log");
+    }
+
+    function openMap(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){ alert("No valid coordinates."); return; }
+      const url = `https://www.google.com/maps?q=${encodeURIComponent(p.lat + "," + p.lon)}`;
+      window.open(url, "_blank");
+    }
+
+    function directionsTo(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){ alert("No valid coordinates."); return; }
+      const url = `https://www.google.com/maps/dir/?api=1&destination=${encodeURIComponent(p.lat + "," + p.lon)}`;
+      window.open(url, "_blank");
+    }
+
+    function deleteCatch(id){
+      const ok = confirm("Delete this catch?");
+      if(!ok) return;
+      const data = getAll().filter(c => String(c.id) !== String(id));
+      saveAll(data);
+      loadLog();
+      renderMapPins();
+      renderGallery();
+    }
+
+    function editCatch(id){
+      const data = getAll();
+      const idx = data.findIndex(c => String(c.id) === String(id));
+      if(idx === -1) return;
+      const c = data[idx];
+
+      const newSpecies = prompt("Species:", c.species || "");
+      if(newSpecies === null) return;
+
+      const newPlace = prompt("Where caught:", c.place || DEFAULT_PLACE);
+      if(newPlace === null) return;
+
+      const newCoords = prompt("Coordinates (lat, lon):", c.coords || "");
+      if(newCoords === null) return;
+
+      const newLength = prompt("Length (cm):", c.length || "");
+      if(newLength === null) return;
+
+      c.species = newSpecies.trim();
+      c.place   = (newPlace.trim() || DEFAULT_PLACE);
+      c.coords  = newCoords.trim();
+      c.length  = newLength.trim();
+
+      // refresh min size based on species
+      const ms = (c.species in MIN_SIZE) ? Number(MIN_SIZE[c.species]) : null;
+      c.minSize = (ms !== null ? String(ms) : "");
+
+      saveAll(data);
+      loadLog();
+      renderMapPins();
+      renderGallery();
+    }
+
+    function loadLog(){
+      const data = getAll().slice().reverse();
+      list.innerHTML = "";
+
+      if(data.length === 0){
+        list.innerHTML = `<div class="card"><div class="mini">No catches yet.</div></div>`;
+        return;
+      }
+
+      data.forEach(c => {
+        const title = safe(c.species);
+        const placeS = safe(c.place);
+        const len = safe(c.length);
+        const date = safe(c.date);
+        const coord = safe(c.coords);
+        const hasCoord = !!parseCoords(c.coords);
+        const ms = safe(c.minSize);
+
+        list.innerHTML += `
+          <div class="card">
+            <div class="entryTitle">${title}</div>
+            <div class="entryMeta">
+              ${placeS ? placeS + " • " : ""}${len ? len + " cm • " : ""}${date}
+              ${ms ? ` • Min ${ms} cm` : ""}
+            </div>
+
+            ${c.photo ? `<img class="entryPhoto" src="${c.photo}" alt="fish photo">` : ""}
+
+            ${hasCoord ? `
+              <div style="margin-top:10px;">
+                <div class="mini">📍 ${coord}</div>
+                <div class="row" style="margin-top:8px;">
+                  <button class="accent" onclick="openMap('${safe(c.coords)}')">Maps</button>
+                  <button onclick="directionsTo('${safe(c.coords)}')">Directions</button>
+                </div>
+              </div>
+            ` : ``}
+
+            <div class="row" style="margin-top:12px;">
+              <button onclick="editCatch('${safe(c.id)}')">Edit</button>
+              <button class="danger" onclick="deleteCatch('${safe(c.id)}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function resetAll(){
+      const ok = confirm("Delete ALL data?");
+      if(!ok) return;
+      saveAll([]);
+      loadLog();
+      renderMapPins();
+      renderGallery();
+      alert("All data cleared.");
+    }
+
+    function getGPS(){
+      if(!navigator.geolocation){
+        alert("GPS is not supported on this browser.");
+        return;
+      }
+      navigator.geolocation.getCurrentPosition(
+        (pos) => {
+          const lat = pos.coords.latitude.toFixed(6);
+          const lon = pos.coords.longitude.toFixed(6);
+          coords.value = lat + ", " + lon;
+
+          // Auto place (requested)
+          place.value = DEFAULT_PLACE;
+
+          alert("GPS captured ✅");
+        },
+        (err) => {
+          alert("Could not get GPS: " + (err && err.message ? err.message : "Unknown error"));
+        },
+        { enableHighAccuracy:true, timeout:12000, maximumAge:0 }
+      );
+    }
+
+    function initMap(){
+      if(mapInstance) return;
+
+      mapInstance = L.map("map", { zoomControl: true }).setView([-34.37, 20.85], 10);
+
+      osmLayer = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", {
+        maxZoom: 19
+      }).addTo(mapInstance);
+
+      // Satellite (Esri)
+      satLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19 }
+      );
+
+      setTimeout(() => mapInstance.invalidateSize(), 50);
+    }
+
+    function clearMarkers(){
+      markers.forEach(m => { try{ mapInstance.removeLayer(m); }catch{} });
+      markers = [];
+    }
+
+    function renderMapPins(){
+      if(!mapInstance) return;
+      clearMarkers();
+
+      const data = getAll();
+      const points = [];
+
+      data.forEach(c => {
+        const p = parseCoords(c.coords);
+        if(!p) return;
+        points.push(p);
+
+        const label = `${c.species || ""} • ${c.place || ""}`.trim();
+        const m = L.marker([p.lat, p.lon]).addTo(mapInstance);
+        m.bindPopup(`<b>${safe(label)}</b><br><span class="mini">${safe(c.coords)}</span>`);
+        markers.push(m);
+      });
+
+      if(points.length){
+        const latlngs = points.map(p => [p.lat, p.lon]);
+        mapInstance.fitBounds(latlngs, { padding:[30,30] });
+      }
+    }
+
+    function toggleSatellite(){
+      if(!mapInstance) initMap();
+      satOn = !satOn;
+      el("satState").textContent = satOn ? "ON" : "OFF";
+
+      if(satOn){
+        try{ mapInstance.removeLayer(osmLayer); }catch{}
+        satLayer.addTo(mapInstance);
+      }else{
+        try{ mapInstance.removeLayer(satLayer); }catch{}
+        osmLayer.addTo(mapInstance);
+      }
+    }
+
+    function renderGallery(){
+      const data = getAll().slice().reverse().filter(c => !!c.photo);
+      galleryBox.innerHTML = "";
+
+      if(data.length === 0){
+        galleryBox.innerHTML = `<div class="card"><div class="mini">No photos yet.</div></div>`;
+        return;
+      }
+
+      data.forEach(c => {
+        const title = safe(c.species);
+        const date  = safe(c.date);
+        galleryBox.innerHTML += `
+          <div class="card" style="margin:0;">
+            <div class="entryTitle">${title}</div>
+            <div class="entryMeta">${date}</div>
+            <img class="entryPhoto" src="${c.photo}" alt="fish photo">
+          </div>
+        `;
+      });
+    }
+
+    // Make functions available for onclick
+    window.showTab = showTab;
+    window.saveCatch = saveCatch;
+    window.clearForm = clearForm;
+    window.getGPS = getGPS;
+    window.openMap = openMap;
+    window.directionsTo = directionsTo;
+    window.deleteCatch = deleteCatch;
+    window.editCatch = editCatch;
+    window.resetAll = resetAll;
+    window.toggleSatellite = toggleSatellite;
+
+    // Start
+    place.value = DEFAULT_PLACE;
+    updateMinSizeUI();
+    showTab("add");
+  })();
+  </script>
+</body>
+</html>
