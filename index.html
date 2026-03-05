@@ -154,6 +154,20 @@ hr{border:none;border-top:1px solid rgba(255,255,255,.10);margin:12px 0}
   <h3 style="margin:0 0 10px">⭐ Favourite Spots</h3>
   <div id="spotsList"></div>
 </section>
+  <button class="navbtn" id="btnSea" onclick="showTab('sea')">🌊 Sea Days</button>
+  <section id="sea">
+  <div class="card">
+    <div style="font-weight:1000; font-size:16px;">🌊 Beste see dae (14 dae)</div>
+    <small>Gebaseer op golfhoogte + wind. Hoe hoër die score, hoe kalmer die see.</small>
+
+    <div class="row" style="margin-top:10px;">
+      <button class="btn secondary" type="button" onclick="fetchSeaDays()">🔄 Refresh</button>
+    </div>
+
+    <div id="seaBox" style="margin-top:12px;"></div>
+  </div>
+  </section>
+  
 
 <script>
 (() => {
