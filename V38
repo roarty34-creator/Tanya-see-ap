@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tanya Deep Sea V38</title>
+  <title>Tanya Deep Sea V40</title>
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#061225">
@@ -17,6 +17,8 @@
       --text:#ffffff;
       --muted:#8aa0c9;
       --danger:#ff5c5c;
+      --ok:#39d98a;
+      --warn:#ffd166;
       --reef:#ffd166;
       --spot:#59d0ff;
       --hot:#ff7b54;
@@ -117,7 +119,7 @@
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
     }
     #map{
-      height:460px;
+      height:480px;
       border-radius:12px;
       overflow:hidden;
     }
@@ -151,7 +153,7 @@
 
   <h1>
     <img src="icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat">
-    Tanya Deep Sea V38
+    Tanya Deep Sea V40
   </h1>
 
   <div class="topnav">
@@ -161,6 +163,7 @@
     <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
     <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
     <button class="navbtn" id="btnSea" onclick="showTab('sea')">Best Days</button>
+    <button class="navbtn" id="btnStrategy" onclick="showTab('strategy')">Drift / Anchor</button>
     <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish ID</button>
   </div>
 
@@ -218,6 +221,7 @@
         <div class="chip" id="chipWind">Wind: —</div>
         <div class="chip" id="chipSwell">Swell: —</div>
         <div class="chip" id="chipTemp">Sea Temp: —</div>
+        <div class="chip" id="chipCurrent">Current: —</div>
       </div>
 
       <label>Photo</label>
@@ -239,12 +243,15 @@
       <div class="row">
         <button onclick="toggleSatellite()">Satellite ON/OFF</button>
         <button class="dark" onclick="toggleReefOverlay()">Reef Overlay</button>
+        <button class="dark" onclick="toggleDepthRings()">Depth Rings</button>
         <button class="dark" onclick="toggleHotspots()">Heatmap</button>
+        <button class="dark" onclick="predictHotspots()">Predict Spots</button>
         <button class="dark" onclick="toggleDriftArrows()">Drift Arrows</button>
+        <button class="dark" onclick="suggestDriftLine()">Best Drift</button>
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
       <div class="mini" style="margin-top:8px;">
-        Tap the map to save a Reef or Spot. GPS also drops a boat pin and centers the map.
+        Tap the map to save a Reef or Spot. GPS drops a boat pin and centers the map.
       </div>
     </div>
     <div id="map"></div>
@@ -287,6 +294,9 @@
         <div><b>2 Week Best Fishing Days</b></div>
         <button onclick="loadFishingDays()">Refresh</button>
       </div>
+      <div class="mini" style="margin-top:8px;">
+        Days 1–8 use wind + wave + swell. Days 9–14 fall back to wind-led scoring.
+      </div>
       <table>
         <thead>
           <tr>
@@ -302,9 +312,22 @@
     </div>
   </section>
 
+  <section id="strategy">
+    <div class="card">
+      <div class="row">
+        <div><b>Drift vs Anchor Helper</b></div>
+        <button onclick="renderStrategy()">Refresh</button>
+      </div>
+      <div id="strategyBox" style="margin-top:10px;"></div>
+      <div class="mini" style="margin-top:10px;">
+        High/low tide is not auto-fed in this build. This helper uses wind, swell, current estimate, and spot type.
+      </div>
+    </div>
+  </section>
+
   <section id="fishid">
     <div class="card">
-      <b>Fish ID Helper</b>
+      <b>Fish Photo Helper</b>
 
       <label>Fish Photo</label>
       <input type="file" id="fishIdPhoto" accept="image/*" capture="environment">
@@ -336,32 +359,32 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const KEY_CATCHES = "tanya_deepsea_catches_v38";
-    const KEY_SPOTS = "tanya_deepsea_spots_v38";
-    const KEY_FISH = "tanya_deepsea_fishhelpers_v38";
+    const KEY_CATCHES = "tanya_deepsea_catches_v40";
+    const KEY_SPOTS = "tanya_deepsea_spots_v40";
+    const KEY_FISH = "tanya_deepsea_fishhelpers_v40";
     const BASE = { lat:-34.37, lng:20.85 };
 
     const KNOWN_SPOTS = [
-      { id:"s1",  name:"Stilbaai Reef 01", type:"Reef", coords:"-34.3905,20.8602", depth:42 },
-      { id:"s2",  name:"Stilbaai Reef 02", type:"Reef", coords:"-34.4120,20.8350", depth:38 },
-      { id:"s3",  name:"Stilbaai Reef 03", type:"Reef", coords:"-34.4015,20.8801", depth:45 },
-      { id:"s4",  name:"Stilbaai Reef 04", type:"Reef", coords:"-34.3750,20.8700", depth:40 },
-      { id:"s5",  name:"Stilbaai Reef 05", type:"Reef", coords:"-34.4200,20.8650", depth:48 },
-      { id:"s6",  name:"Stilbaai Reef 06", type:"Reef", coords:"-34.3955,20.8450", depth:35 },
-      { id:"s7",  name:"Stilbaai Reef 07", type:"Reef", coords:"-34.4050,20.8950", depth:60 },
-      { id:"s8",  name:"Stilbaai Reef 08", type:"Reef", coords:"-34.3825,20.8550", depth:30 },
-      { id:"s9",  name:"Stilbaai Reef 09", type:"Reef", coords:"-34.4300,20.8800", depth:55 },
-      { id:"s10", name:"Stilbaai Reef 10", type:"Reef", coords:"-34.3880,20.8750", depth:42 },
-      { id:"s11", name:"Stilbaai Reef 11", type:"Reef", coords:"-34.3700,20.8600", depth:45 },
-      { id:"s12", name:"Stilbaai Reef 12", type:"Reef", coords:"-34.4100,20.8720", depth:50 },
-      { id:"s13", name:"Stilbaai Reef 13", type:"Reef", coords:"-34.4450,20.9000", depth:70 },
-      { id:"s14", name:"Stilbaai Reef 14", type:"Reef", coords:"-34.3980,20.8850", depth:48 },
-      { id:"s15", name:"Stilbaai Reef 15", type:"Reef", coords:"-34.3925,20.8705", depth:44 },
-      { id:"s16", name:"Stilbaai Reef 16", type:"Reef", coords:"-34.3600,20.8800", depth:50 },
-      { id:"s17", name:"Stilbaai Reef 17", type:"Reef", coords:"-34.4150,20.8450", depth:40 },
-      { id:"s18", name:"Stilbaai Reef 18", type:"Reef", coords:"-34.4305,20.8355", depth:52 },
-      { id:"s19", name:"Stilbaai Reef 19", type:"Reef", coords:"-34.3755,20.8525", depth:38 },
-      { id:"s20", name:"Stilbaai Reef 20", type:"Reef", coords:"-34.4500,20.9150", depth:85 }
+      { id:"s1",  name:"Stilbaai Reef 01", type:"Reef", coords:"-34.390500,20.860200", depth:42 },
+      { id:"s2",  name:"Stilbaai Reef 02", type:"Reef", coords:"-34.412000,20.835000", depth:38 },
+      { id:"s3",  name:"Stilbaai Reef 03", type:"Reef", coords:"-34.401500,20.880100", depth:45 },
+      { id:"s4",  name:"Stilbaai Reef 04", type:"Reef", coords:"-34.375000,20.870000", depth:40 },
+      { id:"s5",  name:"Stilbaai Reef 05", type:"Reef", coords:"-34.420000,20.865000", depth:48 },
+      { id:"s6",  name:"Stilbaai Reef 06", type:"Reef", coords:"-34.395500,20.845000", depth:35 },
+      { id:"s7",  name:"Stilbaai Reef 07", type:"Reef", coords:"-34.405000,20.895000", depth:60 },
+      { id:"s8",  name:"Stilbaai Reef 08", type:"Reef", coords:"-34.382500,20.855000", depth:30 },
+      { id:"s9",  name:"Stilbaai Reef 09", type:"Reef", coords:"-34.430000,20.880000", depth:55 },
+      { id:"s10", name:"Stilbaai Reef 10", type:"Reef", coords:"-34.388000,20.875000", depth:42 },
+      { id:"s11", name:"Stilbaai Reef 11", type:"Reef", coords:"-34.370000,20.860000", depth:45 },
+      { id:"s12", name:"Stilbaai Reef 12", type:"Reef", coords:"-34.410000,20.872000", depth:50 },
+      { id:"s13", name:"Stilbaai Reef 13", type:"Reef", coords:"-34.445000,20.900000", depth:70 },
+      { id:"s14", name:"Stilbaai Reef 14", type:"Reef", coords:"-34.398000,20.885000", depth:48 },
+      { id:"s15", name:"Stilbaai Reef 15", type:"Reef", coords:"-34.392500,20.870500", depth:44 },
+      { id:"s16", name:"Stilbaai Reef 16", type:"Reef", coords:"-34.360000,20.880000", depth:50 },
+      { id:"s17", name:"Stilbaai Reef 17", type:"Reef", coords:"-34.415000,20.845000", depth:40 },
+      { id:"s18", name:"Stilbaai Reef 18", type:"Reef", coords:"-34.430500,20.835500", depth:52 },
+      { id:"s19", name:"Stilbaai Reef 19", type:"Reef", coords:"-34.375500,20.852500", depth:38 },
+      { id:"s20", name:"Stilbaai Reef 20", type:"Reef", coords:"-34.450000,20.915000", depth:85 }
     ];
 
     const MIN_SIZE = {
@@ -392,6 +415,7 @@
     const chipWind = document.getElementById("chipWind");
     const chipSwell = document.getElementById("chipSwell");
     const chipTemp = document.getElementById("chipTemp");
+    const chipCurrent = document.getElementById("chipCurrent");
 
     let photoData = "";
     let fishPhotoData = "";
@@ -401,12 +425,16 @@
     let reefOverlayMarkers = [];
     let hotspotMarkers = [];
     let driftArrowLayers = [];
+    let depthRingLayers = [];
+    let predictedHotspotLayers = [];
     let routeLine = null;
     let myBoatMarker = null;
     let tempClickMarker = null;
+    let driftSuggestionLine = null;
     let reefOverlayOn = false;
     let hotspotsOn = false;
     let driftArrowsOn = false;
+    let depthRingsOn = false;
 
     function parseCoords(str){
       if(!str) return null;
@@ -433,6 +461,13 @@
 
     function getFishHelpers(){ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
     function saveFishHelpers(v){ localStorage.setItem(KEY_FISH, JSON.stringify(v)); }
+
+    function clearLayers(arr){
+      arr.forEach(layer => {
+        try { map.removeLayer(layer); } catch {}
+      });
+      arr.length = 0;
+    }
 
     function loadKnownSpotsIntoSaved(){
       const existing = getAllSpots();
@@ -464,6 +499,7 @@
       if(id==="log") btnLog.classList.add("active");
       if(id==="stats") btnStats.classList.add("active");
       if(id==="sea") btnSea.classList.add("active");
+      if(id==="strategy") btnStrategy.classList.add("active");
       if(id==="fishid") btnFish.classList.add("active");
 
       fillSpotPick();
@@ -489,6 +525,7 @@
       if(id==="log") renderLog();
       if(id==="stats") renderStats();
       if(id==="sea") loadFishingDays();
+      if(id==="strategy") renderStrategy();
       if(id==="fishid") renderFishHelpers();
     }
 
@@ -527,9 +564,7 @@
     species.addEventListener("change", updateMinSize);
     lengthEl.addEventListener("input", checkFishSize);
 
-    photoEl.addEventListener("change", () => {
-      const file = photoEl.files[0];
-      if(!file) return;
+    file) return;
       const reader = new FileReader();
       reader.onload = () => {
         photoData = reader.result;
@@ -565,7 +600,7 @@
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
         placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
-        if(s.depth && !depthEl.value) depthEl.value = s.depth;
+        if(s.depth) depthEl.value = s.depth;
       } else {
         placeEl.value = "Deep Sea";
       }
@@ -598,6 +633,30 @@
       await getDepthFromSea(p.lat, p.lng);
     }
 
+    async function estimateCurrentStrength(lat, lon){
+      try{
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height&timezone=Africa%2FJohannesburg`;
+
+        const [wr, mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const w = await wr.json();
+        const m = await mr.json();
+
+        const wind = Number(w?.current?.wind_speed_10m || 0);
+        const wave = Number(m?.current?.wave_height || 0);
+        const swell = Number(m?.current?.swell_wave_height || 0);
+
+        let current = 0.2;
+        current += wind * 0.015;
+        current += wave * 0.18;
+        current += swell * 0.12;
+
+        return Number(current.toFixed(2));
+      }catch{
+        return 0.5;
+      }
+    }
+
     async function fillSeaChips(lat, lon){
       try{
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&timezone=Africa%2FJohannesburg`;
@@ -610,10 +669,14 @@
         chipWind.textContent = `Wind: ${Number(w?.current?.wind_speed_10m || 0).toFixed(0)} km/h`;
         chipSwell.textContent = `Swell: ${Number(m?.current?.swell_wave_height || 0).toFixed(2)} m`;
         chipTemp.textContent = `Sea Temp: ${Number(m?.current?.sea_surface_temperature || 0).toFixed(1)} °C`;
+
+        const current = await estimateCurrentStrength(lat, lon);
+        chipCurrent.textContent = `Current: ${current} kt`;
       }catch{
         chipWind.textContent = "Wind: —";
         chipSwell.textContent = "Swell: —";
         chipTemp.textContent = "Sea Temp: —";
+        chipCurrent.textContent = "Current: —";
       }
     }
 
@@ -736,6 +799,7 @@
       chipWind.textContent = "Wind: —";
       chipSwell.textContent = "Swell: —";
       chipTemp.textContent = "Sea Temp: —";
+      chipCurrent.textContent = "Current: —";
       sizeNote.textContent = "Choose species to load legal size.";
       sizeNote.style.color = "#9fb0d0";
     }
@@ -1391,4 +1455,4 @@
     }
   </script>
 </body>
-  </html>
+</html>
