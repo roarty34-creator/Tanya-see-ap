@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deepsea-v30";
+const CACHE_NAME = "tanya-deepsea-v31";
 
 const FILES_TO_CACHE = [
   "./",
@@ -6,7 +6,7 @@ const FILES_TO_CACHE = [
   "./manifest.webmanifest",
   "./icon-192.png",
   "./icon-512.png",
-  "./?v=30"
+  "./?v=31"
 ];
 
 self.addEventListener("install", (event) => {
@@ -20,15 +20,15 @@ self.addEventListener("install", (event) => {
 
 self.addEventListener("activate", (event) => {
   event.waitUntil(
-    caches.keys().then((keys) => {
-      return Promise.all(
+    caches.keys().then((keys) =>
+      Promise.all(
         keys.map((key) => {
           if (key !== CACHE_NAME) {
             return caches.delete(key);
           }
         })
-      );
-    }).then(() => self.clients.claim())
+      )
+    ).then(() => self.clients.claim())
   );
 });
 
