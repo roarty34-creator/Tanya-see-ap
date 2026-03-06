@@ -1,5 +1,4 @@
-const CACHE_NAME = "tanya-deepsea-v32";
-
+const CACHE_NAME = "tanya-v32-full";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
@@ -21,9 +20,7 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) {
-            return caches.delete(key);
-          }
+          if (key !== CACHE_NAME) return caches.delete(key);
         })
       )
     ).then(() => self.clients.claim())
