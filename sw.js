@@ -1,15 +1,9 @@
-const CACHE_NAME = "tanya-v35";
+const CACHE="tanya-v36"
 
-self.addEventListener("install", e => {
-  self.skipWaiting();
-});
+self.addEventListener("install",e=>{
+self.skipWaiting()
+})
 
-self.addEventListener("activate", e => {
-  e.waitUntil(self.clients.claim());
-});
-
-self.addEventListener("fetch", e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request))
-  );
-});
+self.addEventListener("fetch",e=>{
+e.respondWith(fetch(e.request))
+})
