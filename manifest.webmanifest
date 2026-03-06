@@ -1,10 +1,11 @@
 {
-  "name": "Tanya Deep Sea App",
+  "name": "Tanya Deep Sea V34",
   "short_name": "Tanya Fish",
-  "start_url": "./?v=32",
+  "start_url": "./?v=34",
   "display": "standalone",
   "background_color": "#061225",
   "theme_color": "#061225",
+  "orientation": "portrait",
   "icons": [
     {
       "src": "icon-192.png",
