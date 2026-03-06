@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tanya Deep Sea V37</title>
+  <title>Tanya Deep Sea V38</title>
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#061225">
@@ -17,8 +17,6 @@
       --text:#ffffff;
       --muted:#8aa0c9;
       --danger:#ff5c5c;
-      --ok:#39d98a;
-      --warn:#ffd166;
       --reef:#ffd166;
       --spot:#59d0ff;
       --hot:#ff7b54;
@@ -153,7 +151,7 @@
 
   <h1>
     <img src="icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat">
-    Tanya Deep Sea V37
+    Tanya Deep Sea V38
   </h1>
 
   <div class="topnav">
@@ -210,6 +208,7 @@
       <div class="row">
         <input id="coords" readonly>
         <button type="button" onclick="getGPS()">Get GPS</button>
+        <button type="button" class="dark" onclick="showTab('mapTab')">Open Map</button>
       </div>
 
       <label>Where Caught</label>
@@ -245,7 +244,7 @@
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
       <div class="mini" style="margin-top:8px;">
-        Tap the map to save a Reef or Spot. The map zooms in and drops a pin.
+        Tap the map to save a Reef or Spot. GPS also drops a boat pin and centers the map.
       </div>
     </div>
     <div id="map"></div>
@@ -337,10 +336,33 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const KEY_CATCHES = "tanya_deepsea_catches_v37";
-    const KEY_SPOTS = "tanya_deepsea_spots_v37";
-    const KEY_FISH = "tanya_deepsea_fishhelpers_v37";
+    const KEY_CATCHES = "tanya_deepsea_catches_v38";
+    const KEY_SPOTS = "tanya_deepsea_spots_v38";
+    const KEY_FISH = "tanya_deepsea_fishhelpers_v38";
     const BASE = { lat:-34.37, lng:20.85 };
+
+    const KNOWN_SPOTS = [
+      { id:"s1",  name:"Stilbaai Reef 01", type:"Reef", coords:"-34.3905,20.8602", depth:42 },
+      { id:"s2",  name:"Stilbaai Reef 02", type:"Reef", coords:"-34.4120,20.8350", depth:38 },
+      { id:"s3",  name:"Stilbaai Reef 03", type:"Reef", coords:"-34.4015,20.8801", depth:45 },
+      { id:"s4",  name:"Stilbaai Reef 04", type:"Reef", coords:"-34.3750,20.8700", depth:40 },
+      { id:"s5",  name:"Stilbaai Reef 05", type:"Reef", coords:"-34.4200,20.8650", depth:48 },
+      { id:"s6",  name:"Stilbaai Reef 06", type:"Reef", coords:"-34.3955,20.8450", depth:35 },
+      { id:"s7",  name:"Stilbaai Reef 07", type:"Reef", coords:"-34.4050,20.8950", depth:60 },
+      { id:"s8",  name:"Stilbaai Reef 08", type:"Reef", coords:"-34.3825,20.8550", depth:30 },
+      { id:"s9",  name:"Stilbaai Reef 09", type:"Reef", coords:"-34.4300,20.8800", depth:55 },
+      { id:"s10", name:"Stilbaai Reef 10", type:"Reef", coords:"-34.3880,20.8750", depth:42 },
+      { id:"s11", name:"Stilbaai Reef 11", type:"Reef", coords:"-34.3700,20.8600", depth:45 },
+      { id:"s12", name:"Stilbaai Reef 12", type:"Reef", coords:"-34.4100,20.8720", depth:50 },
+      { id:"s13", name:"Stilbaai Reef 13", type:"Reef", coords:"-34.4450,20.9000", depth:70 },
+      { id:"s14", name:"Stilbaai Reef 14", type:"Reef", coords:"-34.3980,20.8850", depth:48 },
+      { id:"s15", name:"Stilbaai Reef 15", type:"Reef", coords:"-34.3925,20.8705", depth:44 },
+      { id:"s16", name:"Stilbaai Reef 16", type:"Reef", coords:"-34.3600,20.8800", depth:50 },
+      { id:"s17", name:"Stilbaai Reef 17", type:"Reef", coords:"-34.4150,20.8450", depth:40 },
+      { id:"s18", name:"Stilbaai Reef 18", type:"Reef", coords:"-34.4305,20.8355", depth:52 },
+      { id:"s19", name:"Stilbaai Reef 19", type:"Reef", coords:"-34.3755,20.8525", depth:38 },
+      { id:"s20", name:"Stilbaai Reef 20", type:"Reef", coords:"-34.4500,20.9150", depth:85 }
+    ];
 
     const MIN_SIZE = {
       "Cape Kob":60,
@@ -412,9 +434,23 @@
     function getFishHelpers(){ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
     function saveFishHelpers(v){ localStorage.setItem(KEY_FISH, JSON.stringify(v)); }
 
-    function fmt(n,d=1){
-      const x = Number(n);
-      return Number.isFinite(x) ? x.toFixed(d) : "—";
+    function loadKnownSpotsIntoSaved(){
+      const existing = getAllSpots();
+      const existingCoords = new Set(existing.map(s => s.coords));
+
+      KNOWN_SPOTS.forEach(s => {
+        if(!existingCoords.has(s.coords)){
+          existing.push({
+            id: s.id,
+            name: s.name,
+            type: s.type,
+            coords: s.coords,
+            depth: s.depth
+          });
+        }
+      });
+
+      saveAllSpots(existing);
     }
 
     function showTab(id){
@@ -434,8 +470,20 @@
 
       if(id==="mapTab"){
         initMap();
-        setTimeout(() => map.invalidateSize(), 200);
-        renderMap();
+        setTimeout(() => {
+          map.invalidateSize();
+          if(coordsEl.value){
+            const p = parseCoords(coordsEl.value);
+            if(p){
+              map.setView([p.lat,p.lng],14);
+              if(myBoatMarker){
+                map.removeLayer(myBoatMarker);
+              }
+              myBoatMarker = L.marker([p.lat,p.lng]).addTo(map);
+            }
+          }
+          renderMap();
+        }, 200);
       }
       if(id==="spots") renderSpots();
       if(id==="log") renderLog();
@@ -505,7 +553,6 @@
       const spots = getAllSpots();
       const s = document.getElementById("spotPick");
       s.innerHTML = `<option value="">Choose spot</option>`;
-
       spots.forEach(sp => {
         s.innerHTML += `<option value="${sp.coords}">${sp.name}</option>`;
       });
@@ -518,6 +565,7 @@
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
         placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
+        if(s.depth && !depthEl.value) depthEl.value = s.depth;
       } else {
         placeEl.value = "Deep Sea";
       }
@@ -528,7 +576,6 @@
         const url = `https://api.opentopodata.org/v1/gebco2020?locations=${encodeURIComponent(lat + "," + lng)}`;
         const r = await fetch(url);
         const j = await r.json();
-
         const elev = Number(j?.results?.[0]?.elevation);
 
         if(!Number.isFinite(elev)){
@@ -544,12 +591,10 @@
 
     async function getDepthFromCurrentCoords(){
       const p = parseCoords(coordsEl.value);
-
       if(!p){
         alert("Get GPS or choose a spot first.");
         return;
       }
-
       await getDepthFromSea(p.lat, p.lng);
     }
 
@@ -573,22 +618,41 @@
     }
 
     async function getGPS(){
+      if(!navigator.geolocation){
+        alert("GPS not supported on this device");
+        return;
+      }
+
       navigator.geolocation.getCurrentPosition(async pos => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
 
         coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
-        placeEl.value = "Deep Sea";
 
-        await getDepthFromSea(lat, lng);
-        await fillSeaChips(lat, lng);
+        if(map){
+          if(myBoatMarker){
+            map.removeLayer(myBoatMarker);
+          }
+          myBoatMarker = L.marker([lat,lng]).addTo(map);
+          myBoatMarker.bindPopup("Your Boat").openPopup();
+          map.setView([lat,lng],13);
+        }
+
+        await getDepthFromSea(lat,lng);
+        await fillSeaChips(lat,lng);
 
         const nearest = getNearestSpot(lat, lng);
         if(nearest){
           placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+        } else {
+          placeEl.value = "Deep Sea";
         }
+
       }, () => {
-        alert("Could not get GPS");
+        alert("Could not get GPS location");
+      }, {
+        enableHighAccuracy:true,
+        timeout:10000
       });
     }
 
@@ -650,7 +714,6 @@
       });
 
       saveAllCatches(list);
-
       alert("Catch saved");
       clearCatchForm();
       renderLog();
@@ -799,7 +862,7 @@
         const val = depthValues[i];
         const h = ((bottom - top - 10) * val) / max;
         const x = left + i * step + (step - barW) / 2;
-consty = bottom - h;
+        const y = bottom - h;
 
         ctx.fillStyle = "#2fa4ff";
         ctx.fillRect(x, y, barW, h);
@@ -1104,10 +1167,10 @@ consty = bottom - h;
         box.innerHTML += `
           <div class="card">
             <b>${safe(s.type)} • ${safe(s.name)}</b>
-            <div class="mini mono">📍 ${safe(s.coords)}</div>
+            <div class="mini mono">📍 ${safe(s.coords)}${s.depth ? " • " + safe(s.depth) + " m" : ""}</div>
             <div class="row">
               <button onclick="goToSpotOnMap('${safe(s.coords)}')">Open on Map</button>
-              <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}')">Use Spot</button>
+              <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}','${safe(s.depth || "")}')">Use Spot</button>
               <button class="danger" onclick="deleteSpot('${s.id}')">Delete</button>
             </div>
           </div>
@@ -1129,9 +1192,10 @@ consty = bottom - h;
       }, 200);
     }
 
-    function useSpotCoords(coordStr, name, type){
+    function useSpotCoords(coordStr, name, type, depth){
       coordsEl.value = coordStr;
       placeEl.value = `Deep Sea • ${type} • ${name}`;
+      if(depth && !depthEl.value) depthEl.value = depth;
       showTab("add");
     }
 
@@ -1302,6 +1366,7 @@ consty = bottom - h;
       localStorage.removeItem(KEY_CATCHES);
       localStorage.removeItem(KEY_SPOTS);
       localStorage.removeItem(KEY_FISH);
+      loadKnownSpotsIntoSaved();
       renderLog();
       renderSpots();
       renderStats();
@@ -1310,6 +1375,7 @@ consty = bottom - h;
       fillSpotPick();
     }
 
+    loadKnownSpotsIntoSaved();
     fillSpotPick();
     updateMinSize();
     showTab("add");
@@ -1325,4 +1391,4 @@ consty = bottom - h;
     }
   </script>
 </body>
-</html>
+  </html>
