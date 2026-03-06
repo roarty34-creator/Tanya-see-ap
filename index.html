@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width,initial-scale=1" />
-  <title>Tanya Deep Sea V34</title>
+  <title>Tanya Deep Sea V35</title>
 
   <link rel="manifest" href="manifest.webmanifest">
   <meta name="theme-color" content="#061225">
@@ -21,6 +21,7 @@
       --warn:#ffd166;
       --reef:#ffd166;
       --spot:#59d0ff;
+      --hot:#ff7b54;
     }
     *{box-sizing:border-box}
     body{
@@ -121,7 +122,7 @@
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
     }
     #map{
-      height:430px;
+      height:460px;
       border-radius:12px;
       overflow:hidden;
     }
@@ -142,13 +143,20 @@
       border-bottom:1px solid rgba(255,255,255,.08);
       text-align:left;
     }
+    canvas{
+      width:100%;
+      height:240px;
+      background:#081632;
+      border-radius:10px;
+      display:block;
+    }
   </style>
 </head>
 <body>
 
   <h1>
     <img src="icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat">
-    Tanya Deep Sea V34
+    Tanya Deep Sea V35
   </h1>
 
   <div class="topnav">
@@ -234,11 +242,13 @@
     <div class="card">
       <div class="row">
         <button onclick="toggleSatellite()">Satellite ON/OFF</button>
-        <button class="dark" onclick="centerOnBase()">Center</button>
+        <button class="dark" onclick="toggleReefOverlay()">Reef Overlay</button>
+        <button class="dark" onclick="toggleHotspots()">Heatmap</button>
+        <button class="dark" onclick="toggleDriftArrows()">Drift Arrows</button>
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
       <div class="mini" style="margin-top:8px;">
-        Tap the map to save a Reef or Spot. The app suggests a name automatically.
+        Tap the map to save a Reef or Spot. Navigate draws a route line on the sea map.
       </div>
     </div>
     <div id="map"></div>
@@ -254,8 +264,6 @@
     <div id="spotsList"></div>
   </section>
 
-  >
-
   <section id="log">
     <div class="card">
       <div class="row">
@@ -267,6 +275,10 @@
   </section>
 
   <section id="stats">
+    <div class="card">
+      <b>Best Depth per Species</b>
+      <canvas id="depthChart" width="900" height="240"></canvas>
+    </div>
     <div class="card">
       <b>Stats Summary</b>
       <div id="statsBox" style="margin-top:10px;"></div>
@@ -280,7 +292,7 @@
         <button onclick="loadFishingDays()">Refresh</button>
       </div>
       <div class="mini" style="margin-top:8px;">
-        Days 1–8 use marine wave data. Days 9–14 are wind-based estimates.
+        Better sea scoring with wind + wave + swell.
       </div>
       <table>
         <thead>
@@ -288,6 +300,7 @@
             <th>Date</th>
             <th>Wave</th>
             <th>Wind</th>
+            <th>Score</th>
             <th>Fishing</th>
           </tr>
         </thead>
@@ -300,17 +313,12 @@
     <div class="card">
       <b>Fish ID Helper</b>
       <div class="mini" style="margin-top:8px;">
-        Take a photo, then set the species and reuse it in Add Catch.
+        Take a photo, save the helper, then reuse the species in Add Catch.
       </div>
 
       <label>Fish Photo</label>
       <input type="file" id="fishIdPhoto" accept="image/*" capture="environment">
       <div id="fishIdPreview"></div>
-
-      <div class="row">
-        <button onclick="saveFishHelper()">Save Helper</button>
-        <button class="dark" onclick="copyFishToCatch()">Use species in Add Catch</button>
-      </div>
 
       <label>Species</label>
       <select id="fishIdSpecies">
@@ -327,15 +335,20 @@
         <option>Hottentot</option>
       </select>
 
+      <div class="row">
+        <button onclick="saveFishHelper()">Save Helper</button>
+        <button class="dark" onclick="copyFishToCatch()">Use species in Add Catch</button>
+      </div>
+
       <div id="fishHelpers" style="margin-top:10px;"></div>
     </div>
   </section>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const KEY_CATCHES = "tanya_deepsea_catches_v34";
-    const KEY_SPOTS = "tanya_deepsea_spots_v34";
-    const KEY_FISH = "tanya_deepsea_fishhelpers_v34";
+    const KEY_CATCHES = "tanya_deepsea_catches_v35";
+    const KEY_SPOTS = "tanya_deepsea_spots_v35";
+    const KEY_FISH = "tanya_deepsea_fishhelpers_v35";
     const BASE = { lat:-34.37, lng:20.85 };
 
     const MIN_SIZE = {
@@ -372,8 +385,14 @@
     let map, osm, satLayer, satOn = false;
     let catchMarkers = [];
     let spotMarkers = [];
+    let reefOverlayMarkers = [];
+    let hotspotMarkers = [];
+    let driftArrowLayers = [];
     let routeLine = null;
     let myBoatMarker = null;
+    let reefOverlayOn = false;
+    let hotspotsOn = false;
+    let driftArrowsOn = false;
 
     function parseCoords(str){
       if(!str) return null;
@@ -401,6 +420,11 @@
     function getFishHelpers(){ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
     function saveFishHelpers(v){ localStorage.setItem(KEY_FISH, JSON.stringify(v)); }
 
+    function fmt(n,d=1){
+      const x = Number(n);
+      return Number.isFinite(x) ? x.toFixed(d) : "—";
+    }
+
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
       document.getElementById(id).style.display = "block";
@@ -427,15 +451,37 @@
     function updateMinSize(){
       const v = species.value;
       minSizeEl.value = MIN_SIZE[v] ?? "";
-      if(v === ""){
+      checkFishSize();
+    }
+
+    function checkFishSize(){
+      const sp = species.value;
+      const len = Number(lengthEl.value);
+      const min = MIN_SIZE[sp];
+
+      if(!sp || !len || min === undefined){
         sizeNote.textContent = "Choose species to load legal size.";
-      } else if((MIN_SIZE[v] ?? 0) === 0){
-        sizeNote.textContent = "No minimum set for this species.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
+
+      if(min === 0){
+        sizeNote.textContent = "No minimum size for this species.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
+
+      if(len < min){
+        sizeNote.textContent = "⚠️ UNDERSIZE! Minimum is " + min + " cm";
+        sizeNote.style.color = "#ff5c5c";
       } else {
-        sizeNote.textContent = "Minimum size: " + MIN_SIZE[v] + " cm";
+        sizeNote.textContent = "✅ Legal size (" + min + " cm)";
+        sizeNote.style.color = "#39d98a";
       }
     }
+
     species.addEventListener("change", updateMinSize);
+    lengthEl.addEventListener("input", checkFishSize);
 
     photoEl.addEventListener("change", () => {
       const file = photoEl.files[0];
@@ -461,10 +507,9 @@
 
     function fillSpotPick(){
       const spots = getAllSpots();
-      const s = document.getElementById("spotPick");
-      s.innerHTML = `<option value="">Choose spot</option>`;
+      spotPick.innerHTML = `<option value="">Choose spot</option>`;
       spots.forEach(sp => {
-        s.innerHTML += `<option value="${sp.coords}">${sp.name}</option>`;
+        spotPick.innerHTML += `<option value="${sp.coords}">${sp.name}</option>`;
       });
     }
 
@@ -499,7 +544,7 @@
 
     async function fillSeaChips(lat, lon){
       try{
-        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m&timezone=Africa%2FJohannesburg`;
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&timezone=Africa%2FJohannesburg`;
         const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg`;
 
         const [wr,mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
@@ -560,6 +605,16 @@
         return;
       }
 
+      const min = MIN_SIZE[species.value] || 0;
+      const len = Number(lengthEl.value);
+
+      if(min > 0 && len < min){
+        const ok = confirm(
+          "⚠️ This fish is undersize (" + len + " cm).\nMinimum is " + min + " cm.\n\nSave anyway?"
+        );
+        if(!ok) return;
+      }
+
       const list = getAllCatches();
       list.push({
         id: Date.now(),
@@ -598,6 +653,8 @@
       chipWind.textContent = "Wind: —";
       chipSwell.textContent = "Swell: —";
       chipTemp.textContent = "Sea Temp: —";
+      sizeNote.textContent = "Choose species to load legal size.";
+      sizeNote.style.color = "#9fb0d0";
     }
 
     function renderLog(){
@@ -666,12 +723,61 @@
       renderMap();
     }
 
+    function drawDepthChart(speciesNames, depthValues){
+      const c = document.getElementById("depthChart");
+      const ctx = c.getContext("2d");
+      ctx.clearRect(0,0,c.width,c.height);
+
+      ctx.fillStyle = "#081632";
+      ctx.fillRect(0,0,c.width,c.height);
+
+      if(!speciesNames.length){
+        ctx.fillStyle = "#9fb0d0";
+        ctx.font = "14px Arial";
+        ctx.fillText("No data yet", 20, 30);
+        return;
+      }
+
+      const max = Math.max(...depthValues, 1);
+      const left = 50;
+      const bottom = 200;
+      const top = 20;
+      const usableW = c.width - left - 20;
+      const step = usableW / speciesNames.length;
+      const barW = Math.max(26, step * 0.55);
+
+      ctx.strokeStyle = "#355";
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left, bottom);
+      ctx.lineTo(c.width - 10, bottom);
+      ctx.stroke();
+
+      speciesNames.forEach((name, i) => {
+        const val = depthValues[i];
+        const h = ((bottom - top - 10) * val) / max;
+        const x = left + i * step + (step - barW) / 2;
+        const y = bottom - h;
+
+        ctx.fillStyle = "#2fa4ff";
+        ctx.fillRect(x, y, barW, h);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px Arial";
+        ctx.fillText(String(val), x, y - 5);
+
+        ctx.fillStyle = "#9fb0d0";
+        ctx.fillText(name.slice(0,8), x, 220);
+      });
+    }
+
     function renderStats(){
       const box = document.getElementById("statsBox");
       const list = getAllCatches();
 
       if(list.length === 0){
         box.innerHTML = "No catches yet.";
+        drawDepthChart([], []);
         return;
       }
 
@@ -686,8 +792,15 @@
         bySpot[spotKey] = (bySpot[spotKey] || 0) + 1;
       });
 
+      const speciesNames = Object.keys(bySpecies);
+      const avgDepths = speciesNames.map(sp => {
+        const depths = bySpecies[sp].map(x => Number(x.depth)).filter(x => !isNaN(x));
+        return depths.length ? Number((depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1)) : 0;
+      });
+      drawDepthChart(speciesNames, avgDepths);
+
       let html = "";
-      Object.keys(bySpecies).forEach(sp => {
+      speciesNames.forEach(sp => {
         const catches = bySpecies[sp];
         const depths = catches.map(x => Number(x.depth)).filter(x => !isNaN(x));
         const avg = depths.length ? (depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1) : "—";
@@ -696,7 +809,7 @@
           <div class="card">
             <b>${safe(sp)}</b><br>
             <div class="mini">Catches: ${catches.length}</div>
-            <div class="mini">Average depth: ${avg} m</div>
+            <div class="mini">Best depth avg: ${avg} m</div>
           </div>
         `;
       });
@@ -711,13 +824,21 @@
       box.innerHTML = html;
     }
 
+    function calcScore(wind, wave, swell){
+      let score = 100;
+      if(Number.isFinite(wind)) score -= Math.max(0, wind - 12) * 2.2;
+      if(Number.isFinite(swell)) score -= Math.max(0, swell - 0.8) * 22;
+      if(Number.isFinite(wave)) score -= Math.max(0, wave - 0.7) * 22;
+      return Math.max(0, Math.min(100, Math.round(score)));
+    }
+
     async function loadFishingDays(){
       const lat = -34.37;
       const lon = 20.85;
 
       try{
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=wind_speed_10m_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
-        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&daily=wave_height_max&forecast_days=8&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&daily=wave_height_max,swell_wave_height_max&forecast_days=8&timezone=Africa%2FJohannesburg`;
 
         const [wr,mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
         const w = await wr.json();
@@ -726,28 +847,27 @@
         const days = w.daily.time || [];
         const winds = w.daily.wind_speed_10m_max || [];
         const waves = m.daily?.wave_height_max || [];
+        const swells = m.daily?.swell_wave_height_max || [];
 
         let html = "";
 
         for(let i=0;i<days.length;i++){
-          const wave = i < waves.length ? waves[i] : null;
-          const wind = winds[i];
+          const wave = i < waves.length ? Number(waves[i]) : null;
+          const swell = i < swells.length ? Number(swells[i]) : null;
+          const wind = Number(winds[i]);
+          const score = calcScore(wind, wave, swell);
 
           let rating = "Bad";
-          if(wave !== null){
-            if(wave < 1.2) rating = "Good";
-            if(wave < 0.8) rating = "Excellent";
-            if(wind > 20) rating = "Bad";
-          }else{
-            if(wind < 15) rating = "Good";
-            if(wind < 10) rating = "Excellent";
-          }
+          if(score >= 75) rating = "Excellent";
+          else if(score >= 55) rating = "Good";
+          else if(score >= 40) rating = "Fair";
 
           html += `
             <tr>
               <td>${days[i]}</td>
-              <td>${wave !== null ? wave + "m" : "—"}</td>
-              <td>${wind} km/h</td>
+              <td>${wave !== null ? wave.toFixed(2) + "m" : "—"}</td>
+              <td>${wind.toFixed(0)} km/h</td>
+              <td>${score}/100</td>
               <td>${rating}</td>
             </tr>
           `;
@@ -755,7 +875,7 @@
 
         document.getElementById("fishDays").innerHTML = html;
       }catch{
-        document.getElementById("fishDays").innerHTML = `<tr><td colspan="4">Could not load forecast.</td></tr>`;
+        document.getElementById("fishDays").innerHTML = `<tr><td colspan="5">Could not load forecast.</td></tr>`;
       }
     }
 
@@ -765,10 +885,7 @@
       map = L.map("map").setView([BASE.lat, BASE.lng], 10);
 
       osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png").addTo(map);
-
-      satLayer = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}"
-      );
+      satLayer = L.tileLayer("https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}");
 
       map.on("click", e => {
         const lat = e.latlng.lat.toFixed(6);
@@ -810,6 +927,9 @@
 
       clearMapLayers(catchMarkers);
       clearMapLayers(spotMarkers);
+      clearMapLayers(reefOverlayMarkers);
+      clearMapLayers(hotspotMarkers);
+      clearMapLayers(driftArrowLayers);
 
       getAllCatches().forEach(c => {
         const p = parseCoords(c.coords);
@@ -836,6 +956,10 @@
         `);
         spotMarkers.push(m);
       });
+
+      if(reefOverlayOn) renderReefOverlay();
+      if(hotspotsOn) renderHotspots();
+      if(driftArrowsOn) renderDriftArrows();
     }
 
     function toggleSatellite(){
@@ -876,7 +1000,7 @@
         routeLine = L.polyline([
           [myLat,myLng],
           [Number(lat),Number(lng)]
-        ], {color:"red"}).addTo(map);
+        ], {color:"red", weight:4}).addTo(map);
 
         map.setView([Number(lat),Number(lng)], 13);
       }, () => {
@@ -963,6 +1087,94 @@
       renderMap();
     }
 
+    function toggleReefOverlay(){
+      reefOverlayOn = !reefOverlayOn;
+      renderMap();
+    }
+
+    function renderReefOverlay(){
+      const spots = getAllSpots().filter(s => s.type === "Reef");
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+        const m = L.circle([p.lat, p.lng], {
+          radius: 350,
+          color: "#ffd166",
+          weight: 1,
+          fillColor: "#ffd166",
+          fillOpacity: 0.12
+        }).addTo(map);
+        reefOverlayMarkers.push(m);
+      });
+    }
+
+    function toggleHotspots(){
+      hotspotsOn = !hotspotsOn;
+      renderMap();
+    }
+
+    function renderHotspots(){
+      const list = getAllCatches();
+      const grouped = {};
+
+      list.forEach(c => {
+        if(!c.coords) return;
+        grouped[c.coords] = (grouped[c.coords] || 0) + 1;
+      });
+
+      Object.entries(grouped).forEach(([coord,count]) => {
+        const p = parseCoords(coord);
+        if(!p) return;
+        const m = L.circleMarker([p.lat, p.lng], {
+          radius: 8 + (count * 2),
+          color: "#ff7b54",
+          fillColor: "#ff7b54",
+          fillOpacity: 0.28,
+          weight: 2
+        }).addTo(map);
+        m.bindPopup(`<b>Hotspot</b><br>${count} catches`);
+        hotspotMarkers.push(m);
+      });
+    }
+
+    function toggleDriftArrows(){
+      driftArrowsOn = !driftArrowsOn;
+      renderMap();
+    }
+
+    async function renderDriftArrows(){
+      const seen = new Set();
+      const spots = getAllSpots();
+
+      for(const s of spots){
+        if(seen.has(s.coords)) continue;
+        seen.add(s.coords);
+
+        const p = parseCoords(s.coords);
+        if(!p) continue;
+
+        try{
+          const url = `https://api.open-meteo.com/v1/forecast?latitude=${p.lat}&longitude=${p.lng}&current=wind_direction_10m&timezone=Africa%2FJohannesburg`;
+          const r = await fetch(url);
+          const j = await r.json();
+          const windDir = Number(j?.current?.wind_direction_10m);
+          if(!Number.isFinite(windDir)) continue;
+
+          const driftDir = (windDir + 180) % 360;
+          const len = 0.01;
+          const rad = driftDir * Math.PI / 180;
+          const endLat = p.lat + Math.cos(rad) * len;
+          const endLng = p.lng + Math.sin(rad) * len;
+
+          const line = L.polyline([[p.lat,p.lng],[endLat,endLng]], {
+            color:"#39d98a",
+            weight:3
+          }).addTo(map);
+          driftArrowLayers.push(line);
+        }catch{}
+      }
+    }
+
     function saveFishHelper(){
       const sp = document.getElementById("fishIdSpecies").value;
       if(!sp && !fishPhotoData){
@@ -1045,6 +1257,7 @@
     showTab("add");
     initMap();
     renderLog();
+    renderStats();
   </script>
 
   <script>
@@ -1053,4 +1266,4 @@
     }
   </script>
 </body>
-</html>
+  </html>
