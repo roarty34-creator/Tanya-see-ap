@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tanya Deep Sea V41</title>
+  <title>Tanya Deep Sea V42</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#061225">
@@ -152,7 +152,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat">
-    Tanya Deep Sea V41
+    Tanya Deep Sea V42
   </h1>
 
   <div class="topnav">
@@ -215,6 +215,9 @@
       <label>Where Caught</label>
       <input id="place" value="Deep Sea" readonly>
 
+      <label>Local Area Name</label>
+      <input id="localArea" placeholder="Example: Skulpbank / Blinde Rif / West Reef">
+
       <div class="row">
         <div class="chip" id="chipWind">Wind: —</div>
         <div class="chip" id="chipSwell">Swell: —</div>
@@ -223,14 +226,15 @@
       </div>
 
       <label>Photo</label>
-      <input id="photo" type="file" accept="image/*" capture="environment">
+      <input id="photo" type="file" accept="image/*">
+      <div class="mini">Choose from camera or gallery</div>
       <div id="photoPreview"></div>
 
       <label>Notes</label>
       <textarea id="notes"></textarea>
 
       <div class="row">
-        <button onclick="saveCatch()">Save Catch</button>
+        <button id="saveCatchBtn" style="font-size:16px;padding:14px;" onclick="saveCatch()">SAVE CATCH</button>
         <button class="dark" onclick="clearCatchForm()">Clear</button>
       </div>
     </div>
@@ -240,7 +244,7 @@
     <div class="card">
       <div class="row">
         <button onclick="toggleSatellite()">Satellite ON/OFF</button>
-        <button class="dark" onclick="toggleReefOverlay()">Reef Overlay</button>
+        <button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
       <div class="mini" style="margin-top:8px;">
@@ -254,7 +258,7 @@
     <div class="card">
       <div class="row">
         <div><b>Saved Spots</b></div>
-        <button onclick="saveSpotFromCoords()">Save Spot from Current Coords</button>
+        <button onclick="saveSpotFromCoords()">Save Current Spot</button>
       </div>
     </div>
     <div id="spotsList"></div>
@@ -307,7 +311,8 @@
       <b>Fish Photo Helper</b>
 
       <label>Fish Photo</label>
-      <input type="file" id="fishIdPhoto" accept="image/*" capture="environment">
+      <input type="file" id="fishIdPhoto" accept="image/*">
+      <div class="mini">Choose from camera or gallery</div>
       <div id="fishIdPreview"></div>
 
       <label>Species</label>
@@ -336,9 +341,9 @@
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    const KEY_CATCHES = "tanya_deepsea_catches_v41";
-    const KEY_SPOTS = "tanya_deepsea_spots_v41";
-    const KEY_FISH = "tanya_deepsea_fishhelpers_v41";
+    const KEY_CATCHES = "tanya_deepsea_catches_v42";
+    const KEY_SPOTS = "tanya_deepsea_spots_v42";
+    const KEY_FISH = "tanya_deepsea_fishhelpers_v42";
     const BASE = { lat:-34.37, lng:20.85 };
 
     const KNOWN_SPOTS = [
@@ -385,6 +390,7 @@
     const baitEl = document.getElementById("bait");
     const coordsEl = document.getElementById("coords");
     const placeEl = document.getElementById("place");
+    const localAreaEl = document.getElementById("localArea");
     const notesEl = document.getElementById("notes");
     const photoEl = document.getElementById("photo");
     const photoPreview = document.getElementById("photoPreview");
@@ -446,6 +452,11 @@
         }
       });
       saveAllSpots(existing);
+    }
+
+    function getSpotNameFromCoords(coordStr){
+      const s = getAllSpots().find(x => x.coords === coordStr);
+      return s ? s.name : "";
     }
 
     function showTab(id){
@@ -722,6 +733,8 @@
         bait: baitEl.value,
         coords: coords,
         place: placeEl.value,
+        spotName: getSpotNameFromCoords(coords),
+        localArea: localAreaEl.value,
         notes: notesEl.value,
         photo: photoData || "",
         date: new Date().toLocaleDateString()
@@ -743,6 +756,7 @@
       baitEl.value = "";
       coordsEl.value = "";
       placeEl.value = "Deep Sea";
+      localAreaEl.value = "";
       notesEl.value = "";
       photoEl.value = "";
       photoData = "";
@@ -771,6 +785,7 @@
             <b>${safe(c.species)}</b><br>
             <div class="mini">${safe(c.length)} cm • Min ${safe(c.min)} • Depth ${safe(c.depth)} m</div>
             <div class="mini">${safe(c.place)}</div>
+            ${c.localArea ? `<div class="mini">Area: ${safe(c.localArea)}</div>` : ""}
             <div class="mini mono">📍 ${safe(c.coords)}</div>
             ${c.bait ? `<div class="mini">Bait: ${safe(c.bait)}</div>` : ""}
             ${c.notes ? `<div class="mini">Notes: ${safe(c.notes)}</div>` : ""}
@@ -822,6 +837,7 @@
       baitEl.value = c.bait || "";
       coordsEl.value = c.coords || "";
       placeEl.value = c.place || "Deep Sea";
+      localAreaEl.value = c.localArea || "";
       notesEl.value = c.notes || "";
       photoData = c.photo || "";
       photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
@@ -849,7 +865,7 @@
       if(!speciesNames.length){
         ctx.fillStyle = "#9fb0d0";
         ctx.font = "14px Arial";
-        ctx.fillText("No data yet", 20, 30);
+        ctx.fillText("No depth data yet", 20, 30);
         return;
       }
 
@@ -900,24 +916,37 @@
       const bySpot = {};
 
       list.forEach(c => {
-        if(!bySpecies[c.species]) bySpecies[c.species] = [];
-        bySpecies[c.species].push(c);
-        const spotKey = c.place || c.coords || "Unknown";
+        if(c.species){
+          if(!bySpecies[c.species]) bySpecies[c.species] = [];
+          bySpecies[c.species].push(c);
+        }
+
+        const spotKey = c.localArea || c.spotName || c.place || c.coords || "Unknown";
         bySpot[spotKey] = (bySpot[spotKey] || 0) + 1;
       });
 
-      const speciesNames = Object.keys(bySpecies);
-      const avgDepths = speciesNames.map(sp => {
-        const depths = bySpecies[sp].map(x => Number(x.depth)).filter(x => !isNaN(x));
-        return depths.length ? Number((depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1)) : 0;
+      const speciesNames = [];
+      const avgDepths = [];
+
+      Object.keys(bySpecies).forEach(sp => {
+        const depths = bySpecies[sp]
+          .map(x => Number(x.depth))
+          .filter(x => Number.isFinite(x) && x > 0);
+
+        if(depths.length){
+          speciesNames.push(sp);
+          avgDepths.push(Number((depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1)));
+        }
       });
+
       drawDepthChart(speciesNames, avgDepths);
 
       let html = "";
-      speciesNames.forEach(sp => {
+      Object.keys(bySpecies).forEach(sp => {
         const catches = bySpecies[sp];
-        const depths = catches.map(x => Number(x.depth)).filter(x => !isNaN(x));
+        const depths = catches.map(x => Number(x.depth)).filter(x => Number.isFinite(x) && x > 0);
         const avg = depths.length ? (depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1) : "—";
+
         html += `
           <div class="card">
             <b>${safe(sp)}</b><br>
@@ -927,11 +956,19 @@
         `;
       });
 
-      const bestSpots = Object.entries(bySpot).sort((a,b)=>b[1]-a[1]).slice(0,5);
+      const bestSpots = Object.entries(bySpot)
+        .filter(([name,count]) => name && count > 0)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,5);
+
       html += `<div class="card"><b>Best Spots</b>`;
-      bestSpots.forEach(([spot,count]) => {
-        html += `<div class="mini">${safe(spot)} — ${count} catches</div>`;
-      });
+      if(bestSpots.length){
+        bestSpots.forEach(([spot,count]) => {
+          html += `<div class="mini">${safe(spot)} — ${count} catches</div>`;
+        });
+      } else {
+        html += `<div class="mini">No spot data yet.</div>`;
+      }
       html += `</div>`;
 
       box.innerHTML = html;
