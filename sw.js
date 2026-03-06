@@ -1,11 +1,10 @@
-const CACHE_NAME = "tanya-v38";
+const CACHE_NAME = "tanya-v41";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
   "./icon-192.png",
-  "./icon-512.png",
-  "./?v=38"
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", (event) => {
@@ -20,7 +19,9 @@ self.addEventListener("activate", (event) => {
     caches.keys().then((keys) =>
       Promise.all(
         keys.map((key) => {
-          if (key !== CACHE_NAME) return caches.delete(key);
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
         })
       )
     ).then(() => self.clients.claim())
