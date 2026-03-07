@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <title>Tanya Deep Sea</title>
+  <title>Tanya Deep Sea V43</title>
 
   <link rel="manifest" href="./manifest.webmanifest">
   <meta name="theme-color" content="#061225">
@@ -61,29 +61,29 @@
       padding:14px;
       border-radius:12px;
       margin-bottom:12px;
-      }
+    }
     label{
       display:block;
       font-size:12px;
       margin-top:10px;
-      color:#8aa0c9;
+      color:var(--muted);
     }
     input,select,textarea{
       width:100%;
       padding:10px;
       border:none;
       border-radius:8px;
-      background:#081632;
-      color:white;
+      background:var(--card2);
+      color:#fff;
       box-sizing:border-box;
     }
     textarea{
-      min-height:70px;
+      min-height:72px;
       resize:vertical;
     }
     button{
       margin-top:10px;
-      background:#2fa4ff;
+      background:var(--accent);
       border:none;
       padding:10px;
       border-radius:8px;
@@ -93,11 +93,11 @@
     }
     button.dark{
       background:#132447;
-      color:white;
+      color:#fff;
     }
     button.danger{
-      background:#ff5c5c;
-      color:white;
+      background:var(--danger);
+      color:#fff;
     }
     .row{
       display:flex;
@@ -109,239 +109,1261 @@
     }
     .mini{
       font-size:12px;
-      color:#9fb0d0;
+      color:var(--muted);
     }
     .chip{
       display:inline-block;
-      background:#081632;
+      background:var(--card2);
       padding:6px 10px;
       border-radius:999px;
       font-size:12px;
       margin:4px 4px 0 0;
     }
-    #map{
-      height:420px;
-      border-radius:12px;
-      overflow:hidden;
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
     }
     section{
       display:none;
     }
+    #map{
+      height:430px;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    img.photo{
+      width:100%;
+      border-radius:12px;
+      margin-top:10px;
+    }
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:12px;
+    }
+    th,td{
+      padding:8px;
+      border-bottom:1px solid rgba(255,255,255,.08);
+      text-align:left;
+    }
+    canvas{
+      width:100%;
+      height:220px;
+      background:var(--card2);
+      border-radius:10px;
+      display:block;
+    }
   </style>
 </head>
-
 <body>
 
-<h1>🚤 Tanya Deep Sea</h1>
+  <h1>
+    <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
+    Tanya Deep Sea V43
+  </h1>
 
-<div class="topnav">
-<button class="navbtn" onclick="showTab('add')">Add Catch</button>
-<button class="navbtn" onclick="showTab('mapTab')">Map</button>
-<button class="navbtn" onclick="showTab('spots')">Spots</button>
-<button class="navbtn" onclick="showTab('log')">Log</button>
-<button class="navbtn" onclick="showTab('stats')">Stats</button>
-<button class="navbtn" onclick="showTab('sea')">Best Days</button>
-<button class="navbtn" onclick="showTab('fishid')">Fish ID</button>
-</div>
+  <div class="topnav">
+    <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add Catch</button>
+    <button class="navbtn" id="btnMap" onclick="showTab('mapTab')">Map</button>
+    <button class="navbtn" id="btnSpots" onclick="showTab('spots')">Saved Spots</button>
+    <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
+    <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
+    <button class="navbtn" id="btnSea" onclick="showTab('sea')">Best Days</button>
+    <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
+  </div>
 
-<section id="add">
+  <section id="add">
+    <div class="card">
+      <b>Add Catch</b>
 
-<div class="card">
+      <label>Species</label>
+      <select id="species">
+        <option value="">Choose...</option>
+        <option>Cape Kob</option>
+        <option>Yellowtail</option>
+        <option>Bonito</option>
+        <option>Red Roman</option>
+        <option>Snapper</option>
+        <option>Silverfish</option>
+        <option>Red Steenbras</option>
+        <option>Yellow Belly</option>
+        <option>Galjoen</option>
+        <option>Hottentot</option>
+      </select>
 
-<label>Species</label>
-<select id="species">
-<option value="">Choose...</option>
-<option>Cape Kob</option>
-<option>Yellowtail</option>
-<option>Bonito</option>
-<option>Red Roman</option>
-<option>Snapper</option>
-<option>Silverfish</option>
-<option>Red Steenbras</option>
-<option>Yellow Belly</option>
-<option>Galjoen</option>
-<option>Hottentot</option>
-</select>
+      <label>Length (cm)</label>
+      <input id="length" inputmode="numeric">
 
-<label>Length (cm)</label>
-<input id="length">
+      <label>Minimum Size</label>
+      <input id="minSize" readonly>
+      <div id="sizeNote" class="mini">Choose species to load legal size.</div>
 
-<label>Minimum Size</label>
-<input id="minSize" readonly>
+      <label>Depth (m)</label>
+      <div class="row">
+        <input id="depth" inputmode="numeric">
+        <button type="button" class="dark" onclick="getDepthFromCurrentCoords()">Auto Depth</button>
+      </div>
 
-<label>Depth (m)</label>
-<div class="row">
-<input id="depth">
-<button onclick="getDepthFromCurrentCoords()">Auto Depth</button>
-</div>
+      <label>Bait Used</label>
+      <input id="bait">
 
-<label>Bait Used</label>
-<input id="bait">
+      <label>Choose Spot</label>
+      <select id="spotPick">
+        <option value="">Choose spot</option>
+      </select>
 
-<label>Choose Spot</label>
-<select id="spotPick">
-<option value="">Choose spot</option>
-</select>
+      <label>Coordinates</label>
+      <div class="row">
+        <input id="coords" readonly>
+        <button type="button" onclick="getGPS()">Get GPS</button>
+        <button type="button" class="dark" onclick="showTab('mapTab')">Open Map</button>
+      </div>
 
-<label>Coordinates</label>
-<div class="row">
-<input id="coords" readonly>
-<button onclick="getGPS()">Get GPS</button>
-<button class="dark" onclick="showTab('mapTab')">Open Map</button>
-</div>
+      <label>Where Caught</label>
+      <input id="place" value="Deep Sea" readonly>
 
-<label>Where Caught</label>
-<input id="place" value="Deep Sea" readonly>
+      <label>Local Area Name</label>
+      <input id="localArea" placeholder="Example: Skulpbank / Blinde Rif / West Reef">
 
-<label>Local Area</label>
-<input id="localArea">
+      <div class="row">
+        <div class="chip" id="chipWind">Wind: —</div>
+        <div class="chip" id="chipSwell">Swell: —</div>
+        <div class="chip" id="chipTemp">Sea Temp: —</div>
+        <div class="chip" id="chipCurrent">Current: —</div>
+      </div>
 
-<div class="row">
-<div class="chip" id="chipWind">Wind: --</div>
-<div class="chip" id="chipSwell">Swell: --</div>
-<div class="chip" id="chipTemp">Sea Temp: --</div>
-<div class="chip" id="chipCurrent">Current: --</div>
-</div>
+      <label>Photo</label>
+      <input id="photo" type="file" accept="image/*">
+      <div class="mini">Choose from camera or gallery</div>
+      <div id="photoPreview"></div>
 
-<label>Photo</label>
-<input id="photo" type="file" accept="image/*">
+      <label>Notes</label>
+      <textarea id="notes"></textarea>
 
-<div id="photoPreview"></div>
+      <div class="row">
+        <button id="saveCatchBtn" style="font-size:16px;padding:14px;" onclick="saveCatch()">SAVE CATCH</button>
+        <button class="dark" onclick="clearCatchForm()">Clear</button>
+      </div>
+    </div>
+  </section>
 
-<label>Notes</label>
-<textarea id="notes"></textarea>
+  <section id="mapTab">
+    <div class="card">
+      <div class="row">
+        <button onclick="toggleSatellite()">Satellite ON/OFF</button>
+        <button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
+        <button class="dark" onclick="clearRouteLine()">Clear Route</button>
+      </div>
+      <div class="mini" style="margin-top:8px;">
+        Tap the map to save a Reef or Spot.
+      </div>
+    </div>
+    <div id="map"></div>
+  </section>
 
-<div class="row">
-<button onclick="saveCatch()">SAVE CATCH</button>
-<button class="dark" onclick="clearCatchForm()">Clear</button>
-</div>
+  <section id="spots">
+    <div class="card">
+      <div class="row">
+        <div><b>Saved Spots</b></div>
+        <button onclick="saveSpotFromCoords()">Save Current Spot</button>
+      </div>
+    </div>
+    <div id="spotsList"></div>
+  </section>
 
-</div>
-</section>
+  <section id="log">
+    <div class="card">
+      <div class="row">
+        <div><b>Catch Log</b></div>
+        <button class="danger" onclick="resetAll()">Delete All</button>
+      </div>
+    </div>
+    <div id="catchList"></div>
+  </section>
 
-<section id="mapTab">
+  <section id="stats">
+    <div class="card">
+      <b>Best Depth per Species</b>
+      <canvas id="depthChart" width="900" height="220"></canvas>
+    </div>
+    <div class="card">
+      <b>Stats Summary</b>
+      <div id="statsBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
 
-<div class="card">
+  <section id="sea">
+    <div class="card">
+      <div class="row">
+        <div><b>2 Week Best Fishing Days</b></div>
+        <button onclick="loadFishingDays()">Refresh</button>
+      </div>
+      <table>
+        <thead>
+          <tr>
+            <th>Date</th>
+            <th>Wave</th>
+            <th>Wind</th>
+            <th>Score</th>
+            <th>Fishing</th>
+          </tr>
+        </thead>
+        <tbody id="fishDays"></tbody>
+      </table>
+    </div>
+  </section>
 
-<div class="row">
-<button onclick="toggleSatellite()">🛰 Satellite ON/OFF</button>
-<button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
-</div>
+  <section id="fishid">
+    <div class="card">
+      <b>Fish Photo Helper</b>
 
-</div>
+      <label>Fish Photo</label>
+      <input type="file" id="fishIdPhoto" accept="image/*">
+      <div class="mini">Choose from camera or gallery</div>
+      <div id="fishIdPreview"></div>
 
-<div id="map"></div>
+      <label>Species</label>
+      <select id="fishIdSpecies">
+        <option value="">Choose...</option>
+        <option>Cape Kob</option>
+        <option>Yellowtail</option>
+        <option>Bonito</option>
+        <option>Red Roman</option>
+        <option>Snapper</option>
+        <option>Silverfish</option>
+        <option>Red Steenbras</option>
+        <option>Yellow Belly</option>
+        <option>Galjoen</option>
+        <option>Hottentot</option>
+      </select>
 
-</section>
+      <div class="row">
+        <button onclick="saveFishHelper()">Save Helper</button>
+        <button class="dark" onclick="copyFishToCatch()">Use species in Add Catch</button>
+      </div>
 
-<section id="spots">
+      <div id="fishHelpers" style="margin-top:10px;"></div>
+    </div>
+  </section>
 
-<div class="card">
-<b>Saved Spots</b>
-<button onclick="saveSpotFromCoords()">Save Current Spot</button>
-</div>
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const KEY_CATCHES = "tanya_deepsea_catches";
+    const KEY_SPOTS = "tanya_deepsea_spots";
+    const KEY_FISH = "tanya_deepsea_fishhelpers";
+    const BASE = { lat:-34.37, lng:20.85 };
 
-<div id="spotsList"></div>
+    const KNOWN_SPOTS = [
+      { id:"s1",  name:"Skulpbank 42m",       type:"Reef", coords:"-34.390500,20.860200", depth:42 },
+      { id:"s2",  name:"North Edge 38m",      type:"Reef", coords:"-34.412000,20.835000", depth:38 },
+      { id:"s3",  name:"Blinde Rif East 45m", type:"Reef", coords:"-34.401500,20.880100", depth:45 },
+      { id:"s4",  name:"Middle Reef 40m",     type:"Reef", coords:"-34.375000,20.870000", depth:40 },
+      { id:"s5",  name:"South Reef 48m",      type:"Reef", coords:"-34.420000,20.865000", depth:48 },
+      { id:"s6",  name:"West Drift 35m",      type:"Reef", coords:"-34.395500,20.845000", depth:35 },
+      { id:"s7",  name:"Deep Reef 60m",       type:"Reef", coords:"-34.405000,20.895000", depth:60 },
+      { id:"s8",  name:"Inner Bank 30m",      type:"Reef", coords:"-34.382500,20.855000", depth:30 },
+      { id:"s9",  name:"South Deep 55m",      type:"Reef", coords:"-34.430000,20.880000", depth:55 },
+      { id:"s10", name:"Kob Line 42m",        type:"Reef", coords:"-34.388000,20.875000", depth:42 },
+      { id:"s11", name:"North Bank 45m",      type:"Reef", coords:"-34.370000,20.860000", depth:45 },
+      { id:"s12", name:"Roman Reef 50m",      type:"Reef", coords:"-34.410000,20.872000", depth:50 },
+      { id:"s13", name:"Outer Deep 70m",      type:"Reef", coords:"-34.445000,20.900000", depth:70 },
+      { id:"s14", name:"East Drift 48m",      type:"Reef", coords:"-34.398000,20.885000", depth:48 },
+      { id:"s15", name:"Middle Ridge 44m",    type:"Reef", coords:"-34.392500,20.870500", depth:44 },
+      { id:"s16", name:"Far North 50m",       type:"Reef", coords:"-34.360000,20.880000", depth:50 },
+      { id:"s17", name:"West Bank 40m",       type:"Reef", coords:"-34.415000,20.845000", depth:40 },
+      { id:"s18", name:"Southwest Deep 52m",  type:"Reef", coords:"-34.430500,20.835500", depth:52 },
+      { id:"s19", name:"Inner West 38m",      type:"Reef", coords:"-34.375500,20.852500", depth:38 },
+      { id:"s20", name:"Outer Canyon 85m",    type:"Reef", coords:"-34.450000,20.915000", depth:85 }
+    ];
 
-</section>
+    const MIN_SIZE = {
+      "Cape Kob":60,
+      "Yellowtail":60,
+      "Bonito":0,
+      "Red Roman":30,
+      "Snapper":30,
+      "Silverfish":25,
+      "Red Steenbras":60,
+      "Yellow Belly":30,
+      "Galjoen":35,
+      "Hottentot":22
+    };
 
-<section id="log">
+    const species = document.getElementById("species");
+    const lengthEl = document.getElementById("length");
+    const minSizeEl = document.getElementById("minSize");
+    const sizeNote = document.getElementById("sizeNote");
+    const depthEl = document.getElementById("depth");
+    const baitEl = document.getElementById("bait");
+    const coordsEl = document.getElementById("coords");
+    const placeEl = document.getElementById("place");
+    const localAreaEl = document.getElementById("localArea");
+    const notesEl = document.getElementById("notes");
+    const photoEl = document.getElementById("photo");
+    const photoPreview = document.getElementById("photoPreview");
+    const chipWind = document.getElementById("chipWind");
+    const chipSwell = document.getElementById("chipSwell");
+    const chipTemp = document.getElementById("chipTemp");
+    const chipCurrent = document.getElementById("chipCurrent");
 
-<div class="card">
-<b>Catch Log</b>
-<button class="danger" onclick="resetAll()">Delete All</button>
-</div>
+    let photoData = "";
+    let fishPhotoData = "";
+    let map, osm, satLayer, satOn = false;
+    let catchMarkers = [];
+    let spotMarkers = [];
+    let reefOverlayMarkers = [];
+    let routeLine = null;
+    let myBoatMarker = null;
+    let tempClickMarker = null;
+    let reefOverlayOn = false;
 
-<div id="catchList"></div>
+    function parseCoords(str){
+      if(!str) return null;
+      const p = String(str).split(",").map(x => x.trim());
+      if(p.length < 2) return null;
+      const lat = Number(p[0]);
+      const lng = Number(p[1]);
+      if(!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      return {lat,lng};
+    }
 
-</section>
+    function safe(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;");
+    }
 
-<section id="stats">
+    function getAllCatches(){ return JSON.parse(localStorage.getItem(KEY_CATCHES) || "[]"); }
+    function saveAllCatches(v){ localStorage.setItem(KEY_CATCHES, JSON.stringify(v)); }
 
-<div class="card">
-<b>Best Depth per Species</b>
-<canvas id="depthChart" width="900" height="220"></canvas>
-</div>
+    function getAllSpots(){ return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }
+    function saveAllSpots(v){ localStorage.setItem(KEY_SPOTS, JSON.stringify(v)); }
 
-<div class="card">
-<b>Stats Summary</b>
-<div id="statsBox"></div>
-</div>
+    function getFishHelpers(){ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
+    function saveFishHelpers(v){ localStorage.setItem(KEY_FISH, JSON.stringify(v)); }
 
-</section>
+    function clearLayers(arr){
+      if(!map) return;
+      arr.forEach(m => {
+        try { map.removeLayer(m); } catch {}
+      });
+      arr.length = 0;
+    }
 
-<section id="sea">
+    function loadKnownSpotsIntoSaved(){
+      const existing = getAllSpots();
+      const existingCoords = new Set(existing.map(s => s.coords));
+      KNOWN_SPOTS.forEach(s => {
+        if(!existingCoords.has(s.coords)){
+          existing.push({ id:s.id, name:s.name, type:s.type, coords:s.coords, depth:s.depth });
+        }
+      });
+      saveAllSpots(existing);
+    }
 
-<div class="card">
-<b>2 Week Best Fishing Days</b>
+    function getSpotNameFromCoords(coordStr){
+      const s = getAllSpots().find(x => x.coords === coordStr);
+      return s ? s.name : "";
+    }
 
-<table>
+    function showTab(id){
+      document.querySelectorAll("section").forEach(s => s.style.display = "none");
+      const section = document.getElementById(id);
+      if(section) section.style.display = "block";
 
-<tr>
-<th>Date</th>
-<th>Wave</th>
-<th>Wind</th>
-<th>Score</th>
-<th>Fishing</th>
-</tr>
+      document.querySelectorAll(".navbtn").forEach(b => b.classList.remove("active"));
+      const mapIds = {
+        add:"btnAdd",
+        mapTab:"btnMap",
+        spots:"btnSpots",
+        log:"btnLog",
+        stats:"btnStats",
+        sea:"btnSea",
+        fishid:"btnFish"
+      };
+      const btn = document.getElementById(mapIds[id]);
+      if(btn) btn.classList.add("active");
 
-<tbody id="fishDays"></tbody>
+      fillSpotPick();
 
-</table>
+      if(id === "mapTab"){
+        initMap();
+        setTimeout(() => {
+          map.invalidateSize();
+          renderMap();
+        }, 200);
+      }
+      if(id === "spots") renderSpots();
+      if(id === "log") renderLog();
+      if(id === "stats") renderStats();
+      if(id === "sea") loadFishingDays();
+      if(id === "fishid") renderFishHelpers();
+    }
 
-</div>
+    function updateMinSize(){
+      const v = species.value;
+      minSizeEl.value = MIN_SIZE[v] ?? "";
+      checkFishSize();
+    }
 
-</section>
+    function checkFishSize(){
+      const sp = species.value;
+      const len = Number(lengthEl.value);
+      const min = MIN_SIZE[sp];
 
-<section id="fishid">
+      if(!sp || !len || min === undefined){
+        sizeNote.textContent = "Choose species to load legal size.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
 
-<div class="card">
+      if(min === 0){
+        sizeNote.textContent = "No minimum size for this species.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
 
-<b>Fish Photo Helper</b>
+      if(len < min){
+        sizeNote.textContent = "⚠️ UNDERSIZE! Minimum is " + min + " cm";
+        sizeNote.style.color = "#ff5c5c";
+      } else {
+        sizeNote.textContent = "✅ Legal size (" + min + " cm)";
+        sizeNote.style.color = "#39d98a";
+      }
+    }
 
-<label>Fish Photo</label>
-<input type="file" id="fishIdPhoto" accept="image/*">
+    species.addEventListener("change", updateMinSize);
+    lengthEl.addEventListener("input", checkFishSize);
 
-<div id="fishIdPreview"></div>
+    photoEl.addEventListener("change", () => {
+      const file = photoEl.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        photoData = reader.result;
+        photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
+      };
+      reader.readAsDataURL(file);
+    });
 
-<label>Species</label>
-<select id="fishIdSpecies">
-<option value="">Choose...</option>
-<option>Cape Kob</option>
-<option>Yellowtail</option>
-<option>Bonito</option>
-<option>Red Roman</option>
-<option>Snapper</option>
-<option>Silverfish</option>
-<option>Red Steenbras</option>
-<option>Yellow Belly</option>
-<option>Galjoen</option>
-<option>Hottentot</option>
-</select>
+    document.getElementById("fishIdPhoto").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        fishPhotoData = reader.result;
+        document.getElementById("fishIdPreview").innerHTML = `<img class="photo" src="${reader.result}" alt="fish">`;
+      };
+      reader.readAsDataURL(file);
+    });
 
-<button onclick="saveFishHelper()">Save Helper</button>
+    function fillSpotPick(){
+      const spots = getAllSpots();
+      const s = document.getElementById("spotPick");
+      s.innerHTML = `<option value="">Choose spot</option>`;
+      spots.forEach(sp => {
+        s.innerHTML += `<option value="${sp.coords}">${sp.name}</option>`;
+      });
+    }
 
-<div id="fishHelpers"></div>
+    document.getElementById("spotPick").addEventListener("change", function(e){
+      const coordStr = e.target.value;
+      coordsEl.value = coordStr;
 
-</div>
+      const s = getAllSpots().find(x => x.coords === coordStr);
+      if(s){
+        placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
+        if(s.depth) depthEl.value = s.depth;
+      } else {
+        placeEl.value = "Deep Sea";
+      }
+    });
 
-</section>
+    async function getDepthFromSea(lat, lng){
+      try{
+        const url = `https://api.opentopodata.org/v1/gebco2020?locations=${encodeURIComponent(lat + "," + lng)}`;
+        const r = await fetch(url);
+        const j = await r.json();
+        const elev = Number(j?.results?.[0]?.elevation);
 
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+        if(!Number.isFinite(elev)){
+          alert("Could not load depth");
+          return;
+        }
+        depthEl.value = Math.abs(Math.round(elev));
+      }catch{
+        alert("Could not load depth");
+      }
+    }
 
-<script>
+    async function getDepthFromCurrentCoords(){
+      const p = parseCoords(coordsEl.value);
+      if(!p){
+        alert("Get GPS or choose a spot first.");
+        return;
+      }
+      await getDepthFromSea(p.lat, p.lng);
+    }
 
-function showTab(id){
+    async function estimateCurrentStrength(lat, lon){
+      try{
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height&timezone=Africa%2FJohannesburg`;
 
-document.querySelectorAll("section").forEach(s=>s.style.display="none")
+        const [wr, mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const w = await wr.json();
+        const m = await mr.json();
 
-document.getElementById(id).style.display="block"
+        const wind = Number(w?.current?.wind_speed_10m || 0);
+        const wave = Number(m?.current?.wave_height || 0);
+        const swell = Number(m?.current?.swell_wave_height || 0);
 
-}
+        let current = 0.2;
+        current += wind * 0.015;
+        current += wave * 0.18;
+        current += swell * 0.12;
 
-showTab("add")
+        return Number(current.toFixed(2));
+      }catch{
+        return 0.5;
+      }
+    }
 
-</script>
+    async function fillSeaChips(lat, lon){
+      try{
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg`;
 
+        const [wr,mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const w = await wr.json();
+        const m = await mr.json();
+
+        chipWind.textContent = `Wind: ${Number(w?.current?.wind_speed_10m || 0).toFixed(0)} km/h`;
+        chipSwell.textContent = `Swell: ${Number(m?.current?.swell_wave_height || 0).toFixed(2)} m`;
+        chipTemp.textContent = `Sea Temp: ${Number(m?.current?.sea_surface_temperature || 0).toFixed(1)} °C`;
+
+        const current = await estimateCurrentStrength(lat, lon);
+        chipCurrent.textContent = `Current: ${current} kt`;
+      }catch{
+        chipWind.textContent = "Wind: —";
+        chipSwell.textContent = "Swell: —";
+        chipTemp.textContent = "Sea Temp: —";
+        chipCurrent.textContent = "Current: —";
+      }
+    }
+
+    async function getGPS(){
+      if(!navigator.geolocation){
+        alert("GPS not supported on this device");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
+
+        if(map){
+          if(myBoatMarker) map.removeLayer(myBoatMarker);
+          myBoatMarker = L.marker([lat,lng]).addTo(map);
+          myBoatMarker.bindPopup("Your Boat").openPopup();
+          map.setView([lat,lng],13);
+        }
+
+        await getDepthFromSea(lat,lng);
+        await fillSeaChips(lat,lng);
+
+        const nearest = getNearestSpot(lat, lng);
+        if(nearest){
+          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+        } else {
+          placeEl.value = "Deep Sea";
+        }
+      }, () => {
+        alert("Could not get GPS location");
+      }, {
+        enableHighAccuracy:true,
+        timeout:10000
+      });
+    }
+
+    function getNearestSpot(lat, lng){
+      const spots = getAllSpots();
+      let best = null;
+      let bestDist = Infinity;
+
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+        const d = Math.hypot(lat - p.lat, lng - p.lng);
+        if(d < bestDist){
+          bestDist = d;
+          best = s;
+        }
+      });
+
+      return bestDist < 0.05 ? best : null;
+    }
+
+    function saveCatch(){
+      const sp = species.value;
+      const len = Number(lengthEl.value);
+      const coords = coordsEl.value;
+
+      if(!sp){
+        alert("Choose species");
+        return;
+      }
+      if(!coords){
+        alert("Get GPS or choose a spot first");
+        return;
+      }
+
+      const min = MIN_SIZE[sp] || 0;
+      if(min > 0 && len < min){
+        const ok = confirm("⚠️ This fish is undersize (" + len + " cm).\nMinimum is " + min + " cm.\n\nSave anyway?");
+        if(!ok) return;
+      }
+
+      const list = getAllCatches();
+      list.push({
+        id: Date.now(),
+        species: sp,
+        length: len,
+        min: minSizeEl.value,
+        depth: depthEl.value,
+        bait: baitEl.value,
+        coords: coords,
+        place: placeEl.value,
+        spotName: getSpotNameFromCoords(coords),
+        localArea: localAreaEl.value,
+        notes: notesEl.value,
+        photo: photoData || "",
+        date: new Date().toLocaleDateString()
+      });
+
+      saveAllCatches(list);
+      alert("Catch saved");
+      clearCatchForm();
+      renderLog();
+      renderStats();
+      renderMap();
+    }
+
+    function clearCatchForm(){
+      species.value = "";
+      lengthEl.value = "";
+      minSizeEl.value = "";
+      depthEl.value = "";
+      baitEl.value = "";
+      coordsEl.value = "";
+      placeEl.value = "Deep Sea";
+      localAreaEl.value = "";
+      notesEl.value = "";
+      photoEl.value = "";
+      photoData = "";
+      photoPreview.innerHTML = "";
+      chipWind.textContent = "Wind: —";
+      chipSwell.textContent = "Swell: —";
+      chipTemp.textContent = "Sea Temp: —";
+      chipCurrent.textContent = "Current: —";
+      sizeNote.textContent = "Choose species to load legal size.";
+      sizeNote.style.color = "#9fb0d0";
+    }
+
+    function renderLog(){
+      const box = document.getElementById("catchList");
+      const list = getAllCatches().slice().reverse();
+      box.innerHTML = "";
+
+      if(!list.length){
+        box.innerHTML = `<div class="card">No catches saved yet.</div>`;
+        return;
+      }
+
+      list.forEach(c => {
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(c.species)}</b><br>
+            <div class="mini">${safe(c.length)} cm • Min ${safe(c.min)} • Depth ${safe(c.depth)} m</div>
+            <div class="mini">${safe(c.place)}</div>
+            ${c.localArea ? `<div class="mini">Area: ${safe(c.localArea)}</div>` : ""}
+            <div class="mini mono">📍 ${safe(c.coords)}</div>
+            ${c.bait ? `<div class="mini">Bait: ${safe(c.bait)}</div>` : ""}
+            ${c.notes ? `<div class="mini">Notes: ${safe(c.notes)}</div>` : ""}
+            <div class="mini">${safe(c.date)}</div>
+            ${c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : ""}
+            <div class="row">
+              <button onclick="useLogCoords('${safe(c.coords)}')">Use Log</button>
+              <button class="dark" onclick="editCatch('${c.id}')">Edit</button>
+              <button class="danger" onclick="deleteCatch('${c.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function useLogCoords(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){
+        alert("No valid coordinates in this log entry.");
+        return;
+      }
+
+      coordsEl.value = coordStr;
+      showTab("mapTab");
+
+      setTimeout(() => {
+        map.setView([p.lat, p.lng], 15);
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([p.lat, p.lng]).addTo(map);
+
+        if(!satOn){
+          satOn = true;
+          map.removeLayer(osm);
+          satLayer.addTo(map);
+        }
+      }, 250);
+    }
+
+    function editCatch(id){
+      const list = getAllCatches();
+      const c = list.find(x => String(x.id) === String(id));
+      if(!c) return;
+
+      species.value = c.species || "";
+      updateMinSize();
+      lengthEl.value = c.length || "";
+      minSizeEl.value = c.min || "";
+      depthEl.value = c.depth || "";
+      baitEl.value = c.bait || "";
+      coordsEl.value = c.coords || "";
+      placeEl.value = c.place || "Deep Sea";
+      localAreaEl.value = c.localArea || "";
+      notesEl.value = c.notes || "";
+      photoData = c.photo || "";
+      photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
+
+      saveAllCatches(list.filter(x => String(x.id) !== String(id)));
+      showTab("add");
+    }
+
+    function deleteCatch(id){
+      const ok = confirm("Delete this catch?");
+      if(!ok) return;
+      saveAllCatches(getAllCatches().filter(c => String(c.id) !== String(id)));
+      renderLog();
+      renderStats();
+      renderMap();
+    }
+
+    function drawDepthChart(speciesNames, depthValues){
+      const c = document.getElementById("depthChart");
+      const ctx = c.getContext("2d");
+      ctx.clearRect(0,0,c.width,c.height);
+      ctx.fillStyle = "#081632";
+      ctx.fillRect(0,0,c.width,c.height);
+
+      if(!speciesNames.length){
+        ctx.fillStyle = "#9fb0d0";
+        ctx.font = "14px Arial";
+        ctx.fillText("No depth data yet", 20, 30);
+        return;
+      }
+
+      const max = Math.max(...depthValues, 1);
+      const left = 50;
+      const bottom = 180;
+      const top = 20;
+      const usableW = c.width - left - 20;
+      const step = usableW / speciesNames.length;
+      const barW = Math.max(24, step * 0.55);
+
+      ctx.strokeStyle = "#355";
+      ctx.beginPath();
+      ctx.moveTo(left, top);
+      ctx.lineTo(left, bottom);
+      ctx.lineTo(c.width - 10, bottom);
+      ctx.stroke();
+
+      speciesNames.forEach((name, i) => {
+        const val = depthValues[i];
+        const h = ((bottom - top - 10) * val) / max;
+        const x = left + i * step + (step - barW) / 2;
+        const y = bottom - h;
+
+        ctx.fillStyle = "#2fa4ff";
+        ctx.fillRect(x, y, barW, h);
+
+        ctx.fillStyle = "#fff";
+        ctx.font = "12px Arial";
+        ctx.fillText(String(val), x, y - 5);
+
+        ctx.fillStyle = "#9fb0d0";
+        ctx.fillText(name.slice(0,8), x, 205);
+      });
+    }
+
+    function renderStats(){
+      const box = document.getElementById("statsBox");
+      const list = getAllCatches();
+
+      if(!list.length){
+        box.innerHTML = "No catches yet.";
+        drawDepthChart([], []);
+        return;
+      }
+
+      const bySpecies = {};
+      const bySpot = {};
+
+      list.forEach(c => {
+        if(c.species){
+          if(!bySpecies[c.species]) bySpecies[c.species] = [];
+          bySpecies[c.species].push(c);
+        }
+
+        const spotKey = c.localArea || c.spotName || c.place || c.coords || "Unknown";
+        bySpot[spotKey] = (bySpot[spotKey] || 0) + 1;
+      });
+
+      const speciesNames = [];
+      const avgDepths = [];
+
+      Object.keys(bySpecies).forEach(sp => {
+        const depths = bySpecies[sp]
+          .map(x => Number(x.depth))
+          .filter(x => Number.isFinite(x) && x > 0);
+
+        if(depths.length){
+          speciesNames.push(sp);
+          avgDepths.push(Number((depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1)));
+        }
+      });
+
+      drawDepthChart(speciesNames, avgDepths);
+
+      let html = "";
+      Object.keys(bySpecies).forEach(sp => {
+        const catches = bySpecies[sp];
+        const depths = catches.map(x => Number(x.depth)).filter(x => Number.isFinite(x) && x > 0);
+        const avg = depths.length ? (depths.reduce((a,b)=>a+b,0)/depths.length).toFixed(1) : "—";
+
+        html += `
+          <div class="card">
+            <b>${safe(sp)}</b><br>
+            <div class="mini">Catches: ${catches.length}</div>
+            <div class="mini">Average depth: ${avg} m</div>
+          </div>
+        `;
+      });
+
+      const bestSpots = Object.entries(bySpot)
+        .filter(([name,count]) => name && count > 0)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,5);
+
+      html += `<div class="card"><b>Best Spots</b>`;
+      if(bestSpots.length){
+        bestSpots.forEach(([spot,count]) => {
+          html += `<div class="mini">${safe(spot)} — ${count} catches</div>`;
+        });
+      } else {
+        html += `<div class="mini">No spot data yet.</div>`;
+      }
+      html += `</div>`;
+
+      box.innerHTML = html;
+    }
+
+    function calcScore(wind, wave, swell){
+      let score = 100;
+      if(Number.isFinite(wind)) score -= Math.max(0, wind - 12) * 2.2;
+      if(Number.isFinite(swell)) score -= Math.max(0, swell - 0.8) * 22;
+      if(Number.isFinite(wave)) score -= Math.max(0, wave - 0.7) * 22;
+      return Math.max(0, Math.min(100, Math.round(score)));
+    }
+
+    async function loadFishingDays(){
+      const lat = BASE.lat;
+      const lon = BASE.lng;
+
+      try{
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&daily=wind_speed_10m_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&daily=wave_height_max,swell_wave_height_max&forecast_days=8&timezone=Africa%2FJohannesburg`;
+
+        const [wr,mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const w = await wr.json();
+        const m = await mr.json();
+
+        const days = w.daily.time || [];
+        const winds = w.daily.wind_speed_10m_max || [];
+        const waves = m.daily?.wave_height_max || [];
+        const swells = m.daily?.swell_wave_height_max || [];
+
+        let html = "";
+
+        for(let i=0;i<days.length;i++){
+          const wave = i < waves.length ? Number(waves[i]) : null;
+          const swell = i < swells.length ? Number(swells[i]) : null;
+          const wind = Number(winds[i]);
+          const score = calcScore(wind, wave, swell);
+
+          let rating = "Bad";
+          if(score >= 75) rating = "Excellent";
+          else if(score >= 55) rating = "Good";
+          else if(score >= 40) rating = "Fair";
+
+          html += `
+            <tr>
+              <td>${days[i]}</td>
+              <td>${wave !== null ? wave.toFixed(2) + "m" : "—"}</td>
+              <td>${wind.toFixed(0)} km/h</td>
+              <td>${score}/100</td>
+              <td>${rating}</td>
+            </tr>
+          `;
+        }
+
+        document.getElementById("fishDays").innerHTML = html;
+      }catch{
+        document.getElementById("fishDays").innerHTML = `<tr><td colspan="5">Could not load forecast.</td></tr>`;
+      }
+    }
+
+    function initMap(){
+      if(map) return;
+
+      map = L.map("map").setView([BASE.lat, BASE.lng], 10);
+
+      osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+      satLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19 }
+      );
+
+      map.on("click", e => {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+
+        coordsEl.value = lat + "," + lng;
+
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([lat, lng]).addTo(map);
+        map.setView([lat, lng], 15);
+
+        const autoName = `Spot ${lat}, ${lng}`;
+        const name = prompt("Spot name?", autoName);
+        if(name === null) return;
+
+        const type = prompt("Type: Reef or Spot?", "Reef");
+        if(type === null) return;
+
+        const spots = getAllSpots();
+        spots.push({
+          id: Date.now(),
+          name: name.trim() || autoName,
+          type: type.trim() || "Spot",
+          coords: lat + "," + lng
+        });
+
+        saveAllSpots(spots);
+        fillSpotPick();
+        renderSpots();
+        renderMap();
+      });
+
+      setTimeout(() => map.invalidateSize(), 200);
+    }
+
+    function renderMap(){
+      if(!map) return;
+
+      clearLayers(catchMarkers);
+      clearLayers(spotMarkers);
+      clearLayers(reefOverlayMarkers);
+
+      getAllCatches().forEach(c => {
+        const p = parseCoords(c.coords);
+        if(!p) return;
+        const m = L.marker([p.lat, p.lng]).addTo(map);
+        m.bindPopup(`<b>${safe(c.species)}</b><br>${safe(c.coords || "")}`);
+        catchMarkers.push(m);
+      });
+
+      getAllSpots().forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+        const m = L.circleMarker([p.lat, p.lng], {
+          radius:8,
+          color:s.type==="Reef" ? "#ffd166" : "#59d0ff",
+          weight:2,
+          fillOpacity:0.6
+        }).addTo(map);
+
+        m.bindPopup(`
+          <b>${safe(s.type)} • ${safe(s.name)}</b><br>
+          <span class="mini mono">${safe(s.coords)}</span><br>
+          <span class="mini">${safe(s.depth || "—")} m</span><br><br>
+          <button onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
+        `);
+        spotMarkers.push(m);
+      });
+
+      if(reefOverlayOn) renderReefOverlay();
+    }
+
+    function toggleSatellite(){
+      satOn = !satOn;
+      if(satOn){
+        map.removeLayer(osm);
+        satLayer.addTo(map);
+      } else {
+        map.removeLayer(satLayer);
+        osm.addTo(map);
+      }
+    }
+
+    function clearRouteLine(){
+      if(routeLine){
+        map.removeLayer(routeLine);
+        routeLine = null;
+      }
+      if(myBoatMarker){
+        map.removeLayer(myBoatMarker);
+        myBoatMarker = null;
+      }
+    }
+
+    function navigateToSpot(lat, lng){
+      navigator.geolocation.getCurrentPosition(pos => {
+        const myLat = pos.coords.latitude;
+        const myLng = pos.coords.longitude;
+
+        clearRouteLine();
+
+        myBoatMarker = L.marker([myLat,myLng]).addTo(map);
+        routeLine = L.polyline([[myLat,myLng],[Number(lat),Number(lng)]], {
+          color:"red",
+          weight:4
+        }).addTo(map);
+
+        map.setView([Number(lat),Number(lng)], 13);
+      }, () => {
+        alert("Could not get current location for route.");
+      });
+    }
+
+    function saveSpotFromCoords(){
+      const c = coordsEl.value;
+      if(!c){
+        alert("Choose a spot on the map or get GPS first.");
+        return;
+      }
+
+      const p = parseCoords(c);
+      if(!p){
+        alert("Invalid coordinates.");
+        return;
+      }
+
+      const autoName = `Spot ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
+      const name = prompt("Spot name?", autoName);
+      if(name === null) return;
+
+      const type = prompt("Type: Reef or Spot?", "Reef");
+      if(type === null) return;
+
+      const spots = getAllSpots();
+      spots.push({
+        id: Date.now(),
+        name: name.trim() || autoName,
+        type: type.trim() || "Spot",
+        coords: c
+      });
+
+      saveAllSpots(spots);
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
+    function renderSpots(){
+      const box = document.getElementById("spotsList");
+      const spots = getAllSpots().slice().reverse();
+      box.innerHTML = "";
+
+      if(!spots.length){
+        box.innerHTML = `<div class="card">No saved spots yet.</div>`;
+        return;
+      }
+
+      spots.forEach(s => {
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(s.type)} • ${safe(s.name)}</b>
+            <div class="mini mono">📍 ${safe(s.coords)}${s.depth ? " • " + safe(s.depth) + " m" : ""}</div>
+            <div class="row">
+              <button onclick="goToSpotOnMap('${safe(s.coords)}')">Open on Map</button>
+              <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}','${safe(s.depth || "")}')">Use Spot</button>
+              <button class="danger" onclick="deleteSpot('${s.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function goToSpotOnMap(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p) return;
+      showTab("mapTab");
+      setTimeout(() => {
+        map.setView([p.lat,p.lng], 15);
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([p.lat,p.lng]).addTo(map);
+      }, 200);
+    }
+
+    function useSpotCoords(coordStr, name, type, depth){
+      coordsEl.value = coordStr;
+      placeEl.value = `Deep Sea • ${type} • ${name}`;
+      if(depth && !depthEl.value) depthEl.value = depth;
+      showTab("add");
+    }
+
+    function deleteSpot(id){
+      const ok = confirm("Delete this spot?");
+      if(!ok) return;
+      saveAllSpots(getAllSpots().filter(s => String(s.id) !== String(id)));
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
+    function toggleReefOverlay(){
+      reefOverlayOn = !reefOverlayOn;
+      renderMap();
+    }
+
+    function renderReefOverlay(){
+      const spots = getAllSpots().filter(s => s.type === "Reef");
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+
+        const m = L.circle([p.lat, p.lng], {
+          radius: 350,
+          color: "#ffd166",
+          weight: 1,
+          fillColor: "#ffd166",
+          fillOpacity: 0.12
+        }).addTo(map);
+
+        reefOverlayMarkers.push(m);
+      });
+    }
+
+    function saveFishHelper(){
+      const sp = document.getElementById("fishIdSpecies").value;
+      if(!sp && !fishPhotoData){
+        alert("Choose a photo or species first.");
+        return;
+      }
+
+      const list = getFishHelpers();
+      list.unshift({
+        id: Date.now(),
+        species: sp || "Unknown",
+        photo: fishPhotoData || ""
+      });
+
+      saveFishHelpers(list.slice(0,20));
+      renderFishHelpers();
+    }
+
+    function renderFishHelpers(){
+      const box = document.getElementById("fishHelpers");
+      const list = getFishHelpers();
+      box.innerHTML = "";
+
+      if(!list.length){
+        box.innerHTML = `<div class="mini">No saved helpers yet.</div>`;
+        return;
+      }
+
+      list.forEach(item => {
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(item.species || "Unknown")}</b>
+            ${item.photo ? `<img class="photo" src="${item.photo}" alt="helper">` : ""}
+            <div class="row">
+              <button onclick="useFishHelper('${item.id}')">Use in Add Catch</button>
+              <button class="danger" onclick="deleteFishHelper('${item.id}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function useFishHelper(id){
+      const item = getFishHelpers().find(x => String(x.id) === String(id));
+      if(!item) return;
+
+      species.value = item.species || "";
+      updateMinSize();
+
+      if(item.photo){
+        photoData = item.photo;
+        photoPreview.innerHTML = `<img class="photo" src="${item.photo}" alt="fish">`;
+      }
+
+      showTab("add");
+    }
+
+    function deleteFishHelper(id){
+      saveFishHelpers(getFishHelpers().filter(x => String(x.id) !== String(id)));
+      renderFishHelpers();
+    }
+
+    function copyFishToCatch(){
+      const sp = document.getElementById("fishIdSpecies").value;
+      if(!sp) return;
+      species.value = sp;
+      updateMinSize();
+      showTab("add");
+    }
+
+    function resetAll(){
+      const ok = confirm("Delete all catches and custom spots?");
+      if(!ok) return;
+      localStorage.removeItem(KEY_CATCHES);
+      localStorage.removeItem(KEY_SPOTS);
+      localStorage.removeItem(KEY_FISH);
+      loadKnownSpotsIntoSaved();
+      renderLog();
+      renderSpots();
+      renderStats();
+      renderMap();
+      renderFishHelpers();
+      fillSpotPick();
+    }
+
+    loadKnownSpotsIntoSaved();
+    fillSpotPick();
+    updateMinSize();
+    showTab("add");
+    initMap();
+    renderLog();
+    renderSpots();
+    renderStats();
+  </script>
+
+  <script>
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.register("./sw.js");
+    }
+  </script>
 </body>
-</html>
+  </html>
