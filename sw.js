@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-v45";
+const CACHE_NAME = "tanya-v50";
 const FILES_TO_CACHE = [
   "./",
   "./index.html",
