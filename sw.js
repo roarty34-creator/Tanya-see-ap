@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v63";
+const CACHE_NAME = "tanya-deep-sea-v64";
 const APP_SHELL = [
   "./",
   "./index.html",
