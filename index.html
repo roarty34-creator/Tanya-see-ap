@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V54 Stable</title>
+  <title>Tanya Deep Sea V55 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -201,7 +201,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V54 Stable
+    Tanya Deep Sea V55 Stable
   </h1>
 
   <div class="topnav">
@@ -585,6 +585,24 @@
       return s ? s.name : "";
     }
 
+    function getNearestSpot(lat, lng){
+      const spots = getAllSpots();
+      let best = null;
+      let bestDist = Infinity;
+
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+        const d = Math.hypot(lat - p.lat, lng - p.lng);
+        if(d < bestDist){
+          bestDist = d;
+          best = s;
+        }
+      });
+
+      return bestDist < 0.05 ? best : null;
+    }
+
     function getSpotCatchCount(spot){
       if(!spot) return 0;
       const catches = getAllCatches();
@@ -645,10 +663,6 @@
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
       if(id === "moonTab") renderWeatherPanel();
-
-      if(id === "add"){
-        clearCatchForm();
-      }
     }
 
     function updateMinSize(){
@@ -792,8 +806,16 @@
         const lng = pos.coords.longitude;
 
         coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
-        placeEl.value = "Deep Sea";
         saveWeatherCoords(lat, lng);
+
+        const nearest = getNearestSpot(lat, lng);
+        if(nearest){
+          manualSpotPick.value = nearest.coords;
+          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+          if(!localAreaEl.value) localAreaEl.value = nearest.name;
+        } else {
+          placeEl.value = "Deep Sea";
+        }
 
         if(map){
           if(myBoatMarker) map.removeLayer(myBoatMarker);
@@ -803,6 +825,7 @@
         }
 
         await estimateCurrentStrength(lat, lng);
+
         renderMap();
         renderWeatherPanel();
         render14DayWeather();
@@ -1333,13 +1356,14 @@
         if(!p) return;
 
         const m = L.circle([p.lat, p.lng], {
-          radius: 350,
+          radius: 700,
           color: "#ffd166",
-          weight: 1,
+          weight: 2,
           fillColor: "#ffd166",
-          fillOpacity: 0.12
+          fillOpacity: 0.22
         }).addTo(map);
 
+        m.bindPopup(`<b>Reef Area</b><br>${safe(s.name)}`);
         reefOverlayMarkers.push(m);
       });
     }
@@ -1447,7 +1471,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V54",
+          version: "V55",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1491,7 +1515,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V54" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V55" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1690,6 +1714,31 @@ ${waypoints}
       return map[code] || "Mixed";
     }
 
+    function getBoatDayRating(wind, rain, swell){
+      let score = 100;
+
+      if(wind > 30) score -= 45;
+      else if(wind > 22) score -= 30;
+      else if(wind > 15) score -= 15;
+
+      if(swell > 3) score -= 35;
+      else if(swell > 2.2) score -= 20;
+      else if(swell > 1.5) score -= 10;
+
+      if(rain > 70) score -= 15;
+      else if(rain > 40) score -= 8;
+
+      score = Math.max(0, Math.min(100, Math.round(score)));
+
+      let label = "Good Boat Day";
+      if(score >= 80) label = "Very Good";
+      else if(score >= 65) label = "Good";
+      else if(score >= 45) label = "Okay";
+      else label = "Poor / Rough";
+
+      return { score, label };
+    }
+
     async function render14DayWeather(){
       const box = document.getElementById("weather14Box");
       if(!box) return;
@@ -1698,11 +1747,16 @@ ${waypoints}
       box.innerHTML = `<div class="mini">Loading weather…</div>`;
 
       try{
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
-        const r = await fetch(url);
-        const data = await r.json();
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${c.lat}&longitude=${c.lng}&daily=wave_height_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
 
-        const d = data?.daily;
+        const [wr, mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const weatherData = await wr.json();
+        const marineData = await mr.json();
+
+        const d = weatherData?.daily;
+        const md = marineData?.daily;
+
         if(!d?.time?.length){
           box.innerHTML = `<div class="mini">Could not load weather.</div>`;
           return;
@@ -1714,14 +1768,21 @@ ${waypoints}
         d.time.forEach((day, i) => {
           const dt = new Date(day);
           const label = dt.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+          const wind = Math.round(d.wind_speed_10m_max?.[i] ?? 0);
+          const rain = Math.round(d.precipitation_probability_max?.[i] ?? 0);
+          const swell = Number(md?.wave_height_max?.[i] ?? 0);
+          const rating = getBoatDayRating(wind, rain, swell);
+
           html += `
             <div class="forecastItem">
               <b>${label}</b>
               <div class="mini" style="margin-top:6px;">${weatherCodeText(d.weather_code[i])}</div>
               <div class="mini">Max: ${Math.round(d.temperature_2m_max[i])}°C</div>
               <div class="mini">Min: ${Math.round(d.temperature_2m_min[i])}°C</div>
-              <div class="mini">Rain: ${Math.round(d.precipitation_probability_max[i] ?? 0)}%</div>
-              <div class="mini">Wind: ${Math.round(d.wind_speed_10m_max[i] ?? 0)} km/h</div>
+              <div class="mini">Rain: ${rain}%</div>
+              <div class="mini">Wind: ${wind} km/h</div>
+              <div class="mini">Swell: ${swell.toFixed(1)} m</div>
+              <div class="mini" style="margin-top:6px;"><b>${rating.label}</b></div>
             </div>
           `;
         });
@@ -1754,7 +1815,6 @@ ${waypoints}
     loadKnownSpotsIntoSaved();
     fillSpotPick();
     updateMinSize();
-    clearCatchForm();
     showTab("add");
     initMap();
     renderLog();
@@ -1770,4 +1830,4 @@ ${waypoints}
     }
   </script>
 </body>
-                                                                     </html>
+    </html>
