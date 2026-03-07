@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V64 Stable</title>
+  <title>Tanya Deep Sea V65 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -231,7 +231,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V64 Stable
+    Tanya Deep Sea V65 Stable
   </h1>
 
   <div class="topnav">
@@ -272,10 +272,14 @@
       <input id="minSize" readonly>
       <div id="sizeNote" class="mini">Choose species to load legal size.</div>
 
-      <label>Bait Used</label>
+      <label>Suggested Bait</label>
       <select id="bait">
-        <option value="">Choose bait</option>
+        <option value="">Choose suggested bait</option>
       </select>
+
+      <label>Manual Bait</label>
+      <input id="manualBait" placeholder="Type your own bait here">
+      <div class="mini">Saved catch will use Manual Bait if filled in, otherwise Suggested Bait.</div>
 
       <label>Manual Spot Choice</label>
       <select id="manualSpotPick">
@@ -692,6 +696,7 @@
     const minSizeEl = document.getElementById("minSize");
     const sizeNote = document.getElementById("sizeNote");
     const baitEl = document.getElementById("bait");
+    const manualBaitEl = document.getElementById("manualBait");
     const coordsEl = document.getElementById("coords");
     const placeEl = document.getElementById("place");
     const localAreaEl = document.getElementById("localArea");
@@ -857,7 +862,7 @@
 
     function fillBaitPick(){
       const current = baitEl.value || "";
-      baitEl.innerHTML = `<option value="">Choose bait</option>`;
+      baitEl.innerHTML = `<option value="">Choose suggested bait</option>`;
 
       BAIT_OPTIONS.forEach(bait => {
         const opt = document.createElement("option");
@@ -888,9 +893,7 @@
 
       const allNames = [...new Set([
         ...LOCAL_AREA_PRESETS,
-        ...getAllSpots()
-          .map(s => String(s.name || "").trim())
-          .filter(Boolean)
+        ...getAllSpots().map(s => String(s.name || "").trim()).filter(Boolean)
       ])].sort((a,b) => a.localeCompare(b));
 
       localAreaEl.innerHTML = `<option value="">Choose local area</option>`;
@@ -1203,7 +1206,7 @@
         species: sp,
         length: Number.isFinite(len) ? len : "",
         min: minSizeEl.value,
-        bait: baitEl.value.trim(),
+        bait: (manualBaitEl.value.trim() || baitEl.value.trim()),
         coords: coords,
         place: placeEl.value,
         spotName: spotName,
@@ -1249,6 +1252,7 @@
       lengthEl.value = "";
       minSizeEl.value = "";
       baitEl.value = "";
+      manualBaitEl.value = "";
       coordsEl.value = "";
       placeEl.value = "Deep Sea";
       localAreaEl.value = "";
@@ -1311,6 +1315,7 @@
         baitEl.value = baitText;
       }
 
+      manualBaitEl.value = "";
       updateMinSize();
       showTab("add");
     }
@@ -1392,17 +1397,20 @@
       lengthEl.value = c.length || "";
       minSizeEl.value = c.min || "";
       fillBaitPick();
+
       if(c.bait){
         if(BAIT_OPTIONS.includes(c.bait)){
           baitEl.value = c.bait;
+          manualBaitEl.value = "";
         } else {
-          const opt = document.createElement("option");
-          opt.value = c.bait;
-          opt.textContent = c.bait;
-          baitEl.appendChild(opt);
-          baitEl.value = c.bait;
+          baitEl.value = "";
+          manualBaitEl.value = c.bait;
         }
+      } else {
+        baitEl.value = "";
+        manualBaitEl.value = "";
       }
+
       coordsEl.value = c.coords || "";
       placeEl.value = c.place || "Deep Sea";
       addAreaOptionIfMissing(c.localArea || "");
@@ -2031,7 +2039,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V64",
+          version: "V65",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -2075,7 +2083,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V64" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V65" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
