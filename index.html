@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V49 Stable</title>
+  <title>Tanya Deep Sea V50 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -185,7 +185,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V49 Stable
+    Tanya Deep Sea V50 Stable
   </h1>
 
   <div class="topnav">
@@ -255,7 +255,7 @@
       </div>
 
       <label>Photo</label>
-      <input id="photo" type="file" accept="image/*">
+      <input id="photo" type="file" accept="image/*" capture="environment">
       <div class="mini">Choose from camera or gallery</div>
       <div id="photoPreview"></div>
 
@@ -334,7 +334,7 @@
       <b>Fish Photo Helper</b>
 
       <label>Fish Photo</label>
-      <input type="file" id="fishIdPhoto" accept="image/*">
+      <input type="file" id="fishIdPhoto" accept="image/*" capture="environment">
       <div class="mini">Choose from camera or gallery</div>
       <div id="fishIdPreview"></div>
 
@@ -1415,8 +1415,11 @@
       const item = getFishHelpers().find(x => String(x.id) === String(id));
       if(!item) return;
 
-      species.value = item.species || "";
-      updateMinSize(false);
+      if(item.species){
+        species.value = item.species;
+        minSizeEl.value = MIN_SIZE[item.species] ?? "";
+        checkFishSize();
+      }
 
       if(item.photo){
         photoData = item.photo;
@@ -1434,14 +1437,25 @@
 
     function copyFishToCatch(){
       const sp = document.getElementById("fishIdSpecies").value;
-      if(!sp) return;
 
-      species.value = sp;
-      updateMinSize(false);
+      if(!sp && !fishPhotoData){
+        alert("Choose a species or fish photo first.");
+        return;
+      }
+
+      if(sp){
+        species.value = sp;
+        updateMinSize(false);
+      }
 
       if(fishPhotoData){
         photoData = fishPhotoData;
         photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
+      }
+
+      if(sp){
+        minSizeEl.value = MIN_SIZE[sp] ?? "";
+        checkFishSize();
       }
 
       saveCatchDraft();
@@ -1452,7 +1466,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V49",
+          version: "V50",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1496,7 +1510,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V49" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V50" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1611,4 +1625,4 @@ ${waypoints}
     }
   </script>
 </body>
-          </html>
+  </html>
