@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V51 Stable</title>
+  <title>Tanya Deep Sea V52 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -22,8 +22,6 @@
       --reef:#ffd166;
       --spot:#59d0ff;
       --hot:#ff8c42;
-      --warm:#ffd166;
-      --cool:#59d0ff;
     }
     *{box-sizing:border-box}
     body{
@@ -147,11 +145,6 @@
       font-size:12px;
       margin-top:8px;
     }
-    .warn{
-      color:#ffd166;
-      font-size:12px;
-      margin-top:8px;
-    }
     .top-actions{
       display:flex;
       gap:8px;
@@ -191,13 +184,24 @@
       border-radius:999px;
       background:linear-gradient(90deg,#59d0ff,#ffd166,#ff8c42);
     }
+    .forecastGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(130px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .forecastItem{
+      background:var(--card2);
+      border-radius:12px;
+      padding:10px;
+    }
   </style>
 </head>
 <body>
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V51 Stable
+    Tanya Deep Sea V52 Stable
   </h1>
 
   <div class="topnav">
@@ -207,7 +211,8 @@
     <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
     <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
     <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
-    <button class="navbtn" id="btnWeather" onclick="showTab('weather')">Tide & Moon</button>
+    <button class="navbtn" id="btnWeather" onclick="showTab('weather')">2 Week Weather</button>
+    <button class="navbtn" id="btnMoon" onclick="showTab('moonTab')">Tide & Moon</button>
   </div>
 
   <section id="add">
@@ -238,9 +243,6 @@
 
       <label>Bait Used</label>
       <input id="bait">
-
-      <label>Automatic Nearest Spot</label>
-      <input id="autoSpot" readonly>
 
       <label>Manual Spot Choice</label>
       <select id="manualSpotPick">
@@ -378,6 +380,14 @@
 
   <section id="weather">
     <div class="card">
+      <b>2 Week Weather</b>
+      <div class="mini">Forecast around Stilbaai / your current sea position.</div>
+      <div id="weather14Box" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <section id="moonTab">
+    <div class="card">
       <b>Tide, Moon & Bite</b>
       <div id="weatherBox" style="margin-top:10px;"></div>
     </div>
@@ -389,6 +399,7 @@
     const KEY_SPOTS = "tanya_deepsea_spots";
     const KEY_FISH = "tanya_deepsea_fishhelpers";
     const KEY_DRAFT = "tanya_deepsea_addcatch_draft";
+    const KEY_LAST_WEATHER_COORDS = "tanya_deepsea_weather_coords";
     const BASE = { lat:-34.37, lng:20.85 };
 
     const KNOWN_SPOTS = [
@@ -469,7 +480,6 @@
     const coordsEl = document.getElementById("coords");
     const placeEl = document.getElementById("place");
     const localAreaEl = document.getElementById("localArea");
-    const autoSpotEl = document.getElementById("autoSpot");
     const manualSpotPick = document.getElementById("manualSpotPick");
     const notesEl = document.getElementById("notes");
     const photoEl = document.getElementById("photo");
@@ -524,11 +534,8 @@
     }
 
     function getAllCatches(){
-      try{
-        return JSON.parse(localStorage.getItem(KEY_CATCHES) || "[]");
-      }catch{
-        return [];
-      }
+      try{ return JSON.parse(localStorage.getItem(KEY_CATCHES) || "[]"); }
+      catch{ return []; }
     }
 
     function saveAllCatches(v){
@@ -536,11 +543,8 @@
     }
 
     function getAllSpots(){
-      try{
-        return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]");
-      }catch{
-        return [];
-      }
+      try{ return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }
+      catch{ return []; }
     }
 
     function saveAllSpots(v){
@@ -548,11 +552,8 @@
     }
 
     function getFishHelpers(){
-      try{
-        return JSON.parse(localStorage.getItem(KEY_FISH) || "[]");
-      }catch{
-        return [];
-      }
+      try{ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
+      catch{ return []; }
     }
 
     function saveFishHelpers(v){
@@ -560,11 +561,8 @@
     }
 
     function getCatchDraft(){
-      try{
-        return JSON.parse(localStorage.getItem(KEY_DRAFT) || "{}");
-      }catch{
-        return {};
-      }
+      try{ return JSON.parse(localStorage.getItem(KEY_DRAFT) || "{}"); }
+      catch{ return {}; }
     }
 
     function saveCatchDraft(){
@@ -575,14 +573,13 @@
         coords: coordsEl.value || "",
         place: placeEl.value || "Deep Sea",
         localArea: localAreaEl.value || "",
-        autoSpot: autoSpotEl.value || "",
         manualSpotPick: manualSpotPick.value || "",
         notes: notesEl.value || "",
         photo: photoData || ""
       };
       localStorage.setItem(KEY_DRAFT, JSON.stringify(draft));
       draftMsg.textContent = "Draft saved.";
-      clearDraftMsgSoon();
+      setTimeout(() => draftMsg.textContent = "", 1200);
     }
 
     function loadCatchDraft(){
@@ -596,17 +593,11 @@
       coordsEl.value = d.coords || "";
       placeEl.value = d.place || "Deep Sea";
       localAreaEl.value = d.localArea || "";
-      autoSpotEl.value = d.autoSpot || "";
       manualSpotPick.value = d.manualSpotPick || "";
       notesEl.value = d.notes || "";
       photoData = d.photo || "";
 
-      if(photoData){
-        photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
-      } else {
-        photoPreview.innerHTML = "";
-      }
-
+      photoPreview.innerHTML = photoData ? `<img class="photo" src="${photoData}" alt="photo">` : "";
       checkFishSize();
     }
 
@@ -615,17 +606,9 @@
       draftMsg.textContent = "";
     }
 
-    function clearDraftMsgSoon(){
-      setTimeout(() => {
-        draftMsg.textContent = "";
-      }, 1200);
-    }
-
     function clearLayers(arr){
       if(!map) return;
-      arr.forEach(m => {
-        try { map.removeLayer(m); } catch {}
-      });
+      arr.forEach(m => { try{ map.removeLayer(m); }catch{} });
       arr.length = 0;
     }
 
@@ -640,15 +623,7 @@
     function loadKnownSpotsIntoSaved(){
       const existing = getAllSpots();
       const customOnly = existing.filter(s => !isPresetSpot(s));
-
-      const presets = KNOWN_SPOTS.map(k => ({
-        id: k.id,
-        name: k.name,
-        type: k.type,
-        coords: k.coords,
-        preset: true
-      }));
-
+      const presets = KNOWN_SPOTS.map(k => ({ ...k, preset:true }));
       saveAllSpots([...customOnly, ...presets]);
     }
 
@@ -695,7 +670,8 @@
         log:"btnLog",
         stats:"btnStats",
         fishid:"btnFish",
-        weather:"btnWeather"
+        weather:"btnWeather",
+        moonTab:"btnMoon"
       };
       const btn = document.getElementById(mapIds[id]);
       if(btn) btn.classList.add("active");
@@ -710,25 +686,12 @@
         }, 200);
       }
 
-      if(id === "spots"){
-        renderSpots();
-      }
-
-      if(id === "log"){
-        renderLog();
-      }
-
-      if(id === "stats"){
-        renderStats();
-      }
-
-      if(id === "fishid"){
-        renderFishHelpers();
-      }
-
-      if(id === "weather"){
-        renderWeatherPanel();
-      }
+      if(id === "spots") renderSpots();
+      if(id === "log") renderLog();
+      if(id === "stats") renderStats();
+      if(id === "fishid") renderFishHelpers();
+      if(id === "weather") render14DayWeather();
+      if(id === "moonTab") renderWeatherPanel();
     }
 
     function updateMinSize(doSave = true){
@@ -769,7 +732,6 @@
       checkFishSize();
       saveCatchDraft();
     });
-
     baitEl.addEventListener("input", saveCatchDraft);
     localAreaEl.addEventListener("input", saveCatchDraft);
     notesEl.addEventListener("input", saveCatchDraft);
@@ -799,11 +761,10 @@
 
     function fillSpotPick(){
       const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-      const s = document.getElementById("manualSpotPick");
-      s.innerHTML = `<option value="">Choose spot manually</option>`;
+      manualSpotPick.innerHTML = `<option value="">Choose spot manually</option>`;
       spots.forEach(sp => {
         const mark = isPresetSpot(sp) ? " [Preset]" : " [Custom]";
-        s.innerHTML += `<option value="${safe(sp.coords)}">${safe(sp.name + mark)}</option>`;
+        manualSpotPick.innerHTML += `<option value="${safe(sp.coords)}">${safe(sp.name + mark)}</option>`;
       });
     }
 
@@ -816,12 +777,24 @@
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
         placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
-        autoSpotEl.value = s.name;
         if(!localAreaEl.value) localAreaEl.value = s.name;
       }
 
       saveCatchDraft();
     });
+
+    function saveWeatherCoords(lat, lng){
+      localStorage.setItem(KEY_LAST_WEATHER_COORDS, JSON.stringify({lat, lng}));
+    }
+
+    function getWeatherCoords(){
+      try{
+        const saved = JSON.parse(localStorage.getItem(KEY_LAST_WEATHER_COORDS) || "null");
+        if(saved && Number.isFinite(saved.lat) && Number.isFinite(saved.lng)) return saved;
+      }catch{}
+      const coords = parseCoords(coordsEl.value);
+      return coords || BASE;
+    }
 
     async function estimateCurrentStrength(lat, lon){
       try{
@@ -864,6 +837,8 @@
         const lng = pos.coords.longitude;
 
         coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
+        placeEl.value = "Deep Sea";
+        saveWeatherCoords(lat, lng);
 
         if(map){
           if(myBoatMarker) map.removeLayer(myBoatMarker);
@@ -874,17 +849,7 @@
 
         await estimateCurrentStrength(lat, lng);
         renderWeatherPanel();
-
-        const nearest = getNearestSpot(lat, lng);
-        if(nearest){
-          autoSpotEl.value = nearest.name;
-          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
-          if(!localAreaEl.value) localAreaEl.value = nearest.name;
-        } else {
-          autoSpotEl.value = "";
-          placeEl.value = "Deep Sea";
-        }
-
+        render14DayWeather();
         saveCatchDraft();
       }, () => {
         alert("Could not get GPS location");
@@ -892,24 +857,6 @@
         enableHighAccuracy:true,
         timeout:10000
       });
-    }
-
-    function getNearestSpot(lat, lng){
-      const spots = getAllSpots();
-      let best = null;
-      let bestDist = Infinity;
-
-      spots.forEach(s => {
-        const p = parseCoords(s.coords);
-        if(!p) return;
-        const d = Math.hypot(lat - p.lat, lng - p.lng);
-        if(d < bestDist){
-          bestDist = d;
-          best = s;
-        }
-      });
-
-      return bestDist < 0.05 ? best : null;
     }
 
     function saveCatch(){
@@ -974,7 +921,6 @@
       photoEl.value = "";
       photoData = "";
       photoPreview.innerHTML = "";
-      autoSpotEl.value = "";
       manualSpotPick.value = "";
       chipWind.textContent = "Wind: —";
       chipSwell.textContent = "Swell: —";
@@ -1026,6 +972,7 @@
       }
 
       coordsEl.value = coordStr;
+      saveWeatherCoords(p.lat, p.lng);
       saveCatchDraft();
       showTab("mapTab");
 
@@ -1058,6 +1005,9 @@
       notesEl.value = c.notes || "";
       photoData = c.photo || "";
       photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
+
+      const p = parseCoords(c.coords);
+      if(p) saveWeatherCoords(p.lat, p.lng);
 
       saveAllCatches(list.filter(x => String(x.id) !== String(id)));
       saveCatchDraft();
@@ -1137,20 +1087,12 @@
         const lng = e.latlng.lng.toFixed(6);
 
         coordsEl.value = lat + "," + lng;
+        placeEl.value = "Deep Sea";
+        saveWeatherCoords(Number(lat), Number(lng));
 
         if(tempClickMarker) map.removeLayer(tempClickMarker);
         tempClickMarker = L.marker([lat, lng]).addTo(map);
         map.setView([lat, lng], 15);
-
-        const nearest = getNearestSpot(Number(lat), Number(lng));
-        if(nearest){
-          autoSpotEl.value = nearest.name;
-          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
-          if(!localAreaEl.value) localAreaEl.value = nearest.name;
-        } else {
-          autoSpotEl.value = "";
-          placeEl.value = "Deep Sea";
-        }
 
         saveCatchDraft();
       });
@@ -1355,9 +1297,12 @@
     function useSpotCoords(coordStr, name, type){
       coordsEl.value = coordStr;
       placeEl.value = `Deep Sea • ${type} • ${name}`;
-      autoSpotEl.value = name;
       manualSpotPick.value = coordStr;
       if(!localAreaEl.value) localAreaEl.value = name;
+
+      const p = parseCoords(coordStr);
+      if(p) saveWeatherCoords(p.lat, p.lng);
+
       saveCatchDraft();
       showTab("add");
     }
@@ -1542,7 +1487,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V51",
+          version: "V52",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1586,7 +1531,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V51" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V52" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1616,9 +1561,7 @@ ${waypoints}
         try{
           const data = JSON.parse(reader.result);
 
-          if(!data || typeof data !== "object"){
-            throw new Error("Invalid backup");
-          }
+          if(!data || typeof data !== "object") throw new Error("Invalid backup");
 
           if(Array.isArray(data.catches)) saveAllCatches(data.catches);
 
@@ -1645,6 +1588,7 @@ ${waypoints}
           renderMap();
           renderFishHelpers();
           renderWeatherPanel();
+          render14DayWeather();
 
           backupMsg.textContent = "Backup imported.";
           setTimeout(() => backupMsg.textContent = "", 2500);
@@ -1668,7 +1612,6 @@ ${waypoints}
 
     function getMoonPhaseName(date = new Date()){
       const p = getMoonPhaseFraction(date);
-
       if (p < 0.03 || p > 0.97) return "New Moon";
       if (p < 0.22) return "Waxing Crescent";
       if (p < 0.28) return "First Quarter";
@@ -1696,7 +1639,6 @@ ${waypoints}
 
     function getBitePrediction(){
       const moonBoost = getMoonBoost(new Date());
-
       const wind = getChipNumber(chipWind.textContent);
       const swell = getChipNumber(chipSwell.textContent);
       const current = getChipNumber(chipCurrent.textContent);
@@ -1737,10 +1679,6 @@ ${waypoints}
 
       const moon = getMoonPhaseName(new Date());
       const bite = getBitePrediction();
-
-      let tideText = "Tide API not connected yet";
-      let tideHint = "Moon and bite prediction are working already";
-
       const hour = new Date().getHours();
       const simpleTideState = (hour % 12) < 6 ? "Rising" : "Falling";
 
@@ -1763,10 +1701,76 @@ ${waypoints}
         <div class="card">
           <b>Tide</b>
           <div class="mini" style="margin-top:8px;">State: ${simpleTideState}</div>
-          <div class="mini">${tideText}</div>
-          <div class="mini" style="margin-top:8px;">${tideHint}</div>
+          <div class="mini">Tide API not connected yet.</div>
+          <div class="mini" style="margin-top:8px;">Moon and bite prediction are working already.</div>
         </div>
       `;
+    }
+
+    function weatherCodeText(code){
+      const map = {
+        0:"Clear",
+        1:"Mostly Clear",
+        2:"Partly Cloudy",
+        3:"Cloudy",
+        45:"Fog",
+        48:"Fog",
+        51:"Light Drizzle",
+        53:"Drizzle",
+        55:"Heavy Drizzle",
+        61:"Light Rain",
+        63:"Rain",
+        65:"Heavy Rain",
+        71:"Snow",
+        80:"Rain Showers",
+        81:"Rain Showers",
+        82:"Heavy Showers",
+        95:"Thunderstorm"
+      };
+      return map[code] || "Mixed";
+    }
+
+    async function render14DayWeather(){
+      const box = document.getElementById("weather14Box");
+      if(!box) return;
+
+      const c = getWeatherCoords();
+      box.innerHTML = `<div class="mini">Loading weather…</div>`;
+
+      try{
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${c.lat}&longitude=${c.lng}&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,wind_speed_10m_max&forecast_days=14&timezone=Africa%2FJohannesburg`;
+        const r = await fetch(url);
+        const data = await r.json();
+
+        const d = data?.daily;
+        if(!d?.time?.length){
+          box.innerHTML = `<div class="mini">Could not load weather.</div>`;
+          return;
+        }
+
+        let html = `<div class="mini">Forecast for ${c.lat.toFixed(3)}, ${c.lng.toFixed(3)}</div>`;
+        html += `<div class="forecastGrid">`;
+
+        d.time.forEach((day, i) => {
+          const dt = new Date(day);
+          const label = dt.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+          html += `
+            <div class="forecastItem">
+              <b>${label}</b>
+              <div class="mini" style="margin-top:6px;">${weatherCodeText(d.weather_code[i])}</div>
+              <div class="mini">Max: ${Math.round(d.temperature_2m_max[i])}°C</div>
+              <div class="mini">Min: ${Math.round(d.temperature_2m_min[i])}°C</div>
+              <div class="mini">Rain: ${Math.round(d.precipitation_probability_max[i] ?? 0)}%</div>
+              <div class="mini">Wind: ${Math.round(d.wind_speed_10m_max[i] ?? 0)} km/h</div>
+            </div>
+          `;
+        });
+
+        html += `</div>`;
+        box.innerHTML = html;
+      }catch{
+        box.innerHTML = `<div class="mini">Could not load 2 week weather.</div>`;
+      }
     }
 
     function resetAll(){
@@ -1785,6 +1789,7 @@ ${waypoints}
       fillSpotPick();
       clearCatchForm();
       renderWeatherPanel();
+      render14DayWeather();
     }
 
     loadKnownSpotsIntoSaved();
@@ -1797,6 +1802,7 @@ ${waypoints}
     renderSpots();
     renderStats();
     renderWeatherPanel();
+    render14DayWeather();
   </script>
 
   <script>
