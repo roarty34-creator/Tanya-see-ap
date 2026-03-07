@@ -1,7 +1,7 @@
 {
-  "name": "Tanya Deep Sea V45 Stable",
+  "name": "Tanya Deep Sea V50 Stable",
   "short_name": "Tanya Fish",
-  "start_url": "./?v=45",
+  "start_url": "./?v=50",
   "scope": "./",
   "display": "standalone",
   "background_color": "#061225",
