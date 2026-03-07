@@ -195,6 +195,7 @@
     <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
     <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
     <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
+    <button class="navbtn" id="btnWeather" onclick="showTab('weather')">Tide & Moon</button>
   </div>
 
   <section id="add">
@@ -269,6 +270,12 @@
 
       <div id="draftMsg" class="success"></div>
     </div>
+  </section>
+  <section id="weather">
+  <div class="card">
+    <b>Tide, Moon & Bite</b>
+    <div id="weatherBox" style="margin-top:10px;"></div>
+  </div>
   </section>
 
   <section id="mapTab">
@@ -364,6 +371,103 @@
   </section>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  function getMoonPhaseFraction(date = new Date()){
+  const lp = 2551443;
+  const newMoon = new Date('2001-01-24T13:08:00Z').getTime();
+  const phase = (((date.getTime() - newMoon) / 1000) % lp) / lp;
+  return (phase + 1) % 1;
+}
+
+function getMoonPhaseName(date = new Date()){
+  const p = getMoonPhaseFraction(date);
+
+  if (p < 0.03 || p > 0.97) return "New Moon";
+  if (p < 0.22) return "Waxing Crescent";
+  if (p < 0.28) return "First Quarter";
+  if (p < 0.47) return "Waxing Gibbous";
+  if (p < 0.53) return "Full Moon";
+  if (p < 0.72) return "Waning Gibbous";
+  if (p < 0.78) return "Last Quarter";
+  return "Waning Crescent";
+}
+
+function getMoonBoost(date = new Date()){
+  const p = getMoonPhaseFraction(date);
+  const distNew = Math.min(Math.abs(p - 0), Math.abs(p - 1));
+  const distFull = Math.abs(p - 0.5);
+
+  if(distNew < 0.06 || distFull < 0.06) return 20;
+  if(distNew < 0.12 || distFull < 0.12) return 12;
+  return 4;
+}
+
+function getBitePrediction(){
+  const moonBoost = getMoonBoost(new Date());
+
+  const windText = chipWind.textContent || "";
+  const swellText = chipSwell.textContent || "";
+  const currentText = chipCurrent.textContent || "";
+
+  const wind = Number((windText.match(/([\d.]+)/) || [0,0])[1]);
+  const swell = Number((swellText.match(/([\d.]+)/) || [0,0])[1]);
+  const current = Number((currentText.match(/([\d.]+)/) || [0,0])[1]);
+
+  let score = 50 + moonBoost;
+
+  if(wind > 0){
+    if(wind <= 15) score += 10;
+    else if(wind <= 25) score += 4;
+    else score -= 10;
+  }
+
+  if(swell > 0){
+    if(swell <= 1.8) score += 8;
+    else if(swell <= 2.5) score += 2;
+    else score -= 8;
+  }
+
+  if(current > 0){
+    if(current <= 0.9) score += 8;
+    else if(current <= 1.5) score += 2;
+    else score -= 7;
+  }
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  let label = "Fair";
+  if(score >= 80) label = "Excellent";
+  else if(score >= 65) label = "Good";
+  else if(score >= 45) label = "Fair";
+  else label = "Slow";
+
+  return { score, label };
+}
+
+function renderWeatherPanel(){
+  const box = document.getElementById("weatherBox");
+  const moon = getMoonPhaseName(new Date());
+  const bite = getBitePrediction();
+
+  box.innerHTML = `
+    <div class="card">
+      <b>Moon Phase</b>
+      <div class="mini" style="margin-top:8px;">${moon}</div>
+    </div>
+
+    <div class="card">
+      <b>Bite Prediction</b>
+      <div class="mini" style="margin-top:8px;">Score: ${bite.score}/100</div>
+      <div class="mini">Condition: ${bite.label}</div>
+      <div class="mini" style="margin-top:8px;">Based on moon phase + current wind + swell + current estimate.</div>
+    </div>
+
+    <div class="card">
+      <b>Tide</b>
+      <div class="mini">Ready for API hookup.</div>
+      <div class="mini">For exact high/low tide times, add a tide API key later.</div>
+    </div>
+  `;
+}
   <script>
     const KEY_CATCHES = "tanya_deepsea_catches";
     const KEY_SPOTS = "tanya_deepsea_spots";
@@ -371,23 +475,63 @@
     const KEY_DRAFT = "tanya_deepsea_addcatch_draft";
     const BASE = { lat:-34.37, lng:20.85 };
 
-    const KNOWN_SPOTS = [
-      { id:"s1",  name:"Stilbaai Rif",       type:"Reef", coords:"-34.390500,20.860200", preset:true },
-      { id:"s2",  name:"Blinde Rif",         type:"Reef", coords:"-34.401500,20.880100", preset:true },
-      { id:"s3",  name:"Kabeljou Ridge",     type:"Reef", coords:"-34.375000,20.870000", preset:true },
-      { id:"s4",  name:"Roman Bank",         type:"Reef", coords:"-34.410000,20.872000", preset:true },
-      { id:"s5",  name:"Die Gat",            type:"Reef", coords:"-34.395500,20.845000", preset:true },
-      { id:"s6",  name:"Skulpbank",          type:"Reef", coords:"-34.412000,20.835000", preset:true },
-      { id:"s7",  name:"South Deep",         type:"Reef", coords:"-34.430000,20.880000", preset:true },
-      { id:"s8",  name:"Kob Line",           type:"Reef", coords:"-34.388000,20.875000", preset:true },
-      { id:"s9",  name:"West Reef",          type:"Reef", coords:"-34.415000,20.845000", preset:true },
-      { id:"s10", name:"Outer Bank",         type:"Reef", coords:"-34.430500,20.835500", preset:true },
-      { id:"s11", name:"Middle Reef",        type:"Reef", coords:"-34.392500,20.870500", preset:true },
-      { id:"s12", name:"North Bank",         type:"Reef", coords:"-34.370000,20.860000", preset:true },
-      { id:"s13", name:"East Drift",         type:"Reef", coords:"-34.398000,20.885000", preset:true },
-      { id:"s14", name:"Far North",          type:"Reef", coords:"-34.360000,20.880000", preset:true },
-      { id:"s15", name:"Southwest Deep",     type:"Reef", coords:"-34.430500,20.835500", preset:true }
-    ];
+  const KNOWN_SPOTS = [
+  { id:"s1", name:"Stilbaai Rif", type:"Reef", coords:"-34.390500,20.860200", preset:true },
+  { id:"s2", name:"Blinde Rif", type:"Reef", coords:"-34.401500,20.880100", preset:true },
+  { id:"s3", name:"Kabeljou Ridge", type:"Reef", coords:"-34.375000,20.870000", preset:true },
+  { id:"s4", name:"Roman Bank", type:"Reef", coords:"-34.410000,20.872000", preset:true },
+  { id:"s5", name:"Die Gat", type:"Reef", coords:"-34.395500,20.845000", preset:true },
+  { id:"s6", name:"Skulpbank", type:"Reef", coords:"-34.412000,20.835000", preset:true },
+  { id:"s7", name:"South Deep", type:"Reef", coords:"-34.430000,20.880000", preset:true },
+  { id:"s8", name:"Kob Line", type:"Reef", coords:"-34.388000,20.875000", preset:true },
+  { id:"s9", name:"West Reef", type:"Reef", coords:"-34.415000,20.845000", preset:true },
+  { id:"s10", name:"Outer Bank", type:"Reef", coords:"-34.430500,20.835500", preset:true },
+  { id:"s11", name:"Middle Reef", type:"Reef", coords:"-34.392500,20.870500", preset:true },
+  { id:"s12", name:"North Bank", type:"Reef", coords:"-34.370000,20.860000", preset:true },
+  { id:"s13", name:"East Drift", type:"Reef", coords:"-34.398000,20.885000", preset:true },
+  { id:"s14", name:"Far North", type:"Reef", coords:"-34.360000,20.880000", preset:true },
+  { id:"s15", name:"Southwest Deep", type:"Reef", coords:"-34.430500,20.835500", preset:true },
+
+  { id:"s16", name:"Kob Kop", type:"Reef", coords:"-34.384200,20.866800", preset:true },
+  { id:"s17", name:"Kob Kop East", type:"Reef", coords:"-34.383100,20.872600", preset:true },
+  { id:"s18", name:"Rooibank", type:"Reef", coords:"-34.399800,20.852400", preset:true },
+  { id:"s19", name:"Rooibank South", type:"Reef", coords:"-34.406500,20.853900", preset:true },
+  { id:"s20", name:"Stomp Rif", type:"Reef", coords:"-34.389600,20.848800", preset:true },
+  { id:"s21", name:"Stomp Rif East", type:"Reef", coords:"-34.389200,20.856200", preset:true },
+  { id:"s22", name:"Outer Skulpbank", type:"Reef", coords:"-34.418700,20.828600", preset:true },
+  { id:"s23", name:"Skulpbank Noord", type:"Reef", coords:"-34.407900,20.832700", preset:true },
+  { id:"s24", name:"Roman Lip", type:"Reef", coords:"-34.412900,20.876400", preset:true },
+  { id:"s25", name:"Roman South Lip", type:"Reef", coords:"-34.417600,20.873500", preset:true },
+
+  { id:"s26", name:"Blinde Rif Noord", type:"Reef", coords:"-34.396100,20.878800", preset:true },
+  { id:"s27", name:"Blinde Rif Suid", type:"Reef", coords:"-34.406300,20.882900", preset:true },
+  { id:"s28", name:"Die Gat West", type:"Reef", coords:"-34.394000,20.839900", preset:true },
+  { id:"s29", name:"Die Gat East", type:"Reef", coords:"-34.395900,20.849300", preset:true },
+  { id:"s30", name:"Sand-Klip Lyn", type:"Spot", coords:"-34.387700,20.862300", preset:true },
+  { id:"s31", name:"Kabeljou Plaat", type:"Reef", coords:"-34.379600,20.864100", preset:true },
+  { id:"s32", name:"Kabeljou Plaat Suid", type:"Reef", coords:"-34.384900,20.868000", preset:true },
+  { id:"s33", name:"Vlak Rif", type:"Reef", coords:"-34.376800,20.855300", preset:true },
+  { id:"s34", name:"Vlak Rif East", type:"Reef", coords:"-34.377900,20.861600", preset:true },
+  { id:"s35", name:"Buffel Drift", type:"Spot", coords:"-34.402700,20.867800", preset:true },
+
+  { id:"s36", name:"Buffel Deep", type:"Reef", coords:"-34.409900,20.868600", preset:true },
+  { id:"s37", name:"Outer Kob Drift", type:"Spot", coords:"-34.391800,20.879500", preset:true },
+  { id:"s38", name:"Tail Bank", type:"Reef", coords:"-34.421800,20.861200", preset:true },
+  { id:"s39", name:"Tail Bank East", type:"Reef", coords:"-34.420200,20.870100", preset:true },
+  { id:"s40", name:"South Tail", type:"Reef", coords:"-34.428700,20.865400", preset:true },
+  { id:"s41", name:"North Tail", type:"Reef", coords:"-34.372400,20.872300", preset:true },
+  { id:"s42", name:"North Tail East", type:"Reef", coords:"-34.369300,20.878100", preset:true },
+  { id:"s43", name:"Verby Die Gat", type:"Reef", coords:"-34.398800,20.836100", preset:true },
+  { id:"s44", name:"Verby Die Gat Suid", type:"Reef", coords:"-34.404900,20.838700", preset:true },
+  { id:"s45", name:"West Klippe", type:"Reef", coords:"-34.410800,20.840600", preset:true },
+
+  { id:"s46", name:"Stilbaai Deep Line", type:"Spot", coords:"-34.425300,20.848200", preset:true },
+  { id:"s47", name:"Roman Drift", type:"Spot", coords:"-34.414800,20.879100", preset:true },
+  { id:"s48", name:"Die Lang Lyn", type:"Reef", coords:"-34.386000,20.882700", preset:true },
+  { id:"s49", name:"Die Lang Lyn Suid", type:"Reef", coords:"-34.392600,20.884500", preset:true },
+  { id:"s50", name:"Boesman Bank", type:"Reef", coords:"-34.423900,20.832000", preset:true }
+];
+    
 
     const MIN_SIZE = {
       "Cape Kob":60,
@@ -778,49 +922,48 @@
         chipTemp.textContent = "Sea Temp: —";
         chipCurrent.textContent = "Current: —";
       }
-    }
 
     async function getGPS(){
-      if(!navigator.geolocation){
-        alert("GPS not supported on this device");
-        return;
-      }
+  if(!navigator.geolocation){
+    alert("GPS not supported on this device");
+    return;
+  }
 
-      navigator.geolocation.getCurrentPosition(async pos => {
-        const lat = pos.coords.latitude;
-        const lng = pos.coords.longitude;
+  navigator.geolocation.getCurrentPosition(async pos => {
+    const lat = pos.coords.latitude;
+    const lng = pos.coords.longitude;
 
-        coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
+    coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
 
-        if(map){
-          if(myBoatMarker) map.removeLayer(myBoatMarker);
-          myBoatMarker = L.marker([lat,lng]).addTo(map);
-          myBoatMarker.bindPopup("Your Boat").openPopup();
-          map.setView([lat,lng],13);
-        }
-
-        await estimateCurrentStrength(lat, lng);
-
-        const nearest = getNearestSpot(lat, lng);
-        if(nearest){
-          autoSpotEl.value = nearest.name;
-          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
-          if(!localAreaEl.value) localAreaEl.value = nearest.name;
-        } else {
-          autoSpotEl.value = "";
-          placeEl.value = "Deep Sea";
-        }
-
-        saveCatchDraft();
-      }, () => {
-        alert("Could not get GPS location");
-      }, {
-        enableHighAccuracy:true,
-        timeout:10000
-      });
+    if(map){
+      if(myBoatMarker) map.removeLayer(myBoatMarker);
+      myBoatMarker = L.marker([lat,lng]).addTo(map);
+      myBoatMarker.bindPopup("Your Boat").openPopup();
+      map.setView([lat,lng],13);
     }
 
-    function getNearestSpot(lat, lng){
+    await estimateCurrentStrength(lat, lng);
+    renderWeatherPanel();
+
+    const nearest = getNearestSpot(lat, lng);
+    if(nearest){
+      autoSpotEl.value = nearest.name;
+      placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+      if(!localAreaEl.value) localAreaEl.value = nearest.name;
+    } else {
+      autoSpotEl.value = "";
+      placeEl.value = "Deep Sea";
+    }
+
+    saveCatchDraft();
+  }, () => {
+    alert("Could not get GPS location");
+  }, {
+    enableHighAccuracy:true,
+    timeout:10000
+  });
+    }
+ function getNearestSpot(lat, lng){
       const spots = getAllSpots();
       let best = null;
       let bestDist = Infinity;
