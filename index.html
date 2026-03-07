@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V47 Stable</title>
+  <title>Tanya Deep Sea V49 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -21,6 +21,9 @@
       --ok:#39d98a;
       --reef:#ffd166;
       --spot:#59d0ff;
+      --hot:#ff8c42;
+      --warm:#ffd166;
+      --cool:#59d0ff;
     }
     *{box-sizing:border-box}
     body{
@@ -99,6 +102,11 @@
       background:var(--danger);
       color:#fff;
     }
+    button.locked{
+      background:#243454;
+      color:#9fb0d0;
+      cursor:not-allowed;
+    }
     .row{
       display:flex;
       gap:10px;
@@ -134,17 +142,6 @@
       border-radius:12px;
       margin-top:10px;
     }
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-      font-size:12px;
-    }
-    th,td{
-      padding:8px;
-      border-bottom:1px solid rgba(255,255,255,.08);
-      text-align:left;
-    }
     .success{
       color:var(--ok);
       font-size:12px;
@@ -155,13 +152,40 @@
       font-size:12px;
       margin-top:8px;
     }
+    .top-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:11px;
+      margin:6px 6px 0 0;
+      background:#10213f;
+      color:#dfe9ff;
+    }
+    .tag.preset{
+      background:#3d3416;
+      color:#ffd166;
+    }
+    .tag.custom{
+      background:#12324a;
+      color:#59d0ff;
+    }
+    .tag.hot{
+      background:#4a2418;
+      color:#ffb084;
+    }
   </style>
 </head>
 <body>
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V47 Stable
+    Tanya Deep Sea V49 Stable
   </h1>
 
   <div class="topnav">
@@ -242,6 +266,8 @@
         <button id="saveCatchBtn" style="font-size:16px;padding:14px;" onclick="saveCatch()">SAVE CATCH</button>
         <button class="dark" onclick="clearCatchForm()">Clear</button>
       </div>
+
+      <div id="draftMsg" class="success"></div>
     </div>
   </section>
 
@@ -255,6 +281,9 @@
       <div class="mini" style="margin-top:8px;">
         Tap the map to choose coordinates. Use Save Current Spot only if you want to save it.
       </div>
+      <div class="mini" style="margin-top:8px;">
+        Spot colors: blue/yellow normal • orange = more catches logged there.
+      </div>
     </div>
     <div id="map"></div>
   </section>
@@ -265,7 +294,19 @@
         <div><b>Saved Spots</b></div>
         <button onclick="saveSpotFromCoords()">Save Current Spot</button>
       </div>
-      <div class="mini">Original local names loaded for main reef areas.</div>
+
+      <label>Search Saved Spots</label>
+      <input id="spotSearch" placeholder="Search by name, type or coords">
+
+      <div class="top-actions">
+        <button class="dark" onclick="exportBackup()">Export Backup JSON</button>
+        <button class="dark" onclick="document.getElementById('importBackup').click()">Import Backup JSON</button>
+        <button class="dark" onclick="exportGPX()">Export GPX</button>
+        <input id="importBackup" type="file" accept=".json,application/json" style="display:none">
+      </div>
+
+      <div class="mini" style="margin-top:10px;">Preset spots are locked. Custom spots can be edited or deleted.</div>
+      <div id="backupMsg" class="success"></div>
     </div>
     <div id="spotsList"></div>
   </section>
@@ -327,24 +368,25 @@
     const KEY_CATCHES = "tanya_deepsea_catches";
     const KEY_SPOTS = "tanya_deepsea_spots";
     const KEY_FISH = "tanya_deepsea_fishhelpers";
+    const KEY_DRAFT = "tanya_deepsea_addcatch_draft";
     const BASE = { lat:-34.37, lng:20.85 };
 
     const KNOWN_SPOTS = [
-      { id:"s1",  name:"Stilbaai Rif",       type:"Reef", coords:"-34.390500,20.860200" },
-      { id:"s2",  name:"Blinde Rif",         type:"Reef", coords:"-34.401500,20.880100" },
-      { id:"s3",  name:"Kabeljou Ridge",     type:"Reef", coords:"-34.375000,20.870000" },
-      { id:"s4",  name:"Roman Bank",         type:"Reef", coords:"-34.410000,20.872000" },
-      { id:"s5",  name:"Die Gat",            type:"Reef", coords:"-34.395500,20.845000" },
-      { id:"s6",  name:"Skulpbank",          type:"Reef", coords:"-34.412000,20.835000" },
-      { id:"s7",  name:"South Deep",         type:"Reef", coords:"-34.430000,20.880000" },
-      { id:"s8",  name:"Kob Line",           type:"Reef", coords:"-34.388000,20.875000" },
-      { id:"s9",  name:"West Reef",          type:"Reef", coords:"-34.415000,20.845000" },
-      { id:"s10", name:"Outer Bank",         type:"Reef", coords:"-34.430500,20.835500" },
-      { id:"s11", name:"Middle Reef",        type:"Reef", coords:"-34.392500,20.870500" },
-      { id:"s12", name:"North Bank",         type:"Reef", coords:"-34.370000,20.860000" },
-      { id:"s13", name:"East Drift",         type:"Reef", coords:"-34.398000,20.885000" },
-      { id:"s14", name:"Far North",          type:"Reef", coords:"-34.360000,20.880000" },
-      { id:"s15", name:"Southwest Deep",     type:"Reef", coords:"-34.430500,20.835500" }
+      { id:"s1",  name:"Stilbaai Rif",       type:"Reef", coords:"-34.390500,20.860200", preset:true },
+      { id:"s2",  name:"Blinde Rif",         type:"Reef", coords:"-34.401500,20.880100", preset:true },
+      { id:"s3",  name:"Kabeljou Ridge",     type:"Reef", coords:"-34.375000,20.870000", preset:true },
+      { id:"s4",  name:"Roman Bank",         type:"Reef", coords:"-34.410000,20.872000", preset:true },
+      { id:"s5",  name:"Die Gat",            type:"Reef", coords:"-34.395500,20.845000", preset:true },
+      { id:"s6",  name:"Skulpbank",          type:"Reef", coords:"-34.412000,20.835000", preset:true },
+      { id:"s7",  name:"South Deep",         type:"Reef", coords:"-34.430000,20.880000", preset:true },
+      { id:"s8",  name:"Kob Line",           type:"Reef", coords:"-34.388000,20.875000", preset:true },
+      { id:"s9",  name:"West Reef",          type:"Reef", coords:"-34.415000,20.845000", preset:true },
+      { id:"s10", name:"Outer Bank",         type:"Reef", coords:"-34.430500,20.835500", preset:true },
+      { id:"s11", name:"Middle Reef",        type:"Reef", coords:"-34.392500,20.870500", preset:true },
+      { id:"s12", name:"North Bank",         type:"Reef", coords:"-34.370000,20.860000", preset:true },
+      { id:"s13", name:"East Drift",         type:"Reef", coords:"-34.398000,20.885000", preset:true },
+      { id:"s14", name:"Far North",          type:"Reef", coords:"-34.360000,20.880000", preset:true },
+      { id:"s15", name:"Southwest Deep",     type:"Reef", coords:"-34.430500,20.835500", preset:true }
     ];
 
     const MIN_SIZE = {
@@ -378,6 +420,10 @@
     const chipTemp = document.getElementById("chipTemp");
     const chipCurrent = document.getElementById("chipCurrent");
     const fishHelperMsg = document.getElementById("fishHelperMsg");
+    const draftMsg = document.getElementById("draftMsg");
+    const backupMsg = document.getElementById("backupMsg");
+    const spotSearchEl = document.getElementById("spotSearch");
+    const importBackupEl = document.getElementById("importBackup");
 
     let photoData = "";
     let fishPhotoData = "";
@@ -445,6 +491,68 @@
       localStorage.setItem(KEY_FISH, JSON.stringify(v));
     }
 
+    function getCatchDraft(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY_DRAFT) || "{}");
+      }catch{
+        return {};
+      }
+    }
+
+    function saveCatchDraft(){
+      const draft = {
+        species: species.value || "",
+        length: lengthEl.value || "",
+        bait: baitEl.value || "",
+        coords: coordsEl.value || "",
+        place: placeEl.value || "Deep Sea",
+        localArea: localAreaEl.value || "",
+        autoSpot: autoSpotEl.value || "",
+        manualSpotPick: manualSpotPick.value || "",
+        notes: notesEl.value || "",
+        photo: photoData || ""
+      };
+      localStorage.setItem(KEY_DRAFT, JSON.stringify(draft));
+      draftMsg.textContent = "Draft saved.";
+      clearDraftMsgSoon();
+    }
+
+    function loadCatchDraft(){
+      const d = getCatchDraft();
+      if(!d || typeof d !== "object") return;
+
+      species.value = d.species || "";
+      updateMinSize(false);
+      lengthEl.value = d.length || "";
+      baitEl.value = d.bait || "";
+      coordsEl.value = d.coords || "";
+      placeEl.value = d.place || "Deep Sea";
+      localAreaEl.value = d.localArea || "";
+      autoSpotEl.value = d.autoSpot || "";
+      manualSpotPick.value = d.manualSpotPick || "";
+      notesEl.value = d.notes || "";
+      photoData = d.photo || "";
+
+      if(photoData){
+        photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
+      } else {
+        photoPreview.innerHTML = "";
+      }
+
+      checkFishSize();
+    }
+
+    function clearCatchDraft(){
+      localStorage.removeItem(KEY_DRAFT);
+      draftMsg.textContent = "";
+    }
+
+    function clearDraftMsgSoon(){
+      setTimeout(() => {
+        draftMsg.textContent = "";
+      }, 1200);
+    }
+
     function clearLayers(arr){
       if(!map) return;
       arr.forEach(m => {
@@ -457,48 +565,53 @@
       return String(name || "").trim().toLowerCase();
     }
 
+    function isPresetSpot(spot){
+      return Boolean(spot && (spot.preset === true || String(spot.id).startsWith("s")));
+    }
+
     function loadKnownSpotsIntoSaved(){
       const existing = getAllSpots();
-      const merged = [...existing];
+      const customOnly = existing.filter(s => !isPresetSpot(s));
 
-      KNOWN_SPOTS.forEach(known => {
-        const exactById = merged.find(s => String(s.id) === String(known.id));
-        const exactByCoords = merged.find(s => s.coords === known.coords);
-        const exactByName = merged.find(s => normalizeName(s.name) === normalizeName(known.name));
+      const presets = KNOWN_SPOTS.map(k => ({
+        id: k.id,
+        name: k.name,
+        type: k.type,
+        coords: k.coords,
+        preset: true
+      }));
 
-        if(exactById){
-          exactById.name = known.name;
-          exactById.type = known.type;
-          exactById.coords = known.coords;
-          return;
-        }
-
-        if(exactByCoords){
-          exactByCoords.name = known.name;
-          exactByCoords.type = known.type;
-          return;
-        }
-
-        if(exactByName){
-          exactByName.type = known.type;
-          exactByName.coords = known.coords;
-          return;
-        }
-
-        merged.push({
-          id: known.id,
-          name: known.name,
-          type: known.type,
-          coords: known.coords
-        });
-      });
-
-      saveAllSpots(merged);
+      saveAllSpots([...customOnly, ...presets]);
     }
 
     function getSpotNameFromCoords(coordStr){
       const s = getAllSpots().find(x => x.coords === coordStr);
       return s ? s.name : "";
+    }
+
+    function getSpotCatchCount(spot){
+      if(!spot) return 0;
+      const catches = getAllCatches();
+      return catches.filter(c => {
+        const area = String(c.localArea || "").trim().toLowerCase();
+        const spotName = String(c.spotName || "").trim().toLowerCase();
+        const name = String(spot.name || "").trim().toLowerCase();
+        return c.coords === spot.coords || area === name || spotName === name;
+      }).length;
+    }
+
+    function getSpotMarkerColor(spot){
+      const count = getSpotCatchCount(spot);
+      if(count >= 5) return "#ff8c42";
+      if(count >= 2) return "#ffd166";
+      return spot.type === "Reef" ? "#ffd166" : "#59d0ff";
+    }
+
+    function getSpotHeatLabel(spot){
+      const count = getSpotCatchCount(spot);
+      if(count >= 5) return "Hot Spot";
+      if(count >= 2) return "Active Spot";
+      return "Normal Spot";
     }
 
     function showTab(id){
@@ -545,10 +658,11 @@
       }
     }
 
-    function updateMinSize(){
+    function updateMinSize(doSave = true){
       const v = species.value;
       minSizeEl.value = MIN_SIZE[v] ?? "";
       checkFishSize();
+      if(doSave) saveCatchDraft();
     }
 
     function checkFishSize(){
@@ -577,8 +691,15 @@
       }
     }
 
-    species.addEventListener("change", updateMinSize);
-    lengthEl.addEventListener("input", checkFishSize);
+    species.addEventListener("change", () => updateMinSize(true));
+    lengthEl.addEventListener("input", () => {
+      checkFishSize();
+      saveCatchDraft();
+    });
+
+    baitEl.addEventListener("input", saveCatchDraft);
+    localAreaEl.addEventListener("input", saveCatchDraft);
+    notesEl.addEventListener("input", saveCatchDraft);
 
     photoEl.addEventListener("change", () => {
       const file = photoEl.files[0];
@@ -587,6 +708,7 @@
       reader.onload = () => {
         photoData = reader.result;
         photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
+        saveCatchDraft();
       };
       reader.readAsDataURL(file);
     });
@@ -603,11 +725,12 @@
     });
 
     function fillSpotPick(){
-      const spots = getAllSpots();
+      const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
       const s = document.getElementById("manualSpotPick");
       s.innerHTML = `<option value="">Choose spot manually</option>`;
       spots.forEach(sp => {
-        s.innerHTML += `<option value="${safe(sp.coords)}">${safe(sp.name)}</option>`;
+        const mark = isPresetSpot(sp) ? " [Preset]" : " [Custom]";
+        s.innerHTML += `<option value="${safe(sp.coords)}">${safe(sp.name + mark)}</option>`;
       });
     }
 
@@ -623,6 +746,8 @@
         autoSpotEl.value = s.name;
         if(!localAreaEl.value) localAreaEl.value = s.name;
       }
+
+      saveCatchDraft();
     });
 
     async function estimateCurrentStrength(lat, lon){
@@ -685,6 +810,8 @@
           autoSpotEl.value = "";
           placeEl.value = "Deep Sea";
         }
+
+        saveCatchDraft();
       }, () => {
         alert("Could not get GPS location");
       }, {
@@ -751,11 +878,13 @@
       });
 
       saveAllCatches(list);
+      clearCatchDraft();
       alert("Catch saved");
       clearCatchForm();
       renderLog();
       renderStats();
       renderMap();
+      renderSpots();
     }
 
     function clearCatchForm(){
@@ -778,6 +907,7 @@
       chipCurrent.textContent = "Current: —";
       sizeNote.textContent = "Choose species to load legal size.";
       sizeNote.style.color = "#9fb0d0";
+      clearCatchDraft();
     }
 
     function renderLog(){
@@ -821,6 +951,7 @@
       }
 
       coordsEl.value = coordStr;
+      saveCatchDraft();
       showTab("mapTab");
 
       setTimeout(() => {
@@ -830,7 +961,7 @@
 
         if(!satOn){
           satOn = true;
-          map.removeLayer(osm);
+          if(map.hasLayer(osm)) map.removeLayer(osm);
           satLayer.addTo(map);
         }
       }, 250);
@@ -842,7 +973,7 @@
       if(!c) return;
 
       species.value = c.species || "";
-      updateMinSize();
+      updateMinSize(false);
       lengthEl.value = c.length || "";
       minSizeEl.value = c.min || "";
       baitEl.value = c.bait || "";
@@ -854,6 +985,7 @@
       photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
 
       saveAllCatches(list.filter(x => String(x.id) !== String(id)));
+      saveCatchDraft();
       showTab("add");
     }
 
@@ -864,6 +996,7 @@
       renderLog();
       renderStats();
       renderMap();
+      renderSpots();
     }
 
     function renderStats(){
@@ -889,7 +1022,7 @@
       });
 
       let html = `<div class="card"><b>Species Summary</b>`;
-      Object.keys(bySpecies).forEach(sp => {
+      Object.keys(bySpecies).sort().forEach(sp => {
         html += `<div class="mini">${safe(sp)} — ${bySpecies[sp].length} catches</div>`;
       });
       html += `</div>`;
@@ -901,8 +1034,8 @@
 
       html += `<div class="card"><b>Best Spots</b>`;
       if(bestSpots.length){
-        bestSpots.forEach(([spot,count]) => {
-          html += `<div class="mini">${safe(spot)} — ${count} catches</div>`;
+        bestSpots.forEach(([spot,count], idx) => {
+          html += `<div class="mini">${idx + 1}. ${safe(spot)} — ${count} catches</div>`;
         });
       } else {
         html += `<div class="mini">No spot data yet.</div>`;
@@ -942,6 +1075,8 @@
           autoSpotEl.value = "";
           placeEl.value = "Deep Sea";
         }
+
+        saveCatchDraft();
       });
     }
 
@@ -963,16 +1098,25 @@
       getAllSpots().forEach(s => {
         const p = parseCoords(s.coords);
         if(!p) return;
+
+        const count = getSpotCatchCount(s);
+        const color = getSpotMarkerColor(s);
+        const sourceLabel = isPresetSpot(s) ? "Preset" : "Custom";
+        const heatLabel = getSpotHeatLabel(s);
+
         const m = L.circleMarker([p.lat, p.lng], {
-          radius:8,
-          color:s.type==="Reef" ? "#ffd166" : "#59d0ff",
+          radius: count >= 5 ? 10 : count >= 2 ? 9 : 8,
+          color: color,
           weight:2,
-          fillOpacity:0.6
+          fillOpacity:0.75
         }).addTo(map);
 
         m.bindPopup(`
           <b>${safe(s.type)} • ${safe(s.name)}</b><br>
-          <span class="mini mono">${safe(s.coords)}</span><br><br>
+          <span class="mini mono">${safe(s.coords)}</span><br>
+          <span class="mini">Source: ${safe(sourceLabel)}</span><br>
+          <span class="mini">Catches here: ${count}</span><br>
+          <span class="mini">Status: ${safe(heatLabel)}</span><br><br>
           <button onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
         `);
         spotMarkers.push(m);
@@ -1052,10 +1196,11 @@
       if(type === null) return;
 
       spots.push({
-        id: Date.now(),
+        id: "c" + Date.now(),
         name: name.trim() || autoName,
         type: type.trim() || "Spot",
-        coords: c
+        coords: c,
+        preset: false
       });
 
       saveAllSpots(spots);
@@ -1066,25 +1211,54 @@
 
     function renderSpots(){
       const box = document.getElementById("spotsList");
-      const spots = getAllSpots().slice().reverse();
+      const search = normalizeName(spotSearchEl.value);
+
+      const spots = getAllSpots()
+        .slice()
+        .filter(s => {
+          if(!search) return true;
+          const blob = `${s.name} ${s.type} ${s.coords}`.toLowerCase();
+          return blob.includes(search);
+        })
+        .sort((a,b)=>{
+          const aPreset = isPresetSpot(a) ? 0 : 1;
+          const bPreset = isPresetSpot(b) ? 0 : 1;
+          if(aPreset !== bPreset) return aPreset - bPreset;
+          return String(a.name).localeCompare(String(b.name));
+        });
+
       box.innerHTML = "";
 
       if(!spots.length){
-        box.innerHTML = `<div class="card">No saved spots yet.</div>`;
+        box.innerHTML = `<div class="card">No matching spots found.</div>`;
         return;
       }
 
       spots.forEach(s => {
         const p = parseCoords(s.coords);
+        const preset = isPresetSpot(s);
+        const count = getSpotCatchCount(s);
+        const heat = getSpotHeatLabel(s);
+
         box.innerHTML += `
           <div class="card">
             <b>${safe(s.type)} • ${safe(s.name)}</b>
+            <div>
+              <span class="tag ${preset ? "preset" : "custom"}">${preset ? "Preset" : "Custom"}</span>
+              <span class="tag ${count >= 5 ? "hot" : ""}">${count} catches</span>
+              <span class="tag">${safe(heat)}</span>
+            </div>
             <div class="mini mono">📍 ${safe(s.coords)}</div>
             <div class="row">
               <button onclick="goToSpotOnMap('${safe(s.coords)}')">Open on Map</button>
               <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}')">Use Spot</button>
               <button class="dark" onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
-              <button class="danger" onclick="deleteSpot('${safe(s.id)}')">Delete</button>
+              ${
+                preset
+                  ? `<button class="locked" disabled>Preset Locked</button>`
+                  : `<button class="dark" onclick="editSpot('${safe(s.id)}')">Edit</button>`
+              }
+              <button class="danger" onclick="deleteSpot('${safe(s.id)}')">${preset ? "Reset Preset" : "Delete"}</button>
             </div>
           </div>
         `;
@@ -1108,18 +1282,53 @@
       autoSpotEl.value = name;
       manualSpotPick.value = coordStr;
       if(!localAreaEl.value) localAreaEl.value = name;
+      saveCatchDraft();
       showTab("add");
     }
 
+    function editSpot(id){
+      const spots = getAllSpots();
+      const spot = spots.find(s => String(s.id) === String(id));
+      if(!spot) return;
+
+      if(isPresetSpot(spot)){
+        alert("Preset spots are locked.");
+        return;
+      }
+
+      const newName = prompt("Edit spot name:", spot.name);
+      if(newName === null) return;
+
+      const newType = prompt("Edit type: Reef or Spot", spot.type);
+      if(newType === null) return;
+
+      spot.name = newName.trim() || spot.name;
+      spot.type = newType.trim() || spot.type;
+
+      saveAllSpots(spots);
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
     function deleteSpot(id){
-      const ok = confirm("Delete this spot?");
+      const spots = getAllSpots();
+      const spot = spots.find(s => String(s.id) === String(id));
+      if(!spot) return;
+
+      if(isPresetSpot(spot)){
+        alert("Preset spot reset back to default.");
+        loadKnownSpotsIntoSaved();
+        fillSpotPick();
+        renderSpots();
+        renderMap();
+        return;
+      }
+
+      const ok = confirm("Delete this custom spot?");
       if(!ok) return;
-      const filtered = getAllSpots().filter(s => {
-        if(String(s.id) === String(id) && !String(s.id).startsWith("s")) return false;
-        return true;
-      });
-      saveAllSpots(filtered);
-      loadKnownSpotsIntoSaved();
+
+      saveAllSpots(spots.filter(s => String(s.id) !== String(id)));
       fillSpotPick();
       renderSpots();
       renderMap();
@@ -1207,13 +1416,14 @@
       if(!item) return;
 
       species.value = item.species || "";
-      updateMinSize();
+      updateMinSize(false);
 
       if(item.photo){
         photoData = item.photo;
         photoPreview.innerHTML = `<img class="photo" src="${item.photo}" alt="fish">`;
       }
 
+      saveCatchDraft();
       showTab("add");
     }
 
@@ -1225,23 +1435,155 @@
     function copyFishToCatch(){
       const sp = document.getElementById("fishIdSpecies").value;
       if(!sp) return;
+
       species.value = sp;
-      updateMinSize();
+      updateMinSize(false);
 
       if(fishPhotoData){
         photoData = fishPhotoData;
         photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
       }
 
+      saveCatchDraft();
       showTab("add");
     }
 
+    function exportBackup(){
+      try{
+        const backup = {
+          app: "Tanya Deep Sea",
+          version: "V49",
+          exportedAt: new Date().toISOString(),
+          catches: getAllCatches(),
+          spots: getAllSpots(),
+          fishHelpers: getFishHelpers()
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type:"application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "Backup exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export backup.");
+      }
+    }
+
+    function exportGPX(){
+      try{
+        const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+
+        if(!spots.length){
+          alert("No spots to export.");
+          return;
+        }
+
+        const waypoints = spots.map(s => {
+          const p = parseCoords(s.coords);
+          if(!p) return "";
+          return `
+  <wpt lat="${p.lat}" lon="${p.lng}">
+    <name>${escapeXml(s.name)}</name>
+    <desc>${escapeXml(`${s.type} | ${isPresetSpot(s) ? "Preset" : "Custom"} | Catches: ${getSpotCatchCount(s)}`)}</desc>
+  </wpt>`;
+        }).join("");
+
+        const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Tanya Deep Sea V49" xmlns="http://www.topografix.com/GPX/1/1">
+${waypoints}
+</gpx>`;
+
+        const blob = new Blob([gpx], { type:"application/gpx+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-spots-${new Date().toISOString().slice(0,10)}.gpx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "GPX exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export GPX.");
+      }
+    }
+
+    function escapeXml(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&apos;");
+    }
+
+    importBackupEl.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+
+          if(!data || typeof data !== "object"){
+            throw new Error("Invalid backup");
+          }
+
+          if(Array.isArray(data.catches)) saveAllCatches(data.catches);
+
+          if(Array.isArray(data.spots)){
+            const cleanedSpots = data.spots.map(s => ({
+              id: s.id || ("c" + Date.now() + Math.random()),
+              name: s.name || "Spot",
+              type: s.type || "Spot",
+              coords: s.coords || "",
+              preset: Boolean(s.preset && String(s.id).startsWith("s"))
+            })).filter(s => s.coords);
+
+            const customImported = cleanedSpots.filter(s => !isPresetSpot(s));
+            saveAllSpots(customImported);
+          }
+
+          if(Array.isArray(data.fishHelpers)) saveFishHelpers(data.fishHelpers);
+
+          loadKnownSpotsIntoSaved();
+          fillSpotPick();
+          renderLog();
+          renderSpots();
+          renderStats();
+          renderMap();
+          renderFishHelpers();
+
+          backupMsg.textContent = "Backup imported.";
+          setTimeout(() => backupMsg.textContent = "", 2500);
+        }catch{
+          alert("Invalid backup JSON file.");
+        }finally{
+          importBackupEl.value = "";
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    spotSearchEl.addEventListener("input", renderSpots);
+
     function resetAll(){
-      const ok = confirm("Delete all catches and custom spots?");
+      const ok = confirm("Delete all catches, fish helpers and custom spots?");
       if(!ok) return;
       localStorage.removeItem(KEY_CATCHES);
       localStorage.removeItem(KEY_SPOTS);
       localStorage.removeItem(KEY_FISH);
+      localStorage.removeItem(KEY_DRAFT);
       loadKnownSpotsIntoSaved();
       renderLog();
       renderSpots();
@@ -1249,11 +1591,13 @@
       renderMap();
       renderFishHelpers();
       fillSpotPick();
+      clearCatchForm();
     }
 
     loadKnownSpotsIntoSaved();
     fillSpotPick();
-    updateMinSize();
+    updateMinSize(false);
+    loadCatchDraft();
     showTab("add");
     initMap();
     renderLog();
@@ -1267,4 +1611,4 @@
     }
   </script>
 </body>
-  </html>
+          </html>
