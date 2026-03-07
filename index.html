@@ -1,13 +1,12 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Deep Sea V57 Stable</title>
 
-<title>Tanya Deep Sea V57 Stable</title>
-
-<link rel="manifest" href="./manifest.webmanifest" />
-<meta name="theme-color" content="#061225" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#061225" />
   <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
@@ -1146,10 +1145,16 @@
       clearLayers(spotMarkers);
       clearLayers(reefOverlayMarkers);
 
-      getAllCatches().forEach(c => {
+      getAllCatches().slice(-100).forEach(c => {
         const p = parseCoords(c.coords);
         if(!p) return;
-        const m = L.marker([p.lat, p.lng]).addTo(map);
+        const m = L.circleMarker([p.lat, p.lng], {
+          radius: 6,
+          color: "#59d0ff",
+          weight: 2,
+          fillOpacity: 0.8
+        }).addTo(map);
+
         m.bindPopup(`<b>${safe(c.species)}</b><br>${safe(c.coords || "")}<br>${safe(c.localArea || "")}`);
         catchMarkers.push(m);
       });
@@ -1946,9 +1951,9 @@ ${waypoints}
   </script>
 
   <script>
-if("serviceWorker" in navigator){
-  navigator.serviceWorker.register("./sw.js");
-}
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.register("./sw.js");
+    }
   </script>
 </body>
-  </html>
+      </html>
