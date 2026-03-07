@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V58 Stable</title>
+  <title>Tanya Deep Sea V59 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -105,6 +105,30 @@
       color:#9fb0d0;
       cursor:not-allowed;
     }
+    .pickbtn{
+      display:block;
+      width:100%;
+      text-align:center;
+      margin-top:10px;
+      background:var(--accent);
+      border:none;
+      padding:10px;
+      border-radius:8px;
+      color:#001420;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .darkpick{
+      background:#132447;
+      color:#fff;
+    }
+    .hidden-file{
+      position:absolute;
+      left:-9999px;
+      width:1px;
+      height:1px;
+      opacity:0;
+    }
     .row{
       display:flex;
       gap:10px;
@@ -201,7 +225,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V58 Stable
+    Tanya Deep Sea V59 Stable
   </h1>
 
   <div class="topnav">
@@ -271,11 +295,11 @@
 
       <label>Photo</label>
       <div class="row">
-        <button type="button" onclick="document.getElementById('photoCamera').click()">Take Photo</button>
-        <button type="button" class="dark" onclick="document.getElementById('photoGallery').click()">Choose Gallery</button>
+        <label for="photoCamera" class="pickbtn">Take Photo</label>
+        <label for="photoGallery" class="pickbtn darkpick">Choose Gallery</label>
       </div>
-      <input id="photoCamera" type="file" accept="image/*" capture="environment" style="display:none">
-      <input id="photoGallery" type="file" accept="image/*" style="display:none">
+      <input id="photoCamera" type="file" accept="image/*" capture="environment" class="hidden-file">
+      <input id="photoGallery" type="file" accept="image/*" class="hidden-file">
       <div class="mini">Use camera or gallery</div>
       <div id="photoPreview"></div>
 
@@ -299,7 +323,7 @@
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
       <div class="mini" style="margin-top:8px;">
-        Tap the map to choose coordinates. Use Save Current Spot only if you want to save it.
+        Tap the map to choose coordinates and area name.
       </div>
       <div class="mini" style="margin-top:8px;">
         Spot colors: blue/yellow normal • orange = more catches logged there.
@@ -355,11 +379,11 @@
 
       <label>Fish Photo</label>
       <div class="row">
-        <button type="button" onclick="document.getElementById('fishIdPhotoCamera').click()">Take Photo</button>
-        <button type="button" class="dark" onclick="document.getElementById('fishIdPhotoGallery').click()">Choose Gallery</button>
+        <label for="fishIdPhotoCamera" class="pickbtn">Take Photo</label>
+        <label for="fishIdPhotoGallery" class="pickbtn darkpick">Choose Gallery</label>
       </div>
-      <input type="file" id="fishIdPhotoCamera" accept="image/*" capture="environment" style="display:none">
-      <input type="file" id="fishIdPhotoGallery" accept="image/*" style="display:none">
+      <input id="fishIdPhotoCamera" type="file" accept="image/*" capture="environment" class="hidden-file">
+      <input id="fishIdPhotoGallery" type="file" accept="image/*" class="hidden-file">
       <div class="mini">Use camera or gallery</div>
       <div id="fishIdPreview"></div>
 
@@ -588,18 +612,10 @@
       }
     }
 
-    document.getElementById("photoCamera").addEventListener("change", e => {
-      loadCatchPhoto(e.target.files[0]);
-    });
-    document.getElementById("photoGallery").addEventListener("change", e => {
-      loadCatchPhoto(e.target.files[0]);
-    });
-    document.getElementById("fishIdPhotoCamera").addEventListener("change", e => {
-      loadFishHelperPhoto(e.target.files[0]);
-    });
-    document.getElementById("fishIdPhotoGallery").addEventListener("change", e => {
-      loadFishHelperPhoto(e.target.files[0]);
-    });
+    document.getElementById("photoCamera").addEventListener("change", e => loadCatchPhoto(e.target.files[0]));
+    document.getElementById("photoGallery").addEventListener("change", e => loadCatchPhoto(e.target.files[0]));
+    document.getElementById("fishIdPhotoCamera").addEventListener("change", e => loadFishHelperPhoto(e.target.files[0]));
+    document.getElementById("fishIdPhotoGallery").addEventListener("change", e => loadFishHelperPhoto(e.target.files[0]));
 
     function parseCoords(str){
       if(!str) return null;
@@ -1150,6 +1166,19 @@
         placeEl.value = "Deep Sea";
         saveWeatherCoords(Number(lat), Number(lng));
 
+        const nearest = getNearestSpot(Number(lat), Number(lng));
+
+        if(nearest){
+          manualSpotPick.value = nearest.coords;
+          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+          localAreaEl.value = nearest.name;
+        } else {
+          const typedArea = prompt("Area name for this map spot?", localAreaEl.value || `Area ${lat}, ${lng}`);
+          if(typedArea !== null){
+            localAreaEl.value = typedArea.trim();
+          }
+        }
+
         if(tempClickMarker) map.removeLayer(tempClickMarker);
         tempClickMarker = L.marker([lat, lng]).addTo(map);
         map.setView([lat, lng], 15);
@@ -1316,7 +1345,7 @@
         return;
       }
 
-      const autoName = `Spot ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
+      const autoName = localAreaEl.value.trim() || `Spot ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
       const name = prompt("Spot name?", autoName);
       if(name === null) return;
 
@@ -1609,7 +1638,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V58",
+          version: "V59",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1653,7 +1682,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V58" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V59" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1974,4 +2003,4 @@ ${waypoints}
     }
   </script>
 </body>
-          </html>
+  </html>
