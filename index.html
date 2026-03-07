@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V61 Stable</title>
+  <title>Tanya Deep Sea V62 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -231,7 +231,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V61 Stable
+    Tanya Deep Sea V62 Stable
   </h1>
 
   <div class="topnav">
@@ -517,92 +517,92 @@
       {
         species:"Cape Kob",
         method:"Anchor",
-        bait:"Chokka + Sardine combo, Live Mullet, Sardine",
+        bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly",
         depth:"20m – 50m",
-        time:"Early morning, late afternoon, pushing tide, new/full moon periods",
-        rig:"2-hook bottom rig or single live-bait rig",
-        note:"Best on reef edges, gullies and sandy channels. Drift first if you still need to find the line."
+        time:"Early morning, late afternoon, pushing tide, new/full moon",
+        rig:"2-hook bottom rig or live bait rig",
+        note:"Best on reef edges, gullies and sandy channels."
       },
       {
         species:"Yellowtail",
         method:"Drift",
-        bait:"Live bait, Sardine strip, Metal spoon, Surface plug",
+        bait:"Live Makriel, Pilchard strip, Metal spoon, Surface plug",
         depth:"Surface – 40m",
-        time:"Early morning, clean water, bird activity, working bait balls",
-        rig:"Spinning lure setup or live-bait trace",
-        note:"Work birds, bait balls and pinnacles. Cover water fast."
+        time:"Early morning when birds are working",
+        rig:"Spinning lure rig or live bait trace",
+        note:"Work birds, bait balls and pinnacles."
       },
       {
         species:"Bonito",
         method:"Drift",
-        bait:"Sardine strip, small spoon, feather lure",
+        bait:"Pilchard strip, small spoon, feather lure",
         depth:"Surface – 30m",
-        time:"Morning, active current, surface feeding schools",
-        rig:"Small lure/spoon trace",
-        note:"Usually feeding mid-water in schools. Drift and search."
+        time:"Morning feeding schools",
+        rig:"Small spoon / feather rig",
+        note:"Usually mid-water schools."
       },
       {
         species:"Red Roman",
         method:"Anchor",
-        bait:"Chokka, Sardine, Octopus",
+        bait:"Chokka, Pilchard, Octopus",
         depth:"25m – 60m",
-        time:"Stable weather, slack to medium current, early morning",
+        time:"Morning or late afternoon",
         rig:"2-hook bottom rig",
-        note:"Sit directly over reef structure and keep bait low."
+        note:"Fish tight to reef structure."
       },
       {
         species:"Snapper",
         method:"Anchor",
-        bait:"Chokka, Sardine, Redbait",
+        bait:"Chokka, Pilchard, Redbait",
         depth:"20m – 50m",
-        time:"Morning and evening, moderate current",
-        rig:"Bottom rig with short snoots",
-        note:"Fish tight to reef and ledges."
+        time:"Morning bite window",
+        rig:"Short snoot bottom rig",
+        note:"Keep bait on reef bottom."
       },
       {
         species:"Silverfish",
         method:"Anchor",
-        bait:"Chokka, Sardine strip",
+        bait:"Chokka strip, Pilchard strip",
         depth:"20m – 45m",
-        time:"Morning, slack to pushing tide",
+        time:"Morning and slack tide",
         rig:"Light bottom rig",
-        note:"Usually caught on reef bottom once you are on the fish."
+        note:"Usually caught on reef bottom."
       },
       {
         species:"Red Steenbras",
         method:"Anchor",
-        bait:"Chokka, Sardine, Redbait",
+        bait:"Chokka, Pilchard, Redbait",
         depth:"20m – 60m",
-        time:"Low light, pushing tide, calm sea days",
+        time:"Low light and pushing tide",
         rig:"Strong bottom rig",
-        note:"Often on sandy reef edges. Drift first if needed, then anchor."
+        note:"Often on sandy reef edges."
       },
       {
         species:"Yellow Belly",
         method:"Anchor",
-        bait:"Chokka, Sardine",
+        bait:"Chokka, Pilchard",
         depth:"20m – 50m",
-        time:"Morning and stable current conditions",
+        time:"Morning bite",
         rig:"Bottom rig",
-        note:"Stay on reef patches and hold bait in the strike zone."
+        note:"Stay on reef patches."
       },
       {
         species:"Galjoen",
         method:"Anchor",
         bait:"Redbait, Mussel, Crab",
-        depth:"Shallow reef / rocky structure",
-        time:"Rougher water, white water, pushing tide",
-        rig:"Short trace / reef setup",
-        note:"Normally closer to rocky structure and fixed ground."
+        depth:"Rocky reef / shallow structure",
+        time:"Rough water and pushing tide",
+        rig:"Short trace reef rig",
+        note:"More common close to rocky areas."
       },
       {
         species:"Hottentot",
         method:"Anchor",
-        bait:"Chokka, Sardine, Redbait",
+        bait:"Chokka, Pilchard, Redbait",
         depth:"15m – 40m",
-        time:"Morning, reef bite windows, moderate current",
+        time:"Morning reef bite",
         rig:"Light bottom rig",
-        note:"Very common reef fish. Best when sitting properly on reef."
+        note:"Very common reef fish."
       }
     ];
 
@@ -744,6 +744,10 @@
         .replaceAll(">","&gt;")
         .replaceAll('"',"&quot;")
         .replaceAll("'","&apos;");
+    }
+
+    function jsQuote(text){
+      return JSON.stringify(String(text || ""));
     }
 
     function getAllCatches(){ return getJSON(KEY_CATCHES, []); }
@@ -1134,6 +1138,13 @@
       navigateToSpot(p.lat, p.lng);
     }
 
+    function useSuggestedBait(speciesName, baitText){
+      species.value = speciesName || "";
+      baitEl.value = baitText || "";
+      updateMinSize();
+      showTab("add");
+    }
+
     function renderLog(){
       const box = document.getElementById("catchList");
       const list = getAllCatches().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
@@ -1158,9 +1169,9 @@
             <div class="mini">${safe(showDate)}</div>
             ${c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : ""}
             <div class="row">
-              <button onclick="useLogCoords('${safe(c.coords)}')">Use Log</button>
-              <button class="dark" onclick="editCatch('${safe(c.id)}')">Edit</button>
-              <button class="danger" onclick="deleteCatch('${safe(c.id)}')">Delete</button>
+              <button onclick="useLogCoords(${jsQuote(c.coords)})">Use Log</button>
+              <button class="dark" onclick="editCatch(${jsQuote(c.id)})">Edit</button>
+              <button class="danger" onclick="deleteCatch(${jsQuote(c.id)})">Delete</button>
             </div>
           </div>
         `;
@@ -1284,9 +1295,9 @@
               <div class="mini"><b>${idx + 1}. ${safe(spot)}</b> — ${data.count} catches</div>
               ${data.coords ? `<div class="mini mono">📍 ${safe(data.coords)}</div>` : ""}
               <div class="row">
-                ${data.coords ? `<button onclick="goToSpotOnMap('${safe(data.coords)}')">Open Map</button>` : ""}
-                ${data.coords ? `<button class="dark" onclick="useBestSpot('${safe(data.coords)}','${safe(spot)}')">Use Area</button>` : ""}
-                ${data.coords ? `<button class="dark" onclick="navAreaMap('${safe(data.coords)}','${safe(spot)}')">Navigate</button>` : ""}
+                ${data.coords ? `<button onclick="goToSpotOnMap(${jsQuote(data.coords)})">Open Map</button>` : ""}
+                ${data.coords ? `<button class="dark" onclick="useBestSpot(${jsQuote(data.coords)}, ${jsQuote(spot)})">Use Area</button>` : ""}
+                ${data.coords ? `<button class="dark" onclick="navAreaMap(${jsQuote(data.coords)}, ${jsQuote(spot)})">Navigate</button>` : ""}
               </div>
             </div>
           `;
@@ -1384,8 +1395,8 @@
           <span class="mini">Source: ${safe(sourceLabel)}</span><br>
           <span class="mini">Catches here: ${count}</span><br>
           <span class="mini">Status: ${safe(heatLabel)}</span><br><br>
-          <button onclick="useBestSpot('${safe(s.coords)}','${safe(s.name)}')">Use Area</button>
-          <button onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
+          <button onclick="useBestSpot(${jsQuote(s.coords)}, ${jsQuote(s.name)})">Use Area</button>
+          <button onclick="navigateToSpot(${jsQuote(p.lat)}, ${jsQuote(p.lng)})">Navigate</button>
         `);
         spotMarkers.push(m);
       });
@@ -1564,15 +1575,15 @@
             </div>
             <div class="mini mono">📍 ${safe(s.coords)}</div>
             <div class="row">
-              <button onclick="goToSpotOnMap('${safe(s.coords)}')">Open on Map</button>
-              <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}')">Use Spot</button>
-              <button class="dark" onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
+              <button onclick="goToSpotOnMap(${jsQuote(s.coords)})">Open on Map</button>
+              <button class="dark" onclick="useSpotCoords(${jsQuote(s.coords)}, ${jsQuote(s.name)}, ${jsQuote(s.type)})">Use Spot</button>
+              <button class="dark" onclick="navigateToSpot(${jsQuote(p.lat)}, ${jsQuote(p.lng)})">Navigate</button>
               ${
                 preset
                   ? `<button class="locked" disabled>Preset Locked</button>`
-                  : `<button class="dark" onclick="editSpot('${safe(s.id)}')">Edit</button>`
+                  : `<button class="dark" onclick="editSpot(${jsQuote(s.id)})">Edit</button>`
               }
-              <button class="danger" onclick="deleteSpot('${safe(s.id)}')">${preset ? "Reset Preset" : "Delete"}</button>
+              <button class="danger" onclick="deleteSpot(${jsQuote(s.id)})">${preset ? "Reset Preset" : "Delete"}</button>
             </div>
           </div>
         `;
@@ -1738,8 +1749,8 @@
             <b>${safe(item.species || "Unknown")}</b>
             ${item.photo ? `<img class="photo" src="${item.photo}" alt="helper">` : ""}
             <div class="row">
-              <button onclick="useFishHelper('${safe(item.id)}')">Use in Add Catch</button>
-              <button class="danger" onclick="deleteFishHelper('${safe(item.id)}')">Delete</button>
+              <button onclick="useFishHelper(${jsQuote(item.id)})">Use in Add Catch</button>
+              <button class="danger" onclick="deleteFishHelper(${jsQuote(item.id)})">Delete</button>
             </div>
           </div>
         `;
@@ -1795,7 +1806,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V61",
+          version: "V62",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1839,7 +1850,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V61" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V62" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1947,6 +1958,10 @@ ${waypoints}
 
             <div class="mini" style="margin-top:8px;">
               ${safe(item.note)}
+            </div>
+
+            <div class="row">
+              <button onclick="useSuggestedBait(${jsQuote(item.species)}, ${jsQuote(item.bait)})">Use Suggested Bait</button>
             </div>
           </div>
         `;
@@ -2215,4 +2230,4 @@ ${waypoints}
     }
   </script>
 </body>
-  </html>
+                                                       </html>
