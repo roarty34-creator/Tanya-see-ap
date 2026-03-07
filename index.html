@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V63 Stable</title>
+  <title>Tanya Deep Sea V64 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -231,7 +231,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V63 Stable
+    Tanya Deep Sea V64 Stable
   </h1>
 
   <div class="topnav">
@@ -273,7 +273,9 @@
       <div id="sizeNote" class="mini">Choose species to load legal size.</div>
 
       <label>Bait Used</label>
-      <input id="bait">
+      <select id="bait">
+        <option value="">Choose bait</option>
+      </select>
 
       <label>Manual Spot Choice</label>
       <select id="manualSpotPick">
@@ -449,6 +451,82 @@
     const KEY_FISH = "tanya_deepsea_fishhelpers";
     const KEY_LAST_WEATHER_COORDS = "tanya_deepsea_weather_coords";
     const BASE = { lat:-34.37, lng:20.85 };
+
+    const BAIT_OPTIONS = [
+      "Chokka",
+      "Pilchard",
+      "Pilchard belly",
+      "Pilchard strip",
+      "Chokka + Pilchard combo",
+      "Live Makriel",
+      "Makriel strip",
+      "Octopus",
+      "Redbait",
+      "Mussel",
+      "Crab",
+      "Feather lure",
+      "Small spoon",
+      "Metal spoon",
+      "Surface plug",
+      "Live bait"
+    ];
+
+    const LOCAL_AREA_PRESETS = [
+      "Baai Drop",
+      "Seekat",
+      "Diep Bankie",
+      "Blinde Rif",
+      "Skulpbank",
+      "Die Gat",
+      "Roman Bank",
+      "Stilbaai Rif",
+      "Kabeljou Ridge",
+      "Kabeljou Kop",
+      "Kob Line",
+      "Outer Bank",
+      "Middle Reef",
+      "North Bank",
+      "East Drift",
+      "Far North",
+      "South Deep",
+      "Southwest Deep",
+      "West Reef",
+      "Kob Kop",
+      "Kob Kop East",
+      "Rooibank",
+      "Rooibank South",
+      "Stomp Rif",
+      "Stomp Rif East",
+      "Outer Skulpbank",
+      "Skulpbank Noord",
+      "Roman Lip",
+      "Roman South Lip",
+      "Blinde Rif Noord",
+      "Blinde Rif Suid",
+      "Die Gat West",
+      "Die Gat East",
+      "Sand-Klip Lyn",
+      "Kabeljou Plaat",
+      "Kabeljou Plaat Suid",
+      "Vlak Rif",
+      "Vlak Rif East",
+      "Buffel Drift",
+      "Buffel Deep",
+      "Outer Kob Drift",
+      "Tail Bank",
+      "Tail Bank East",
+      "South Tail",
+      "North Tail",
+      "North Tail East",
+      "Verby Die Gat",
+      "Verby Die Gat Suid",
+      "West Klippe",
+      "Stilbaai Deep Line",
+      "Roman Drift",
+      "Die Lang Lyn",
+      "Die Lang Lyn Suid",
+      "Boesman Bank"
+    ];
 
     const KNOWN_SPOTS = [
       { id:"s1",  name:"Stilbaai Rif",       type:"Reef", coords:"-34.390500,20.860200", preset:true },
@@ -777,6 +855,22 @@
       saveAllSpots([...customOnly, ...presets]);
     }
 
+    function fillBaitPick(){
+      const current = baitEl.value || "";
+      baitEl.innerHTML = `<option value="">Choose bait</option>`;
+
+      BAIT_OPTIONS.forEach(bait => {
+        const opt = document.createElement("option");
+        opt.value = bait;
+        opt.textContent = bait;
+        baitEl.appendChild(opt);
+      });
+
+      if(BAIT_OPTIONS.includes(current)){
+        baitEl.value = current;
+      }
+    }
+
     function fillSpotPick(){
       const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
       manualSpotPick.innerHTML = `<option value="">Choose spot manually</option>`;
@@ -791,14 +885,16 @@
 
     function fillLocalAreaPick(){
       const current = localAreaEl.value || "";
-      const allNames = [...new Set(
-        getAllSpots()
+
+      const allNames = [...new Set([
+        ...LOCAL_AREA_PRESETS,
+        ...getAllSpots()
           .map(s => String(s.name || "").trim())
           .filter(Boolean)
-          .sort((a,b) => a.localeCompare(b))
-      )];
+      ])].sort((a,b) => a.localeCompare(b));
 
       localAreaEl.innerHTML = `<option value="">Choose local area</option>`;
+
       allNames.forEach(name => {
         const opt = document.createElement("option");
         opt.value = name;
@@ -915,6 +1011,7 @@
       if(btn) btn.classList.add("active");
 
       fillSpotPick();
+      fillBaitPick();
       fillLocalAreaPick();
 
       if(id === "mapTab"){
@@ -1202,7 +1299,18 @@
 
     function useSuggestedBait(speciesName, baitText){
       species.value = speciesName || "";
-      baitEl.value = baitText || "";
+      fillBaitPick();
+
+      if(BAIT_OPTIONS.includes(baitText)){
+        baitEl.value = baitText;
+      } else {
+        const opt = document.createElement("option");
+        opt.value = baitText;
+        opt.textContent = baitText;
+        baitEl.appendChild(opt);
+        baitEl.value = baitText;
+      }
+
       updateMinSize();
       showTab("add");
     }
@@ -1283,7 +1391,18 @@
       updateMinSize();
       lengthEl.value = c.length || "";
       minSizeEl.value = c.min || "";
-      baitEl.value = c.bait || "";
+      fillBaitPick();
+      if(c.bait){
+        if(BAIT_OPTIONS.includes(c.bait)){
+          baitEl.value = c.bait;
+        } else {
+          const opt = document.createElement("option");
+          opt.value = c.bait;
+          opt.textContent = c.bait;
+          baitEl.appendChild(opt);
+          baitEl.value = c.bait;
+        }
+      }
       coordsEl.value = c.coords || "";
       placeEl.value = c.place || "Deep Sea";
       addAreaOptionIfMissing(c.localArea || "");
@@ -1476,8 +1595,8 @@
           <span class="mini">Source: ${safe(sourceLabel)}</span><br>
           <span class="mini">Catches here: ${count}</span><br>
           <span class="mini">Status: ${safe(heatLabel)}</span><br><br>
-          <button onclick="window.useBestSpotFromPopup(${p.lat}, ${p.lng}, '${safe(s.coords)}', '${safe(s.name)}')">Use Area</button>
-          <button onclick="window.navigateToSpot(${p.lat}, ${p.lng})">Navigate</button>
+          <button onclick="window.useBestSpotFromPopup('${safe(s.coords)}', '${safe(s.name)}')">Use Area</button>
+          <button onclick="window.navigateToSpotFromPopup(${p.lat}, ${p.lng})">Navigate</button>
         `);
         spotMarkers.push(m);
       });
@@ -1485,11 +1604,11 @@
       if(reefOverlayOn) renderReefOverlay();
     }
 
-    window.useBestSpotFromPopup = function(lat, lng, coordStr, areaName){
+    window.useBestSpotFromPopup = function(coordStr, areaName){
       useBestSpot(coordStr, areaName);
     };
 
-    window.navigateToSpot = function(lat, lng){
+    window.navigateToSpotFromPopup = function(lat, lng){
       navigateToSpotInternal(lat, lng);
     };
 
@@ -1912,7 +2031,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V63",
+          version: "V64",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1956,7 +2075,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V63" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V64" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -2007,6 +2126,7 @@ ${waypoints}
 
           loadKnownSpotsIntoSaved();
           fillSpotPick();
+          fillBaitPick();
           fillLocalAreaPick();
           renderLog();
           renderSpots();
@@ -2317,6 +2437,7 @@ ${waypoints}
       renderMap();
       renderFishHelpers();
       fillSpotPick();
+      fillBaitPick();
       fillLocalAreaPick();
       clearCatchForm();
       renderWeatherPanel();
@@ -2326,6 +2447,7 @@ ${waypoints}
 
     loadKnownSpotsIntoSaved();
     fillSpotPick();
+    fillBaitPick();
     fillLocalAreaPick();
     updateMinSize();
     showTab("add");
