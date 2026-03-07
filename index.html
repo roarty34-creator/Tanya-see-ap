@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V60 Stable</title>
+  <title>Tanya Deep Sea V61 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -231,7 +231,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V60 Stable
+    Tanya Deep Sea V61 Stable
   </h1>
 
   <div class="topnav">
@@ -243,6 +243,7 @@
     <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
     <button class="navbtn" id="btnWeather" onclick="showTab('weather')">2 Week Weather</button>
     <button class="navbtn" id="btnMoon" onclick="showTab('moonTab')">Tide & Moon</button>
+    <button class="navbtn" id="btnTips" onclick="showTab('tips')">Species Tips</button>
   </div>
 
   <section id="add">
@@ -316,8 +317,6 @@
         <button id="saveCatchBtn" style="font-size:16px;padding:14px;" onclick="saveCatch()">SAVE CATCH</button>
         <button class="dark" onclick="clearCatchForm()">Clear</button>
       </div>
-
-      <div id="draftMsg" class="success"></div>
     </div>
   </section>
 
@@ -433,6 +432,13 @@
     </div>
   </section>
 
+  <section id="tips">
+    <div class="card">
+      <b>Best Method Per Species</b>
+      <div id="tipsBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const KEY_CATCHES = "tanya_deepsea_catches";
@@ -457,45 +463,41 @@
       { id:"s13", name:"East Drift",         type:"Reef", coords:"-34.398000,20.885000", preset:true },
       { id:"s14", name:"Far North",          type:"Reef", coords:"-34.360000,20.880000", preset:true },
       { id:"s15", name:"Southwest Deep",     type:"Reef", coords:"-34.430500,20.835500", preset:true },
-
-      { id:"s16", name:"Kob Kop",             type:"Reef", coords:"-34.384200,20.866800", preset:true },
-      { id:"s17", name:"Kob Kop East",        type:"Reef", coords:"-34.383100,20.872600", preset:true },
-      { id:"s18", name:"Rooibank",            type:"Reef", coords:"-34.399800,20.852400", preset:true },
-      { id:"s19", name:"Rooibank South",      type:"Reef", coords:"-34.406500,20.853900", preset:true },
-      { id:"s20", name:"Stomp Rif",           type:"Reef", coords:"-34.389600,20.848800", preset:true },
-      { id:"s21", name:"Stomp Rif East",      type:"Reef", coords:"-34.389200,20.856200", preset:true },
-      { id:"s22", name:"Outer Skulpbank",     type:"Reef", coords:"-34.418700,20.828600", preset:true },
-      { id:"s23", name:"Skulpbank Noord",     type:"Reef", coords:"-34.407900,20.832700", preset:true },
-      { id:"s24", name:"Roman Lip",           type:"Reef", coords:"-34.412900,20.876400", preset:true },
-      { id:"s25", name:"Roman South Lip",     type:"Reef", coords:"-34.417600,20.873500", preset:true },
-
-      { id:"s26", name:"Blinde Rif Noord",    type:"Reef", coords:"-34.396100,20.878800", preset:true },
-      { id:"s27", name:"Blinde Rif Suid",     type:"Reef", coords:"-34.406300,20.882900", preset:true },
-      { id:"s28", name:"Die Gat West",        type:"Reef", coords:"-34.394000,20.839900", preset:true },
-      { id:"s29", name:"Die Gat East",        type:"Reef", coords:"-34.395900,20.849300", preset:true },
-      { id:"s30", name:"Sand-Klip Lyn",       type:"Spot", coords:"-34.387700,20.862300", preset:true },
-      { id:"s31", name:"Kabeljou Plaat",      type:"Reef", coords:"-34.379600,20.864100", preset:true },
-      { id:"s32", name:"Kabeljou Plaat Suid", type:"Reef", coords:"-34.384900,20.868000", preset:true },
-      { id:"s33", name:"Vlak Rif",            type:"Reef", coords:"-34.376800,20.855300", preset:true },
-      { id:"s34", name:"Vlak Rif East",       type:"Reef", coords:"-34.377900,20.861600", preset:true },
-      { id:"s35", name:"Buffel Drift",        type:"Spot", coords:"-34.402700,20.867800", preset:true },
-
-      { id:"s36", name:"Buffel Deep",         type:"Reef", coords:"-34.409900,20.868600", preset:true },
-      { id:"s37", name:"Outer Kob Drift",     type:"Spot", coords:"-34.391800,20.879500", preset:true },
-      { id:"s38", name:"Tail Bank",           type:"Reef", coords:"-34.421800,20.861200", preset:true },
-      { id:"s39", name:"Tail Bank East",      type:"Reef", coords:"-34.420200,20.870100", preset:true },
-      { id:"s40", name:"South Tail",          type:"Reef", coords:"-34.428700,20.865400", preset:true },
-      { id:"s41", name:"North Tail",          type:"Reef", coords:"-34.372400,20.872300", preset:true },
-      { id:"s42", name:"North Tail East",     type:"Reef", coords:"-34.369300,20.878100", preset:true },
-      { id:"s43", name:"Verby Die Gat",       type:"Reef", coords:"-34.398800,20.836100", preset:true },
-      { id:"s44", name:"Verby Die Gat Suid",  type:"Reef", coords:"-34.404900,20.838700", preset:true },
-      { id:"s45", name:"West Klippe",         type:"Reef", coords:"-34.410800,20.840600", preset:true },
-
-      { id:"s46", name:"Stilbaai Deep Line",  type:"Spot", coords:"-34.425300,20.848200", preset:true },
-      { id:"s47", name:"Roman Drift",         type:"Spot", coords:"-34.414800,20.879100", preset:true },
-      { id:"s48", name:"Die Lang Lyn",        type:"Reef", coords:"-34.386000,20.882700", preset:true },
-      { id:"s49", name:"Die Lang Lyn Suid",   type:"Reef", coords:"-34.392600,20.884500", preset:true },
-      { id:"s50", name:"Boesman Bank",        type:"Reef", coords:"-34.423900,20.832000", preset:true }
+      { id:"s16", name:"Kob Kop",            type:"Reef", coords:"-34.384200,20.866800", preset:true },
+      { id:"s17", name:"Kob Kop East",       type:"Reef", coords:"-34.383100,20.872600", preset:true },
+      { id:"s18", name:"Rooibank",           type:"Reef", coords:"-34.399800,20.852400", preset:true },
+      { id:"s19", name:"Rooibank South",     type:"Reef", coords:"-34.406500,20.853900", preset:true },
+      { id:"s20", name:"Stomp Rif",          type:"Reef", coords:"-34.389600,20.848800", preset:true },
+      { id:"s21", name:"Stomp Rif East",     type:"Reef", coords:"-34.389200,20.856200", preset:true },
+      { id:"s22", name:"Outer Skulpbank",    type:"Reef", coords:"-34.418700,20.828600", preset:true },
+      { id:"s23", name:"Skulpbank Noord",    type:"Reef", coords:"-34.407900,20.832700", preset:true },
+      { id:"s24", name:"Roman Lip",          type:"Reef", coords:"-34.412900,20.876400", preset:true },
+      { id:"s25", name:"Roman South Lip",    type:"Reef", coords:"-34.417600,20.873500", preset:true },
+      { id:"s26", name:"Blinde Rif Noord",   type:"Reef", coords:"-34.396100,20.878800", preset:true },
+      { id:"s27", name:"Blinde Rif Suid",    type:"Reef", coords:"-34.406300,20.882900", preset:true },
+      { id:"s28", name:"Die Gat West",       type:"Reef", coords:"-34.394000,20.839900", preset:true },
+      { id:"s29", name:"Die Gat East",       type:"Reef", coords:"-34.395900,20.849300", preset:true },
+      { id:"s30", name:"Sand-Klip Lyn",      type:"Spot", coords:"-34.387700,20.862300", preset:true },
+      { id:"s31", name:"Kabeljou Plaat",     type:"Reef", coords:"-34.379600,20.864100", preset:true },
+      { id:"s32", name:"Kabeljou Plaat Suid",type:"Reef", coords:"-34.384900,20.868000", preset:true },
+      { id:"s33", name:"Vlak Rif",           type:"Reef", coords:"-34.376800,20.855300", preset:true },
+      { id:"s34", name:"Vlak Rif East",      type:"Reef", coords:"-34.377900,20.861600", preset:true },
+      { id:"s35", name:"Buffel Drift",       type:"Spot", coords:"-34.402700,20.867800", preset:true },
+      { id:"s36", name:"Buffel Deep",        type:"Reef", coords:"-34.409900,20.868600", preset:true },
+      { id:"s37", name:"Outer Kob Drift",    type:"Spot", coords:"-34.391800,20.879500", preset:true },
+      { id:"s38", name:"Tail Bank",          type:"Reef", coords:"-34.421800,20.861200", preset:true },
+      { id:"s39", name:"Tail Bank East",     type:"Reef", coords:"-34.420200,20.870100", preset:true },
+      { id:"s40", name:"South Tail",         type:"Reef", coords:"-34.428700,20.865400", preset:true },
+      { id:"s41", name:"North Tail",         type:"Reef", coords:"-34.372400,20.872300", preset:true },
+      { id:"s42", name:"North Tail East",    type:"Reef", coords:"-34.369300,20.878100", preset:true },
+      { id:"s43", name:"Verby Die Gat",      type:"Reef", coords:"-34.398800,20.836100", preset:true },
+      { id:"s44", name:"Verby Die Gat Suid", type:"Reef", coords:"-34.404900,20.838700", preset:true },
+      { id:"s45", name:"West Klippe",        type:"Reef", coords:"-34.410800,20.840600", preset:true },
+      { id:"s46", name:"Stilbaai Deep Line", type:"Spot", coords:"-34.425300,20.848200", preset:true },
+      { id:"s47", name:"Roman Drift",        type:"Spot", coords:"-34.414800,20.879100", preset:true },
+      { id:"s48", name:"Die Lang Lyn",       type:"Reef", coords:"-34.386000,20.882700", preset:true },
+      { id:"s49", name:"Die Lang Lyn Suid",  type:"Reef", coords:"-34.392600,20.884500", preset:true },
+      { id:"s50", name:"Boesman Bank",       type:"Reef", coords:"-34.423900,20.832000", preset:true }
     ];
 
     const MIN_SIZE = {
@@ -510,6 +512,99 @@
       "Galjoen":35,
       "Hottentot":22
     };
+
+    const SPECIES_TIPS = [
+      {
+        species:"Cape Kob",
+        method:"Anchor",
+        bait:"Chokka + Sardine combo, Live Mullet, Sardine",
+        depth:"20m – 50m",
+        time:"Early morning, late afternoon, pushing tide, new/full moon periods",
+        rig:"2-hook bottom rig or single live-bait rig",
+        note:"Best on reef edges, gullies and sandy channels. Drift first if you still need to find the line."
+      },
+      {
+        species:"Yellowtail",
+        method:"Drift",
+        bait:"Live bait, Sardine strip, Metal spoon, Surface plug",
+        depth:"Surface – 40m",
+        time:"Early morning, clean water, bird activity, working bait balls",
+        rig:"Spinning lure setup or live-bait trace",
+        note:"Work birds, bait balls and pinnacles. Cover water fast."
+      },
+      {
+        species:"Bonito",
+        method:"Drift",
+        bait:"Sardine strip, small spoon, feather lure",
+        depth:"Surface – 30m",
+        time:"Morning, active current, surface feeding schools",
+        rig:"Small lure/spoon trace",
+        note:"Usually feeding mid-water in schools. Drift and search."
+      },
+      {
+        species:"Red Roman",
+        method:"Anchor",
+        bait:"Chokka, Sardine, Octopus",
+        depth:"25m – 60m",
+        time:"Stable weather, slack to medium current, early morning",
+        rig:"2-hook bottom rig",
+        note:"Sit directly over reef structure and keep bait low."
+      },
+      {
+        species:"Snapper",
+        method:"Anchor",
+        bait:"Chokka, Sardine, Redbait",
+        depth:"20m – 50m",
+        time:"Morning and evening, moderate current",
+        rig:"Bottom rig with short snoots",
+        note:"Fish tight to reef and ledges."
+      },
+      {
+        species:"Silverfish",
+        method:"Anchor",
+        bait:"Chokka, Sardine strip",
+        depth:"20m – 45m",
+        time:"Morning, slack to pushing tide",
+        rig:"Light bottom rig",
+        note:"Usually caught on reef bottom once you are on the fish."
+      },
+      {
+        species:"Red Steenbras",
+        method:"Anchor",
+        bait:"Chokka, Sardine, Redbait",
+        depth:"20m – 60m",
+        time:"Low light, pushing tide, calm sea days",
+        rig:"Strong bottom rig",
+        note:"Often on sandy reef edges. Drift first if needed, then anchor."
+      },
+      {
+        species:"Yellow Belly",
+        method:"Anchor",
+        bait:"Chokka, Sardine",
+        depth:"20m – 50m",
+        time:"Morning and stable current conditions",
+        rig:"Bottom rig",
+        note:"Stay on reef patches and hold bait in the strike zone."
+      },
+      {
+        species:"Galjoen",
+        method:"Anchor",
+        bait:"Redbait, Mussel, Crab",
+        depth:"Shallow reef / rocky structure",
+        time:"Rougher water, white water, pushing tide",
+        rig:"Short trace / reef setup",
+        note:"Normally closer to rocky structure and fixed ground."
+      },
+      {
+        species:"Hottentot",
+        method:"Anchor",
+        bait:"Chokka, Sardine, Redbait",
+        depth:"15m – 40m",
+        time:"Morning, reef bite windows, moderate current",
+        rig:"Light bottom rig",
+        note:"Very common reef fish. Best when sitting properly on reef."
+      }
+    ];
 
     const species = document.getElementById("species");
     const lengthEl = document.getElementById("length");
@@ -741,7 +836,8 @@
         stats:"btnStats",
         fishid:"btnFish",
         weather:"btnWeather",
-        moonTab:"btnMoon"
+        moonTab:"btnMoon",
+        tips:"btnTips"
       };
       const btn = document.getElementById(mapIds[id]);
       if(btn) btn.classList.add("active");
@@ -762,6 +858,7 @@
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
       if(id === "moonTab") renderWeatherPanel();
+      if(id === "tips") renderSpeciesTips();
     }
 
     function updateMinSize(){
@@ -1698,7 +1795,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V60",
+          version: "V61",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1742,7 +1839,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V60" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V61" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1800,6 +1897,7 @@ ${waypoints}
           renderFishHelpers();
           renderWeatherPanel();
           render14DayWeather();
+          renderSpeciesTips();
 
           backupMsg.textContent = "Backup imported.";
           setTimeout(() => backupMsg.textContent = "", 2500);
@@ -1813,6 +1911,58 @@ ${waypoints}
     });
 
     spotSearchEl.addEventListener("input", renderSpots);
+
+    function renderSpeciesTips(){
+      const box = document.getElementById("tipsBox");
+      if(!box) return;
+
+      let html = "";
+
+      SPECIES_TIPS.forEach(item => {
+        const isAnchor = item.method === "Anchor";
+
+        html += `
+          <div class="card">
+            <b>${safe(item.species)}</b>
+
+            <div style="margin-top:6px;">
+              <span class="tag ${isAnchor ? "preset" : "custom"}">${safe(item.method)}</span>
+            </div>
+
+            <div class="mini" style="margin-top:8px;">
+              <b>Suggested Bait:</b> ${safe(item.bait)}
+            </div>
+
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Depth:</b> ${safe(item.depth)}
+            </div>
+
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Time:</b> ${safe(item.time)}
+            </div>
+
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Rig:</b> ${safe(item.rig)}
+            </div>
+
+            <div class="mini" style="margin-top:8px;">
+              ${safe(item.note)}
+            </div>
+          </div>
+        `;
+      });
+
+      html += `
+        <div class="card">
+          <b>Quick Rule</b>
+          <div class="mini" style="margin-top:8px;">Pelagic fish → Drift</div>
+          <div class="mini">Reef / Bottom fish → Anchor</div>
+          <div class="mini">Best combo: Drift first to find fish, then anchor on the mark.</div>
+        </div>
+      `;
+
+      box.innerHTML = html;
+    }
 
     function getMoonPhaseFraction(date = new Date()){
       const lp = 2551443;
@@ -2043,6 +2193,7 @@ ${waypoints}
       clearCatchForm();
       renderWeatherPanel();
       render14DayWeather();
+      renderSpeciesTips();
     }
 
     loadKnownSpotsIntoSaved();
@@ -2055,6 +2206,7 @@ ${waypoints}
     renderStats();
     renderWeatherPanel();
     render14DayWeather();
+    renderSpeciesTips();
   </script>
 
   <script>
@@ -2063,4 +2215,4 @@ ${waypoints}
     }
   </script>
 </body>
-        </html>
+  </html>
