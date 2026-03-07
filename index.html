@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V55 Stable</title>
+  <title>Tanya Deep Sea V56 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -201,7 +201,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V55 Stable
+    Tanya Deep Sea V56 Stable
   </h1>
 
   <div class="topnav">
@@ -504,6 +504,65 @@
     let tempClickMarker = null;
     let reefOverlayOn = false;
 
+    function getJSON(key, fallback){
+      try{
+        const raw = localStorage.getItem(key);
+        return raw ? JSON.parse(raw) : fallback;
+      }catch{
+        return fallback;
+      }
+    }
+
+    function setJSON(key, value){
+      localStorage.setItem(key, JSON.stringify(value));
+    }
+
+    function isQuotaError(err){
+      return err && (
+        err.name === "QuotaExceededError" ||
+        err.name === "NS_ERROR_DOM_QUOTA_REACHED" ||
+        err.code === 22 ||
+        err.code === 1014
+      );
+    }
+
+    function resizeImageFile(file, maxSize = 1200, quality = 0.78){
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+
+        reader.onload = () => {
+          const img = new Image();
+
+          img.onload = () => {
+            let { width, height } = img;
+
+            if(width > height && width > maxSize){
+              height = Math.round(height * (maxSize / width));
+              width = maxSize;
+            } else if(height >= width && height > maxSize){
+              width = Math.round(width * (maxSize / height));
+              height = maxSize;
+            }
+
+            const canvas = document.createElement("canvas");
+            canvas.width = width;
+            canvas.height = height;
+
+            const ctx = canvas.getContext("2d");
+            ctx.drawImage(img, 0, 0, width, height);
+
+            resolve(canvas.toDataURL("image/jpeg", quality));
+          };
+
+          img.onerror = reject;
+          img.src = reader.result;
+        };
+
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    }
+
     function parseCoords(str){
       if(!str) return null;
       const p = String(str).split(",").map(x => x.trim());
@@ -533,30 +592,27 @@
     }
 
     function getAllCatches(){
-      try{ return JSON.parse(localStorage.getItem(KEY_CATCHES) || "[]"); }
-      catch{ return []; }
+      return getJSON(KEY_CATCHES, []);
     }
 
     function saveAllCatches(v){
-      localStorage.setItem(KEY_CATCHES, JSON.stringify(v));
+      setJSON(KEY_CATCHES, v);
     }
 
     function getAllSpots(){
-      try{ return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]"); }
-      catch{ return []; }
+      return getJSON(KEY_SPOTS, []);
     }
 
     function saveAllSpots(v){
-      localStorage.setItem(KEY_SPOTS, JSON.stringify(v));
+      setJSON(KEY_SPOTS, v);
     }
 
     function getFishHelpers(){
-      try{ return JSON.parse(localStorage.getItem(KEY_FISH) || "[]"); }
-      catch{ return []; }
+      return getJSON(KEY_FISH, []);
     }
 
     function saveFishHelpers(v){
-      localStorage.setItem(KEY_FISH, JSON.stringify(v));
+      setJSON(KEY_FISH, v);
     }
 
     function clearLayers(arr){
@@ -700,26 +756,28 @@
     species.addEventListener("change", updateMinSize);
     lengthEl.addEventListener("input", checkFishSize);
 
-    photoEl.addEventListener("change", () => {
+    photoEl.addEventListener("change", async () => {
       const file = photoEl.files[0];
       if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        photoData = reader.result;
+
+      try{
+        photoData = await resizeImageFile(file, 1200, 0.78);
         photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
-      };
-      reader.readAsDataURL(file);
+      }catch{
+        alert("Could not load photo.");
+      }
     });
 
-    document.getElementById("fishIdPhoto").addEventListener("change", e => {
+    document.getElementById("fishIdPhoto").addEventListener("change", async e => {
       const file = e.target.files[0];
       if(!file) return;
-      const reader = new FileReader();
-      reader.onload = () => {
-        fishPhotoData = reader.result;
-        document.getElementById("fishIdPreview").innerHTML = `<img class="photo" src="${reader.result}" alt="fish">`;
-      };
-      reader.readAsDataURL(file);
+
+      try{
+        fishPhotoData = await resizeImageFile(file, 1200, 0.78);
+        document.getElementById("fishIdPreview").innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
+      }catch{
+        alert("Could not load fish photo.");
+      }
     });
 
     function fillSpotPick(){
@@ -861,7 +919,7 @@
       const spotName = getSpotNameFromCoords(coords);
       const areaName = localAreaEl.value.trim() || spotName;
 
-      list.push({
+      const entry = {
         id: Date.now(),
         species: sp,
         length: Number.isFinite(len) ? len : "",
@@ -874,9 +932,27 @@
         notes: notesEl.value.trim(),
         photo: photoData || "",
         date: new Date().toISOString()
-      });
+      };
 
-      saveAllCatches(list);
+      try{
+        list.push(entry);
+        saveAllCatches(list);
+      }catch(err){
+        if(isQuotaError(err)){
+          try{
+            entry.photo = "";
+            list.push(entry);
+            saveAllCatches(list);
+            alert("Catch saved, but photo was too large to store.");
+          }catch{
+            alert("Could not save catch. Storage is full.");
+            return;
+          }
+        }else{
+          alert("Could not save catch.");
+          return;
+        }
+      }
 
       clearCatchForm();
       renderLog();
@@ -1378,13 +1454,25 @@
       }
 
       const list = getFishHelpers();
-      list.unshift({
+
+      const item = {
         id: Date.now(),
         species: sp ? sp : "Unknown",
         photo: fishPhotoData || ""
-      });
+      };
 
-      saveFishHelpers(list.slice(0,20));
+      try{
+        list.unshift(item);
+        saveFishHelpers(list.slice(0,20));
+      }catch(err){
+        if(isQuotaError(err)){
+          alert("Could not save Fish Helper photo. Storage is full.");
+        }else{
+          alert("Could not save Fish Helper.");
+        }
+        return;
+      }
+
       renderFishHelpers();
 
       fishPhotoData = "";
@@ -1471,7 +1559,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V55",
+          version: "V56",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1515,7 +1603,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V55" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V56" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1830,4 +1918,4 @@ ${waypoints}
     }
   </script>
 </body>
-    </html>
+        </html>
