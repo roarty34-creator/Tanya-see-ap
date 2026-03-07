@@ -1,407 +1,1808 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Deep Sea V51 Stable</title>
 
-<title>Tanya Deep Sea V51 Stable</title>
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#061225" />
+  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
-<link rel="manifest" href="./manifest.webmanifest">
-<meta name="theme-color" content="#061225">
-
-<link rel="stylesheet"
-href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
-
-<style>
-:root{
---bg:#061225;
---card:#0f1c38;
---card2:#081632;
---accent:#2fa4ff;
---text:#ffffff;
---muted:#9fb0d0;
---danger:#ff5c5c;
---ok:#39d98a;
---reef:#ffd166;
---spot:#59d0ff;
-}
-
-*{box-sizing:border-box}
-
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:linear-gradient(#061225,#081b3d);
-color:#fff;
-padding:16px;
-}
-
-h1{
-display:flex;
-align-items:center;
-gap:10px;
-font-size:22px;
-margin:0 0 12px;
-}
-
-.topnav{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-margin-bottom:12px;
-}
-
-.navbtn{
-background:#0f1c38;
-border:none;
-padding:9px 12px;
-border-radius:8px;
-color:#fff;
-font-weight:bold;
-cursor:pointer;
-}
-
-.navbtn.active{
-background:var(--accent);
-color:#001420;
-}
-
-.card{
-background:var(--card);
-padding:14px;
-border-radius:12px;
-margin-bottom:12px;
-}
-
-label{
-display:block;
-font-size:12px;
-margin-top:10px;
-color:var(--muted);
-}
-
-input,select,textarea{
-width:100%;
-padding:10px;
-border:none;
-border-radius:8px;
-background:var(--card2);
-color:#fff;
-}
-
-button{
-margin-top:10px;
-background:var(--accent);
-border:none;
-padding:10px;
-border-radius:8px;
-color:#001420;
-font-weight:bold;
-cursor:pointer;
-}
-
-button.dark{
-background:#132447;
-color:#fff;
-}
-
-.row{
-display:flex;
-gap:10px;
-flex-wrap:wrap;
-}
-
-section{display:none}
-
-#map{
-height:430px;
-border-radius:12px;
-overflow:hidden;
-}
-
-.photo{
-width:100%;
-border-radius:12px;
-margin-top:10px;
-}
-
-.mini{
-font-size:12px;
-color:var(--muted);
-}
-
-.chip{
-display:inline-block;
-background:#081632;
-padding:6px 10px;
-border-radius:999px;
-font-size:12px;
-margin:4px 4px 0 0;
-}
-
-</style>
+  <style>
+    :root{
+      --bg:#061225;
+      --card:#0f1c38;
+      --card2:#081632;
+      --accent:#2fa4ff;
+      --text:#ffffff;
+      --muted:#9fb0d0;
+      --danger:#ff5c5c;
+      --ok:#39d98a;
+      --reef:#ffd166;
+      --spot:#59d0ff;
+      --hot:#ff8c42;
+      --warm:#ffd166;
+      --cool:#59d0ff;
+    }
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(#061225,#081b3d);
+      color:var(--text);
+      padding:16px;
+    }
+    h1{
+      display:flex;
+      align-items:center;
+      gap:10px;
+      font-size:22px;
+      margin:0 0 12px;
+    }
+    .topnav{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin-bottom:12px;
+    }
+    .navbtn{
+      background:#0f1c38;
+      border:none;
+      padding:9px 12px;
+      border-radius:8px;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .navbtn.active{
+      background:var(--accent);
+      color:#001420;
+    }
+    .card{
+      background:var(--card);
+      padding:14px;
+      border-radius:12px;
+      margin-bottom:12px;
+    }
+    label{
+      display:block;
+      font-size:12px;
+      margin-top:10px;
+      color:var(--muted);
+    }
+    input,select,textarea{
+      width:100%;
+      padding:10px;
+      border:none;
+      border-radius:8px;
+      background:var(--card2);
+      color:#fff;
+      box-sizing:border-box;
+    }
+    textarea{
+      min-height:72px;
+      resize:vertical;
+    }
+    button{
+      margin-top:10px;
+      background:var(--accent);
+      border:none;
+      padding:10px;
+      border-radius:8px;
+      color:#001420;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    button.dark{
+      background:#132447;
+      color:#fff;
+    }
+    button.danger{
+      background:var(--danger);
+      color:#fff;
+    }
+    button.locked{
+      background:#243454;
+      color:#9fb0d0;
+      cursor:not-allowed;
+    }
+    .row{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+    }
+    .row>*{
+      flex:1;
+      min-width:0;
+    }
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+    }
+    .chip{
+      display:inline-block;
+      background:var(--card2);
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:12px;
+      margin:4px 4px 0 0;
+    }
+    .mono{
+      font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
+    }
+    section{display:none}
+    #map{
+      height:430px;
+      border-radius:12px;
+      overflow:hidden;
+    }
+    img.photo{
+      width:100%;
+      border-radius:12px;
+      margin-top:10px;
+    }
+    .success{
+      color:var(--ok);
+      font-size:12px;
+      margin-top:8px;
+    }
+    .warn{
+      color:#ffd166;
+      font-size:12px;
+      margin-top:8px;
+    }
+    .top-actions{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:10px;
+    }
+    .tag{
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      font-size:11px;
+      margin:6px 6px 0 0;
+      background:#10213f;
+      color:#dfe9ff;
+    }
+    .tag.preset{
+      background:#3d3416;
+      color:#ffd166;
+    }
+    .tag.custom{
+      background:#12324a;
+      color:#59d0ff;
+    }
+    .tag.hot{
+      background:#4a2418;
+      color:#ffb084;
+    }
+    .meter{
+      height:12px;
+      background:#081632;
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+    .meterFill{
+      height:100%;
+      border-radius:999px;
+      background:linear-gradient(90deg,#59d0ff,#ffd166,#ff8c42);
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>
-<img src="./icon-192.png" width="30">
-Tanya Deep Sea V51 Stable
-</h1>
-
-<div class="topnav">
-
-<button class="navbtn" onclick="showTab('add')">Add Catch</button>
-<button class="navbtn" onclick="showTab('mapTab')">Map</button>
-<button class="navbtn" onclick="showTab('spots')">Saved Spots</button>
-<button class="navbtn" onclick="showTab('log')">Log</button>
-<button class="navbtn" onclick="showTab('stats')">Stats</button>
-<button class="navbtn" onclick="showTab('fishid')">Fish Helper</button>
-<button class="navbtn" onclick="showTab('weather')">Tide & Moon</button>
-
-</div>
-
-<!-- ADD CATCH -->
-
-<section id="add">
-
-<div class="card">
-
-<b>Add Catch</b>
-
-<label>Species</label>
-<select id="species">
-<option>Cape Kob</option>
-<option>Yellowtail</option>
-<option>Bonito</option>
-<option>Red Roman</option>
-<option>Snapper</option>
-<option>Silverfish</option>
-<option>Red Steenbras</option>
-<option>Yellow Belly</option>
-<option>Galjoen</option>
-<option>Hottentot</option>
-</select>
-
-<label>Length (cm)</label>
-<input id="length">
-
-<label>Minimum Size</label>
-<input id="minSize" readonly>
-
-<label>Bait Used</label>
-<input id="bait">
-
-<label>Coordinates</label>
-<div class="row">
-<input id="coords">
-<button onclick="getGPS()">Get GPS</button>
-<button class="dark" onclick="showTab('mapTab')">Open Map</button>
-</div>
-
-<div class="row">
-<div class="chip" id="chipWind">Wind: —</div>
-<div class="chip" id="chipSwell">Swell: —</div>
-<div class="chip" id="chipTemp">Temp: —</div>
-<div class="chip" id="chipCurrent">Current: —</div>
-</div>
-
-<label>Photo</label>
-<input id="photo" type="file" accept="image/*" capture="environment">
-<div id="photoPreview"></div>
-
-<label>Notes</label>
-<textarea id="notes"></textarea>
-
-<button onclick="saveCatch()">SAVE CATCH</button>
-
-</div>
-</section>
-
-<!-- MAP -->
-
-<section id="mapTab">
-<div id="map"></div>
-</section>
-
-<!-- WEATHER -->
-
-<section id="weather">
-<div class="card">
-<b>Moon & Bite Prediction</b>
-<div id="weatherBox"></div>
-</div>
-</section>
-
-<script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
-
-<script>
-
-const BASE = {lat:-34.37,lng:20.85}
-
-let map
-let osm
-let sat
-
-function showTab(id){
-
-document.querySelectorAll("section").forEach(s=>s.style.display="none")
-
-document.getElementById(id).style.display="block"
-
-if(id==="mapTab"){
-setTimeout(()=>{map.invalidateSize()},200)
-}
-
-if(id==="weather"){
-renderWeatherPanel()
-}
-
-}
-
-function initMap(){
-
-map=L.map("map").setView([BASE.lat,BASE.lng],10)
-
-osm=L.tileLayer(
-"https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png",
-{maxZoom:19}
-).addTo(map)
-
-}
-
-function getMoonPhase(){
-
-const lp=2551443
-const new_moon=new Date("2001-01-24T13:08:00Z").getTime()
-
-const phase=((Date.now()-new_moon)/1000)%lp
-
-return phase/lp
-
-}
-
-function moonName(){
-
-const p=getMoonPhase()
-
-if(p<0.03||p>0.97)return"New Moon"
-if(p<0.25)return"Waxing Crescent"
-if(p<0.28)return"First Quarter"
-if(p<0.50)return"Waxing Gibbous"
-if(p<0.53)return"Full Moon"
-if(p<0.75)return"Waning Gibbous"
-if(p<0.78)return"Last Quarter"
-
-return"Waning Crescent"
-
-}
-
-function bitePrediction(){
-
-const phase=getMoonPhase()
-
-let score=50
-
-if(phase<0.05||phase>0.95)score+=20
-if(Math.abs(phase-0.5)<0.05)score+=20
-
-const wind=parseFloat(chipWind.textContent.match(/\d+/))
-
-if(wind<15)score+=10
-if(wind>25)score-=10
-
-score=Math.max(0,Math.min(100,score))
-
-let label="Fair"
-
-if(score>80)label="Excellent"
-else if(score>65)label="Good"
-else if(score<40)label="Slow"
-
-return{score,label}
-
-}
-
-function renderWeatherPanel(){
-
-const moon=moonName()
-const bite=bitePrediction()
-
-weatherBox.innerHTML=`
-
-<div class="card">
-<b>Moon Phase</b>
-<div class="mini">${moon}</div>
-</div>
-
-<div class="card">
-<b>Bite Prediction</b>
-<div class="mini">Score ${bite.score}/100</div>
-<div class="mini">${bite.label}</div>
-</div>
-
-`
-
-}
-
-async function estimateCurrentStrength(lat,lon){
-
-try{
-
-const weatherUrl=
-`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m`
-
-const marineUrl=
-`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,sea_surface_temperature`
-
-const wr=await fetch(weatherUrl)
-const mr=await fetch(marineUrl)
-
-const w=await wr.json()
-const m=await mr.json()
-
-chipWind.textContent=`Wind: ${w.current.wind_speed_10m} km/h`
-chipSwell.textContent=`Swell: ${m.current.wave_height} m`
-chipTemp.textContent=`Temp: ${m.current.sea_surface_temperature}°C`
-
-chipCurrent.textContent="Current: ~0.6 kt"
-
-}catch{
-
-chipWind.textContent="Wind: —"
-
-}
-
-}
-
-async function getGPS(){
-
-navigator.geolocation.getCurrentPosition(async pos=>{
-
-const lat=pos.coords.latitude
-const lon=pos.coords.longitude
-
-coords.value=lat.toFixed(6)+","+lon.toFixed(6)
-
-await estimateCurrentStrength(lat,lon)
-
-renderWeatherPanel()
-
-})
-
-}
-
-initMap()
-showTab("add")
-
-</script>
-
-<script>
-if("serviceWorker" in navigator){
-navigator.serviceWorker.register("./sw.js")
-}
-</script>
-
+  <h1>
+    <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
+    Tanya Deep Sea V51 Stable
+  </h1>
+
+  <div class="topnav">
+    <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add Catch</button>
+    <button class="navbtn" id="btnMap" onclick="showTab('mapTab')">Map</button>
+    <button class="navbtn" id="btnSpots" onclick="showTab('spots')">Saved Spots</button>
+    <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
+    <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
+    <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
+    <button class="navbtn" id="btnWeather" onclick="showTab('weather')">Tide & Moon</button>
+  </div>
+
+  <section id="add">
+    <div class="card">
+      <b>Add Catch</b>
+
+      <label>Species</label>
+      <select id="species">
+        <option value="">Choose...</option>
+        <option>Cape Kob</option>
+        <option>Yellowtail</option>
+        <option>Bonito</option>
+        <option>Red Roman</option>
+        <option>Snapper</option>
+        <option>Silverfish</option>
+        <option>Red Steenbras</option>
+        <option>Yellow Belly</option>
+        <option>Galjoen</option>
+        <option>Hottentot</option>
+      </select>
+
+      <label>Length (cm)</label>
+      <input id="length" inputmode="numeric">
+
+      <label>Minimum Size</label>
+      <input id="minSize" readonly>
+      <div id="sizeNote" class="mini">Choose species to load legal size.</div>
+
+      <label>Bait Used</label>
+      <input id="bait">
+
+      <label>Automatic Nearest Spot</label>
+      <input id="autoSpot" readonly>
+
+      <label>Manual Spot Choice</label>
+      <select id="manualSpotPick">
+        <option value="">Choose spot manually</option>
+      </select>
+
+      <label>Coordinates</label>
+      <div class="row">
+        <input id="coords" readonly>
+        <button type="button" onclick="getGPS()">Get GPS</button>
+        <button type="button" class="dark" onclick="showTab('mapTab')">Open Map</button>
+      </div>
+
+      <label>Where Caught</label>
+      <input id="place" value="Deep Sea" readonly>
+
+      <label>Local Area Name</label>
+      <input id="localArea" placeholder="Example: Skulpbank / Blinde Rif / Die Gat">
+
+      <div class="row">
+        <div class="chip" id="chipWind">Wind: —</div>
+        <div class="chip" id="chipSwell">Swell: —</div>
+        <div class="chip" id="chipTemp">Sea Temp: —</div>
+        <div class="chip" id="chipCurrent">Current: —</div>
+      </div>
+
+      <label>Photo</label>
+      <input id="photo" type="file" accept="image/*" capture="environment">
+      <div class="mini">Choose from camera or gallery</div>
+      <div id="photoPreview"></div>
+
+      <label>Notes</label>
+      <textarea id="notes"></textarea>
+
+      <div class="row">
+        <button id="saveCatchBtn" style="font-size:16px;padding:14px;" onclick="saveCatch()">SAVE CATCH</button>
+        <button class="dark" onclick="clearCatchForm()">Clear</button>
+      </div>
+
+      <div id="draftMsg" class="success"></div>
+    </div>
+  </section>
+
+  <section id="mapTab">
+    <div class="card">
+      <div class="row">
+        <button onclick="toggleSatellite()">Satellite ON/OFF</button>
+        <button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
+        <button class="dark" onclick="clearRouteLine()">Clear Route</button>
+      </div>
+      <div class="mini" style="margin-top:8px;">
+        Tap the map to choose coordinates. Use Save Current Spot only if you want to save it.
+      </div>
+      <div class="mini" style="margin-top:8px;">
+        Spot colors: blue/yellow normal • orange = more catches logged there.
+      </div>
+    </div>
+    <div id="map"></div>
+  </section>
+
+  <section id="spots">
+    <div class="card">
+      <div class="row">
+        <div><b>Saved Spots</b></div>
+        <button onclick="saveSpotFromCoords()">Save Current Spot</button>
+      </div>
+
+      <label>Search Saved Spots</label>
+      <input id="spotSearch" placeholder="Search by name, type or coords">
+
+      <div class="top-actions">
+        <button class="dark" onclick="exportBackup()">Export Backup JSON</button>
+        <button class="dark" onclick="document.getElementById('importBackup').click()">Import Backup JSON</button>
+        <button class="dark" onclick="exportGPX()">Export GPX</button>
+        <input id="importBackup" type="file" accept=".json,application/json" style="display:none">
+      </div>
+
+      <div class="mini" style="margin-top:10px;">Preset spots are locked. Custom spots can be edited or deleted.</div>
+      <div id="backupMsg" class="success"></div>
+    </div>
+    <div id="spotsList"></div>
+  </section>
+
+  <section id="log">
+    <div class="card">
+      <div class="row">
+        <div><b>Catch Log</b></div>
+        <button class="danger" onclick="resetAll()">Delete All</button>
+      </div>
+      <div class="mini">Log reloads from saved storage every time you open it.</div>
+    </div>
+    <div id="catchList"></div>
+  </section>
+
+  <section id="stats">
+    <div class="card">
+      <b>Stats Summary</b>
+      <div id="statsBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <section id="fishid">
+    <div class="card">
+      <b>Fish Photo Helper</b>
+
+      <label>Fish Photo</label>
+      <input type="file" id="fishIdPhoto" accept="image/*" capture="environment">
+      <div class="mini">Choose from camera or gallery</div>
+      <div id="fishIdPreview"></div>
+
+      <label>Species</label>
+      <select id="fishIdSpecies">
+        <option value="">Choose...</option>
+        <option>Cape Kob</option>
+        <option>Yellowtail</option>
+        <option>Bonito</option>
+        <option>Red Roman</option>
+        <option>Snapper</option>
+        <option>Silverfish</option>
+        <option>Red Steenbras</option>
+        <option>Yellow Belly</option>
+        <option>Galjoen</option>
+        <option>Hottentot</option>
+      </select>
+
+      <div class="row">
+        <button onclick="saveFishHelper()">Save Helper</button>
+        <button class="dark" onclick="copyFishToCatch()">Use species in Add Catch</button>
+      </div>
+
+      <div id="fishHelperMsg" class="success"></div>
+      <div id="fishHelpers" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <section id="weather">
+    <div class="card">
+      <b>Tide, Moon & Bite</b>
+      <div id="weatherBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+  <script>
+    const KEY_CATCHES = "tanya_deepsea_catches";
+    const KEY_SPOTS = "tanya_deepsea_spots";
+    const KEY_FISH = "tanya_deepsea_fishhelpers";
+    const KEY_DRAFT = "tanya_deepsea_addcatch_draft";
+    const BASE = { lat:-34.37, lng:20.85 };
+
+    const KNOWN_SPOTS = [
+      { id:"s1",  name:"Stilbaai Rif",       type:"Reef", coords:"-34.390500,20.860200", preset:true },
+      { id:"s2",  name:"Blinde Rif",         type:"Reef", coords:"-34.401500,20.880100", preset:true },
+      { id:"s3",  name:"Kabeljou Ridge",     type:"Reef", coords:"-34.375000,20.870000", preset:true },
+      { id:"s4",  name:"Roman Bank",         type:"Reef", coords:"-34.410000,20.872000", preset:true },
+      { id:"s5",  name:"Die Gat",            type:"Reef", coords:"-34.395500,20.845000", preset:true },
+      { id:"s6",  name:"Skulpbank",          type:"Reef", coords:"-34.412000,20.835000", preset:true },
+      { id:"s7",  name:"South Deep",         type:"Reef", coords:"-34.430000,20.880000", preset:true },
+      { id:"s8",  name:"Kob Line",           type:"Reef", coords:"-34.388000,20.875000", preset:true },
+      { id:"s9",  name:"West Reef",          type:"Reef", coords:"-34.415000,20.845000", preset:true },
+      { id:"s10", name:"Outer Bank",         type:"Reef", coords:"-34.430500,20.835500", preset:true },
+      { id:"s11", name:"Middle Reef",        type:"Reef", coords:"-34.392500,20.870500", preset:true },
+      { id:"s12", name:"North Bank",         type:"Reef", coords:"-34.370000,20.860000", preset:true },
+      { id:"s13", name:"East Drift",         type:"Reef", coords:"-34.398000,20.885000", preset:true },
+      { id:"s14", name:"Far North",          type:"Reef", coords:"-34.360000,20.880000", preset:true },
+      { id:"s15", name:"Southwest Deep",     type:"Reef", coords:"-34.430500,20.835500", preset:true },
+
+      { id:"s16", name:"Kob Kop",             type:"Reef", coords:"-34.384200,20.866800", preset:true },
+      { id:"s17", name:"Kob Kop East",        type:"Reef", coords:"-34.383100,20.872600", preset:true },
+      { id:"s18", name:"Rooibank",            type:"Reef", coords:"-34.399800,20.852400", preset:true },
+      { id:"s19", name:"Rooibank South",      type:"Reef", coords:"-34.406500,20.853900", preset:true },
+      { id:"s20", name:"Stomp Rif",           type:"Reef", coords:"-34.389600,20.848800", preset:true },
+      { id:"s21", name:"Stomp Rif East",      type:"Reef", coords:"-34.389200,20.856200", preset:true },
+      { id:"s22", name:"Outer Skulpbank",     type:"Reef", coords:"-34.418700,20.828600", preset:true },
+      { id:"s23", name:"Skulpbank Noord",     type:"Reef", coords:"-34.407900,20.832700", preset:true },
+      { id:"s24", name:"Roman Lip",           type:"Reef", coords:"-34.412900,20.876400", preset:true },
+      { id:"s25", name:"Roman South Lip",     type:"Reef", coords:"-34.417600,20.873500", preset:true },
+
+      { id:"s26", name:"Blinde Rif Noord",    type:"Reef", coords:"-34.396100,20.878800", preset:true },
+      { id:"s27", name:"Blinde Rif Suid",     type:"Reef", coords:"-34.406300,20.882900", preset:true },
+      { id:"s28", name:"Die Gat West",        type:"Reef", coords:"-34.394000,20.839900", preset:true },
+      { id:"s29", name:"Die Gat East",        type:"Reef", coords:"-34.395900,20.849300", preset:true },
+      { id:"s30", name:"Sand-Klip Lyn",       type:"Spot", coords:"-34.387700,20.862300", preset:true },
+      { id:"s31", name:"Kabeljou Plaat",      type:"Reef", coords:"-34.379600,20.864100", preset:true },
+      { id:"s32", name:"Kabeljou Plaat Suid", type:"Reef", coords:"-34.384900,20.868000", preset:true },
+      { id:"s33", name:"Vlak Rif",            type:"Reef", coords:"-34.376800,20.855300", preset:true },
+      { id:"s34", name:"Vlak Rif East",       type:"Reef", coords:"-34.377900,20.861600", preset:true },
+      { id:"s35", name:"Buffel Drift",        type:"Spot", coords:"-34.402700,20.867800", preset:true },
+
+      { id:"s36", name:"Buffel Deep",         type:"Reef", coords:"-34.409900,20.868600", preset:true },
+      { id:"s37", name:"Outer Kob Drift",     type:"Spot", coords:"-34.391800,20.879500", preset:true },
+      { id:"s38", name:"Tail Bank",           type:"Reef", coords:"-34.421800,20.861200", preset:true },
+      { id:"s39", name:"Tail Bank East",      type:"Reef", coords:"-34.420200,20.870100", preset:true },
+      { id:"s40", name:"South Tail",          type:"Reef", coords:"-34.428700,20.865400", preset:true },
+      { id:"s41", name:"North Tail",          type:"Reef", coords:"-34.372400,20.872300", preset:true },
+      { id:"s42", name:"North Tail East",     type:"Reef", coords:"-34.369300,20.878100", preset:true },
+      { id:"s43", name:"Verby Die Gat",       type:"Reef", coords:"-34.398800,20.836100", preset:true },
+      { id:"s44", name:"Verby Die Gat Suid",  type:"Reef", coords:"-34.404900,20.838700", preset:true },
+      { id:"s45", name:"West Klippe",         type:"Reef", coords:"-34.410800,20.840600", preset:true },
+
+      { id:"s46", name:"Stilbaai Deep Line",  type:"Spot", coords:"-34.425300,20.848200", preset:true },
+      { id:"s47", name:"Roman Drift",         type:"Spot", coords:"-34.414800,20.879100", preset:true },
+      { id:"s48", name:"Die Lang Lyn",        type:"Reef", coords:"-34.386000,20.882700", preset:true },
+      { id:"s49", name:"Die Lang Lyn Suid",   type:"Reef", coords:"-34.392600,20.884500", preset:true },
+      { id:"s50", name:"Boesman Bank",        type:"Reef", coords:"-34.423900,20.832000", preset:true }
+    ];
+
+    const MIN_SIZE = {
+      "Cape Kob":60,
+      "Yellowtail":60,
+      "Bonito":0,
+      "Red Roman":30,
+      "Snapper":30,
+      "Silverfish":25,
+      "Red Steenbras":60,
+      "Yellow Belly":30,
+      "Galjoen":35,
+      "Hottentot":22
+    };
+
+    const species = document.getElementById("species");
+    const lengthEl = document.getElementById("length");
+    const minSizeEl = document.getElementById("minSize");
+    const sizeNote = document.getElementById("sizeNote");
+    const baitEl = document.getElementById("bait");
+    const coordsEl = document.getElementById("coords");
+    const placeEl = document.getElementById("place");
+    const localAreaEl = document.getElementById("localArea");
+    const autoSpotEl = document.getElementById("autoSpot");
+    const manualSpotPick = document.getElementById("manualSpotPick");
+    const notesEl = document.getElementById("notes");
+    const photoEl = document.getElementById("photo");
+    const photoPreview = document.getElementById("photoPreview");
+    const chipWind = document.getElementById("chipWind");
+    const chipSwell = document.getElementById("chipSwell");
+    const chipTemp = document.getElementById("chipTemp");
+    const chipCurrent = document.getElementById("chipCurrent");
+    const fishHelperMsg = document.getElementById("fishHelperMsg");
+    const draftMsg = document.getElementById("draftMsg");
+    const backupMsg = document.getElementById("backupMsg");
+    const spotSearchEl = document.getElementById("spotSearch");
+    const importBackupEl = document.getElementById("importBackup");
+
+    let photoData = "";
+    let fishPhotoData = "";
+    let map, osm, satLayer, satOn = false;
+    let catchMarkers = [];
+    let spotMarkers = [];
+    let reefOverlayMarkers = [];
+    let routeLine = null;
+    let myBoatMarker = null;
+    let tempClickMarker = null;
+    let reefOverlayOn = false;
+
+    function parseCoords(str){
+      if(!str) return null;
+      const p = String(str).split(",").map(x => x.trim());
+      if(p.length < 2) return null;
+      const lat = Number(p[0]);
+      const lng = Number(p[1]);
+      if(!Number.isFinite(lat) || !Number.isFinite(lng)) return null;
+      return {lat,lng};
+    }
+
+    function safe(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&#39;");
+    }
+
+    function escapeXml(text){
+      return String(text || "")
+        .replaceAll("&","&amp;")
+        .replaceAll("<","&lt;")
+        .replaceAll(">","&gt;")
+        .replaceAll('"',"&quot;")
+        .replaceAll("'","&apos;");
+    }
+
+    function getAllCatches(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY_CATCHES) || "[]");
+      }catch{
+        return [];
+      }
+    }
+
+    function saveAllCatches(v){
+      localStorage.setItem(KEY_CATCHES, JSON.stringify(v));
+    }
+
+    function getAllSpots(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY_SPOTS) || "[]");
+      }catch{
+        return [];
+      }
+    }
+
+    function saveAllSpots(v){
+      localStorage.setItem(KEY_SPOTS, JSON.stringify(v));
+    }
+
+    function getFishHelpers(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY_FISH) || "[]");
+      }catch{
+        return [];
+      }
+    }
+
+    function saveFishHelpers(v){
+      localStorage.setItem(KEY_FISH, JSON.stringify(v));
+    }
+
+    function getCatchDraft(){
+      try{
+        return JSON.parse(localStorage.getItem(KEY_DRAFT) || "{}");
+      }catch{
+        return {};
+      }
+    }
+
+    function saveCatchDraft(){
+      const draft = {
+        species: species.value || "",
+        length: lengthEl.value || "",
+        bait: baitEl.value || "",
+        coords: coordsEl.value || "",
+        place: placeEl.value || "Deep Sea",
+        localArea: localAreaEl.value || "",
+        autoSpot: autoSpotEl.value || "",
+        manualSpotPick: manualSpotPick.value || "",
+        notes: notesEl.value || "",
+        photo: photoData || ""
+      };
+      localStorage.setItem(KEY_DRAFT, JSON.stringify(draft));
+      draftMsg.textContent = "Draft saved.";
+      clearDraftMsgSoon();
+    }
+
+    function loadCatchDraft(){
+      const d = getCatchDraft();
+      if(!d || typeof d !== "object") return;
+
+      species.value = d.species || "";
+      updateMinSize(false);
+      lengthEl.value = d.length || "";
+      baitEl.value = d.bait || "";
+      coordsEl.value = d.coords || "";
+      placeEl.value = d.place || "Deep Sea";
+      localAreaEl.value = d.localArea || "";
+      autoSpotEl.value = d.autoSpot || "";
+      manualSpotPick.value = d.manualSpotPick || "";
+      notesEl.value = d.notes || "";
+      photoData = d.photo || "";
+
+      if(photoData){
+        photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
+      } else {
+        photoPreview.innerHTML = "";
+      }
+
+      checkFishSize();
+    }
+
+    function clearCatchDraft(){
+      localStorage.removeItem(KEY_DRAFT);
+      draftMsg.textContent = "";
+    }
+
+    function clearDraftMsgSoon(){
+      setTimeout(() => {
+        draftMsg.textContent = "";
+      }, 1200);
+    }
+
+    function clearLayers(arr){
+      if(!map) return;
+      arr.forEach(m => {
+        try { map.removeLayer(m); } catch {}
+      });
+      arr.length = 0;
+    }
+
+    function normalizeName(name){
+      return String(name || "").trim().toLowerCase();
+    }
+
+    function isPresetSpot(spot){
+      return Boolean(spot && (spot.preset === true || String(spot.id).startsWith("s")));
+    }
+
+    function loadKnownSpotsIntoSaved(){
+      const existing = getAllSpots();
+      const customOnly = existing.filter(s => !isPresetSpot(s));
+
+      const presets = KNOWN_SPOTS.map(k => ({
+        id: k.id,
+        name: k.name,
+        type: k.type,
+        coords: k.coords,
+        preset: true
+      }));
+
+      saveAllSpots([...customOnly, ...presets]);
+    }
+
+    function getSpotNameFromCoords(coordStr){
+      const s = getAllSpots().find(x => x.coords === coordStr);
+      return s ? s.name : "";
+    }
+
+    function getSpotCatchCount(spot){
+      if(!spot) return 0;
+      const catches = getAllCatches();
+      return catches.filter(c => {
+        const area = String(c.localArea || "").trim().toLowerCase();
+        const spotName = String(c.spotName || "").trim().toLowerCase();
+        const name = String(spot.name || "").trim().toLowerCase();
+        return c.coords === spot.coords || area === name || spotName === name;
+      }).length;
+    }
+
+    function getSpotMarkerColor(spot){
+      const count = getSpotCatchCount(spot);
+      if(count >= 5) return "#ff8c42";
+      if(count >= 2) return "#ffd166";
+      return spot.type === "Reef" ? "#ffd166" : "#59d0ff";
+    }
+
+    function getSpotHeatLabel(spot){
+      const count = getSpotCatchCount(spot);
+      if(count >= 5) return "Hot Spot";
+      if(count >= 2) return "Active Spot";
+      return "Normal Spot";
+    }
+
+    function showTab(id){
+      document.querySelectorAll("section").forEach(s => s.style.display = "none");
+      const section = document.getElementById(id);
+      if(section) section.style.display = "block";
+
+      document.querySelectorAll(".navbtn").forEach(b => b.classList.remove("active"));
+      const mapIds = {
+        add:"btnAdd",
+        mapTab:"btnMap",
+        spots:"btnSpots",
+        log:"btnLog",
+        stats:"btnStats",
+        fishid:"btnFish",
+        weather:"btnWeather"
+      };
+      const btn = document.getElementById(mapIds[id]);
+      if(btn) btn.classList.add("active");
+
+      fillSpotPick();
+
+      if(id === "mapTab"){
+        initMap();
+        setTimeout(() => {
+          map.invalidateSize();
+          renderMap();
+        }, 200);
+      }
+
+      if(id === "spots"){
+        renderSpots();
+      }
+
+      if(id === "log"){
+        renderLog();
+      }
+
+      if(id === "stats"){
+        renderStats();
+      }
+
+      if(id === "fishid"){
+        renderFishHelpers();
+      }
+
+      if(id === "weather"){
+        renderWeatherPanel();
+      }
+    }
+
+    function updateMinSize(doSave = true){
+      const v = species.value;
+      minSizeEl.value = MIN_SIZE[v] ?? "";
+      checkFishSize();
+      if(doSave) saveCatchDraft();
+    }
+
+    function checkFishSize(){
+      const sp = species.value;
+      const len = Number(lengthEl.value);
+      const min = MIN_SIZE[sp];
+
+      if(!sp || !len || min === undefined){
+        sizeNote.textContent = "Choose species to load legal size.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
+
+      if(min === 0){
+        sizeNote.textContent = "No minimum size for this species.";
+        sizeNote.style.color = "#9fb0d0";
+        return;
+      }
+
+      if(len < min){
+        sizeNote.textContent = "⚠️ UNDERSIZE! Minimum is " + min + " cm";
+        sizeNote.style.color = "#ff5c5c";
+      } else {
+        sizeNote.textContent = "✅ Legal size (" + min + " cm)";
+        sizeNote.style.color = "#39d98a";
+      }
+    }
+
+    species.addEventListener("change", () => updateMinSize(true));
+    lengthEl.addEventListener("input", () => {
+      checkFishSize();
+      saveCatchDraft();
+    });
+
+    baitEl.addEventListener("input", saveCatchDraft);
+    localAreaEl.addEventListener("input", saveCatchDraft);
+    notesEl.addEventListener("input", saveCatchDraft);
+
+    photoEl.addEventListener("change", () => {
+      const file = photoEl.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        photoData = reader.result;
+        photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
+        saveCatchDraft();
+      };
+      reader.readAsDataURL(file);
+    });
+
+    document.getElementById("fishIdPhoto").addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        fishPhotoData = reader.result;
+        document.getElementById("fishIdPreview").innerHTML = `<img class="photo" src="${reader.result}" alt="fish">`;
+      };
+      reader.readAsDataURL(file);
+    });
+
+    function fillSpotPick(){
+      const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+      const s = document.getElementById("manualSpotPick");
+      s.innerHTML = `<option value="">Choose spot manually</option>`;
+      spots.forEach(sp => {
+        const mark = isPresetSpot(sp) ? " [Preset]" : " [Custom]";
+        s.innerHTML += `<option value="${safe(sp.coords)}">${safe(sp.name + mark)}</option>`;
+      });
+    }
+
+    manualSpotPick.addEventListener("change", function(e){
+      const coordStr = e.target.value;
+      if(!coordStr) return;
+
+      coordsEl.value = coordStr;
+
+      const s = getAllSpots().find(x => x.coords === coordStr);
+      if(s){
+        placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
+        autoSpotEl.value = s.name;
+        if(!localAreaEl.value) localAreaEl.value = s.name;
+      }
+
+      saveCatchDraft();
+    });
+
+    async function estimateCurrentStrength(lat, lon){
+      try{
+        const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m&timezone=Africa%2FJohannesburg`;
+        const marineUrl = `https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg`;
+
+        const [wr, mr] = await Promise.all([fetch(weatherUrl), fetch(marineUrl)]);
+        const w = await wr.json();
+        const m = await mr.json();
+
+        const wind = Number(w?.current?.wind_speed_10m || 0);
+        const wave = Number(m?.current?.wave_height || 0);
+        const swell = Number(m?.current?.swell_wave_height || 0);
+
+        chipWind.textContent = `Wind: ${wind.toFixed(0)} km/h`;
+        chipSwell.textContent = `Swell: ${swell.toFixed(2)} m`;
+        chipTemp.textContent = `Sea Temp: ${Number(m?.current?.sea_surface_temperature || 0).toFixed(1)} °C`;
+
+        let current = 0.2;
+        current += wind * 0.015;
+        current += wave * 0.18;
+        current += swell * 0.12;
+        chipCurrent.textContent = `Current: ${current.toFixed(2)} kt`;
+      }catch{
+        chipWind.textContent = "Wind: —";
+        chipSwell.textContent = "Swell: —";
+        chipTemp.textContent = "Sea Temp: —";
+        chipCurrent.textContent = "Current: —";
+      }
+    }
+
+    async function getGPS(){
+      if(!navigator.geolocation){
+        alert("GPS not supported on this device");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(async pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
+
+        if(map){
+          if(myBoatMarker) map.removeLayer(myBoatMarker);
+          myBoatMarker = L.marker([lat,lng]).addTo(map);
+          myBoatMarker.bindPopup("Your Boat").openPopup();
+          map.setView([lat,lng],13);
+        }
+
+        await estimateCurrentStrength(lat, lng);
+        renderWeatherPanel();
+
+        const nearest = getNearestSpot(lat, lng);
+        if(nearest){
+          autoSpotEl.value = nearest.name;
+          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+          if(!localAreaEl.value) localAreaEl.value = nearest.name;
+        } else {
+          autoSpotEl.value = "";
+          placeEl.value = "Deep Sea";
+        }
+
+        saveCatchDraft();
+      }, () => {
+        alert("Could not get GPS location");
+      }, {
+        enableHighAccuracy:true,
+        timeout:10000
+      });
+    }
+
+    function getNearestSpot(lat, lng){
+      const spots = getAllSpots();
+      let best = null;
+      let bestDist = Infinity;
+
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+        const d = Math.hypot(lat - p.lat, lng - p.lng);
+        if(d < bestDist){
+          bestDist = d;
+          best = s;
+        }
+      });
+
+      return bestDist < 0.05 ? best : null;
+    }
+
+    function saveCatch(){
+      const sp = species.value;
+      const len = Number(lengthEl.value);
+      const coords = coordsEl.value;
+
+      if(!sp){
+        alert("Choose species");
+        return;
+      }
+      if(!coords){
+        alert("Get GPS or choose a spot first");
+        return;
+      }
+
+      const min = MIN_SIZE[sp] || 0;
+      if(min > 0 && len && len < min){
+        const ok = confirm("⚠️ This fish is undersize (" + len + " cm).\nMinimum is " + min + " cm.\n\nSave anyway?");
+        if(!ok) return;
+      }
+
+      const list = getAllCatches();
+      const spotName = getSpotNameFromCoords(coords);
+      const areaName = localAreaEl.value.trim() || spotName;
+
+      list.push({
+        id: Date.now(),
+        species: sp,
+        length: Number.isFinite(len) ? len : "",
+        min: minSizeEl.value,
+        bait: baitEl.value.trim(),
+        coords: coords,
+        place: placeEl.value,
+        spotName: spotName,
+        localArea: areaName,
+        notes: notesEl.value.trim(),
+        photo: photoData || "",
+        date: new Date().toISOString()
+      });
+
+      saveAllCatches(list);
+      clearCatchDraft();
+      alert("Catch saved");
+      clearCatchForm();
+      renderLog();
+      renderStats();
+      renderMap();
+      renderSpots();
+      renderWeatherPanel();
+    }
+
+    function clearCatchForm(){
+      species.value = "";
+      lengthEl.value = "";
+      minSizeEl.value = "";
+      baitEl.value = "";
+      coordsEl.value = "";
+      placeEl.value = "Deep Sea";
+      localAreaEl.value = "";
+      notesEl.value = "";
+      photoEl.value = "";
+      photoData = "";
+      photoPreview.innerHTML = "";
+      autoSpotEl.value = "";
+      manualSpotPick.value = "";
+      chipWind.textContent = "Wind: —";
+      chipSwell.textContent = "Swell: —";
+      chipTemp.textContent = "Sea Temp: —";
+      chipCurrent.textContent = "Current: —";
+      sizeNote.textContent = "Choose species to load legal size.";
+      sizeNote.style.color = "#9fb0d0";
+      clearCatchDraft();
+    }
+
+    function renderLog(){
+      const box = document.getElementById("catchList");
+      const list = getAllCatches().slice().sort((a,b) => new Date(b.date) - new Date(a.date));
+      box.innerHTML = "";
+
+      if(!list.length){
+        box.innerHTML = `<div class="card">No catches saved yet.</div>`;
+        return;
+      }
+
+      list.forEach(c => {
+        const showDate = c.date ? new Date(c.date).toLocaleDateString() : "";
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(c.species)}</b><br>
+            <div class="mini">${safe(c.length)} cm • Min ${safe(c.min)}</div>
+            <div class="mini">${safe(c.place)}</div>
+            ${c.localArea ? `<div class="mini">Area: ${safe(c.localArea)}</div>` : ""}
+            <div class="mini mono">📍 ${safe(c.coords)}</div>
+            ${c.bait ? `<div class="mini">Bait: ${safe(c.bait)}</div>` : ""}
+            ${c.notes ? `<div class="mini">Notes: ${safe(c.notes)}</div>` : ""}
+            <div class="mini">${safe(showDate)}</div>
+            ${c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : ""}
+            <div class="row">
+              <button onclick="useLogCoords('${safe(c.coords)}')">Use Log</button>
+              <button class="dark" onclick="editCatch('${safe(c.id)}')">Edit</button>
+              <button class="danger" onclick="deleteCatch('${safe(c.id)}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function useLogCoords(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){
+        alert("No valid coordinates in this log entry.");
+        return;
+      }
+
+      coordsEl.value = coordStr;
+      saveCatchDraft();
+      showTab("mapTab");
+
+      setTimeout(() => {
+        map.setView([p.lat, p.lng], 15);
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([p.lat, p.lng]).addTo(map);
+
+        if(!satOn){
+          satOn = true;
+          if(map.hasLayer(osm)) map.removeLayer(osm);
+          satLayer.addTo(map);
+        }
+      }, 250);
+    }
+
+    function editCatch(id){
+      const list = getAllCatches();
+      const c = list.find(x => String(x.id) === String(id));
+      if(!c) return;
+
+      species.value = c.species || "";
+      updateMinSize(false);
+      lengthEl.value = c.length || "";
+      minSizeEl.value = c.min || "";
+      baitEl.value = c.bait || "";
+      coordsEl.value = c.coords || "";
+      placeEl.value = c.place || "Deep Sea";
+      localAreaEl.value = c.localArea || "";
+      notesEl.value = c.notes || "";
+      photoData = c.photo || "";
+      photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
+
+      saveAllCatches(list.filter(x => String(x.id) !== String(id)));
+      saveCatchDraft();
+      showTab("add");
+    }
+
+    function deleteCatch(id){
+      const ok = confirm("Delete this catch?");
+      if(!ok) return;
+      saveAllCatches(getAllCatches().filter(c => String(c.id) !== String(id)));
+      renderLog();
+      renderStats();
+      renderMap();
+      renderSpots();
+      renderWeatherPanel();
+    }
+
+    function renderStats(){
+      const box = document.getElementById("statsBox");
+      const list = getAllCatches();
+
+      if(!list.length){
+        box.innerHTML = "No catches yet.";
+        return;
+      }
+
+      const bySpecies = {};
+      const bySpot = {};
+
+      list.forEach(c => {
+        if(c.species){
+          if(!bySpecies[c.species]) bySpecies[c.species] = [];
+          bySpecies[c.species].push(c);
+        }
+
+        const spotKey = c.localArea || c.spotName || c.place || c.coords || "Unknown";
+        bySpot[spotKey] = (bySpot[spotKey] || 0) + 1;
+      });
+
+      let html = `<div class="card"><b>Species Summary</b>`;
+      Object.keys(bySpecies).sort().forEach(sp => {
+        html += `<div class="mini">${safe(sp)} — ${bySpecies[sp].length} catches</div>`;
+      });
+      html += `</div>`;
+
+      const bestSpots = Object.entries(bySpot)
+        .filter(([name,count]) => name && count > 0)
+        .sort((a,b)=>b[1]-a[1])
+        .slice(0,5);
+
+      html += `<div class="card"><b>Best Spots</b>`;
+      if(bestSpots.length){
+        bestSpots.forEach(([spot,count], idx) => {
+          html += `<div class="mini">${idx + 1}. ${safe(spot)} — ${count} catches</div>`;
+        });
+      } else {
+        html += `<div class="mini">No spot data yet.</div>`;
+      }
+      html += `</div>`;
+
+      box.innerHTML = html;
+    }
+
+    function initMap(){
+      if(map) return;
+
+      map = L.map("map").setView([BASE.lat, BASE.lng], 10);
+
+      osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png", { maxZoom: 19 }).addTo(map);
+      satLayer = L.tileLayer(
+        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
+        { maxZoom: 19 }
+      );
+
+      map.on("click", e => {
+        const lat = e.latlng.lat.toFixed(6);
+        const lng = e.latlng.lng.toFixed(6);
+
+        coordsEl.value = lat + "," + lng;
+
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([lat, lng]).addTo(map);
+        map.setView([lat, lng], 15);
+
+        const nearest = getNearestSpot(Number(lat), Number(lng));
+        if(nearest){
+          autoSpotEl.value = nearest.name;
+          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
+          if(!localAreaEl.value) localAreaEl.value = nearest.name;
+        } else {
+          autoSpotEl.value = "";
+          placeEl.value = "Deep Sea";
+        }
+
+        saveCatchDraft();
+      });
+    }
+
+    function renderMap(){
+      if(!map) return;
+
+      clearLayers(catchMarkers);
+      clearLayers(spotMarkers);
+      clearLayers(reefOverlayMarkers);
+
+      getAllCatches().forEach(c => {
+        const p = parseCoords(c.coords);
+        if(!p) return;
+        const m = L.marker([p.lat, p.lng]).addTo(map);
+        m.bindPopup(`<b>${safe(c.species)}</b><br>${safe(c.coords || "")}<br>${safe(c.localArea || "")}`);
+        catchMarkers.push(m);
+      });
+
+      getAllSpots().forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+
+        const count = getSpotCatchCount(s);
+        const color = getSpotMarkerColor(s);
+        const sourceLabel = isPresetSpot(s) ? "Preset" : "Custom";
+        const heatLabel = getSpotHeatLabel(s);
+
+        const m = L.circleMarker([p.lat, p.lng], {
+          radius: count >= 5 ? 10 : count >= 2 ? 9 : 8,
+          color: color,
+          weight:2,
+          fillOpacity:0.75
+        }).addTo(map);
+
+        m.bindPopup(`
+          <b>${safe(s.type)} • ${safe(s.name)}</b><br>
+          <span class="mini mono">${safe(s.coords)}</span><br>
+          <span class="mini">Source: ${safe(sourceLabel)}</span><br>
+          <span class="mini">Catches here: ${count}</span><br>
+          <span class="mini">Status: ${safe(heatLabel)}</span><br><br>
+          <button onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
+        `);
+        spotMarkers.push(m);
+      });
+
+      if(reefOverlayOn) renderReefOverlay();
+    }
+
+    function toggleSatellite(){
+      if(!map) return;
+      satOn = !satOn;
+      if(satOn){
+        if(map.hasLayer(osm)) map.removeLayer(osm);
+        satLayer.addTo(map);
+      } else {
+        if(map.hasLayer(satLayer)) map.removeLayer(satLayer);
+        osm.addTo(map);
+      }
+    }
+
+    function clearRouteLine(){
+      if(routeLine && map){
+        map.removeLayer(routeLine);
+        routeLine = null;
+      }
+      if(myBoatMarker && map){
+        map.removeLayer(myBoatMarker);
+        myBoatMarker = null;
+      }
+    }
+
+    function navigateToSpot(lat, lng){
+      navigator.geolocation.getCurrentPosition(pos => {
+        const myLat = pos.coords.latitude;
+        const myLng = pos.coords.longitude;
+
+        clearRouteLine();
+
+        myBoatMarker = L.marker([myLat,myLng]).addTo(map);
+        routeLine = L.polyline([
+          [myLat,myLng],
+          [Number(lat),Number(lng)]
+        ], { color:"red", weight:4 }).addTo(map);
+
+        map.setView([Number(lat),Number(lng)], 13);
+      }, () => {
+        alert("Could not get current location for route.");
+      });
+    }
+
+    function saveSpotFromCoords(){
+      const c = coordsEl.value;
+      if(!c){
+        alert("Choose a spot on the map or get GPS first.");
+        return;
+      }
+
+      const p = parseCoords(c);
+      if(!p){
+        alert("Invalid coordinates.");
+        return;
+      }
+
+      const spots = getAllSpots();
+      const alreadyExists = spots.find(s => String(s.coords) === String(c));
+
+      if(alreadyExists){
+        alert("This spot is already saved as: " + alreadyExists.name);
+        return;
+      }
+
+      const autoName = `Spot ${p.lat.toFixed(3)}, ${p.lng.toFixed(3)}`;
+      const name = prompt("Spot name?", autoName);
+      if(name === null) return;
+
+      const type = prompt("Type: Reef or Spot?", "Reef");
+      if(type === null) return;
+
+      spots.push({
+        id: "c" + Date.now(),
+        name: name.trim() || autoName,
+        type: type.trim() || "Spot",
+        coords: c,
+        preset: false
+      });
+
+      saveAllSpots(spots);
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
+    function renderSpots(){
+      const box = document.getElementById("spotsList");
+      const search = normalizeName(spotSearchEl.value);
+
+      const spots = getAllSpots()
+        .slice()
+        .filter(s => {
+          if(!search) return true;
+          const blob = `${s.name} ${s.type} ${s.coords}`.toLowerCase();
+          return blob.includes(search);
+        })
+        .sort((a,b)=>{
+          const aPreset = isPresetSpot(a) ? 0 : 1;
+          const bPreset = isPresetSpot(b) ? 0 : 1;
+          if(aPreset !== bPreset) return aPreset - bPreset;
+          return String(a.name).localeCompare(String(b.name));
+        });
+
+      box.innerHTML = "";
+
+      if(!spots.length){
+        box.innerHTML = `<div class="card">No matching spots found.</div>`;
+        return;
+      }
+
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        const preset = isPresetSpot(s);
+        const count = getSpotCatchCount(s);
+        const heat = getSpotHeatLabel(s);
+
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(s.type)} • ${safe(s.name)}</b>
+            <div>
+              <span class="tag ${preset ? "preset" : "custom"}">${preset ? "Preset" : "Custom"}</span>
+              <span class="tag ${count >= 5 ? "hot" : ""}">${count} catches</span>
+              <span class="tag">${safe(heat)}</span>
+            </div>
+            <div class="mini mono">📍 ${safe(s.coords)}</div>
+            <div class="row">
+              <button onclick="goToSpotOnMap('${safe(s.coords)}')">Open on Map</button>
+              <button class="dark" onclick="useSpotCoords('${safe(s.coords)}','${safe(s.name)}','${safe(s.type)}')">Use Spot</button>
+              <button class="dark" onclick="navigateToSpot('${p.lat}','${p.lng}')">Navigate</button>
+              ${
+                preset
+                  ? `<button class="locked" disabled>Preset Locked</button>`
+                  : `<button class="dark" onclick="editSpot('${safe(s.id)}')">Edit</button>`
+              }
+              <button class="danger" onclick="deleteSpot('${safe(s.id)}')">${preset ? "Reset Preset" : "Delete"}</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function goToSpotOnMap(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p) return;
+      showTab("mapTab");
+      setTimeout(() => {
+        map.setView([p.lat,p.lng], 15);
+        if(tempClickMarker) map.removeLayer(tempClickMarker);
+        tempClickMarker = L.marker([p.lat,p.lng]).addTo(map);
+      }, 200);
+    }
+
+    function useSpotCoords(coordStr, name, type){
+      coordsEl.value = coordStr;
+      placeEl.value = `Deep Sea • ${type} • ${name}`;
+      autoSpotEl.value = name;
+      manualSpotPick.value = coordStr;
+      if(!localAreaEl.value) localAreaEl.value = name;
+      saveCatchDraft();
+      showTab("add");
+    }
+
+    function editSpot(id){
+      const spots = getAllSpots();
+      const spot = spots.find(s => String(s.id) === String(id));
+      if(!spot) return;
+
+      if(isPresetSpot(spot)){
+        alert("Preset spots are locked.");
+        return;
+      }
+
+      const newName = prompt("Edit spot name:", spot.name);
+      if(newName === null) return;
+
+      const newType = prompt("Edit type: Reef or Spot", spot.type);
+      if(newType === null) return;
+
+      spot.name = newName.trim() || spot.name;
+      spot.type = newType.trim() || spot.type;
+
+      saveAllSpots(spots);
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
+    function deleteSpot(id){
+      const spots = getAllSpots();
+      const spot = spots.find(s => String(s.id) === String(id));
+      if(!spot) return;
+
+      if(isPresetSpot(spot)){
+        alert("Preset spot reset back to default.");
+        loadKnownSpotsIntoSaved();
+        fillSpotPick();
+        renderSpots();
+        renderMap();
+        return;
+      }
+
+      const ok = confirm("Delete this custom spot?");
+      if(!ok) return;
+
+      saveAllSpots(spots.filter(s => String(s.id) !== String(id)));
+      fillSpotPick();
+      renderSpots();
+      renderMap();
+    }
+
+    function toggleReefOverlay(){
+      reefOverlayOn = !reefOverlayOn;
+      renderMap();
+    }
+
+    function renderReefOverlay(){
+      const spots = getAllSpots().filter(s => s.type === "Reef");
+      spots.forEach(s => {
+        const p = parseCoords(s.coords);
+        if(!p) return;
+
+        const m = L.circle([p.lat, p.lng], {
+          radius: 350,
+          color: "#ffd166",
+          weight: 1,
+          fillColor: "#ffd166",
+          fillOpacity: 0.12
+        }).addTo(map);
+
+        reefOverlayMarkers.push(m);
+      });
+    }
+
+    function saveFishHelper(){
+      const sp = document.getElementById("fishIdSpecies").value;
+      fishHelperMsg.textContent = "";
+
+      if(!fishPhotoData){
+        alert("Choose a fish photo first.");
+        return;
+      }
+
+      const list = getFishHelpers();
+      list.unshift({
+        id: Date.now(),
+        species: sp ? sp : "Unknown",
+        photo: fishPhotoData || ""
+      });
+
+      saveFishHelpers(list.slice(0,20));
+      renderFishHelpers();
+
+      fishPhotoData = "";
+      document.getElementById("fishIdPreview").innerHTML = "";
+      document.getElementById("fishIdSpecies").value = "";
+      document.getElementById("fishIdPhoto").value = "";
+      fishHelperMsg.textContent = "Fish helper saved.";
+
+      setTimeout(() => {
+        fishHelperMsg.textContent = "";
+      }, 2500);
+    }
+
+    function renderFishHelpers(){
+      const box = document.getElementById("fishHelpers");
+      const list = getFishHelpers();
+      box.innerHTML = "";
+
+      if(!list.length){
+        box.innerHTML = `<div class="mini">No saved helpers yet.</div>`;
+        return;
+      }
+
+      list.forEach(item => {
+        box.innerHTML += `
+          <div class="card">
+            <b>${safe(item.species || "Unknown")}</b>
+            ${item.photo ? `<img class="photo" src="${item.photo}" alt="helper">` : ""}
+            <div class="row">
+              <button onclick="useFishHelper('${safe(item.id)}')">Use in Add Catch</button>
+              <button class="danger" onclick="deleteFishHelper('${safe(item.id)}')">Delete</button>
+            </div>
+          </div>
+        `;
+      });
+    }
+
+    function useFishHelper(id){
+      const item = getFishHelpers().find(x => String(x.id) === String(id));
+      if(!item) return;
+
+      if(item.species){
+        species.value = item.species;
+        minSizeEl.value = MIN_SIZE[item.species] ?? "";
+        checkFishSize();
+      }
+
+      if(item.photo){
+        photoData = item.photo;
+        photoPreview.innerHTML = `<img class="photo" src="${item.photo}" alt="fish">`;
+      }
+
+      saveCatchDraft();
+      showTab("add");
+    }
+
+    function deleteFishHelper(id){
+      saveFishHelpers(getFishHelpers().filter(x => String(x.id) !== String(id)));
+      renderFishHelpers();
+    }
+
+    function copyFishToCatch(){
+      const sp = document.getElementById("fishIdSpecies").value;
+
+      if(!sp && !fishPhotoData){
+        alert("Choose a species or fish photo first.");
+        return;
+      }
+
+      if(sp){
+        species.value = sp;
+        updateMinSize(false);
+      }
+
+      if(fishPhotoData){
+        photoData = fishPhotoData;
+        photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
+      }
+
+      if(sp){
+        minSizeEl.value = MIN_SIZE[sp] ?? "";
+        checkFishSize();
+      }
+
+      saveCatchDraft();
+      showTab("add");
+    }
+
+    function exportBackup(){
+      try{
+        const backup = {
+          app: "Tanya Deep Sea",
+          version: "V51",
+          exportedAt: new Date().toISOString(),
+          catches: getAllCatches(),
+          spots: getAllSpots(),
+          fishHelpers: getFishHelpers()
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type:"application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "Backup exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export backup.");
+      }
+    }
+
+    function exportGPX(){
+      try{
+        const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+
+        if(!spots.length){
+          alert("No spots to export.");
+          return;
+        }
+
+        const waypoints = spots.map(s => {
+          const p = parseCoords(s.coords);
+          if(!p) return "";
+          return `
+  <wpt lat="${p.lat}" lon="${p.lng}">
+    <name>${escapeXml(s.name)}</name>
+    <desc>${escapeXml(`${s.type} | ${isPresetSpot(s) ? "Preset" : "Custom"} | Catches: ${getSpotCatchCount(s)}`)}</desc>
+  </wpt>`;
+        }).join("");
+
+        const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Tanya Deep Sea V51" xmlns="http://www.topografix.com/GPX/1/1">
+${waypoints}
+</gpx>`;
+
+        const blob = new Blob([gpx], { type:"application/gpx+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-spots-${new Date().toISOString().slice(0,10)}.gpx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "GPX exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export GPX.");
+      }
+    }
+
+    importBackupEl.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+
+          if(!data || typeof data !== "object"){
+            throw new Error("Invalid backup");
+          }
+
+          if(Array.isArray(data.catches)) saveAllCatches(data.catches);
+
+          if(Array.isArray(data.spots)){
+            const cleanedSpots = data.spots.map(s => ({
+              id: s.id || ("c" + Date.now() + Math.random()),
+              name: s.name || "Spot",
+              type: s.type || "Spot",
+              coords: s.coords || "",
+              preset: Boolean(s.preset && String(s.id).startsWith("s"))
+            })).filter(s => s.coords);
+
+            const customImported = cleanedSpots.filter(s => !isPresetSpot(s));
+            saveAllSpots(customImported);
+          }
+
+          if(Array.isArray(data.fishHelpers)) saveFishHelpers(data.fishHelpers);
+
+          loadKnownSpotsIntoSaved();
+          fillSpotPick();
+          renderLog();
+          renderSpots();
+          renderStats();
+          renderMap();
+          renderFishHelpers();
+          renderWeatherPanel();
+
+          backupMsg.textContent = "Backup imported.";
+          setTimeout(() => backupMsg.textContent = "", 2500);
+        }catch{
+          alert("Invalid backup JSON file.");
+        }finally{
+          importBackupEl.value = "";
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    spotSearchEl.addEventListener("input", renderSpots);
+
+    function getMoonPhaseFraction(date = new Date()){
+      const lp = 2551443;
+      const newMoon = new Date("2001-01-24T13:08:00Z").getTime();
+      const phase = (((date.getTime() - newMoon) / 1000) % lp) / lp;
+      return (phase + 1) % 1;
+    }
+
+    function getMoonPhaseName(date = new Date()){
+      const p = getMoonPhaseFraction(date);
+
+      if (p < 0.03 || p > 0.97) return "New Moon";
+      if (p < 0.22) return "Waxing Crescent";
+      if (p < 0.28) return "First Quarter";
+      if (p < 0.47) return "Waxing Gibbous";
+      if (p < 0.53) return "Full Moon";
+      if (p < 0.72) return "Waning Gibbous";
+      if (p < 0.78) return "Last Quarter";
+      return "Waning Crescent";
+    }
+
+    function getMoonBoost(date = new Date()){
+      const p = getMoonPhaseFraction(date);
+      const distNew = Math.min(Math.abs(p - 0), Math.abs(p - 1));
+      const distFull = Math.abs(p - 0.5);
+
+      if(distNew < 0.06 || distFull < 0.06) return 20;
+      if(distNew < 0.12 || distFull < 0.12) return 12;
+      return 4;
+    }
+
+    function getChipNumber(text){
+      const m = String(text || "").match(/([\d.]+)/);
+      return m ? Number(m[1]) : 0;
+    }
+
+    function getBitePrediction(){
+      const moonBoost = getMoonBoost(new Date());
+
+      const wind = getChipNumber(chipWind.textContent);
+      const swell = getChipNumber(chipSwell.textContent);
+      const current = getChipNumber(chipCurrent.textContent);
+
+      let score = 50 + moonBoost;
+
+      if(wind > 0){
+        if(wind <= 15) score += 10;
+        else if(wind <= 25) score += 4;
+        else score -= 10;
+      }
+
+      if(swell > 0){
+        if(swell <= 1.8) score += 8;
+        else if(swell <= 2.5) score += 2;
+        else score -= 8;
+      }
+
+      if(current > 0){
+        if(current <= 0.9) score += 8;
+        else if(current <= 1.5) score += 2;
+        else score -= 7;
+      }
+
+      score = Math.max(0, Math.min(100, Math.round(score)));
+
+      let label = "Fair";
+      if(score >= 80) label = "Excellent";
+      else if(score >= 65) label = "Good";
+      else if(score < 45) label = "Slow";
+
+      return { score, label };
+    }
+
+    function renderWeatherPanel(){
+      const box = document.getElementById("weatherBox");
+      if(!box) return;
+
+      const moon = getMoonPhaseName(new Date());
+      const bite = getBitePrediction();
+
+      let tideText = "Tide API not connected yet";
+      let tideHint = "Moon and bite prediction are working already";
+
+      const hour = new Date().getHours();
+      const simpleTideState = (hour % 12) < 6 ? "Rising" : "Falling";
+
+      box.innerHTML = `
+        <div class="card">
+          <b>Moon Phase</b>
+          <div class="mini" style="margin-top:8px;">${moon}</div>
+        </div>
+
+        <div class="card">
+          <b>Bite Prediction</b>
+          <div class="mini" style="margin-top:8px;">Score: ${bite.score}/100</div>
+          <div class="mini">Condition: ${bite.label}</div>
+          <div class="meter">
+            <div class="meterFill" style="width:${bite.score}%"></div>
+          </div>
+          <div class="mini" style="margin-top:8px;">Based on moon phase + wind + swell + current estimate.</div>
+        </div>
+
+        <div class="card">
+          <b>Tide</b>
+          <div class="mini" style="margin-top:8px;">State: ${simpleTideState}</div>
+          <div class="mini">${tideText}</div>
+          <div class="mini" style="margin-top:8px;">${tideHint}</div>
+        </div>
+      `;
+    }
+
+    function resetAll(){
+      const ok = confirm("Delete all catches, fish helpers and custom spots?");
+      if(!ok) return;
+      localStorage.removeItem(KEY_CATCHES);
+      localStorage.removeItem(KEY_SPOTS);
+      localStorage.removeItem(KEY_FISH);
+      localStorage.removeItem(KEY_DRAFT);
+      loadKnownSpotsIntoSaved();
+      renderLog();
+      renderSpots();
+      renderStats();
+      renderMap();
+      renderFishHelpers();
+      fillSpotPick();
+      clearCatchForm();
+      renderWeatherPanel();
+    }
+
+    loadKnownSpotsIntoSaved();
+    fillSpotPick();
+    updateMinSize(false);
+    loadCatchDraft();
+    showTab("add");
+    initMap();
+    renderLog();
+    renderSpots();
+    renderStats();
+    renderWeatherPanel();
+  </script>
+
+  <script>
+    if("serviceWorker" in navigator){
+      navigator.serviceWorker.register("./sw.js");
+    }
+  </script>
 </body>
-</html>
+          </html>
