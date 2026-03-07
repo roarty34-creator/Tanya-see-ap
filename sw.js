@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v54";
+const CACHE_NAME = "tanya-deep-sea-v55";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -18,9 +18,7 @@ self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
       Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
+        keys.filter(key => key !== CACHE_NAME).map(key => caches.delete(key))
       )
     )
   );
@@ -29,7 +27,6 @@ self.addEventListener("activate", event => {
 
 self.addEventListener("fetch", event => {
   const req = event.request;
-
   if (req.method !== "GET") return;
 
   event.respondWith(
