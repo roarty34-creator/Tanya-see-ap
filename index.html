@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V53 Stable</title>
+  <title>Tanya Deep Sea V54 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -201,7 +201,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V53 Stable
+    Tanya Deep Sea V54 Stable
   </h1>
 
   <div class="topnav">
@@ -398,7 +398,6 @@
     const KEY_CATCHES = "tanya_deepsea_catches";
     const KEY_SPOTS = "tanya_deepsea_spots";
     const KEY_FISH = "tanya_deepsea_fishhelpers";
-    const KEY_DRAFT = "tanya_deepsea_addcatch_draft";
     const KEY_LAST_WEATHER_COORDS = "tanya_deepsea_weather_coords";
     const BASE = { lat:-34.37, lng:20.85 };
 
@@ -560,51 +559,6 @@
       localStorage.setItem(KEY_FISH, JSON.stringify(v));
     }
 
-    function getCatchDraft(){
-      try{ return JSON.parse(localStorage.getItem(KEY_DRAFT) || "{}"); }
-      catch{ return {}; }
-    }
-
-    function saveCatchDraft(){
-      const draft = {
-        species: species.value || "",
-        length: lengthEl.value || "",
-        bait: baitEl.value || "",
-        coords: coordsEl.value || "",
-        place: placeEl.value || "Deep Sea",
-        localArea: localAreaEl.value || "",
-        manualSpotPick: manualSpotPick.value || "",
-        notes: notesEl.value || "",
-        photo: photoData || ""
-      };
-      localStorage.setItem(KEY_DRAFT, JSON.stringify(draft));
-      draftMsg.textContent = "Draft saved.";
-      setTimeout(() => draftMsg.textContent = "", 1200);
-    }
-
-    function loadCatchDraft(){
-      const d = getCatchDraft();
-      if(!d || typeof d !== "object") return;
-
-      species.value = d.species || "";
-      updateMinSize(false);
-      lengthEl.value = d.length || "";
-      baitEl.value = d.bait || "";
-      coordsEl.value = d.coords || "";
-      placeEl.value = d.place || "Deep Sea";
-      localAreaEl.value = d.localArea || "";
-      manualSpotPick.value = d.manualSpotPick || "";
-      notesEl.value = d.notes || "";
-      photoData = d.photo || "";
-      photoPreview.innerHTML = photoData ? `<img class="photo" src="${photoData}" alt="photo">` : "";
-      checkFishSize();
-    }
-
-    function clearCatchDraft(){
-      localStorage.removeItem(KEY_DRAFT);
-      draftMsg.textContent = "";
-    }
-
     function clearLayers(arr){
       if(!map) return;
       arr.forEach(m => { try{ map.removeLayer(m); }catch{} });
@@ -693,21 +647,14 @@
       if(id === "moonTab") renderWeatherPanel();
 
       if(id === "add"){
-        const draft = getCatchDraft();
-        const hasDraft = draft && (draft.species || draft.length || draft.bait || draft.coords || draft.localArea || draft.notes || draft.photo);
-        if(hasDraft){
-          loadCatchDraft();
-        } else {
-          clearCatchForm();
-        }
+        clearCatchForm();
       }
     }
 
-    function updateMinSize(doSave = true){
+    function updateMinSize(){
       const v = species.value;
       minSizeEl.value = MIN_SIZE[v] ?? "";
       checkFishSize();
-      if(doSave) saveCatchDraft();
     }
 
     function checkFishSize(){
@@ -736,14 +683,8 @@
       }
     }
 
-    species.addEventListener("change", () => updateMinSize(true));
-    lengthEl.addEventListener("input", () => {
-      checkFishSize();
-      saveCatchDraft();
-    });
-    baitEl.addEventListener("input", saveCatchDraft);
-    localAreaEl.addEventListener("input", saveCatchDraft);
-    notesEl.addEventListener("input", saveCatchDraft);
+    species.addEventListener("change", updateMinSize);
+    lengthEl.addEventListener("input", checkFishSize);
 
     photoEl.addEventListener("change", () => {
       const file = photoEl.files[0];
@@ -752,7 +693,6 @@
       reader.onload = () => {
         photoData = reader.result;
         photoPreview.innerHTML = `<img class="photo" src="${photoData}" alt="photo">`;
-        saveCatchDraft();
       };
       reader.readAsDataURL(file);
     });
@@ -796,8 +736,6 @@
           render14DayWeather();
         });
       }
-
-      saveCatchDraft();
     });
 
     function saveWeatherCoords(lat, lng){
@@ -865,12 +803,9 @@
         }
 
         await estimateCurrentStrength(lat, lng);
-
         renderMap();
         renderWeatherPanel();
         render14DayWeather();
-
-        saveCatchDraft();
       }, () => {
         alert("Could not get GPS location");
       }, {
@@ -920,9 +855,7 @@
 
       saveAllCatches(list);
 
-      clearCatchDraft();
       clearCatchForm();
-
       renderLog();
       renderStats();
       renderMap();
@@ -952,7 +885,6 @@
       chipCurrent.textContent = "Current: —";
       sizeNote.textContent = "Choose species to load legal size.";
       sizeNote.style.color = "#9fb0d0";
-      clearCatchDraft();
     }
 
     function renderLog(){
@@ -997,7 +929,6 @@
 
       coordsEl.value = coordStr;
       saveWeatherCoords(p.lat, p.lng);
-      saveCatchDraft();
 
       estimateCurrentStrength(p.lat, p.lng).then(() => {
         renderWeatherPanel();
@@ -1025,7 +956,7 @@
       if(!c) return;
 
       species.value = c.species || "";
-      updateMinSize(false);
+      updateMinSize();
       lengthEl.value = c.length || "";
       minSizeEl.value = c.min || "";
       baitEl.value = c.bait || "";
@@ -1040,7 +971,6 @@
       if(p) saveWeatherCoords(p.lat, p.lng);
 
       saveAllCatches(list.filter(x => String(x.id) !== String(id)));
-      saveCatchDraft();
       showTab("add");
     }
 
@@ -1126,8 +1056,6 @@
         if(tempClickMarker) map.removeLayer(tempClickMarker);
         tempClickMarker = L.marker([lat, lng]).addTo(map);
         map.setView([lat, lng], 15);
-
-        saveCatchDraft();
       });
     }
 
@@ -1342,7 +1270,6 @@
         });
       }
 
-      saveCatchDraft();
       showTab("add");
     }
 
@@ -1486,7 +1413,6 @@
         photoPreview.innerHTML = `<img class="photo" src="${item.photo}" alt="fish">`;
       }
 
-      saveCatchDraft();
       showTab("add");
     }
 
@@ -1514,7 +1440,6 @@
         photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
       }
 
-      saveCatchDraft();
       showTab("add");
     }
 
@@ -1522,7 +1447,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V53",
+          version: "V54",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1566,7 +1491,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V53" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V54" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1814,7 +1739,6 @@ ${waypoints}
       localStorage.removeItem(KEY_CATCHES);
       localStorage.removeItem(KEY_SPOTS);
       localStorage.removeItem(KEY_FISH);
-      localStorage.removeItem(KEY_DRAFT);
       loadKnownSpotsIntoSaved();
       renderLog();
       renderSpots();
@@ -1829,8 +1753,8 @@ ${waypoints}
 
     loadKnownSpotsIntoSaved();
     fillSpotPick();
-    updateMinSize(false);
-    loadCatchDraft();
+    updateMinSize();
+    clearCatchForm();
     showTab("add");
     initMap();
     renderLog();
@@ -1846,4 +1770,4 @@ ${waypoints}
     }
   </script>
 </body>
-  </html>
+                                                                     </html>
