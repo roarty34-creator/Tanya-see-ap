@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V52 Stable</title>
+  <title>Tanya Deep Sea V53 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -201,7 +201,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V52 Stable
+    Tanya Deep Sea V53 Stable
   </h1>
 
   <div class="topnav">
@@ -596,7 +596,6 @@
       manualSpotPick.value = d.manualSpotPick || "";
       notesEl.value = d.notes || "";
       photoData = d.photo || "";
-
       photoPreview.innerHTML = photoData ? `<img class="photo" src="${photoData}" alt="photo">` : "";
       checkFishSize();
     }
@@ -692,6 +691,16 @@
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
       if(id === "moonTab") renderWeatherPanel();
+
+      if(id === "add"){
+        const draft = getCatchDraft();
+        const hasDraft = draft && (draft.species || draft.length || draft.bait || draft.coords || draft.localArea || draft.notes || draft.photo);
+        if(hasDraft){
+          loadCatchDraft();
+        } else {
+          clearCatchForm();
+        }
+      }
     }
 
     function updateMinSize(doSave = true){
@@ -773,11 +782,19 @@
       if(!coordStr) return;
 
       coordsEl.value = coordStr;
-
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
         placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
         if(!localAreaEl.value) localAreaEl.value = s.name;
+      }
+
+      const p = parseCoords(coordStr);
+      if(p){
+        saveWeatherCoords(p.lat, p.lng);
+        estimateCurrentStrength(p.lat, p.lng).then(() => {
+          renderWeatherPanel();
+          render14DayWeather();
+        });
       }
 
       saveCatchDraft();
@@ -848,8 +865,11 @@
         }
 
         await estimateCurrentStrength(lat, lng);
+
+        renderMap();
         renderWeatherPanel();
         render14DayWeather();
+
         saveCatchDraft();
       }, () => {
         alert("Could not get GPS location");
@@ -899,14 +919,18 @@
       });
 
       saveAllCatches(list);
+
       clearCatchDraft();
-      alert("Catch saved");
       clearCatchForm();
+
       renderLog();
       renderStats();
       renderMap();
       renderSpots();
       renderWeatherPanel();
+      render14DayWeather();
+
+      alert("Catch saved");
     }
 
     function clearCatchForm(){
@@ -974,6 +998,12 @@
       coordsEl.value = coordStr;
       saveWeatherCoords(p.lat, p.lng);
       saveCatchDraft();
+
+      estimateCurrentStrength(p.lat, p.lng).then(() => {
+        renderWeatherPanel();
+        render14DayWeather();
+      });
+
       showTab("mapTab");
 
       setTimeout(() => {
@@ -1017,12 +1047,15 @@
     function deleteCatch(id){
       const ok = confirm("Delete this catch?");
       if(!ok) return;
+
       saveAllCatches(getAllCatches().filter(c => String(c.id) !== String(id)));
+
       renderLog();
       renderStats();
       renderMap();
       renderSpots();
       renderWeatherPanel();
+      render14DayWeather();
     }
 
     function renderStats(){
@@ -1301,7 +1334,13 @@
       if(!localAreaEl.value) localAreaEl.value = name;
 
       const p = parseCoords(coordStr);
-      if(p) saveWeatherCoords(p.lat, p.lng);
+      if(p){
+        saveWeatherCoords(p.lat, p.lng);
+        estimateCurrentStrength(p.lat, p.lng).then(() => {
+          renderWeatherPanel();
+          render14DayWeather();
+        });
+      }
 
       saveCatchDraft();
       showTab("add");
@@ -1466,17 +1505,13 @@
 
       if(sp){
         species.value = sp;
-        updateMinSize(false);
+        minSizeEl.value = MIN_SIZE[sp] ?? "";
+        checkFishSize();
       }
 
       if(fishPhotoData){
         photoData = fishPhotoData;
         photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
-      }
-
-      if(sp){
-        minSizeEl.value = MIN_SIZE[sp] ?? "";
-        checkFishSize();
       }
 
       saveCatchDraft();
@@ -1487,7 +1522,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V52",
+          version: "V53",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -1531,7 +1566,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V52" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V53" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -1811,4 +1846,4 @@ ${waypoints}
     }
   </script>
 </body>
-        </html>
+  </html>
