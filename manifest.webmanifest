@@ -1,12 +1,11 @@
-
 {
-  "name": "Tanya Deep Sea V63 Stable",
-  "short_name": "Deep Sea V63",
+  "name": "Tanya Deep Sea V64 Stable",
+  "short_name": "Deep Sea V64",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#061225",
   "theme_color": "#061225",
-  "description": "Deep sea fishing log, saved spots, fish helper, moon, tide, bite prediction and weather for Stilbaai.",
+  "description": "Deep sea fishing log, saved spots, local areas, fish helper, moon, tide, bite prediction and weather for Stilbaai.",
   "icons": [
     {
       "src": "./icon-192.png",
