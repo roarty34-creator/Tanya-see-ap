@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V65 Stable</title>
+  <title>Tanya Deep Sea V66 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -231,7 +231,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V65 Stable
+    Tanya Deep Sea V66 Stable
   </h1>
 
   <div class="topnav">
@@ -279,7 +279,7 @@
 
       <label>Manual Bait</label>
       <input id="manualBait" placeholder="Type your own bait here">
-      <div class="mini">Saved catch will use Manual Bait if filled in, otherwise Suggested Bait.</div>
+      <div class="mini">Saved catch uses Manual Bait first, otherwise Suggested Bait.</div>
 
       <label>Manual Spot Choice</label>
       <select id="manualSpotPick">
@@ -853,6 +853,75 @@
       return Boolean(spot && (spot.preset === true || String(spot.id).startsWith("s")));
     }
 
+    function getSpeciesTip(speciesName){
+      return SPECIES_TIPS.find(item => item.species === speciesName) || null;
+    }
+
+    function autoFillSuggestedBaitFromSpecies(){
+      if(manualBaitEl.value.trim()) return;
+
+      const selectedSpecies = species.value;
+      const tip = getSpeciesTip(selectedSpecies);
+
+      fillBaitPick();
+
+      if(tip && tip.bait){
+        if(BAIT_OPTIONS.includes(tip.bait)){
+          baitEl.value = tip.bait;
+        } else {
+          const opt = document.createElement("option");
+          opt.value = tip.bait;
+          opt.textContent = tip.bait;
+          baitEl.appendChild(opt);
+          baitEl.value = tip.bait;
+        }
+      } else {
+        baitEl.value = "";
+      }
+    }
+
+    function updateWhereCaughtDisplay(typeText = ""){
+      const area = localAreaEl.value || "";
+      const base = "Deep Sea";
+
+      if(area && typeText){
+        placeEl.value = `${base} • ${typeText} • ${area}`;
+      } else if(area){
+        placeEl.value = `${base} • ${area}`;
+      } else {
+        placeEl.value = base;
+      }
+    }
+
+    function autoSaveCurrentSpot(){
+      const coords = coordsEl.value.trim();
+      if(!coords) return;
+
+      const area = localAreaEl.value.trim();
+      if(!area) return;
+
+      const spots = getAllSpots();
+
+      const existing = spots.find(s =>
+        String(s.coords) === String(coords) ||
+        normalizeName(s.name) === normalizeName(area)
+      );
+
+      if(existing) return;
+
+      spots.push({
+        id: "c" + Date.now(),
+        name: area,
+        type: "Spot",
+        coords: coords,
+        preset: false
+      });
+
+      saveAllSpots(spots);
+      fillSpotPick();
+      fillLocalAreaPick();
+    }
+
     function loadKnownSpotsIntoSaved(){
       const existing = getAllSpots();
       const customOnly = existing.filter(s => !isPresetSpot(s));
@@ -978,13 +1047,13 @@
       if(area){
         const s = getAllSpots().find(x => x.name === area);
         if(s){
-          placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
           if(!coords){
             coordsEl.value = s.coords;
           }
           manualSpotPick.value = s.coords;
+          updateWhereCaughtDisplay(s.type || "Area");
         } else {
-          placeEl.value = `Deep Sea • Area • ${area}`;
+          updateWhereCaughtDisplay("Area");
         }
       } else {
         placeEl.value = "Deep Sea";
@@ -1066,7 +1135,10 @@
       }
     }
 
-    species.addEventListener("change", updateMinSize);
+    species.addEventListener("change", () => {
+      updateMinSize();
+      autoFillSuggestedBaitFromSpecies();
+    });
     lengthEl.addEventListener("input", checkFishSize);
 
     manualSpotPick.addEventListener("change", function(e){
@@ -1077,8 +1149,8 @@
 
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
-        placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
         addAreaOptionIfMissing(s.name);
+        updateWhereCaughtDisplay(s.type || "Area");
       }
 
       const p = parseCoords(coordStr);
@@ -1150,11 +1222,11 @@
         const nearest = getNearestSpot(lat, lng);
         if(nearest){
           manualSpotPick.value = nearest.coords;
-          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
           addAreaOptionIfMissing(nearest.name);
+          updateWhereCaughtDisplay(nearest.type || "Area");
         } else {
-          placeEl.value = "Deep Sea";
           localAreaEl.value = "";
+          placeEl.value = "Deep Sea";
         }
 
         if(map){
@@ -1200,6 +1272,8 @@
       const list = getAllCatches();
       const spotName = getSpotNameFromCoords(coords);
       const areaName = localAreaEl.value.trim() || spotName;
+
+      autoSaveCurrentSpot();
 
       const entry = {
         id: Date.now(),
@@ -1276,10 +1350,10 @@
       const s = getAllSpots().find(x => x.coords === coordStr);
 
       if(s){
-        placeEl.value = `Deep Sea • ${s.type} • ${s.name}`;
         manualSpotPick.value = coordStr;
+        updateWhereCaughtDisplay(s.type || "Area");
       } else {
-        placeEl.value = "Deep Sea";
+        updateWhereCaughtDisplay("Area");
       }
 
       const p = parseCoords(coordStr);
@@ -1412,8 +1486,13 @@
       }
 
       coordsEl.value = c.coords || "";
-      placeEl.value = c.place || "Deep Sea";
       addAreaOptionIfMissing(c.localArea || "");
+      if(c.localArea){
+        const s = getAllSpots().find(x => x.name === c.localArea);
+        updateWhereCaughtDisplay(s?.type || "Area");
+      } else {
+        placeEl.value = c.place || "Deep Sea";
+      }
       notesEl.value = c.notes || "";
       photoData = c.photo || "";
       photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
@@ -1540,13 +1619,13 @@
 
         if(nearest){
           manualSpotPick.value = nearest.coords;
-          placeEl.value = `Deep Sea • ${nearest.type} • ${nearest.name}`;
           addAreaOptionIfMissing(nearest.name);
+          updateWhereCaughtDisplay(nearest.type || "Area");
         } else {
           const typedArea = prompt("Area name for this map spot?", "");
           if(typedArea !== null && typedArea.trim()){
             addAreaOptionIfMissing(typedArea.trim());
-            placeEl.value = `Deep Sea • Area • ${typedArea.trim()}`;
+            updateWhereCaughtDisplay("Area");
           }
         }
 
@@ -1830,9 +1909,9 @@
 
     function useSpotCoords(coordStr, name, type){
       coordsEl.value = coordStr;
-      placeEl.value = `Deep Sea • ${type} • ${name}`;
       manualSpotPick.value = coordStr;
       addAreaOptionIfMissing(name);
+      updateWhereCaughtDisplay(type || "Area");
 
       const p = parseCoords(coordStr);
       if(p){
@@ -1998,6 +2077,7 @@
         species.value = item.species;
         minSizeEl.value = MIN_SIZE[item.species] ?? "";
         checkFishSize();
+        autoFillSuggestedBaitFromSpecies();
       }
 
       if(item.photo){
@@ -2025,6 +2105,7 @@
         species.value = sp;
         minSizeEl.value = MIN_SIZE[sp] ?? "";
         checkFishSize();
+        autoFillSuggestedBaitFromSpecies();
       }
 
       if(fishPhotoData){
@@ -2039,7 +2120,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V65",
+          version: "V66",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -2083,7 +2164,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V65" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V66" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
