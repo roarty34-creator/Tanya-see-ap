@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V72 Stable</title>
+  <title>Tanya Deep Sea V73 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -266,7 +266,7 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V72 Stable
+    Tanya Deep Sea V73 Stable
   </h1>
 
   <div class="topnav">
@@ -279,7 +279,7 @@
     <button class="navbtn" id="btnFish" onclick="showTab('fishid')">Fish Helper</button>
     <button class="navbtn" id="btnWeather" onclick="showTab('weather')">2 Week Weather</button>
     <button class="navbtn" id="btnMoon" onclick="showTab('moonTab')">Tide & Moon</button>
-    <button class="navbtn" id="btnTips" onclick="showTab('tips')">Species Tips</button>
+    <button class="navbtn" id="btnExtra" onclick="showTab('extraTab')">Extra Info</button>
   </div>
 
   <section id="add">
@@ -297,7 +297,6 @@
         <option>Silverfish</option>
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
-        <option>Galjoen</option>
         <option>Hottentot</option>
       </select>
 
@@ -307,6 +306,7 @@
       <label>Minimum Size</label>
       <input id="minSize" readonly>
       <div id="sizeNote" class="mini">Choose species to load legal size.</div>
+      <div id="seasonWarn" class="mini" style="margin-top:10px;"></div>
 
       <label>Suggested Bait</label>
       <select id="bait">
@@ -495,7 +495,6 @@
         <option>Silverfish</option>
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
-        <option>Galjoen</option>
         <option>Hottentot</option>
       </select>
 
@@ -524,12 +523,19 @@
     </div>
   </section>
 
-  <section id="tips">
+  <section id="extraTab">
     <div class="card">
-      <b>Best Method Per Species</b>
-      <div id="tipsBox" style="margin-top:10px;"></div>
+      <b>Extra Info</b>
+      <div id="extraBox" style="margin-top:10px;"></div>
     </div>
   </section>
+
+  <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
+    Tanya Deep Sea Fishing App<br>
+    Core system: V69<br>
+    Cache system: V71-style<br>
+    Build version: V73 Stable
+  </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
@@ -646,7 +652,7 @@
       "Silverfish": { best:"All year", note:"Often steady on reef when conditions are good.", closed:"Check current rules" },
       "Red Steenbras": { best:"Cooler months / reef edges", note:"Sensitive species. Handle carefully.", closed:"Closed season: 1 Sep - 30 Nov" },
       "Yellow Belly": { best:"All year", note:"Usually linked to reef structure and decent current.", closed:"Check current rules" },
-      "Galjoen": { best:"Winter to early Spring", note:"Likes rougher water and rocky structure.", closed:"Closed season: 15 Oct - end Feb" },
+      "Galjoen": { best:"Winter to early Spring", note:"Mostly shore / rocky structure species.", closed:"Closed season: 15 Oct - end Feb" },
       "Hottentot": { best:"All year", note:"Common reef fish in workable conditions.", closed:"Check current rules" }
     };
 
@@ -659,7 +665,6 @@
       { species:"Silverfish", method:"Anchor", bait:"Chokka strip, Pilchard strip", depth:"20m – 45m", time:"Morning and slack tide", rig:"Light bottom rig", note:"Usually caught on reef bottom." },
       { species:"Red Steenbras", method:"Anchor", bait:"Chokka, Pilchard, Redbait", depth:"20m – 60m", time:"Low light and pushing tide", rig:"Strong bottom rig", note:"Often on sandy reef edges." },
       { species:"Yellow Belly", method:"Anchor", bait:"Chokka, Pilchard", depth:"20m – 50m", time:"Morning bite", rig:"Bottom rig", note:"Stay on reef patches." },
-      { species:"Galjoen", method:"Anchor", bait:"Redbait, Mussel, Crab", depth:"Rocky reef / shallow structure", time:"Rough water and pushing tide", rig:"Short trace reef rig", note:"More common close to rocky areas." },
       { species:"Hottentot", method:"Anchor", bait:"Chokka, Pilchard, Redbait", depth:"15m – 40m", time:"Morning reef bite", rig:"Light bottom rig", note:"Very common reef fish." }
     ];
 
@@ -843,6 +848,57 @@
       if(level >= 2) return "threat-2";
       if(level >= 1) return "threat-1";
       return "threat-0";
+    }
+
+    function isRedSteenbrasClosed(date = new Date()){
+      const month = date.getMonth() + 1;
+      return month >= 9 && month <= 11;
+    }
+
+    function getSeasonStatus(speciesName, date = new Date()){
+      if(speciesName === "Red Steenbras"){
+        return isRedSteenbrasClosed(date)
+          ? { status: "CLOSED NOW", colorClass: "threat-5" }
+          : { status: "OPEN NOW", colorClass: "threat-1" };
+      }
+      return { status: "CHECK RULES", colorClass: "threat-2" };
+    }
+
+    function renderSeasonWarning(){
+      const box = document.getElementById("seasonWarn");
+      if(!box) return;
+
+      const sp = species.value;
+      if(!sp){
+        box.innerHTML = "";
+        return;
+      }
+
+      const season = getSeasonInfo(sp);
+      const state = getSeasonStatus(sp);
+
+      if(state.status === "CLOSED NOW"){
+        box.innerHTML = `
+          <span class="threatBadge ${state.colorClass}">${state.status}</span>
+          <div class="mini" style="margin-top:6px;">
+            ${safe(sp)} closed season: ${safe(season.closed)}
+          </div>
+        `;
+      } else if(state.status === "OPEN NOW"){
+        box.innerHTML = `
+          <span class="threatBadge ${state.colorClass}">${state.status}</span>
+          <div class="mini" style="margin-top:6px;">
+            Best season: ${safe(season.best)}
+          </div>
+        `;
+      } else {
+        box.innerHTML = `
+          <span class="threatBadge ${state.colorClass}">${state.status}</span>
+          <div class="mini" style="margin-top:6px;">
+            Closed season not confirmed here. Always check current rules.
+          </div>
+        `;
+      }
     }
 
     function autoFillSuggestedBaitFromSpecies(){
@@ -1049,7 +1105,7 @@
         fishid:"btnFish",
         weather:"btnWeather",
         moonTab:"btnMoon",
-        tips:"btnTips"
+        extraTab:"btnExtra"
       };
       const btn = document.getElementById(mapIds[id]);
       if(btn) btn.classList.add("active");
@@ -1072,7 +1128,7 @@
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
       if(id === "moonTab") renderWeatherPanel();
-      if(id === "tips") renderSpeciesTips();
+      if(id === "extraTab") renderExtraInfo();
     }
 
     function updateMinSize(){
@@ -1108,6 +1164,7 @@
     species.addEventListener("change", () => {
       updateMinSize();
       autoFillSuggestedBaitFromSpecies();
+      renderSeasonWarning();
     });
     lengthEl.addEventListener("input", checkFishSize);
 
@@ -1297,6 +1354,12 @@
         return;
       }
 
+      const seasonState = getSeasonStatus(sp);
+      if(seasonState.status === "CLOSED NOW"){
+        alert(sp + " is currently in CLOSED season.");
+        return;
+      }
+
       const min = MIN_SIZE[sp] || 0;
       if(min > 0 && len && len < min){
         const ok = confirm("⚠️ This fish is undersize (" + len + " cm).\nMinimum is " + min + " cm.\n\nSave anyway?");
@@ -1372,6 +1435,7 @@
       manualSpotPick.value = "";
       sizeNote.textContent = "Choose species to load legal size.";
       sizeNote.style.color = "#9fb0d0";
+      renderSeasonWarning();
     }
 
     function useBestSpot(coordStr, areaName){
@@ -1420,6 +1484,7 @@
 
       manualBaitEl.value = "";
       updateMinSize();
+      renderSeasonWarning();
       showTab("add");
     }
 
@@ -1550,9 +1615,14 @@
         alert("Analyze fish first.");
         return;
       }
+      if(lastDetectedFish.species === "Galjoen"){
+        alert("Galjoen kept in Extra Info / other species notes.");
+        return;
+      }
       species.value = lastDetectedFish.species;
       updateMinSize();
       autoFillSuggestedBaitFromSpecies();
+      renderSeasonWarning();
       showTab("add");
     }
 
@@ -1661,6 +1731,7 @@
       if(p) saveWeatherCoords(p.lat, p.lng);
 
       saveAllCatches(list.filter(x => String(x.id) !== String(id)));
+      renderSeasonWarning();
       showTab("add");
     }
 
@@ -2199,11 +2270,12 @@
       const item = getFishHelpers().find(x => String(x.id) === String(id));
       if(!item) return;
 
-      if(item.species){
+      if(item.species && item.species !== "Galjoen"){
         species.value = item.species;
         minSizeEl.value = MIN_SIZE[item.species] ?? "";
         checkFishSize();
         autoFillSuggestedBaitFromSpecies();
+        renderSeasonWarning();
       }
 
       if(item.photo){
@@ -2225,11 +2297,12 @@
         return;
       }
 
-      if(sp){
+      if(sp && sp !== "Galjoen"){
         species.value = sp;
         minSizeEl.value = MIN_SIZE[sp] ?? "";
         checkFishSize();
         autoFillSuggestedBaitFromSpecies();
+        renderSeasonWarning();
       }
 
       if(fishPhotoData){
@@ -2239,8 +2312,8 @@
       showTab("add");
     }
 
-    function renderSpeciesTips(){
-      const box = document.getElementById("tipsBox");
+    function renderExtraInfo(){
+      const box = document.getElementById("extraBox");
       if(!box) return;
 
       box.innerHTML = "";
@@ -2252,6 +2325,7 @@
           const threat = getThreatInfo(item.species);
           const threatClass = getThreatClass(threat.level);
           const season = getSeasonInfo(item.species);
+          const seasonState = getSeasonStatus(item.species);
 
           const card = document.createElement("div");
           card.className = "card";
@@ -2261,10 +2335,11 @@
             <div style="margin-top:6px;">
               <span class="tag ${isAnchor ? "preset" : "custom"}">${safe(item.method)}</span>
               <span class="threatBadge ${threatClass}">${safe(threat.short)}</span>
+              <span class="threatBadge ${seasonState.colorClass}">${safe(seasonState.status)}</span>
             </div>
 
             <div class="mini" style="margin-top:8px;"><b>Threat Status:</b> ${safe(threat.status)}</div>
-            <div class="mini" style="margin-top:6px;"><b>Season:</b> ${safe(season.best)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Best Season:</b> ${safe(season.best)}</div>
             <div class="mini" style="margin-top:6px;"><b>Season Note:</b> ${safe(season.note)}</div>
             <div class="mini" style="margin-top:6px;"><b>Closed Season / Rules:</b> ${safe(season.closed)}</div>
             <div class="mini" style="margin-top:6px;"><b>Suggested Bait:</b> ${safe(item.bait)}</div>
@@ -2285,38 +2360,60 @@
           box.appendChild(card);
         });
 
-      const guide = document.createElement("div");
-      guide.className = "card";
-      guide.innerHTML = `
+      const threatGuide = document.createElement("div");
+      threatGuide.className = "card";
+      threatGuide.innerHTML = `
         <b>Threat Colour Guide</b>
         <div style="margin-top:8px;"><span class="threatBadge threat-5">CR</span> <span class="mini">Highest concern</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-4">EN</span> <span class="mini">Very high concern</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-3">Collapsed</span> <span class="mini">Collapsed / sensitive stock</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-2">Check</span> <span class="mini">Check carefully</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-1">Low</span> <span class="mini">Lower concern in app</span></div>
+        <div style="margin-top:6px;"><span class="threatBadge threat-1">Open</span> <span class="mini">Open now / lower concern</span></div>
       `;
-      box.appendChild(guide);
+      box.appendChild(threatGuide);
 
       const seasonGuide = document.createElement("div");
       seasonGuide.className = "card";
       seasonGuide.innerHTML = `
-        <b>Season Guide</b>
-        <div class="mini" style="margin-top:8px;">Galjoen: best winter to early spring</div>
-        <div class="mini">Red Steenbras: sensitive species - closed season 1 Sep to 30 Nov</div>
-        <div class="mini">Galjoen closed season: 15 Oct to end Feb</div>
-        <div class="mini" style="margin-top:8px;">Always check current permit rules before keeping fish.</div>
+        <b>Boat Species Season Guide</b>
+        <div class="mini" style="margin-top:8px;">Red Steenbras: closed season 1 Sep - 30 Nov</div>
+        <div class="mini">Cape Kob: often better from spring to autumn</div>
+        <div class="mini">Yellowtail / Bonito: best in warmer months with bait and bird activity</div>
+        <div class="mini">Red Roman / Snapper / Hottentot / Silverfish: reef structure matters more than calendar alone</div>
       `;
       box.appendChild(seasonGuide);
 
-      const quick = document.createElement("div");
-      quick.className = "card";
-      quick.innerHTML = `
-        <b>Quick Rule</b>
+      const extraSpecies = document.createElement("div");
+      extraSpecies.className = "card";
+      extraSpecies.innerHTML = `
+        <b>Other / Less Boat-Focused Notes</b>
+        <div class="mini" style="margin-top:8px;"><b>Galjoen:</b> mostly more relevant around rocky structure and shore-style fishing.</div>
+        <div class="mini">Closed season: 15 Oct - end Feb.</div>
+        <div class="mini">Kept here in Extra Info so the main app stays boat-focused.</div>
+      `;
+      box.appendChild(extraSpecies);
+
+      const rigGuide = document.createElement("div");
+      rigGuide.className = "card";
+      rigGuide.innerHTML = `
+        <b>Quick Boat Guide</b>
         <div class="mini" style="margin-top:8px;">Pelagic fish → Drift</div>
         <div class="mini">Reef / Bottom fish → Anchor</div>
-        <div class="mini">Best combo: Drift first to find fish, then anchor on the mark.</div>
+        <div class="mini">Drift first to find fish, then anchor on the mark.</div>
+        <div class="mini">Use the Map + Drift tabs together before every drop.</div>
       `;
-      box.appendChild(quick);
+      box.appendChild(rigGuide);
+
+      const safetyGuide = document.createElement("div");
+      safetyGuide.className = "card";
+      safetyGuide.innerHTML = `
+        <b>Boat Safety Notes</b>
+        <div class="mini" style="margin-top:8px;">Check wind + swell before launch.</div>
+        <div class="mini">If current is too strong, drift may be too fast for bottom fishing.</div>
+        <div class="mini">Use route line on Map to move cleanly between saved spots.</div>
+        <div class="mini">Log catches with area names so Stats can show your hottest reefs.</div>
+      `;
+      box.appendChild(safetyGuide);
     }
 
     function getMoonPhaseFraction(date = new Date()){
@@ -2508,6 +2605,129 @@
       }
     }
 
+    function exportBackup(){
+      try{
+        const backup = {
+          app: "Tanya Deep Sea",
+          version: "V73",
+          exportedAt: new Date().toISOString(),
+          catches: getAllCatches(),
+          spots: getAllSpots(),
+          fishHelpers: getFishHelpers()
+        };
+
+        const blob = new Blob([JSON.stringify(backup, null, 2)], { type:"application/json" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-backup-${new Date().toISOString().slice(0,10)}.json`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "Backup exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export backup.");
+      }
+    }
+
+    function exportGPX(){
+      try{
+        const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+        if(!spots.length){
+          alert("No spots to export.");
+          return;
+        }
+
+        const waypoints = spots.map(s => {
+          const p = parseCoords(s.coords);
+          if(!p) return "";
+          return `
+  <wpt lat="${p.lat}" lon="${p.lng}">
+    <name>${escapeXml(s.name)}</name>
+    <desc>${escapeXml(`${s.type} | ${isPresetSpot(s) ? "Preset" : "Custom"} | Catches: ${getSpotCatchCount(s)}`)}</desc>
+  </wpt>`;
+        }).join("");
+
+        const gpx = `<?xml version="1.0" encoding="UTF-8"?>
+<gpx version="1.1" creator="Tanya Deep Sea V73" xmlns="http://www.topografix.com/GPX/1/1">
+${waypoints}
+</gpx>`;
+
+        const blob = new Blob([gpx], { type:"application/gpx+xml" });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `tanya-deepsea-spots-${new Date().toISOString().slice(0,10)}.gpx`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        URL.revokeObjectURL(url);
+
+        backupMsg.textContent = "GPX exported.";
+        setTimeout(() => backupMsg.textContent = "", 2000);
+      }catch{
+        alert("Could not export GPX.");
+      }
+    }
+
+    importBackupEl.addEventListener("change", e => {
+      const file = e.target.files[0];
+      if(!file) return;
+
+      const reader = new FileReader();
+      reader.onload = () => {
+        try{
+          const data = JSON.parse(reader.result);
+          if(!data || typeof data !== "object") throw new Error("Invalid backup");
+
+          if(Array.isArray(data.catches)) saveAllCatches(data.catches);
+
+          if(Array.isArray(data.spots)){
+            const cleanedSpots = data.spots.map(s => ({
+              id: s.id || ("c" + Date.now() + Math.random()),
+              name: s.name || "Spot",
+              type: s.type || "Spot",
+              coords: s.coords || "",
+              preset: Boolean(s.preset && String(s.id).startsWith("s"))
+            })).filter(s => s.coords);
+
+            const customImported = cleanedSpots.filter(s => !isPresetSpot(s));
+            saveAllSpots(customImported);
+          }
+
+          if(Array.isArray(data.fishHelpers)) saveFishHelpers(data.fishHelpers);
+
+          loadKnownSpotsIntoSaved();
+          fillSpotPick();
+          fillBaitPick();
+          fillLocalAreaPick();
+          renderLog();
+          renderSpots();
+          renderStats();
+          renderMap();
+          renderFishHelpers();
+          renderWeatherPanel();
+          render14DayWeather();
+          renderDriftPanel();
+          renderExtraInfo();
+          renderSeasonWarning();
+
+          backupMsg.textContent = "Backup imported.";
+          setTimeout(() => backupMsg.textContent = "", 2500);
+        }catch{
+          alert("Invalid backup JSON file.");
+        }finally{
+          importBackupEl.value = "";
+        }
+      };
+      reader.readAsText(file);
+    });
+
+    spotSearchEl.addEventListener("input", renderSpots);
+
     function resetAll(){
       const ok = confirm("Delete all catches, fish helpers and custom spots?");
       if(!ok) return;
@@ -2527,7 +2747,8 @@
       renderWeatherPanel();
       render14DayWeather();
       renderDriftPanel();
-      renderSpeciesTips();
+      renderExtraInfo();
+      renderSeasonWarning();
     }
 
     loadKnownSpotsIntoSaved();
@@ -2543,7 +2764,8 @@
     renderWeatherPanel();
     render14DayWeather();
     renderDriftPanel();
-    renderSpeciesTips();
+    renderExtraInfo();
+    renderSeasonWarning();
   </script>
 
   <script>
@@ -2551,18 +2773,5 @@
       navigator.serviceWorker.register("./sw.js");
     }
   </script>
-  <script>
-  if("serviceWorker" in navigator){
-    navigator.serviceWorker.register("./sw.js");
-  }
-</script>
-
-<div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
-Tanya Deep Sea Fishing App<br>
-Core system: V69<br>
-Cache system: V71<br>
-Build version: V72 Stable
-</div>
-
 </body>
-</html>
+    </html>
