@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v66";
+const CACHE_NAME = "tanya-deep-sea-v67";
 const APP_SHELL = [
   "./",
   "./index.html",
@@ -38,11 +38,9 @@ self.addEventListener("fetch", event => {
       return fetch(req)
         .then(response => {
           const copy = response.clone();
-
           if (req.url.startsWith(self.location.origin)) {
             caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
           }
-
           return response;
         })
         .catch(() => {
