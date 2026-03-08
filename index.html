@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V68 Stable</title>
+  <title>Tanya Deep Sea V69 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -266,12 +266,13 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V68 Stable
+    Tanya Deep Sea V69 Stable
   </h1>
 
   <div class="topnav">
     <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add Catch</button>
     <button class="navbtn" id="btnMap" onclick="showTab('mapTab')">Map</button>
+    <button class="navbtn" id="btnDrift" onclick="showTab('driftTab')">Drift</button>
     <button class="navbtn" id="btnSpots" onclick="showTab('spots')">Saved Spots</button>
     <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
     <button class="navbtn" id="btnStats" onclick="showTab('stats')">Stats</button>
@@ -371,14 +372,17 @@
         <button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
         <button class="dark" onclick="clearRouteLine()">Clear Route</button>
       </div>
-      <div class="mini" style="margin-top:8px;">
-        Tap the map to choose coordinates and area name.
-      </div>
-      <div class="mini" style="margin-top:8px;">
-        Spot colors: blue/yellow normal • orange = more catches logged there.
-      </div>
+      <div class="mini" style="margin-top:8px;">Tap the map to choose coordinates and area name.</div>
+      <div class="mini" style="margin-top:8px;">Spot colors: blue/yellow normal • orange = more catches logged there.</div>
     </div>
     <div id="map"></div>
+  </section>
+
+  <section id="driftTab">
+    <div class="card">
+      <b>🌊 Drift Direction</b>
+      <div id="driftBox" style="margin-top:10px;"></div>
+    </div>
   </section>
 
   <section id="spots">
@@ -518,11 +522,6 @@
       <b>Tide, Moon & Bite</b>
       <div id="weatherBox" style="margin-top:10px;"></div>
     </div>
-
-    <div class="card">
-      <b>🌊 Drift Direction</b>
-      <div id="driftBox" style="margin-top:10px;"></div>
-    </div>
   </section>
 
   <section id="tips">
@@ -636,6 +635,19 @@
       "Hottentot": { level:2, status:"Use caution", short:"Check" },
       "Yellowtail": { level:1, status:"Lower concern in app", short:"Low" },
       "Bonito": { level:1, status:"Lower concern in app", short:"Low" }
+    };
+
+    const SPECIES_SEASONS = {
+      "Cape Kob": { best:"Spring to Autumn", note:"Often fishes well in warmer months and moving water.", closed:"Check current rules" },
+      "Yellowtail": { best:"Summer to Autumn", note:"Best when birds and bait are active offshore.", closed:"Check current rules" },
+      "Bonito": { best:"Summer to Autumn", note:"Usually with warm water and surface action.", closed:"Check current rules" },
+      "Red Roman": { best:"All year", note:"Stable sea and reef structure help.", closed:"Check current rules" },
+      "Snapper": { best:"All year", note:"Best in workable sea and reef conditions.", closed:"Check current rules" },
+      "Silverfish": { best:"All year", note:"Often steady on reef when conditions are good.", closed:"Check current rules" },
+      "Red Steenbras": { best:"Cooler months / reef edges", note:"Sensitive species. Handle carefully.", closed:"Closed season: 1 Sep - 30 Nov" },
+      "Yellow Belly": { best:"All year", note:"Usually linked to reef structure and decent current.", closed:"Check current rules" },
+      "Galjoen": { best:"Winter to early Spring", note:"Likes rougher water and rocky structure.", closed:"Closed season: 15 Oct - end Feb" },
+      "Hottentot": { best:"All year", note:"Common reef fish in workable conditions.", closed:"Check current rules" }
     };
 
     const SPECIES_TIPS = [
@@ -818,6 +830,10 @@
 
     function getThreatInfo(speciesName){
       return SPECIES_THREAT[speciesName] || { level:0, status:"Unknown", short:"?" };
+    }
+
+    function getSeasonInfo(speciesName){
+      return SPECIES_SEASONS[speciesName] || { best:"Unknown", note:"No season info added yet.", closed:"Check current rules" };
     }
 
     function getThreatClass(level){
@@ -1024,9 +1040,16 @@
 
       document.querySelectorAll(".navbtn").forEach(b => b.classList.remove("active"));
       const mapIds = {
-        add:"btnAdd", mapTab:"btnMap", spots:"btnSpots", log:"btnLog",
-        stats:"btnStats", fishid:"btnFish", weather:"btnWeather",
-        moonTab:"btnMoon", tips:"btnTips"
+        add:"btnAdd",
+        mapTab:"btnMap",
+        driftTab:"btnDrift",
+        spots:"btnSpots",
+        log:"btnLog",
+        stats:"btnStats",
+        fishid:"btnFish",
+        weather:"btnWeather",
+        moonTab:"btnMoon",
+        tips:"btnTips"
       };
       const btn = document.getElementById(mapIds[id]);
       if(btn) btn.classList.add("active");
@@ -1042,15 +1065,13 @@
           renderMap();
         }, 200);
       }
+      if(id === "driftTab") renderDriftPanel();
       if(id === "spots") renderSpots();
       if(id === "log") renderLog();
       if(id === "stats") renderStats();
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
-      if(id === "moonTab"){
-        renderWeatherPanel();
-        renderDriftPanel();
-      }
+      if(id === "moonTab") renderWeatherPanel();
       if(id === "tips") renderSpeciesTips();
     }
 
@@ -1132,16 +1153,12 @@
     }
 
     function compassToArrow(dir){
-      const map = {
-        "N":"↑","NE":"↗","E":"→","SE":"↘","S":"↓","SW":"↙","W":"←","NW":"↖","—":"•"
-      };
+      const map = { "N":"↑","NE":"↗","E":"→","SE":"↘","S":"↓","SW":"↙","W":"←","NW":"↖","—":"•" };
       return map[dir] || "•";
     }
 
     function oppositeCompass(dir){
-      const opposite = {
-        "N":"S","NE":"SW","E":"W","SE":"NW","S":"N","SW":"NE","W":"E","NW":"SE","—":"—"
-      };
+      const opposite = { "N":"S","NE":"SW","E":"W","SE":"NW","S":"N","SW":"NE","W":"E","NW":"SE","—":"—" };
       return opposite[dir] || "—";
     }
 
@@ -1206,9 +1223,7 @@
         </div>
 
         <div class="driftArrow">${compassToArrow(driftDir)}</div>
-
         <div class="mini" style="text-align:center;">Likely drift direction</div>
-
         <div class="mini" style="margin-top:10px;">${safe(setup)}</div>
 
         <div class="compassGrid">
@@ -1499,10 +1514,7 @@
         scores["Snapper"] += 2;
       }
 
-      const ranked = Object.entries(scores)
-        .sort((a,b) => b[1] - a[1])
-        .slice(0,3);
-
+      const ranked = Object.entries(scores).sort((a,b) => b[1] - a[1]).slice(0,3);
       const best = ranked[0];
       let confidence = "Low";
       let confClass = "confidence-low";
@@ -2239,6 +2251,7 @@
           const isAnchor = item.method === "Anchor";
           const threat = getThreatInfo(item.species);
           const threatClass = getThreatClass(threat.level);
+          const season = getSeasonInfo(item.species);
 
           const card = document.createElement("div");
           card.className = "card";
@@ -2250,29 +2263,15 @@
               <span class="threatBadge ${threatClass}">${safe(threat.short)}</span>
             </div>
 
-            <div class="mini" style="margin-top:8px;">
-              <b>Threat Status:</b> ${safe(threat.status)}
-            </div>
-
-            <div class="mini" style="margin-top:6px;">
-              <b>Suggested Bait:</b> ${safe(item.bait)}
-            </div>
-
-            <div class="mini" style="margin-top:6px;">
-              <b>Best Depth:</b> ${safe(item.depth)}
-            </div>
-
-            <div class="mini" style="margin-top:6px;">
-              <b>Best Time:</b> ${safe(item.time)}
-            </div>
-
-            <div class="mini" style="margin-top:6px;">
-              <b>Best Rig:</b> ${safe(item.rig)}
-            </div>
-
-            <div class="mini" style="margin-top:8px;">
-              ${safe(item.note)}
-            </div>
+            <div class="mini" style="margin-top:8px;"><b>Threat Status:</b> ${safe(threat.status)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Season:</b> ${safe(season.best)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Season Note:</b> ${safe(season.note)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Closed Season / Rules:</b> ${safe(season.closed)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Suggested Bait:</b> ${safe(item.bait)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Best Depth:</b> ${safe(item.depth)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Best Time:</b> ${safe(item.time)}</div>
+            <div class="mini" style="margin-top:6px;"><b>Best Rig:</b> ${safe(item.rig)}</div>
+            <div class="mini" style="margin-top:8px;">${safe(item.note)}</div>
 
             <div class="row">
               <button class="btn-bait">Use Suggested Bait</button>
@@ -2297,6 +2296,17 @@
         <div style="margin-top:6px;"><span class="threatBadge threat-1">Low</span> <span class="mini">Lower concern in app</span></div>
       `;
       box.appendChild(guide);
+
+      const seasonGuide = document.createElement("div");
+      seasonGuide.className = "card";
+      seasonGuide.innerHTML = `
+        <b>Season Guide</b>
+        <div class="mini" style="margin-top:8px;">Galjoen: best winter to early spring</div>
+        <div class="mini">Red Steenbras: sensitive species - closed season 1 Sep to 30 Nov</div>
+        <div class="mini">Galjoen closed season: 15 Oct to end Feb</div>
+        <div class="mini" style="margin-top:8px;">Always check current permit rules before keeping fish.</div>
+      `;
+      box.appendChild(seasonGuide);
 
       const quick = document.createElement("div");
       quick.className = "card";
@@ -2370,7 +2380,6 @@
       if(score >= 80) label = "Excellent";
       else if(score >= 65) label = "Good";
       else if(score < 45) label = "Slow";
-
       return { score, label };
     }
 
@@ -2543,4 +2552,4 @@
     }
   </script>
 </body>
-  </html>
+        </html>
