@@ -1,5 +1,6 @@
-const CACHE_NAME = "tanya-deep-sea-v69";
-const APP_SHELL = [
+const CACHE_NAME = "tanya-deep-sea-v70";
+
+const APP_FILES = [
   "./",
   "./index.html",
   "./manifest.webmanifest",
@@ -9,42 +10,49 @@ const APP_SHELL = [
 
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL))
+    caches.open(CACHE_NAME).then(cache => {
+      return cache.addAll(APP_FILES);
+    })
   );
   self.skipWaiting();
 });
 
 self.addEventListener("activate", event => {
   event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    )
+    caches.keys().then(keys => {
+      return Promise.all(
+        keys.map(key => {
+          if (key !== CACHE_NAME) {
+            return caches.delete(key);
+          }
+        })
+      );
+    })
   );
   self.clients.claim();
 });
 
 self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET") return;
+  if (event.request.method !== "GET") return;
 
   event.respondWith(
-    caches.match(req).then(cached => {
-      if (cached) return cached;
+    caches.match(event.request).then(response => {
+      if (response) return response;
 
-      return fetch(req)
-        .then(response => {
-          const copy = response.clone();
-          if (req.url.startsWith(self.location.origin)) {
-            caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
+      return fetch(event.request)
+        .then(fetchRes => {
+          const copy = fetchRes.clone();
+
+          if (event.request.url.startsWith(self.location.origin)) {
+            caches.open(CACHE_NAME).then(cache => {
+              cache.put(event.request, copy);
+            });
           }
-          return response;
+
+          return fetchRes;
         })
         .catch(() => {
-          if (req.mode === "navigate") {
+          if (event.request.mode === "navigate") {
             return caches.match("./index.html");
           }
         });
