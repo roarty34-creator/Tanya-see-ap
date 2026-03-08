@@ -1,12 +1,12 @@
 {
-  "name": "Tanya Deep Sea V70 Stable",
-  "short_name": "Deep Sea V70",
+  "name": "Tanya Deep Sea V72 Stable",
+  "short_name": "Deep Sea V72",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#061225",
   "theme_color": "#061225",
   "orientation": "portrait",
-  "description": "Deep Sea Fishing Log for Stilbaai. Catch log, spots, drift, season guide and fishing tools.",
+  "description": "Stilbaai Deep Sea Fishing Log with GPS spots, drift direction, tides, moon phase, bite prediction, species tips and weather.",
   "icons": [
     {
       "src": "./icon-192.png",
