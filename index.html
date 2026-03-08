@@ -260,6 +260,20 @@
       border-radius:8px;
       font-size:12px;
     }
+    .fishTimeBar{
+      height:20px;
+      background:#081632;
+      border-radius:12px;
+      overflow:hidden;
+      margin-top:10px;
+    }
+    .fishTimeFill{
+      height:100%;
+      width:0%;
+      background:#39d98a;
+      transition:width 0.4s ease;
+      border-radius:12px;
+    }
   </style>
 </head>
 <body>
@@ -517,6 +531,14 @@
   </section>
 
   <section id="moonTab">
+    <div class="card">
+      <b>🎣 Best Fishing Time Today</b>
+      <div class="fishTimeBar">
+        <div id="fishMeterFill" class="fishTimeFill"></div>
+      </div>
+      <div id="fishMeterText" class="mini" style="margin-top:8px;">Calculating fishing conditions...</div>
+    </div>
+
     <div class="card">
       <b>Tide, Moon & Bite</b>
       <div id="weatherBox" style="margin-top:10px;"></div>
@@ -1127,7 +1149,10 @@
       if(id === "stats") renderStats();
       if(id === "fishid") renderFishHelpers();
       if(id === "weather") render14DayWeather();
-      if(id === "moonTab") renderWeatherPanel();
+      if(id === "moonTab"){
+        renderWeatherPanel();
+        renderFishingMeter();
+      }
       if(id === "extraTab") renderExtraInfo();
     }
 
@@ -1186,6 +1211,7 @@
           renderWeatherPanel();
           render14DayWeather();
           renderDriftPanel();
+          renderFishingMeter();
         });
       }
     });
@@ -1297,6 +1323,70 @@
       `;
     }
 
+    function calculateFishingScore(){
+      let score = 50;
+
+      const wind = getChipNumber(chipWind.textContent);
+      const swell = getChipNumber(chipSwell.textContent);
+      const current = getChipNumber(chipCurrent.textContent);
+
+      const moonBoost = getMoonBoost(new Date());
+      score += moonBoost;
+
+      if(wind > 0){
+        if(wind <= 15) score += 15;
+        else if(wind <= 25) score += 5;
+        else score -= 18;
+      }
+
+      if(swell > 0){
+        if(swell <= 1.5) score += 15;
+        else if(swell <= 2.5) score += 5;
+        else score -= 18;
+      }
+
+      if(current > 0){
+        if(current <= 0.9) score += 8;
+        else if(current <= 1.5) score += 2;
+        else score -= 10;
+      }
+
+      score = Math.max(0, Math.min(100, Math.round(score)));
+      return score;
+    }
+
+    function renderFishingMeter(){
+      const fill = document.getElementById("fishMeterFill");
+      const text = document.getElementById("fishMeterText");
+      if(!fill || !text) return;
+
+      const score = calculateFishingScore();
+      fill.style.width = score + "%";
+
+      let status = "Fair";
+      let note = "Workable boat conditions.";
+
+      if(score >= 80){
+        status = "Excellent";
+        note = "Best chance for a strong bite window.";
+        fill.style.background = "#39d98a";
+      } else if(score >= 65){
+        status = "Good";
+        note = "Good fishing conditions today.";
+        fill.style.background = "#ffd166";
+      } else if(score >= 45){
+        status = "Fair";
+        note = "Fishable, but not perfect.";
+        fill.style.background = "#ffb84d";
+      } else {
+        status = "Poor";
+        note = "Conditions look rough or slow.";
+        fill.style.background = "#ff5c5c";
+      }
+
+      text.textContent = `${status} fishing conditions (${score}%) — ${note}`;
+    }
+
     async function getGPS(){
       if(!navigator.geolocation){
         alert("GPS not supported on this device");
@@ -1332,6 +1422,7 @@
         renderWeatherPanel();
         render14DayWeather();
         renderDriftPanel();
+        renderFishingMeter();
       }, () => {
         alert("Could not get GPS location");
       }, {
@@ -1415,6 +1506,7 @@
       renderWeatherPanel();
       render14DayWeather();
       renderDriftPanel();
+      renderFishingMeter();
       alert("Catch saved");
     }
 
@@ -1456,6 +1548,7 @@
           renderWeatherPanel();
           render14DayWeather();
           renderDriftPanel();
+          renderFishingMeter();
         });
       }
       showTab("add");
@@ -1676,6 +1769,7 @@
         renderWeatherPanel();
         render14DayWeather();
         renderDriftPanel();
+        renderFishingMeter();
       });
 
       showTab("mapTab");
@@ -1746,6 +1840,7 @@
       renderWeatherPanel();
       render14DayWeather();
       renderDriftPanel();
+      renderFishingMeter();
     }
 
     function renderStats(){
@@ -2121,6 +2216,7 @@
           renderWeatherPanel();
           render14DayWeather();
           renderDriftPanel();
+          renderFishingMeter();
         });
       }
       showTab("add");
@@ -2712,6 +2808,7 @@ ${waypoints}
           renderWeatherPanel();
           render14DayWeather();
           renderDriftPanel();
+          renderFishingMeter();
           renderExtraInfo();
           renderSeasonWarning();
 
@@ -2747,6 +2844,7 @@ ${waypoints}
       renderWeatherPanel();
       render14DayWeather();
       renderDriftPanel();
+      renderFishingMeter();
       renderExtraInfo();
       renderSeasonWarning();
     }
@@ -2764,6 +2862,7 @@ ${waypoints}
     renderWeatherPanel();
     render14DayWeather();
     renderDriftPanel();
+    renderFishingMeter();
     renderExtraInfo();
     renderSeasonWarning();
   </script>
@@ -2774,4 +2873,4 @@ ${waypoints}
     }
   </script>
 </body>
-    </html>
+  </html>
