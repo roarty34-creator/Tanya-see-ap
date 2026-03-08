@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V66 Stable</title>
+  <title>Tanya Deep Sea V67 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -225,13 +225,51 @@
       background:#081632;
       border-radius:10px;
     }
+    .threatBadge{
+      display:inline-block;
+      padding:6px 10px;
+      border-radius:999px;
+      font-size:11px;
+      font-weight:bold;
+      margin:6px 6px 0 0;
+    }
+    .threat-5{
+      background:#5a1010;
+      color:#ffb3b3;
+      border:1px solid #ff5c5c;
+    }
+    .threat-4{
+      background:#5a2a10;
+      color:#ffd0b3;
+      border:1px solid #ff8c42;
+    }
+    .threat-3{
+      background:#5a4a10;
+      color:#ffe7a3;
+      border:1px solid #ffd166;
+    }
+    .threat-2{
+      background:#10354a;
+      color:#b9ecff;
+      border:1px solid #59d0ff;
+    }
+    .threat-1{
+      background:#12351e;
+      color:#c8ffd9;
+      border:1px solid #39d98a;
+    }
+    .threat-0{
+      background:#2a3550;
+      color:#d7def0;
+      border:1px solid #7f8fb3;
+    }
   </style>
 </head>
 <body>
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V66 Stable
+    Tanya Deep Sea V67 Stable
   </h1>
 
   <div class="topnav">
@@ -598,6 +636,19 @@
       "Hottentot":22
     };
 
+    const SPECIES_THREAT = {
+      "Red Steenbras": { level:5, status:"Critically Endangered", short:"CR" },
+      "Cape Kob": { level:4, status:"Endangered", short:"EN" },
+      "Galjoen": { level:3, status:"Collapsed stock / Check rules", short:"Collapsed" },
+      "Red Roman": { level:2, status:"Use caution", short:"Check" },
+      "Snapper": { level:2, status:"Use caution", short:"Check" },
+      "Silverfish": { level:2, status:"Use caution", short:"Check" },
+      "Yellow Belly": { level:2, status:"Use caution", short:"Check" },
+      "Hottentot": { level:2, status:"Use caution", short:"Check" },
+      "Yellowtail": { level:1, status:"Lower concern in app", short:"Low" },
+      "Bonito": { level:1, status:"Lower concern in app", short:"Low" }
+    };
+
     const SPECIES_TIPS = [
       {
         species:"Cape Kob",
@@ -753,7 +804,6 @@
           const img = new Image();
           img.onload = () => {
             let { width, height } = img;
-
             if(width > height && width > maxSize){
               height = Math.round(height * (maxSize / width));
               width = maxSize;
@@ -761,14 +811,11 @@
               width = Math.round(width * (maxSize / height));
               height = maxSize;
             }
-
             const canvas = document.createElement("canvas");
             canvas.width = width;
             canvas.height = height;
-
             const ctx = canvas.getContext("2d");
             ctx.drawImage(img, 0, 0, width, height);
-
             resolve(canvas.toDataURL("image/jpeg", quality));
           };
           img.onerror = reject;
@@ -857,14 +904,24 @@
       return SPECIES_TIPS.find(item => item.species === speciesName) || null;
     }
 
+    function getThreatInfo(speciesName){
+      return SPECIES_THREAT[speciesName] || { level:0, status:"Unknown", short:"?" };
+    }
+
+    function getThreatClass(level){
+      if(level >= 5) return "threat-5";
+      if(level >= 4) return "threat-4";
+      if(level >= 3) return "threat-3";
+      if(level >= 2) return "threat-2";
+      if(level >= 1) return "threat-1";
+      return "threat-0";
+    }
+
     function autoFillSuggestedBaitFromSpecies(){
       if(manualBaitEl.value.trim()) return;
-
       const selectedSpecies = species.value;
       const tip = getSpeciesTip(selectedSpecies);
-
       fillBaitPick();
-
       if(tip && tip.bait){
         if(BAIT_OPTIONS.includes(tip.bait)){
           baitEl.value = tip.bait;
@@ -883,7 +940,6 @@
     function updateWhereCaughtDisplay(typeText = ""){
       const area = localAreaEl.value || "";
       const base = "Deep Sea";
-
       if(area && typeText){
         placeEl.value = `${base} • ${typeText} • ${area}`;
       } else if(area){
@@ -896,17 +952,14 @@
     function autoSaveCurrentSpot(){
       const coords = coordsEl.value.trim();
       if(!coords) return;
-
       const area = localAreaEl.value.trim();
       if(!area) return;
 
       const spots = getAllSpots();
-
       const existing = spots.find(s =>
         String(s.coords) === String(coords) ||
         normalizeName(s.name) === normalizeName(area)
       );
-
       if(existing) return;
 
       spots.push({
@@ -932,14 +985,12 @@
     function fillBaitPick(){
       const current = baitEl.value || "";
       baitEl.innerHTML = `<option value="">Choose suggested bait</option>`;
-
       BAIT_OPTIONS.forEach(bait => {
         const opt = document.createElement("option");
         opt.value = bait;
         opt.textContent = bait;
         baitEl.appendChild(opt);
       });
-
       if(BAIT_OPTIONS.includes(current)){
         baitEl.value = current;
       }
@@ -959,14 +1010,12 @@
 
     function fillLocalAreaPick(){
       const current = localAreaEl.value || "";
-
       const allNames = [...new Set([
         ...LOCAL_AREA_PRESETS,
         ...getAllSpots().map(s => String(s.name || "").trim()).filter(Boolean)
       ])].sort((a,b) => a.localeCompare(b));
 
       localAreaEl.innerHTML = `<option value="">Choose local area</option>`;
-
       allNames.forEach(name => {
         const opt = document.createElement("option");
         opt.value = name;
@@ -1001,7 +1050,6 @@
       const spots = getAllSpots();
       let best = null;
       let bestDist = Infinity;
-
       spots.forEach(s => {
         const p = parseCoords(s.coords);
         if(!p) return;
@@ -1011,7 +1059,6 @@
           best = s;
         }
       });
-
       return bestDist < 0.05 ? best : null;
     }
 
@@ -1043,13 +1090,10 @@
     function updateWhereCaughtFromArea(){
       const coords = coordsEl.value;
       const area = localAreaEl.value;
-
       if(area){
         const s = getAllSpots().find(x => x.name === area);
         if(s){
-          if(!coords){
-            coordsEl.value = s.coords;
-          }
+          if(!coords) coordsEl.value = s.coords;
           manualSpotPick.value = s.coords;
           updateWhereCaughtDisplay(s.type || "Area");
         } else {
@@ -1093,7 +1137,6 @@
           renderMap();
         }, 200);
       }
-
       if(id === "spots") renderSpots();
       if(id === "log") renderLog();
       if(id === "stats") renderStats();
@@ -1119,13 +1162,11 @@
         sizeNote.style.color = "#9fb0d0";
         return;
       }
-
       if(min === 0){
         sizeNote.textContent = "No minimum size for this species.";
         sizeNote.style.color = "#9fb0d0";
         return;
       }
-
       if(len < min){
         sizeNote.textContent = "⚠️ UNDERSIZE! Minimum is " + min + " cm";
         sizeNote.style.color = "#ff5c5c";
@@ -1144,7 +1185,6 @@
     manualSpotPick.addEventListener("change", function(e){
       const coordStr = e.target.value;
       if(!coordStr) return;
-
       coordsEl.value = coordStr;
 
       const s = getAllSpots().find(x => x.coords === coordStr);
@@ -1237,7 +1277,6 @@
         }
 
         await estimateCurrentStrength(lat, lng);
-
         renderMap();
         renderWeatherPanel();
         render14DayWeather();
@@ -1317,7 +1356,6 @@
       renderSpots();
       renderWeatherPanel();
       render14DayWeather();
-
       alert("Catch saved");
     }
 
@@ -1348,7 +1386,6 @@
       coordsEl.value = coordStr;
       addAreaOptionIfMissing(areaName);
       const s = getAllSpots().find(x => x.coords === coordStr);
-
       if(s){
         manualSpotPick.value = coordStr;
         updateWhereCaughtDisplay(s.type || "Area");
@@ -1364,7 +1401,6 @@
           render14DayWeather();
         });
       }
-
       showTab("add");
     }
 
@@ -1447,7 +1483,6 @@
       });
 
       showTab("mapTab");
-
       setTimeout(() => {
         map.setView([p.lat, p.lng], 15);
         if(tempClickMarker) map.removeLayer(tempClickMarker);
@@ -1507,9 +1542,7 @@
     function deleteCatch(id){
       const ok = confirm("Delete this catch?");
       if(!ok) return;
-
       saveAllCatches(getAllCatches().filter(c => String(c.id) !== String(id)));
-
       renderLog();
       renderStats();
       renderMap();
@@ -1538,10 +1571,7 @@
 
         const spotKey = c.localArea || c.spotName || c.place || c.coords || "Unknown";
         if(!bySpot[spotKey]){
-          bySpot[spotKey] = {
-            count: 0,
-            coords: c.coords || ""
-          };
+          bySpot[spotKey] = { count:0, coords:c.coords || "" };
         }
         bySpot[spotKey].count += 1;
         if(!bySpot[spotKey].coords && c.coords) bySpot[spotKey].coords = c.coords;
@@ -1585,13 +1615,11 @@
             ${data.coords ? `<button class="dark btn-nav">Navigate</button>` : ""}
           </div>
         `;
-
         if(data.coords){
           item.querySelector(".btn-open").onclick = () => goToSpotOnMap(data.coords);
           item.querySelector(".btn-area").onclick = () => useBestSpot(data.coords, spot);
           item.querySelector(".btn-nav").onclick = () => navAreaMap(data.coords, spot);
         }
-
         bestCard.appendChild(item);
       });
     }
@@ -1616,7 +1644,6 @@
         saveWeatherCoords(Number(lat), Number(lng));
 
         const nearest = getNearestSpot(Number(lat), Number(lng));
-
         if(nearest){
           manualSpotPick.value = nearest.coords;
           addAreaOptionIfMissing(nearest.name);
@@ -1752,13 +1779,10 @@
           navTargetMarker = L.marker([targetLat, targetLng]).addTo(map);
           navTargetMarker.bindPopup("Target Spot");
 
-          routeLine = L.polyline(
-            [
-              [myLat, myLng],
-              [targetLat, targetLng]
-            ],
-            { color:"red", weight:4 }
-          ).addTo(map);
+          routeLine = L.polyline([
+            [myLat, myLng],
+            [targetLat, targetLng]
+          ], { color:"red", weight:4 }).addTo(map);
 
           const km = (Math.hypot(targetLat - myLat, targetLng - myLng) * 111).toFixed(2);
 
@@ -1850,7 +1874,6 @@
         });
 
       box.innerHTML = "";
-
       if(!spots.length){
         box.innerHTML = `<div class="card">No matching spots found.</div>`;
         return;
@@ -1876,10 +1899,7 @@
             <button class="btn-open-map">Open on Map</button>
             <button class="dark btn-use-spot">Use Spot</button>
             <button class="dark btn-nav">Navigate</button>
-            ${preset
-              ? `<button class="locked" disabled>Preset Locked</button>`
-              : `<button class="dark btn-edit">Edit</button>`
-            }
+            ${preset ? `<button class="locked" disabled>Preset Locked</button>` : `<button class="dark btn-edit">Edit</button>`}
             <button class="danger btn-delete">${preset ? "Reset Preset" : "Delete"}</button>
           </div>
         `;
@@ -1921,7 +1941,6 @@
           render14DayWeather();
         });
       }
-
       showTab("add");
     }
 
@@ -1929,7 +1948,6 @@
       const spots = getAllSpots();
       const spot = spots.find(s => String(s.id) === String(id));
       if(!spot) return;
-
       if(isPresetSpot(spot)){
         alert("Preset spots are locked.");
         return;
@@ -1937,7 +1955,6 @@
 
       const newName = prompt("Edit spot name:", spot.name);
       if(newName === null) return;
-
       const newType = prompt("Edit type: Reef or Spot", spot.type);
       if(newType === null) return;
 
@@ -2029,7 +2046,6 @@
       }
 
       renderFishHelpers();
-
       fishPhotoData = "";
       document.getElementById("fishIdPreview").innerHTML = "";
       document.getElementById("fishIdSpecies").value = "";
@@ -2084,7 +2100,6 @@
         photoData = item.photo;
         photoPreview.innerHTML = `<img class="photo" src="${item.photo}" alt="fish">`;
       }
-
       showTab("add");
     }
 
@@ -2095,7 +2110,6 @@
 
     function copyFishToCatch(){
       const sp = document.getElementById("fishIdSpecies").value;
-
       if(!sp && !fishPhotoData){
         alert("Choose a species or fish photo first.");
         return;
@@ -2112,7 +2126,6 @@
         photoData = fishPhotoData;
         photoPreview.innerHTML = `<img class="photo" src="${fishPhotoData}" alt="fish">`;
       }
-
       showTab("add");
     }
 
@@ -2120,7 +2133,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V66",
+          version: "V67",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -2147,7 +2160,6 @@
     function exportGPX(){
       try{
         const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-
         if(!spots.length){
           alert("No spots to export.");
           return;
@@ -2164,7 +2176,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V66" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V67" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -2193,7 +2205,6 @@ ${waypoints}
       reader.onload = () => {
         try{
           const data = JSON.parse(reader.result);
-
           if(!data || typeof data !== "object") throw new Error("Invalid backup");
 
           if(Array.isArray(data.catches)) saveAllCatches(data.catches);
@@ -2245,49 +2256,85 @@ ${waypoints}
 
       box.innerHTML = "";
 
-      SPECIES_TIPS.forEach(item => {
-        const isAnchor = item.method === "Anchor";
+      [...SPECIES_TIPS]
+        .sort((a, b) => getThreatInfo(b.species).level - getThreatInfo(a.species).level)
+        .forEach(item => {
+          const isAnchor = item.method === "Anchor";
+          const threat = getThreatInfo(item.species);
+          const threatClass = getThreatClass(threat.level);
 
-        const card = document.createElement("div");
-        card.className = "card";
-        card.innerHTML = `
-          <b>${safe(item.species)}</b>
+          const card = document.createElement("div");
+          card.className = "card";
+          card.innerHTML = `
+            <b>${safe(item.species)}</b>
 
-          <div style="margin-top:6px;">
-            <span class="tag ${isAnchor ? "preset" : "custom"}">${safe(item.method)}</span>
-          </div>
+            <div style="margin-top:6px;">
+              <span class="tag ${isAnchor ? "preset" : "custom"}">${safe(item.method)}</span>
+              <span class="threatBadge ${threatClass}">${safe(threat.short)}</span>
+            </div>
 
-          <div class="mini" style="margin-top:8px;">
-            <b>Suggested Bait:</b> ${safe(item.bait)}
-          </div>
+            <div class="mini" style="margin-top:8px;">
+              <b>Threat Status:</b> ${safe(threat.status)}
+            </div>
 
-          <div class="mini" style="margin-top:6px;">
-            <b>Best Depth:</b> ${safe(item.depth)}
-          </div>
+            <div class="mini" style="margin-top:6px;">
+              <b>Suggested Bait:</b> ${safe(item.bait)}
+            </div>
 
-          <div class="mini" style="margin-top:6px;">
-            <b>Best Time:</b> ${safe(item.time)}
-          </div>
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Depth:</b> ${safe(item.depth)}
+            </div>
 
-          <div class="mini" style="margin-top:6px;">
-            <b>Best Rig:</b> ${safe(item.rig)}
-          </div>
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Time:</b> ${safe(item.time)}
+            </div>
 
-          <div class="mini" style="margin-top:8px;">
-            ${safe(item.note)}
-          </div>
+            <div class="mini" style="margin-top:6px;">
+              <b>Best Rig:</b> ${safe(item.rig)}
+            </div>
 
-          <div class="row">
-            <button class="btn-bait">Use Suggested Bait</button>
-          </div>
-        `;
+            <div class="mini" style="margin-top:8px;">
+              ${safe(item.note)}
+            </div>
 
-        card.querySelector(".btn-bait").onclick = () => {
-          useSuggestedBait(item.species, item.bait);
-        };
+            <div class="row">
+              <button class="btn-bait">Use Suggested Bait</button>
+            </div>
+          `;
 
-        box.appendChild(card);
-      });
+          card.querySelector(".btn-bait").onclick = () => {
+            useSuggestedBait(item.species, item.bait);
+          };
+
+          box.appendChild(card);
+        });
+
+      const guide = document.createElement("div");
+      guide.className = "card";
+      guide.innerHTML = `
+        <b>Threat Colour Guide</b>
+        <div style="margin-top:8px;">
+          <span class="threatBadge threat-5">CR</span>
+          <span class="mini">Highest concern</span>
+        </div>
+        <div style="margin-top:6px;">
+          <span class="threatBadge threat-4">EN</span>
+          <span class="mini">Very high concern</span>
+        </div>
+        <div style="margin-top:6px;">
+          <span class="threatBadge threat-3">Collapsed</span>
+          <span class="mini">Collapsed / sensitive stock</span>
+        </div>
+        <div style="margin-top:6px;">
+          <span class="threatBadge threat-2">Check</span>
+          <span class="mini">Check carefully</span>
+        </div>
+        <div style="margin-top:6px;">
+          <span class="threatBadge threat-1">Low</span>
+          <span class="mini">Lower concern in app</span>
+        </div>
+      `;
+      box.appendChild(guide);
 
       const quick = document.createElement("div");
       quick.className = "card";
@@ -2323,7 +2370,6 @@ ${waypoints}
       const p = getMoonPhaseFraction(date);
       const distNew = Math.min(Math.abs(p - 0), Math.abs(p - 1));
       const distFull = Math.abs(p - 0.5);
-
       if(distNew < 0.06 || distFull < 0.06) return 20;
       if(distNew < 0.12 || distFull < 0.12) return 12;
       return 4;
@@ -2341,19 +2387,16 @@ ${waypoints}
       const current = getChipNumber(chipCurrent.textContent);
 
       let score = 50 + moonBoost;
-
       if(wind > 0){
         if(wind <= 15) score += 10;
         else if(wind <= 25) score += 4;
         else score -= 10;
       }
-
       if(swell > 0){
         if(swell <= 1.8) score += 8;
         else if(swell <= 2.5) score += 2;
         else score -= 8;
       }
-
       if(current > 0){
         if(current <= 0.9) score += 8;
         else if(current <= 1.5) score += 2;
@@ -2412,30 +2455,15 @@ ${waypoints}
 
     function weatherCodeText(code){
       const map = {
-        0:"Clear",
-        1:"Mostly Clear",
-        2:"Partly Cloudy",
-        3:"Cloudy",
-        45:"Fog",
-        48:"Fog",
-        51:"Light Drizzle",
-        53:"Drizzle",
-        55:"Heavy Drizzle",
-        61:"Light Rain",
-        63:"Rain",
-        65:"Heavy Rain",
-        71:"Snow",
-        80:"Rain Showers",
-        81:"Rain Showers",
-        82:"Heavy Showers",
-        95:"Thunderstorm"
+        0:"Clear",1:"Mostly Clear",2:"Partly Cloudy",3:"Cloudy",45:"Fog",48:"Fog",
+        51:"Light Drizzle",53:"Drizzle",55:"Heavy Drizzle",61:"Light Rain",63:"Rain",
+        65:"Heavy Rain",71:"Snow",80:"Rain Showers",81:"Rain Showers",82:"Heavy Showers",95:"Thunderstorm"
       };
       return map[code] || "Mixed";
     }
 
     function getBoatDayRating(wind, rain, swell){
       let score = 100;
-
       if(wind > 30) score -= 45;
       else if(wind > 22) score -= 30;
       else if(wind > 15) score -= 15;
@@ -2475,7 +2503,6 @@ ${waypoints}
 
         const d = weatherData?.daily;
         const md = marineData?.daily;
-
         if(!d?.time?.length){
           box.innerHTML = `<div class="mini">Could not load weather.</div>`;
           return;
@@ -2555,4 +2582,4 @@ ${waypoints}
     }
   </script>
 </body>
-  </html>
+               </html>
