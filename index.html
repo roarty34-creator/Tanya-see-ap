@@ -165,14 +165,15 @@
     .statusHigh{color:#ff8c42;font-weight:bold}
     .statusMed{color:#ffd166;font-weight:bold}
     .statusLow{color:#39d98a;font-weight:bold}
+    .statusNeutral{color:#9fb0d0;font-weight:bold}
     pre.rig{
       background:#081632;
       color:#d7e6ff;
       padding:12px;
       border-radius:10px;
       overflow:auto;
-      font-size:13px;
-      line-height:1.35;
+      font-size:14px;
+      line-height:1.45;
       white-space:pre-wrap;
       margin-top:8px;
     }
@@ -181,7 +182,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V88 Stable</div>
+  <div class="mini">V89 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -304,18 +305,20 @@
       <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Rules & Limits</div>
       <div class="mini">
         Bag limit: check current permit.<br><br>
-        Mixed species total: check current permit.
+        Mixed species total: check current permit.<br><br>
+        Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
+        Hawe reference point in this build: <b>-34.385542, 21.425433</b>
       </div>
     </div>
   </section>
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V88 Stable
+    Build version: V89 Stable
   </div>
 
   <script>
-    const HARBOUR = { lat:-34.3695, lon:20.8500, name:"Stilbaai Harbour" };
+    const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
     const MARINE_LINE_LON = HARBOUR.lon;
 
     const SPOTS = [
@@ -356,12 +359,17 @@
     const FISH_INFO = {
       "Cape Kob":{
         bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly",
-        rigs:["2-hook bottom rig","Live bait rig","Sliding sinker trace"],
-        status:"Endangered",
-        statusClass:"statusHigh",
+        hook:"6/0 to 8/0",
+        sinker:"6oz to 8oz, depending on drift/current",
+        strop:"60 cm to 100 cm leader",
+        rigType:"Running sinker rig / live bait rig / 2-hook bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Best spring to autumn",
         closed:"Check current permit rules",
-        sketch:`Rod tip
+        sketch:`RUNNING SINKER RIG
+
+Rod tip
   |
 Main line
   |
@@ -373,153 +381,195 @@ Swivel
   |
 Leader 60-100 cm
   |
-Hook
+6/0 - 8/0 hook
 
-OR 2-hook bottom rig:
+2-HOOK BOTTOM RIG
 
 Main line
   |
 Swivel
   |
-Top snoot ---- hook
+Top snoot 25-35 cm ---- hook
   |
-Bottom snoot - hook
+Bottom snoot 25-35 cm - hook
   |
-Sinker`
+Sinker 6oz - 8oz`
       },
       "Yellowtail":{
         bait:"Live Makriel, Pilchard strip, Metal spoon, Surface plug",
-        rigs:["Spinning lure rig","Live bait trace"],
-        status:"Lower concern",
-        statusClass:"statusLow",
+        hook:"5/0 to 7/0 for live bait",
+        sinker:"Usually no sinker or very light",
+        strop:"80 cm to 150 cm leader",
+        rigType:"Live bait trace / lure rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
-        sketch:`Rod tip
+        sketch:`LIVE BAIT / LURE RIG
+
+Rod tip
   |
-Main line
+Main line / braid
   |
 Swivel
   |
-Leader
+Leader 80-150 cm
   |
-Spoon / Plug / Live bait hook`
+5/0 - 7/0 hook
+  |
+Live bait / spoon / plug`
       },
       "Bonito":{
         bait:"Pilchard strip, Small spoon, Feather lure",
-        rigs:["Feather rig","Small spoon spinning rig"],
-        status:"Lower concern",
-        statusClass:"statusLow",
+        hook:"1/0 to 3/0 or lure hooks",
+        sinker:"Usually none",
+        strop:"50 cm to 100 cm leader",
+        rigType:"Feather rig / spoon spinning rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
-        sketch:`Rod tip
+        sketch:`FEATHER / SPOON RIG
+
+Rod tip
   |
 Main line
   |
 Small swivel
   |
-Leader
+Leader 50-100 cm
   |
 Feather lure / spoon`
       },
       "Red Roman":{
         bait:"Chokka, Pilchard, Octopus, Squid",
-        rigs:["2-hook bottom rig","Short snoot reef rig"],
-        status:"Caution",
+        hook:"4/0 to 6/0",
+        sinker:"6oz to 8oz",
+        strop:"Short snoots 20 cm to 30 cm",
+        rigType:"2-hook bottom rig / short reef rig",
+        status:"Sensitive species - handle carefully",
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
-        sketch:`Main line
+        sketch:`REEF BOTTOM RIG
+
+Main line
   |
 Swivel
   |
-Top short snoot ---- hook
+Top short snoot 20-30 cm ---- hook
   |
-Bottom short snoot - hook
+Bottom short snoot 20-30 cm - hook
   |
-Sinker`
+Sinker 6oz - 8oz`
       },
       "Snapper":{
         bait:"Chokka, Pilchard, Redbait, Squid",
-        rigs:["Bottom rig","Short hook trace"],
-        status:"Caution",
+        hook:"4/0 to 6/0",
+        sinker:"6oz to 8oz",
+        strop:"20 cm to 40 cm",
+        rigType:"Bottom rig / short hook trace",
+        status:"Sensitive species - handle carefully",
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
-        sketch:`Main line
+        sketch:`SHORT BOTTOM RIG
+
+Main line
   |
 Swivel
   |
-Sinker
+Sinker 6oz - 8oz
   |
-Short hook snoot`
+Hook snoot 20-40 cm`
       },
       "Silverfish":{
         bait:"Chokka strip, Pilchard strip, Pilchard",
-        rigs:["Light bottom rig"],
-        status:"Caution",
-        statusClass:"statusMed",
+        hook:"2/0 to 4/0",
+        sinker:"4oz to 6oz",
+        strop:"20 cm to 30 cm",
+        rigType:"Light bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        sketch:`Main line
+        sketch:`LIGHT BOTTOM RIG
+
+Main line
   |
 Swivel
   |
-Small sinker
+Small sinker 4oz - 6oz
   |
-Single hook snoot`
+Single hook snoot 20-30 cm`
       },
       "Red Steenbras":{
         bait:"Chokka, Pilchard, Redbait, Squid",
-        rigs:["Strong bottom rig","Longer hook snoot"],
-        status:"Most endangered",
+        hook:"6/0 to 8/0",
+        sinker:"7oz to 9oz",
+        strop:"70 cm to 120 cm",
+        rigType:"Strong bottom rig / longer hook snoot",
+        status:"Most endangered / very sensitive",
         statusClass:"statusHigh",
         season:"Sensitive species",
         closed:"Closed season: 1 Sep - 30 Nov",
-        sketch:`Main line
+        sketch:`STRONG BOTTOM RIG
+
+Main line
   |
 Heavy swivel
   |
-Sinker
+Sinker 7oz - 9oz
   |
-Long snoot
+Long snoot 70-120 cm
   |
-Strong hook`
+6/0 - 8/0 strong hook`
       },
       "Yellow Belly":{
         bait:"Chokka, Pilchard",
-        rigs:["Bottom rig"],
-        status:"Caution",
-        statusClass:"statusMed",
+        hook:"4/0 to 6/0",
+        sinker:"6oz to 8oz",
+        strop:"30 cm to 50 cm",
+        rigType:"Bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        sketch:`Main line
+        sketch:`BOTTOM RIG
+
+Main line
   |
 Swivel
   |
-Sinker
+Sinker 6oz - 8oz
   |
-Hook trace`
+Hook trace 30-50 cm`
       },
       "Hottentot":{
         bait:"Chokka, Pilchard, Redbait, Mussel",
-        rigs:["Light bottom rig","Short reef trace"],
-        status:"Caution",
-        statusClass:"statusMed",
+        hook:"1/0 to 3/0",
+        sinker:"4oz to 6oz",
+        strop:"20 cm to 30 cm",
+        rigType:"Light bottom rig / short reef trace",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        sketch:`Main line
+        sketch:`LIGHT REEF TRACE
+
+Main line
   |
 Swivel
   |
-Light sinker
+Light sinker 4oz - 6oz
   |
-Short trace
+Short trace 20-30 cm
   |
-Hook`
+1/0 - 3/0 hook`
       }
     };
 
-    const KEY_LOG = "tanya_v88_log";
+    const KEY_LOG = "tanya_v89_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
@@ -651,6 +701,17 @@ Hook`
       }
     }
 
+    function tryAutoMatchAreaFromCoords(coordStr){
+      const normalized = coordStr.replace(/\s+/g,"").trim();
+      const match = SPOTS.find(s => s.coord.replace(/\s+/g,"").trim() === normalized);
+      if(match){
+        document.getElementById("area").value = match.name;
+        if(!document.getElementById("whereCaught").value.trim()){
+          document.getElementById("whereCaught").value = match.name;
+        }
+      }
+    }
+
     function fillFromArea(){
       const area = document.getElementById("area");
       const selected = area.options[area.selectedIndex];
@@ -699,11 +760,13 @@ Hook`
         return;
       }
 
+      tryAutoMatchAreaFromCoords(coords);
+
       const list = getLog();
       list.unshift({
         species,
         bait,
-        area,
+        area: document.getElementById("area").value,
         coords,
         whereCaught,
         notes,
@@ -813,12 +876,15 @@ Hook`
       document.getElementById("fishInfoBox").innerHTML = `
         <div class="spotCard">
           <div class="spotTitle">${species}</div>
-          <div class="spotSub">Bait, rig, status and season info</div>
+          <div class="spotSub">Bait, status, season and full rig setup</div>
           <div class="mini" style="margin-top:8px;"><b>Status:</b> <span class="${info.statusClass}">${info.status}</span></div>
           <div class="mini" style="margin-top:8px;"><b>Preferred Bait:</b> ${info.bait}</div>
+          <div class="mini" style="margin-top:8px;"><b>Preferred Hook Size:</b> ${info.hook}</div>
+          <div class="mini" style="margin-top:8px;"><b>Preferred Sinker / Weight:</b> ${info.sinker}</div>
+          <div class="mini" style="margin-top:8px;"><b>Strop Length:</b> ${info.strop}</div>
+          <div class="mini" style="margin-top:8px;"><b>Rig Type:</b> ${info.rigType}</div>
           <div class="mini" style="margin-top:8px;"><b>Best Season:</b> ${info.season}</div>
           <div class="mini" style="margin-top:8px;"><b>Closed Season:</b> ${info.closed}</div>
-          <div class="mini" style="margin-top:8px;"><b>Rigs:</b> ${info.rigs.join(", ")}</div>
           <div class="mini" style="margin-top:8px;"><b>Rig Sketch:</b></div>
           <pre class="rig">${info.sketch}</pre>
         </div>
@@ -834,8 +900,9 @@ Hook`
     document.getElementById("sizeCaught").addEventListener("input", checkSizeWarning);
 
     document.getElementById("coords").addEventListener("input", () => {
-      document.getElementById("coordAreaText").textContent =
-        describeSeaAreaFromCoord(document.getElementById("coords").value.trim());
+      const coord = document.getElementById("coords").value.trim();
+      document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
+      tryAutoMatchAreaFromCoords(coord);
     });
 
     renderSpotList();
