@@ -3,18 +3,24 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>Tanya Deep Sea Fishing App</title>
 
 <link rel="manifest" href="./manifest.webmanifest">
 <meta name="theme-color" content="#061225">
 
 <style>
+
 body{
 background:#061225;
 color:#fff;
 font-family:Arial;
 margin:0;
 padding:20px;
+}
+
+h1{
+margin-bottom:15px;
 }
 
 button{
@@ -59,10 +65,9 @@ color:#9fb0d0;
 <div>
 <button onclick="showTab('add')">Add Catch</button>
 <button onclick="showTab('spots')">Spots & Navigate</button>
-<button onclick="showTab('drift')">Drift</button>
 <button onclick="showTab('log')">Log</button>
-<button onclick="showTab('stats')">Stats</button>
-<button onclick="showTab('guide')">Boat Guide</button>
+<button onclick="showTab('season')">Season Guide</button>
+<button onclick="showTab('rules')">Rules</button>
 </div>
 
 <section id="add">
@@ -94,7 +99,13 @@ color:#9fb0d0;
 </select>
 
 <label>Local Area</label>
-<input id="localArea">
+<select id="area">
+<option>Skulpbank</option>
+<option>Blinde Rif</option>
+<option>Kabeljou Ridge</option>
+<option>Roman Bank</option>
+<option>Die Gat</option>
+</select>
 
 <label>Coordinates</label>
 <input id="coords">
@@ -102,7 +113,12 @@ color:#9fb0d0;
 <button onclick="getGPS()">Get GPS</button>
 
 <label>Where Caught</label>
-<input id="whereCaught" value="Deep Sea">
+<input id="whereCaught">
+
+<div class="mini">
+Log catches with area names.<br>
+Stats uses the Local Area Name to rank your best reefs.
+</div>
 
 <button onclick="saveCatch()">Save Catch</button>
 
@@ -116,8 +132,18 @@ color:#9fb0d0;
 
 <h2>Spots & Navigate</h2>
 
+<div class="mini">
+Use navigation between saved spots.<br>
+The app shows distance, bearing and ETA from Stilbaai harbour.
+</div>
+
 <select id="nextSpot">
-<option value="">Choose next spot</option>
+
+<option value="-34.3905,20.8602">Skulpbank</option>
+<option value="-34.4015,20.8801">Blinde Rif</option>
+<option value="-34.3750,20.8700">Kabeljou Ridge</option>
+<option value="-34.4200,20.8650">Roman Bank</option>
+
 </select>
 
 <button onclick="startNavigation()">Start Navigation</button>
@@ -135,14 +161,67 @@ color:#9fb0d0;
 </div>
 </section>
 
+<section id="season" style="display:none">
+
+<div class="card">
+
+<h2>Species Season Guide</h2>
+
+<div class="mini">
+
+Cape Kob — Best from spring to autumn.<br><br>
+
+Yellowtail — Best from summer to autumn.<br><br>
+
+Bonito — Best from summer to autumn.<br><br>
+
+Red Roman — Good all year.<br><br>
+
+Snapper — Good all year.<br><br>
+
+Silverfish — Good all year.<br><br>
+
+Hottentot — Good all year.<br><br>
+
+Yellow Belly — Good all year.<br><br>
+
+Red Steenbras — Closed season: 1 Sep - 30 Nov.
+
+</div>
+
+</div>
+
+</section>
+
+<section id="rules" style="display:none">
+
+<div class="card">
+
+<h2>Rules & Limits</h2>
+
+<div class="mini">
+
+Bag limit: check current permit.<br><br>
+
+Mixed species total: check current permit.
+
+</div>
+
+</div>
+
+</section>
+
 <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
 Tanya Deep Sea Fishing App<br>
 Core system: V69<br>
 Cache system: V71-style<br>
-Build version: V74 Stable
+Build version: V78 Stable
 </div>
 
 <script>
+
+const HARBOUR_LAT=-34.3695
+const HARBOUR_LON=20.8500
 
 function showTab(id){
 document.querySelectorAll("section").forEach(s=>s.style.display="none")
@@ -150,11 +229,16 @@ document.getElementById(id).style.display="block"
 }
 
 function getGPS(){
+
 navigator.geolocation.getCurrentPosition(pos=>{
+
 const lat=pos.coords.latitude
 const lon=pos.coords.longitude
+
 document.getElementById("coords").value=lat+","+lon
+
 })
+
 }
 
 function saveCatch(){
@@ -196,6 +280,48 @@ ${c.date}
 })
 
 document.getElementById("logBox").innerHTML=html
+
+}
+
+function startNavigation(){
+
+const spot=document.getElementById("nextSpot").value.split(",")
+
+const lat=spot[0]
+const lon=spot[1]
+
+const d=distance(HARBOUR_LAT,HARBOUR_LON,lat,lon)
+
+document.getElementById("navResult").innerHTML=
+
+"Start: Stilbaai Harbour<br>"+
+"Distance: "+d.toFixed(2)+" km<br>"+
+"<button onclick='satNav("+lat+","+lon+")'>Satellite Navigation</button>"
+
+}
+
+function satNav(lat,lon){
+
+window.open(
+"https://www.google.com/maps?q="+lat+","+lon+"&t=k",
+"_blank"
+)
+
+}
+
+function distance(lat1,lon1,lat2,lon2){
+
+const R=6371
+
+const dLat=(lat2-lat1)*Math.PI/180
+const dLon=(lon2-lon1)*Math.PI/180
+
+const a=
+Math.sin(dLat/2)*Math.sin(dLat/2)+
+Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180)*
+Math.sin(dLon/2)*Math.sin(dLon/2)
+
+return R*2*Math.atan2(Math.sqrt(a),Math.sqrt(1-a))
 
 }
 
