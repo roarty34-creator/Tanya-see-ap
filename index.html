@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea V73 Stable</title>
+  <title>Tanya Deep Sea V74 Stable</title>
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
@@ -280,12 +280,13 @@
 
   <h1>
     <img src="./icon-192.png" width="30" height="30" style="border-radius:8px;" alt="boat icon">
-    Tanya Deep Sea V73 Stable
+    Tanya Deep Sea V74 Stable
   </h1>
 
   <div class="topnav">
     <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add Catch</button>
     <button class="navbtn" id="btnMap" onclick="showTab('mapTab')">Map</button>
+    <button class="navbtn" id="btnNavigate" onclick="showTab('navigateTab')">Navigate</button>
     <button class="navbtn" id="btnDrift" onclick="showTab('driftTab')">Drift</button>
     <button class="navbtn" id="btnSpots" onclick="showTab('spots')">Saved Spots</button>
     <button class="navbtn" id="btnLog" onclick="showTab('log')">Log</button>
@@ -391,6 +392,39 @@
       <div class="mini" style="margin-top:8px;">Spot colors: blue/yellow normal • orange = more catches logged there.</div>
     </div>
     <div id="map"></div>
+  </section>
+
+  <section id="navigateTab">
+    <div class="card">
+      <b>Navigate to Next Spot</b>
+
+      <label>Choose Next Spot</label>
+      <select id="nextSpotPick">
+        <option value="">Choose next spot</option>
+      </select>
+
+      <label>Boat Speed (km/h)</label>
+      <input id="boatSpeedInput" type="number" inputmode="decimal" placeholder="Example: 25" value="25">
+
+      <div class="row">
+        <button onclick="setCurrentBoatLocation()">Use Current Location</button>
+        <button class="dark" onclick="startNextNavigation()">Start Navigation</button>
+      </div>
+
+      <label>Route Chain (multiple spots)</label>
+      <select id="routeChainPick">
+        <option value="">Add spot to route chain</option>
+      </select>
+
+      <div class="row">
+        <button onclick="addSpotToRouteChain()">Add To Route</button>
+        <button class="dark" onclick="startRouteChain()">Start Route Chain</button>
+        <button class="danger" onclick="clearRouteChainList()">Clear Chain</button>
+      </div>
+
+      <div id="routeChainListBox" style="margin-top:10px;"></div>
+      <div id="navInfoBox" style="margin-top:10px;"></div>
+    </div>
   </section>
 
   <section id="driftTab">
@@ -564,7 +598,7 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V73 Stable
+    Build version: V74 Stable
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -733,6 +767,8 @@
     let reefOverlayOn = false;
     let lastDetectedFish = null;
     let lastWindDir = "—";
+    let routeChain = [];
+    let routeChainIndex = 0;
 
     function getJSON(key, fallback){
       try{
@@ -987,6 +1023,8 @@
       saveAllSpots(spots);
       fillSpotPick();
       fillLocalAreaPick();
+      fillNextSpotPick();
+      fillRouteChainPick();
     }
 
     function loadKnownSpotsIntoSaved(){
@@ -1038,6 +1076,50 @@
       });
       if(allNames.includes(current)){
         localAreaEl.value = current;
+      }
+    }
+
+    function fillNextSpotPick(){
+      const sel = document.getElementById("nextSpotPick");
+      if(!sel) return;
+
+      const current = sel.value || "";
+      const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+
+      sel.innerHTML = `<option value="">Choose next spot</option>`;
+
+      spots.forEach(sp => {
+        const label = `${sp.name} (${sp.type}${isPresetSpot(sp) ? " • Preset" : " • Custom"})`;
+        const opt = document.createElement("option");
+        opt.value = sp.coords;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+
+      if([...sel.options].some(o => o.value === current)){
+        sel.value = current;
+      }
+    }
+
+    function fillRouteChainPick(){
+      const sel = document.getElementById("routeChainPick");
+      if(!sel) return;
+
+      const current = sel.value || "";
+      const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
+
+      sel.innerHTML = `<option value="">Add spot to route chain</option>`;
+
+      spots.forEach(sp => {
+        const label = `${sp.name} (${sp.type}${isPresetSpot(sp) ? " • Preset" : " • Custom"})`;
+        const opt = document.createElement("option");
+        opt.value = sp.coords;
+        opt.textContent = label;
+        sel.appendChild(opt);
+      });
+
+      if([...sel.options].some(o => o.value === current)){
+        sel.value = current;
       }
     }
 
@@ -1128,6 +1210,7 @@
       const mapIds = {
         add:"btnAdd",
         mapTab:"btnMap",
+        navigateTab:"btnNavigate",
         driftTab:"btnDrift",
         spots:"btnSpots",
         log:"btnLog",
@@ -1151,6 +1234,11 @@
           map.invalidateSize();
           renderMap();
         }, 200);
+      }
+      if(id === "navigateTab"){
+        fillNextSpotPick();
+        fillRouteChainPick();
+        renderRouteChainList();
       }
       if(id === "driftTab") renderDriftPanel();
       if(id === "spots") renderSpots();
@@ -1253,6 +1341,52 @@
     function oppositeCompass(dir){
       const opposite = { "N":"S","NE":"SW","E":"W","SE":"NW","S":"N","SW":"NE","W":"E","NW":"SE","—":"—" };
       return opposite[dir] || "—";
+    }
+
+    function calcDistanceKm(lat1, lon1, lat2, lon2){
+      const R = 6371;
+      const dLat = (lat2 - lat1) * Math.PI / 180;
+      const dLon = (lon2 - lon1) * Math.PI / 180;
+
+      const a =
+        Math.sin(dLat/2) * Math.sin(dLat/2) +
+        Math.cos(lat1 * Math.PI / 180) *
+        Math.cos(lat2 * Math.PI / 180) *
+        Math.sin(dLon/2) * Math.sin(dLon/2);
+
+      const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
+      return R * c;
+    }
+
+    function calcBearing(lat1, lon1, lat2, lon2){
+      const φ1 = lat1 * Math.PI / 180;
+      const φ2 = lat2 * Math.PI / 180;
+      const λ1 = lon1 * Math.PI / 180;
+      const λ2 = lon2 * Math.PI / 180;
+
+      const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
+      const x =
+        Math.cos(φ1) * Math.sin(φ2) -
+        Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
+
+      let brng = Math.atan2(y, x) * 180 / Math.PI;
+      brng = (brng + 360) % 360;
+      return brng;
+    }
+
+    function bearingToCompass(bearing){
+      const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+      return dirs[Math.round(bearing / 45) % 8];
+    }
+
+    function calcETA(distanceKm, speedKmh){
+      if(!speedKmh || speedKmh <= 0) return "—";
+      const hours = distanceKm / speedKmh;
+      const totalMinutes = Math.round(hours * 60);
+      const h = Math.floor(totalMinutes / 60);
+      const m = totalMinutes % 60;
+      if(h > 0) return `${h}h ${m}m`;
+      return `${m} min`;
     }
 
     async function estimateCurrentStrength(lat, lon){
@@ -1395,6 +1529,225 @@
       }
 
       text.textContent = `${status} fishing conditions (${score}%) — ${note}`;
+    }
+
+    function setCurrentBoatLocation(){
+      if(!navigator.geolocation){
+        alert("GPS not supported on this device");
+        return;
+      }
+
+      navigator.geolocation.getCurrentPosition(pos => {
+        const lat = pos.coords.latitude;
+        const lng = pos.coords.longitude;
+
+        coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
+        saveWeatherCoords(lat, lng);
+
+        const nearest = getNearestSpot(lat, lng);
+        if(nearest){
+          addAreaOptionIfMissing(nearest.name);
+          manualSpotPick.value = nearest.coords;
+          updateWhereCaughtDisplay(nearest.type || "Area");
+        }
+
+        const box = document.getElementById("navInfoBox");
+        if(box){
+          box.innerHTML = `<div class="chip">Current: ${lat.toFixed(6)}, ${lng.toFixed(6)}</div>`;
+        }
+
+        if(map){
+          if(myBoatMarker) map.removeLayer(myBoatMarker);
+          myBoatMarker = L.marker([lat, lng]).addTo(map);
+          myBoatMarker.bindPopup("Your Boat");
+        }
+      }, () => {
+        alert("Could not get current location");
+      }, {
+        enableHighAccuracy:true,
+        timeout:10000
+      });
+    }
+
+    function startNextNavigation(){
+      const nextCoords = document.getElementById("nextSpotPick").value;
+      const speed = Number(document.getElementById("boatSpeedInput").value || 0);
+
+      if(!nextCoords){
+        alert("Choose next spot first.");
+        return;
+      }
+
+      const currentPos = parseCoords(coordsEl.value);
+      if(!currentPos){
+        alert("Get current location first.");
+        return;
+      }
+
+      const nextPos = parseCoords(nextCoords);
+      if(!nextPos){
+        alert("Invalid next spot coordinates.");
+        return;
+      }
+
+      const targetSpot = getAllSpots().find(s => s.coords === nextCoords);
+      const distanceKm = calcDistanceKm(currentPos.lat, currentPos.lng, nextPos.lat, nextPos.lng);
+      const bearing = calcBearing(currentPos.lat, currentPos.lng, nextPos.lat, nextPos.lng);
+      const eta = calcETA(distanceKm, speed);
+
+      const box = document.getElementById("navInfoBox");
+      if(box){
+        box.innerHTML = `
+          <div class="card">
+            <b>Navigation Ready</b>
+            <div class="mini" style="margin-top:8px;">From: ${safe(coordsEl.value)}</div>
+            <div class="mini">To: ${safe(targetSpot?.name || "Next Spot")}</div>
+            <div class="mini mono">Target: ${safe(nextCoords)}</div>
+            <div class="mini" style="margin-top:8px;"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
+            <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
+            <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
+          </div>
+        `;
+      }
+
+      navigateToSpotInternal(nextPos.lat, nextPos.lng);
+    }
+
+    function addSpotToRouteChain(){
+      const coords = document.getElementById("routeChainPick").value;
+      if(!coords){
+        alert("Choose a spot to add.");
+        return;
+      }
+
+      const spot = getAllSpots().find(s => s.coords === coords);
+      if(!spot){
+        alert("Spot not found.");
+        return;
+      }
+
+      routeChain.push({
+        name: spot.name,
+        type: spot.type,
+        coords: spot.coords
+      });
+
+      renderRouteChainList();
+    }
+
+    function renderRouteChainList(){
+      const box = document.getElementById("routeChainListBox");
+      if(!box) return;
+
+      if(!routeChain.length){
+        box.innerHTML = `<div class="mini">No route chain added yet.</div>`;
+        return;
+      }
+
+      box.innerHTML = "";
+      routeChain.forEach((item, idx) => {
+        const card = document.createElement("div");
+        card.className = "card";
+        card.innerHTML = `
+          <b>${idx + 1}. ${safe(item.name)}</b>
+          <div class="mini">${safe(item.type)}</div>
+          <div class="mini mono">${safe(item.coords)}</div>
+          <button class="danger" onclick="removeRouteChainSpot(${idx})">Remove</button>
+        `;
+        box.appendChild(card);
+      });
+    }
+
+    function removeRouteChainSpot(index){
+      routeChain.splice(index, 1);
+      renderRouteChainList();
+    }
+
+    function clearRouteChainList(){
+      routeChain = [];
+      routeChainIndex = 0;
+      renderRouteChainList();
+      const box = document.getElementById("navInfoBox");
+      if(box) box.innerHTML = "";
+    }
+
+    function startRouteChain(){
+      if(!routeChain.length){
+        alert("Add route chain spots first.");
+        return;
+      }
+
+      const currentPos = parseCoords(coordsEl.value);
+      if(!currentPos){
+        alert("Get current location first.");
+        return;
+      }
+
+      routeChainIndex = 0;
+      navigateToRouteChainStep(currentPos.lat, currentPos.lng);
+    }
+
+    function navigateToRouteChainStep(fromLat, fromLng){
+      if(routeChainIndex >= routeChain.length){
+        const box = document.getElementById("navInfoBox");
+        if(box){
+          box.innerHTML = `
+            <div class="card">
+              <b>Route Chain Complete</b>
+              <div class="mini" style="margin-top:8px;">All route points done.</div>
+            </div>
+          `;
+        }
+        return;
+      }
+
+      const speed = Number(document.getElementById("boatSpeedInput").value || 0);
+      const target = routeChain[routeChainIndex];
+      const p = parseCoords(target.coords);
+      if(!p) return;
+
+      const distanceKm = calcDistanceKm(fromLat, fromLng, p.lat, p.lng);
+      const bearing = calcBearing(fromLat, fromLng, p.lat, p.lng);
+      const eta = calcETA(distanceKm, speed);
+
+      const box = document.getElementById("navInfoBox");
+      if(box){
+        box.innerHTML = `
+          <div class="card">
+            <b>Route Step ${routeChainIndex + 1} of ${routeChain.length}</b>
+            <div class="mini" style="margin-top:8px;"><b>Next Spot:</b> ${safe(target.name)}</div>
+            <div class="mini mono">${safe(target.coords)}</div>
+            <div class="mini"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
+            <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
+            <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
+            <div class="row">
+              <button onclick="markRouteStepDone()">Next Reached</button>
+            </div>
+          </div>
+        `;
+      }
+
+      navigateToSpotInternal(p.lat, p.lng);
+    }
+
+    function markRouteStepDone(){
+      const currentPos = parseCoords(coordsEl.value);
+      const target = routeChain[routeChainIndex];
+      const p = target ? parseCoords(target.coords) : null;
+
+      routeChainIndex += 1;
+
+      if(routeChainIndex >= routeChain.length){
+        navigateToRouteChainStep(0, 0);
+        return;
+      }
+
+      if(p){
+        coordsEl.value = `${p.lat.toFixed(6)},${p.lng.toFixed(6)}`;
+        navigateToRouteChainStep(p.lat, p.lng);
+      } else if(currentPos){
+        navigateToRouteChainStep(currentPos.lat, currentPos.lng);
+      }
     }
 
     async function getGPS(){
@@ -2075,7 +2428,7 @@
 
           routeLine = L.polyline([[myLat, myLng],[targetLat, targetLng]], { color:"red", weight:4 }).addTo(map);
 
-          const km = (Math.hypot(targetLat - myLat, targetLng - myLng) * 111).toFixed(2);
+          const km = calcDistanceKm(myLat, myLng, targetLat, targetLng).toFixed(2);
           map.fitBounds(routeLine.getBounds(), { padding:[30,30] });
 
           setTimeout(() => {
@@ -2140,6 +2493,8 @@
       saveAllSpots(spots);
       fillSpotPick();
       fillLocalAreaPick();
+      fillNextSpotPick();
+      fillRouteChainPick();
       renderSpots();
       renderMap();
     }
@@ -2192,7 +2547,10 @@
 
         wrap.querySelector(".btn-open-map").onclick = () => goToSpotOnMap(s.coords);
         wrap.querySelector(".btn-use-spot").onclick = () => useSpotCoords(s.coords, s.name, s.type);
-        wrap.querySelector(".btn-nav").onclick = () => navigateToSpotInternal(p.lat, p.lng);
+        wrap.querySelector(".btn-nav").onclick = () => {
+          document.getElementById("nextSpotPick").value = s.coords;
+          showTab("navigateTab");
+        };
         wrap.querySelector(".btn-delete").onclick = () => deleteSpot(s.id);
 
         const editBtn = wrap.querySelector(".btn-edit");
@@ -2252,6 +2610,8 @@
       saveAllSpots(spots);
       fillSpotPick();
       fillLocalAreaPick();
+      fillNextSpotPick();
+      fillRouteChainPick();
       renderSpots();
       renderMap();
     }
@@ -2266,6 +2626,8 @@
         loadKnownSpotsIntoSaved();
         fillSpotPick();
         fillLocalAreaPick();
+        fillNextSpotPick();
+        fillRouteChainPick();
         renderSpots();
         renderMap();
         return;
@@ -2277,6 +2639,8 @@
       saveAllSpots(spots.filter(s => String(s.id) !== String(id)));
       fillSpotPick();
       fillLocalAreaPick();
+      fillNextSpotPick();
+      fillRouteChainPick();
       renderSpots();
       renderMap();
     }
@@ -2722,7 +3086,7 @@
       try{
         const backup = {
           app: "Tanya Deep Sea",
-          version: "V73",
+          version: "V74",
           exportedAt: new Date().toISOString(),
           catches: getAllCatches(),
           spots: getAllSpots(),
@@ -2765,7 +3129,7 @@
         }).join("");
 
         const gpx = `<?xml version="1.0" encoding="UTF-8"?>
-<gpx version="1.1" creator="Tanya Deep Sea V73" xmlns="http://www.topografix.com/GPX/1/1">
+<gpx version="1.1" creator="Tanya Deep Sea V74" xmlns="http://www.topografix.com/GPX/1/1">
 ${waypoints}
 </gpx>`;
 
@@ -2831,6 +3195,8 @@ ${waypoints}
           fillSpotPick();
           fillBaitPick();
           fillLocalAreaPick();
+          fillNextSpotPick();
+          fillRouteChainPick();
           renderLog();
           renderSpots();
           renderStats();
@@ -2842,6 +3208,7 @@ ${waypoints}
           renderFishingMeter();
           renderExtraInfo();
           renderBoatGuide();
+          renderRouteChainList();
           renderSeasonWarning();
 
           backupMsg.textContent = "Backup imported successfully.";
@@ -2880,7 +3247,10 @@ ${waypoints}
       fillSpotPick();
       fillBaitPick();
       fillLocalAreaPick();
+      fillNextSpotPick();
+      fillRouteChainPick();
       clearCatchForm();
+      clearRouteChainList();
       renderWeatherPanel();
       render14DayWeather();
       renderDriftPanel();
@@ -2894,6 +3264,8 @@ ${waypoints}
     fillSpotPick();
     fillBaitPick();
     fillLocalAreaPick();
+    fillNextSpotPick();
+    fillRouteChainPick();
     updateMinSize();
     showTab("add");
     initMap();
@@ -2906,6 +3278,7 @@ ${waypoints}
     renderFishingMeter();
     renderExtraInfo();
     renderBoatGuide();
+    renderRouteChainList();
     renderSeasonWarning();
   </script>
 
