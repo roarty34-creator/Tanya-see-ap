@@ -1,1 +1,455 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 
+<title>Tanya Deep Sea Fishing App</title>
+
+<link rel="manifest" href="./manifest.webmanifest">
+<meta name="theme-color" content="#061225">
+
+<style>
+body{
+  background:#061225;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  margin:0;
+  padding:20px;
+}
+h1{
+  margin-bottom:15px;
+}
+button{
+  background:#2fa4ff;
+  border:none;
+  padding:10px 14px;
+  border-radius:10px;
+  margin:5px;
+  color:#001420;
+  font-size:14px;
+}
+.card{
+  background:#0f1c38;
+  padding:15px;
+  border-radius:15px;
+  margin-top:15px;
+}
+input,select{
+  width:100%;
+  padding:10px;
+  background:#081632;
+  color:#fff;
+  border:none;
+  border-radius:10px;
+  margin-top:5px;
+  box-sizing:border-box;
+}
+.mini{
+  font-size:12px;
+  color:#9fb0d0;
+  line-height:1.4;
+}
+.meterWrap{
+  background:#081632;
+  height:20px;
+  border-radius:999px;
+  overflow:hidden;
+  margin-top:10px;
+}
+.meterFill{
+  height:100%;
+  width:0%;
+  background:linear-gradient(90deg,#39d98a,#ffd166,#ff8c42);
+}
+</style>
+</head>
+
+<body>
+
+<h1>Tanya Deep Sea Fishing App</h1>
+
+<div>
+<button onclick="showTab('add')">Add Catch</button>
+<button onclick="showTab('spots')">Spots & Navigate</button>
+<button onclick="showTab('drift')">Drift</button>
+<button onclick="showTab('log')">Log</button>
+<button onclick="showTab('season')">Season Guide</button>
+<button onclick="showTab('rules')">Rules</button>
+</div>
+
+<section id="add">
+
+<div class="card">
+<h2>Add Catch</h2>
+
+<label>Species</label>
+<select id="species">
+<option value="">Choose...</option>
+<option>Cape Kob</option>
+<option>Yellowtail</option>
+<option>Bonito</option>
+<option>Red Roman</option>
+<option>Snapper</option>
+<option>Silverfish</option>
+<option>Red Steenbras</option>
+<option>Yellow Belly</option>
+<option>Hottentot</option>
+</select>
+
+<label>Bait Used</label>
+<select id="bait">
+<option>Pilchard</option>
+<option>Pilchard belly</option>
+<option>Pilchard strip</option>
+<option>Makriel</option>
+<option>Live Makriel</option>
+<option>Chokka</option>
+<option>Chokka strip</option>
+<option>Chokka + Pilchard combo</option>
+<option>Squid</option>
+<option>Octopus</option>
+<option>Redbait</option>
+<option>Mussel</option>
+<option>Crab</option>
+<option>Feather lure</option>
+<option>Small spoon</option>
+<option>Metal spoon</option>
+<option>Surface plug</option>
+<option>Live bait</option>
+</select>
+
+<label>Local Area</label>
+<select id="area" onchange="fillWhereCaught()">
+<option value="">Choose saved area...</option>
+<option value="Skulpbank" data-coords="-34.3905,20.8602">Skulpbank</option>
+<option value="Blinde Rif" data-coords="-34.4015,20.8801">Blinde Rif</option>
+<option value="Kabeljou Ridge" data-coords="-34.3750,20.8700">Kabeljou Ridge</option>
+<option value="Roman Bank" data-coords="-34.4200,20.8650">Roman Bank</option>
+<option value="Die Gat" data-coords="-34.3955,20.8450">Die Gat</option>
+<option value="Stilbaai Rif" data-coords="-34.3888,20.8570">Stilbaai Rif</option>
+<option value="Outer Bank" data-coords="-34.4305,20.8355">Outer Bank</option>
+<option value="South Deep" data-coords="-34.4300,20.8800">South Deep</option>
+</select>
+
+<label>Coordinates</label>
+<input id="coords">
+<button onclick="getGPS()">Get GPS</button>
+
+<label>Where Caught</label>
+<input id="whereCaught" placeholder="Auto-filled from area name">
+
+<div class="mini">
+Log catches with area names.<br>
+Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.
+</div>
+
+<button onclick="saveCatch()">Save Catch</button>
+</div>
+
+</section>
+
+<section id="spots" style="display:none">
+
+<div class="card">
+<h2>Spots & Navigate</h2>
+
+<div class="mini">
+Use navigation between saved spots.<br>
+Example: choose a saved next spot in Spots & Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.
+</div>
+
+<div class="card" style="margin-top:10px;">
+<b>Best Fishing Time Today</b>
+<div class="meterWrap">
+  <div id="fishMeter" class="meterFill"></div>
+</div>
+<div id="fishMeterText" class="mini" style="margin-top:8px;">Loading conditions...</div>
+</div>
+
+<select id="nextSpot">
+<option value="">Choose next spot</option>
+<option value="-34.3905,20.8602">Skulpbank</option>
+<option value="-34.4015,20.8801">Blinde Rif</option>
+<option value="-34.3750,20.8700">Kabeljou Ridge</option>
+<option value="-34.4200,20.8650">Roman Bank</option>
+<option value="-34.3955,20.8450">Die Gat</option>
+<option value="-34.3888,20.8570">Stilbaai Rif</option>
+<option value="-34.4305,20.8355">Outer Bank</option>
+<option value="-34.4300,20.8800">South Deep</option>
+</select>
+
+<label>Boat Speed (km/h)</label>
+<input id="boatSpeed" value="25">
+
+<button onclick="startNavigation()">Start Navigation</button>
+
+<div id="navResult" class="mini"></div>
+</div>
+
+</section>
+
+<section id="drift" style="display:none">
+
+<div class="card">
+<h2>Drift</h2>
+<div id="driftBox" class="mini">Loading drift...</div>
+</div>
+
+</section>
+
+<section id="log" style="display:none">
+<div class="card">
+<h2>Catch Log</h2>
+<div id="logBox"></div>
+</div>
+</section>
+
+<section id="season" style="display:none">
+
+<div class="card">
+
+<h2>Species Season Guide</h2>
+
+<div class="mini">
+Cape Kob — Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
+Yellowtail — Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
+Bonito — Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
+Red Roman — Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
+Snapper — Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
+Silverfish — Good all year. Usually better over reef in calmer workable conditions.<br><br>
+Hottentot — Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
+Yellow Belly — Good all year. Focus on reef patches, current and proper bait on the bottom.<br><br>
+Red Steenbras — Closed season: 1 Sep - 30 Nov. Sensitive species. Handle carefully.
+</div>
+
+</div>
+
+</section>
+
+<section id="rules" style="display:none">
+
+<div class="card">
+<h2>Rules & Limits</h2>
+<div class="mini">
+Bag limit: check current permit.<br><br>
+Mixed species total: check current permit.
+</div>
+</div>
+
+</section>
+
+<div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
+Tanya Deep Sea Fishing App<br>
+Core system: V69<br>
+Cache system: V71-style<br>
+Build version: V79 Stable
+</div>
+
+<script>
+const HARBOUR_LAT = -34.3695;
+const HARBOUR_LON = 20.8500;
+let lastWindDir = "—";
+let lastWindSpeed = 0;
+let lastSwell = 0;
+let lastCurrent = 0;
+
+function showTab(id){
+  document.querySelectorAll("section").forEach(s=>s.style.display="none");
+  document.getElementById(id).style.display="block";
+}
+
+function fillWhereCaught(){
+  const area = document.getElementById("area");
+  const selected = area.options[area.selectedIndex];
+  document.getElementById("whereCaught").value = selected.value || "";
+  if(selected.dataset.coords){
+    document.getElementById("coords").value = selected.dataset.coords;
+  }
+}
+
+function getGPS(){
+  navigator.geolocation.getCurrentPosition(pos=>{
+    const lat = pos.coords.latitude;
+    const lon = pos.coords.longitude;
+    document.getElementById("coords").value = lat + "," + lon;
+  });
+}
+
+function saveCatch(){
+  const species = document.getElementById("species").value;
+  const bait = document.getElementById("bait").value;
+  const coords = document.getElementById("coords").value;
+  const area = document.getElementById("area").value;
+  const whereCaught = document.getElementById("whereCaught").value;
+
+  let log = JSON.parse(localStorage.getItem("catchlog") || "[]");
+  log.push({
+    species,
+    bait,
+    coords,
+    area,
+    whereCaught,
+    date:new Date().toLocaleString()
+  });
+  localStorage.setItem("catchlog", JSON.stringify(log));
+  renderLog();
+  alert("Catch saved");
+}
+
+function renderLog(){
+  let log = JSON.parse(localStorage.getItem("catchlog") || "[]");
+  let html = "";
+
+  log.forEach(c=>{
+    html += `
+    <div class="card">
+      <b>${c.species}</b><br>
+      Bait: ${c.bait}<br>
+      Area: ${c.area || "-"}<br>
+      Where Caught: ${c.whereCaught || "-"}<br>
+      Coords: ${c.coords}<br>
+      ${c.date}<br><br>
+      <button onclick="satNavFromString('${c.coords}')">Satellite Nav</button>
+    </div>
+    `;
+  });
+
+  document.getElementById("logBox").innerHTML = html || "<div class='mini'>No catches saved yet.</div>";
+}
+
+function startNavigation(){
+  const spot = document.getElementById("nextSpot").value.split(",");
+  if(spot.length !== 2 || !spot[0]){
+    alert("Choose next spot first");
+    return;
+  }
+
+  const lat = Number(spot[0]);
+  const lon = Number(spot[1]);
+  const speed = Number(document.getElementById("boatSpeed").value || 25);
+
+  const d = distance(HARBOUR_LAT, HARBOUR_LON, lat, lon);
+  const bearing = getBearing(HARBOUR_LAT, HARBOUR_LON, lat, lon);
+  const compass = bearingToCompass(bearing);
+  const etaHours = d / speed;
+  const etaMin = Math.round(etaHours * 60);
+
+  document.getElementById("navResult").innerHTML =
+    "Start: Stilbaai Harbour<br>" +
+    "Distance: " + d.toFixed(2) + " km<br>" +
+    "Bearing: " + bearing.toFixed(0) + "° (" + compass + ")<br>" +
+    "ETA: " + etaMin + " min<br><br>" +
+    "<button onclick='satNav(" + lat + "," + lon + ")'>Satellite Navigation</button>";
+}
+
+function satNav(lat,lon){
+  window.open("https://www.google.com/maps?q=" + lat + "," + lon + "&t=k","_blank");
+}
+
+function satNavFromString(coordStr){
+  const p = coordStr.split(",");
+  if(p.length !== 2) return;
+  satNav(Number(p[0]), Number(p[1]));
+}
+
+function distance(lat1,lon1,lat2,lon2){
+  const R = 6371;
+  const dLat = (lat2-lat1) * Math.PI/180;
+  const dLon = (lon2-lon1) * Math.PI/180;
+
+  const a =
+    Math.sin(dLat/2)*Math.sin(dLat/2) +
+    Math.cos(lat1*Math.PI/180)*Math.cos(lat2*Math.PI/180) *
+    Math.sin(dLon/2)*Math.sin(dLon/2);
+
+  return R * 2 * Math.atan2(Math.sqrt(a),Math.sqrt(1-a));
+}
+
+function getBearing(lat1, lon1, lat2, lon2){
+  const y = Math.sin((lon2-lon1)*Math.PI/180) * Math.cos(lat2*Math.PI/180);
+  const x =
+    Math.cos(lat1*Math.PI/180) * Math.sin(lat2*Math.PI/180) -
+    Math.sin(lat1*Math.PI/180) * Math.cos(lat2*Math.PI/180) *
+    Math.cos((lon2-lon1)*Math.PI/180);
+  return (Math.atan2(y, x) * 180 / Math.PI + 360) % 360;
+}
+
+function bearingToCompass(bearing){
+  const dirs = ["N","NE","E","SE","S","SW","W","NW"];
+  return dirs[Math.round(bearing / 45) % 8];
+}
+
+function oppositeCompass(dir){
+  const map = {N:"S",NE:"SW",E:"W",SE:"NW",S:"N",SW:"NE",W:"E",NW:"SE","—":"—"};
+  return map[dir] || "—";
+}
+
+async function loadConditions(){
+  try{
+    const weather = await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${HARBOUR_LAT}&longitude=${HARBOUR_LON}&current=wind_speed_10m,wind_direction_10m&timezone=Africa%2FJohannesburg`);
+    const marine = await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${HARBOUR_LAT}&longitude=${HARBOUR_LON}&current=wave_height,swell_wave_height,sea_surface_temperature&timezone=Africa%2FJohannesburg`);
+
+    const w = await weather.json();
+    const m = await marine.json();
+
+    lastWindSpeed = Number(w?.current?.wind_speed_10m || 0);
+    lastWindDir = bearingToCompass(Number(w?.current?.wind_direction_10m || 0));
+    lastSwell = Number(m?.current?.swell_wave_height || 0);
+    const wave = Number(m?.current?.wave_height || 0);
+
+    lastCurrent = 0.2 + lastWindSpeed * 0.015 + wave * 0.18 + lastSwell * 0.12;
+
+    renderFishingMeter();
+    renderDrift();
+  }catch{
+    document.getElementById("fishMeterText").textContent = "Conditions unavailable";
+    document.getElementById("driftBox").textContent = "Conditions unavailable";
+  }
+}
+
+function renderFishingMeter(){
+  let score = 50;
+
+  if(lastWindSpeed <= 15) score += 15;
+  else if(lastWindSpeed <= 25) score += 5;
+  else score -= 12;
+
+  if(lastSwell <= 1.5) score += 15;
+  else if(lastSwell <= 2.5) score += 5;
+  else score -= 12;
+
+  if(lastCurrent <= 0.9) score += 12;
+  else if(lastCurrent <= 1.5) score += 4;
+  else score -= 8;
+
+  score = Math.max(0, Math.min(100, Math.round(score)));
+
+  document.getElementById("fishMeter").style.width = score + "%";
+
+  let text = "Fair";
+  if(score >= 80) text = "Excellent";
+  else if(score >= 65) text = "Good";
+  else if(score < 45) text = "Poor";
+
+  document.getElementById("fishMeterText").textContent =
+    text + " fishing conditions (" + score + "%) • Wind " +
+    lastWindSpeed.toFixed(0) + " km/h • Swell " +
+    lastSwell.toFixed(1) + " m";
+}
+
+function renderDrift(){
+  const drift = oppositeCompass(lastWindDir);
+  document.getElementById("driftBox").innerHTML =
+    "Wind Direction: " + lastWindDir + "<br>" +
+    "Likely Drift: " + drift + "<br>" +
+    "Current: " + lastCurrent.toFixed(2) + " kt<br><br>" +
+    "Start slightly up-current from your target reef so the boat drifts across the strike zone.";
+}
+
+renderLog();
+loadConditions();
+</script>
+
+</body>
+</html>
