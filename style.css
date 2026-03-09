@@ -1,57 +1,153 @@
 body{
+  background:#061225;
+  color:#fff;
+  font-family:Arial,Helvetica,sans-serif;
+  margin:0;
+  padding:15px;
+}
 
-background:#061225;
-color:white;
-font-family:Arial;
-margin:0;
-padding:15px;
-
+h1{
+  font-size:28px;
+  margin:0 0 16px;
 }
 
 .topnav{
-
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-margin-bottom:12px;
-
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  margin-bottom:14px;
 }
 
-button{
+.navbtn{
+  background:#2fa4ff;
+  border:none;
+  padding:11px 14px;
+  border-radius:12px;
+  color:#001420;
+  font-size:15px;
+}
 
-background:#2fa4ff;
-border:none;
-padding:10px;
-border-radius:8px;
-
+.navbtn.active{
+  box-shadow:0 0 0 2px rgba(255,255,255,0.18) inset;
 }
 
 .card{
+  background:#0f1c38;
+  padding:14px;
+  border-radius:18px;
+  margin-bottom:14px;
+}
 
-background:#0f1c38;
-padding:14px;
-border-radius:12px;
-margin-bottom:12px;
-
+label{
+  display:block;
+  margin-top:10px;
+  margin-bottom:4px;
+  font-size:13px;
 }
 
 input,select{
+  width:100%;
+  padding:11px;
+  background:#081632;
+  color:#fff;
+  border:none;
+  border-radius:12px;
+  box-sizing:border-box;
+  font-size:16px;
+}
 
-width:100%;
-padding:9px;
-margin-top:6px;
-background:#081632;
-color:white;
-border:none;
-border-radius:8px;
+button{
+  background:#2fa4ff;
+  border:none;
+  padding:11px 14px;
+  border-radius:12px;
+  color:#001420;
+  font-size:15px;
+  cursor:pointer;
+}
 
+button.dark{
+  background:#17345e;
+  color:#fff;
+}
+
+button.danger{
+  background:#b23b4d;
+  color:#fff;
+}
+
+.row{
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.row > *{
+  flex:1 1 140px;
+}
+
+.sectionTitle{
+  font-size:12px;
+  color:#9fb0d0;
+  margin-bottom:10px;
+}
+
+.mini{
+  font-size:13px;
+  color:#c0cbe0;
+  line-height:1.4;
+}
+
+.tipText{
+  margin-top:8px;
+}
+
+.conditionsRow{
+  display:flex;
+  flex-wrap:wrap;
+  gap:8px;
+  margin-top:10px;
+}
+
+.chip{
+  background:#081632;
+  padding:8px 10px;
+  border-radius:999px;
+  font-size:12px;
+}
+
+.successText{
+  color:#67e59a;
+  margin-top:8px;
+}
+
+.spotCard{
+  background:#0f1c38;
+  padding:12px;
+  border-radius:16px;
+  margin-bottom:10px;
+}
+
+.spotTitle{
+  font-size:18px;
+  font-weight:bold;
+}
+
+.spotSub{
+  font-size:13px;
+  color:#9fb0d0;
+  margin-top:4px;
 }
 
 .version{
+  text-align:center;
+  font-size:11px;
+  color:#9fb0d0;
+  margin-top:26px;
+  margin-bottom:10px;
+}
 
-text-align:center;
-font-size:11px;
-color:#9fb0d0;
-margin-top:30px;
-
+.guideBlock{
+  margin-top:10px;
 }
