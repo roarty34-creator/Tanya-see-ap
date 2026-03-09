@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v76";
+const CACHE_NAME = "tanya-deep-sea-v77";
 const FILES = [
   "./",
   "./index.html",
