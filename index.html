@@ -182,7 +182,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V89 Stable</div>
+  <div class="mini">V90 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -314,7 +314,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V89 Stable
+    Build version: V90 Stable
   </div>
 
   <script>
@@ -359,41 +359,41 @@
     const FISH_INFO = {
       "Cape Kob":{
         bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly",
-        hook:"6/0 to 8/0",
-        sinker:"6oz to 8oz, depending on drift/current",
-        strop:"60 cm to 100 cm leader",
-        rigType:"Running sinker rig / live bait rig / 2-hook bottom rig",
+        hook:"Bo hook 7/0, onder hook 8/0 of 9/0 Kendal / J hooks",
+        sinker:"6oz to 8oz grapnel / bottle sinker",
+        strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm lank",
+        rigType:"Stilbaai Groot Kabeljou Strop (Double Strop Rig)",
         status:"Check current permit / stock status",
         statusClass:"statusNeutral",
         season:"Best spring to autumn",
         closed:"Check current permit rules",
-        sketch:`RUNNING SINKER RIG
+        why:`✔ Kabeljou vat dikwels aas wat net bo die bodem hang
+✔ Twee hooks hou die aas reguit
+✔ Minder kans dat aas spin in stroom
+✔ Groot kabeljou vat hom maklik
 
-Rod tip
-  |
-Main line
-  |
-Running sinker
-  |
-Bead
-  |
-Swivel
-  |
-Leader 60-100 cm
-  |
-6/0 - 8/0 hook
+Klein maar belangrike kabeljou tip:
+Baie ervare hengelaars maak die onderste hook groter.
+Bo: 7/0
+Onder: 8/0 of 9/0
+Want kabeljou vat gewoonlik die onderste aas eerste.`,
+        sketch:`STILBAAI GROOT KABELJOU STROP
+(DOUBLE STROP RIG)
 
-2-HOOK BOTTOM RIG
-
-Main line
+Hooflyn
+40-50 lb braid
   |
-Swivel
+Sterk barrel swivel
   |
-Top snoot 25-35 cm ---- hook
+Leader
+0.80 - 1.0 mm nylon
+± 80 cm lank
   |
-Bottom snoot 25-35 cm - hook
+Bo hook snoot ---- 7/0 hook
   |
-Sinker 6oz - 8oz`
+Onder hook snoot - 8/0 of 9/0 hook
+  |
+6-8 oz grapnel / bottle sinker`
       },
       "Yellowtail":{
         bait:"Live Makriel, Pilchard strip, Metal spoon, Surface plug",
@@ -405,6 +405,8 @@ Sinker 6oz - 8oz`
         statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
+        why:`✔ Live bait and surface presentations work well
+✔ Longer leader helps cleaner lure action`,
         sketch:`LIVE BAIT / LURE RIG
 
 Rod tip
@@ -429,6 +431,8 @@ Live bait / spoon / plug`
         statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
+        why:`✔ Fast-moving lure presentations match feeding action
+✔ Light setup keeps lure swimming properly`,
         sketch:`FEATHER / SPOON RIG
 
 Rod tip
@@ -451,6 +455,8 @@ Feather lure / spoon`
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
+        why:`✔ Short snoots keep bait near reef
+✔ Good for strong reef structure fishing`,
         sketch:`REEF BOTTOM RIG
 
 Main line
@@ -473,6 +479,8 @@ Sinker 6oz - 8oz`
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
+        why:`✔ Compact rig holds bottom well
+✔ Keeps bait close in the strike zone`,
         sketch:`SHORT BOTTOM RIG
 
 Main line
@@ -493,6 +501,7 @@ Hook snoot 20-40 cm`
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
+        why:`✔ Lighter setup presents smaller baits naturally`,
         sketch:`LIGHT BOTTOM RIG
 
 Main line
@@ -513,6 +522,8 @@ Single hook snoot 20-30 cm`
         statusClass:"statusHigh",
         season:"Sensitive species",
         closed:"Closed season: 1 Sep - 30 Nov",
+        why:`✔ Strong trace helps in heavy conditions
+✔ Handle carefully and follow permit rules`,
         sketch:`STRONG BOTTOM RIG
 
 Main line
@@ -535,6 +546,7 @@ Long snoot 70-120 cm
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
+        why:`✔ Simple bottom presentation works well on reef patches`,
         sketch:`BOTTOM RIG
 
 Main line
@@ -555,6 +567,7 @@ Hook trace 30-50 cm`
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
+        why:`✔ Smaller hooks and shorter traces suit this species better`,
         sketch:`LIGHT REEF TRACE
 
 Main line
@@ -569,7 +582,7 @@ Short trace 20-30 cm
       }
     };
 
-    const KEY_LOG = "tanya_v89_log";
+    const KEY_LOG = "tanya_v90_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
@@ -743,7 +756,6 @@ Short trace 20-30 cm
     function saveCatch(){
       const species = document.getElementById("species").value;
       const bait = document.getElementById("bait").value;
-      const area = document.getElementById("area").value;
       const coords = document.getElementById("coords").value.trim();
       const whereCaught = document.getElementById("whereCaught").value.trim();
       const notes = document.getElementById("notes").value.trim();
@@ -885,6 +897,7 @@ Short trace 20-30 cm
           <div class="mini" style="margin-top:8px;"><b>Rig Type:</b> ${info.rigType}</div>
           <div class="mini" style="margin-top:8px;"><b>Best Season:</b> ${info.season}</div>
           <div class="mini" style="margin-top:8px;"><b>Closed Season:</b> ${info.closed}</div>
+          <div class="mini" style="margin-top:8px;"><b>Why this rig works:</b><br>${(info.why || "").replace(/\n/g,"<br>")}</div>
           <div class="mini" style="margin-top:8px;"><b>Rig Sketch:</b></div>
           <pre class="rig">${info.sketch}</pre>
         </div>
@@ -914,4 +927,4 @@ Short trace 20-30 cm
     renderLog();
   </script>
 </body>
-  </html>
+</html>
