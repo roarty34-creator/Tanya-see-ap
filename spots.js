@@ -1,3 +1,36 @@
+const ALL_BAIT_OPTIONS = [
+  "Pilchard",
+  "Pilchard belly",
+  "Pilchard strip",
+  "Makriel",
+  "Live Makriel",
+  "Chokka",
+  "Chokka strip",
+  "Chokka + Pilchard combo",
+  "Squid",
+  "Octopus",
+  "Redbait",
+  "Mussel",
+  "Crab",
+  "Feather lure",
+  "Small spoon",
+  "Metal spoon",
+  "Surface plug",
+  "Live bait"
+];
+
+const BAIT_BY_SPECIES = {
+  "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Chokka","Pilchard"],
+  "Yellowtail":["Live Makriel","Pilchard strip","Metal spoon","Surface plug","Live bait"],
+  "Bonito":["Pilchard strip","Small spoon","Feather lure","Makriel"],
+  "Red Roman":["Chokka","Pilchard","Octopus","Squid"],
+  "Snapper":["Chokka","Pilchard","Redbait","Squid"],
+  "Silverfish":["Chokka strip","Pilchard strip","Pilchard"],
+  "Red Steenbras":["Chokka","Pilchard","Redbait","Squid"],
+  "Yellow Belly":["Chokka","Pilchard"],
+  "Hottentot":["Chokka","Pilchard","Redbait","Mussel"]
+};
+
 const DEFAULT_SPOTS = [
   { id:"s1", name:"Skulpbank", lat:-34.3905, lon:20.8602, type:"Reef", preset:true },
   { id:"s2", name:"Blinde Rif", lat:-34.4015, lon:20.8801, type:"Reef", preset:true },
@@ -8,15 +41,3 @@ const DEFAULT_SPOTS = [
   { id:"s7", name:"Outer Bank", lat:-34.4305, lon:20.8355, type:"Reef", preset:true },
   { id:"s8", name:"South Deep", lat:-34.4300, lon:20.8800, type:"Deep", preset:true }
 ];
-
-const BAIT_BY_SPECIES = {
-  "Cape Kob":["Pilchard","Chokka","Makriel"],
-  "Yellowtail":["Makriel","Pilchard","Squid"],
-  "Bonito":["Makriel","Pilchard","Squid"],
-  "Red Roman":["Chokka","Squid","Octopus"],
-  "Snapper":["Chokka","Squid","Pilchard"],
-  "Silverfish":["Pilchard","Chokka"],
-  "Red Steenbras":["Chokka","Pilchard","Squid"],
-  "Yellow Belly":["Pilchard","Chokka"],
-  "Hottentot":["Pilchard","Chokka"]
-};
