@@ -156,13 +156,12 @@
       background:linear-gradient(90deg,#39d98a,#ffd166,#ff8c42);
     }
     .ok{color:var(--ok)}
-    .warn{color:var(--warn)}
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V81 Final Stable</div>
+  <div class="mini">V82 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('add')">Add Catch</button>
@@ -192,6 +191,10 @@
         <option>Hottentot</option>
       </select>
 
+      <label>Minimum Size</label>
+      <input id="minSize" readonly />
+      <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
+
       <label>Bait Used</label>
       <select id="bait">
         <option value="">Choose...</option>
@@ -210,7 +213,7 @@
       </div>
 
       <label>Where Caught</label>
-      <input id="whereCaught" readonly placeholder="Auto-filled from area name" />
+      <input id="whereCaught" placeholder="Auto-filled from area name or type your own" />
 
       <label>Notes</label>
       <textarea id="notes" placeholder="Optional notes"></textarea>
@@ -274,6 +277,7 @@
       <div class="row" style="margin-top:10px;">
         <button onclick="startNavigation()">Start Navigation</button>
         <button class="dark" onclick="openSelectedSatellite()">Satellite View</button>
+        <button class="dark" onclick="showTab('mapTab')">Open Map</button>
       </div>
 
       <div id="navResult" class="mini" style="margin-top:10px;"></div>
@@ -288,7 +292,7 @@
   <section id="driftTab" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Drift</div>
-      <div id="driftBox" class="mini">Loading drift...</div>
+      <div id="driftBox" class="mini">Drift line will show after boat GPS / coordinates are loaded.</div>
     </div>
   </section>
 
@@ -324,7 +328,11 @@
       <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Rules & Limits</div>
       <div class="mini">
         Bag limit: check current permit.<br><br>
-        Mixed species total: check current permit.
+        Mixed species total: check current permit.<br><br>
+        Check wind and swell before launch.<br><br>
+        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
+        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.<br><br>
+        If current is too strong, drift may be too fast for bottom fishing. Your line will angle away fast and sinkers may not hold bottom properly.
       </div>
     </div>
   </section>
@@ -333,12 +341,14 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V81 Final Stable
+    Build version: V82 Stable
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
+    // CHANGE THIS ONE LINE TO YOUR CORRECT HARBOUR COORDS
     const HARBOUR = { lat:-34.3695, lon:20.8500, name:"Stilbaai Harbour" };
+
     const DEFAULT_SPOTS = [
       { name:"Skulpbank", lat:-34.3905, lon:20.8602 },
       { name:"Blinde Rif", lat:-34.4015, lon:20.8801 },
@@ -369,8 +379,20 @@
       "Hottentot":["Chokka","Pilchard","Redbait","Mussel"]
     };
 
-    const KEY_SPOTS = "tanya_v81_spots";
-    const KEY_LOG = "tanya_v81_log";
+    const MIN_SIZE = {
+      "Cape Kob":60,
+      "Yellowtail":60,
+      "Bonito":0,
+      "Red Roman":30,
+      "Snapper":30,
+      "Silverfish":25,
+      "Red Steenbras":60,
+      "Yellow Belly":30,
+      "Hottentot":22
+    };
+
+    const KEY_SPOTS = "tanya_v82_spots";
+    const KEY_LOG = "tanya_v82_log";
 
     let map;
     let osmLayer;
@@ -480,6 +502,27 @@
       if(merged.includes(current)) bait.value = current;
     }
 
+    function updateMinSize(){
+      const species = document.getElementById("species").value;
+      const minSizeEl = document.getElementById("minSize");
+      const note = document.getElementById("minSizeNote");
+
+      if(!species){
+        minSizeEl.value = "";
+        note.textContent = "Choose species to load minimum size.";
+        return;
+      }
+
+      const min = MIN_SIZE[species] ?? "";
+      minSizeEl.value = min;
+
+      if(min === 0){
+        note.textContent = "No minimum size set in app for this species.";
+      } else {
+        note.textContent = "Minimum size loaded for selected species.";
+      }
+    }
+
     function fillAreaDropdown(){
       const area = document.getElementById("area");
       const current = area.value;
@@ -516,7 +559,9 @@
     function fillFromArea(){
       const area = document.getElementById("area");
       const selected = area.options[area.selectedIndex];
-      document.getElementById("whereCaught").value = selected.value || "";
+      if(selected.value){
+        document.getElementById("whereCaught").value = selected.value;
+      }
       if(selected.dataset.coords){
         document.getElementById("coords").value = selected.dataset.coords;
       }
@@ -546,9 +591,13 @@
 
         const near = nearestSpot(lat, lon);
         if(near){
-          document.getElementById("whereCaught").value = near.name;
+          if(!document.getElementById("whereCaught").value.trim()){
+            document.getElementById("whereCaught").value = near.name;
+          }
           document.getElementById("area").value = near.name;
         }
+
+        renderDrift();
       }, () => {
         alert("Could not get GPS");
       }, {
@@ -564,6 +613,7 @@
       document.getElementById("whereCaught").value = "";
       document.getElementById("area").value = "";
       fillBaitOptions();
+      updateMinSize();
       document.getElementById("saveMsg").textContent = "";
     }
 
@@ -572,23 +622,39 @@
       const bait = document.getElementById("bait").value;
       const area = document.getElementById("area").value;
       const coords = document.getElementById("coords").value;
-      const whereCaught = document.getElementById("whereCaught").value;
+      const whereCaught = document.getElementById("whereCaught").value.trim();
       const notes = document.getElementById("notes").value.trim();
+      const minSize = document.getElementById("minSize").value || "";
 
-      if(!species || !coords || !area){
-        alert("Choose species, area and coordinates first.");
+      if(!species){
+        alert("Choose species first.");
+        return;
+      }
+
+      if(!coords){
+        alert("Choose coordinates first.");
         return;
       }
 
       const list = getLog();
       list.unshift({
-        species,bait,area,coords,whereCaught,notes,
+        species,
+        bait,
+        area,
+        coords,
+        whereCaught,
+        notes,
+        minSize,
         date:new Date().toLocaleString()
       });
       saveLog(list);
 
-      document.getElementById("saveMsg").textContent = "Catch saved.";
+      document.getElementById("saveMsg").textContent = "Catch saved to log.";
       renderLog();
+
+      setTimeout(() => {
+        document.getElementById("saveMsg").textContent = "";
+      }, 2000);
     }
 
     function renderLog(){
@@ -605,6 +671,7 @@
         html += `
           <div class="spotCard">
             <b>${c.species}</b><br>
+            <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
             <span class="mini">Bait: ${c.bait || "-"}</span><br>
             <span class="mini">Area: ${c.area || "-"}</span><br>
             <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
@@ -650,8 +717,10 @@
 
         const near = nearestSpot(chosenLat, chosenLon);
         if(near){
-          document.getElementById("whereCaught").value = near.name;
           document.getElementById("area").value = near.name;
+          if(!document.getElementById("whereCaught").value.trim()){
+            document.getElementById("whereCaught").value = near.name;
+          }
         }
       });
     }
@@ -823,7 +892,6 @@
         renderDrift();
       }catch{
         document.getElementById("fishMeterText").textContent = "Conditions unavailable";
-        document.getElementById("driftBox").textContent = "Conditions unavailable";
       }
     }
 
@@ -855,21 +923,33 @@
     }
 
     function renderDrift(){
+      const box = document.getElementById("driftBox");
+      const coordsValue = document.getElementById("coords").value.trim();
+
+      if(!coordsValue){
+        box.innerHTML = "Drift line will show after boat GPS / coordinates are loaded.";
+        return;
+      }
+
       const drift = oppositeCompass(lastWindDir);
-      document.getElementById("driftBox").innerHTML =
+      box.innerHTML =
         "Wind Direction: " + lastWindDir + "<br>" +
         "Likely Drift: " + drift + "<br>" +
         "Current: " + lastCurrent.toFixed(2) + " kt<br><br>" +
         "Start slightly up-current from your target reef so the boat drifts across the strike zone.";
     }
 
-    document.getElementById("species").addEventListener("change", fillBaitOptions);
+    document.getElementById("species").addEventListener("change", () => {
+      fillBaitOptions();
+      updateMinSize();
+    });
 
     fillBaitOptions();
     fillAreaDropdown();
     fillSpotDropdowns();
     renderLog();
     renderSavedSpots();
+    updateMinSize();
     loadConditions();
   </script>
 </body>
