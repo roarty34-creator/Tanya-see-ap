@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v81";
+const CACHE_NAME = "tanya-deep-sea-v82";
 
 const APP_SHELL = [
   "./",
@@ -18,9 +18,7 @@ self.addEventListener("install", event => {
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
-      Promise.all(
-        keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k))
-      )
+      Promise.all(keys.filter(k => k !== CACHE_NAME).map(k => caches.delete(k)))
     )
   );
   self.clients.claim();
@@ -35,11 +33,9 @@ self.addEventListener("fetch", event => {
 
       return fetch(event.request).then(response => {
         const copy = response.clone();
-
         if(event.request.url.startsWith(self.location.origin)){
           caches.open(CACHE_NAME).then(cache => cache.put(event.request, copy));
         }
-
         return response;
       }).catch(() => caches.match("./index.html"));
     })
