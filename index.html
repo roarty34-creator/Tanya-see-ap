@@ -12,12 +12,13 @@
   <h1>Tanya Deep Sea Fishing App</h1>
 
   <div class="topnav">
-    <button class="navbtn active" data-tab-btn="add" onclick="showTab('add')">Add Catch</button>
-    <button class="navbtn" data-tab-btn="spots" onclick="showTab('spots')">Spots &amp; Navigate</button>
-    <button class="navbtn" data-tab-btn="drift" onclick="showTab('drift')">Drift</button>
-    <button class="navbtn" data-tab-btn="log" onclick="showTab('log')">Log</button>
-    <button class="navbtn" data-tab-btn="stats" onclick="showTab('stats')">Stats</button>
-    <button class="navbtn" data-tab-btn="guide" onclick="showTab('guide')">Boat Guide</button>
+    <button class="navbtn active" onclick="showTab('add')">Add Catch</button>
+    <button class="navbtn" onclick="showTab('spots')">Spots &amp; Navigate</button>
+    <button class="navbtn" onclick="showTab('drift')">Drift</button>
+    <button class="navbtn" onclick="showTab('log')">Log</button>
+    <button class="navbtn" onclick="showTab('stats')">Stats</button>
+    <button class="navbtn" onclick="showTab('guide')">Boat Guide</button>
+    <button class="navbtn" onclick="showTab('rules')">Rules &amp; Limits</button>
   </div>
 
   <section id="add">
@@ -55,9 +56,10 @@
       </div>
 
       <label for="whereCaught">Where Caught</label>
-      <input id="whereCaught" readonly value="Deep Sea" />
+      <input id="whereCaught" readonly placeholder="Auto-filled from area name" />
 
       <div class="mini tipText">Tip: Save every catch with the correct Local Area Name so Stats can show your hottest reefs correctly.</div>
+      <div class="mini tipText">Log catches with area names. Stats uses the correct Local Area Name to rank your hottest reefs.</div>
 
       <div class="conditionsRow">
         <div class="chip" id="chipWind">Wind: loading...</div>
@@ -112,8 +114,8 @@
     </div>
 
     <div class="card">
-      <b>Nearby Spots Within 12 km</b>
-      <div class="mini">Get current location first to see nearby spots.</div>
+      <b>Spots from Stilbaai Harbour (max 20 km)</b>
+      <div class="mini">Starts from Stilbaai harbour. If GPS is loaded, it uses your current boat position.</div>
     </div>
 
     <div id="spotsList"></div>
@@ -168,18 +170,21 @@
       <div class="mini guideBlock">
         <b>Check wind + swell before launch</b><br>
         Good wind: under 15 km/h = comfortable, 15–25 km/h = workable, above 25 km/h = rougher, above 30 km/h = poor boat day.<br><br>
-
         Good swell: under 1.5 m = comfortable, 1.5–2.5 m = workable, above 2.5 m = rough, above 3 m = usually poor for bottom fishing.<br><br>
-
         <b>If current is too strong, drift may be too fast for bottom fishing — how to know</b><br>
         You will struggle to hold bottom, your line will angle away fast, sinkers won’t stay down properly, and the boat will drift over the reef too quickly before your bait stays in the strike zone.<br><br>
-
         <b>Use navigation between saved spots</b><br>
         Example: choose a saved next spot in Spots &amp; Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.<br><br>
-
         <b>Log catches with area names</b><br>
         Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.
       </div>
+    </div>
+  </section>
+
+  <section id="rules" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Rules &amp; Limits</div>
+      <div id="rulesBox" class="mini"></div>
     </div>
   </section>
 
@@ -187,10 +192,10 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V75 Stable
+    Build version: V76 Stable
   </div>
 
   <script src="./spots.js"></script>
   <script src="./app.js"></script>
 </body>
-          </html>
+</html>
