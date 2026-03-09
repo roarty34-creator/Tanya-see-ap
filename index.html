@@ -231,18 +231,45 @@
     .infoPurple{background:var(--purple)}
     .infoTeal{background:var(--teal)}
     .infoGold{background:var(--gold)}
+    .guideGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+    .guideCard{
+      background:#0b2244;
+      border-radius:12px;
+      padding:12px;
+    }
+    .guideName{
+      font-size:17px;
+      font-weight:bold;
+      margin-bottom:6px;
+    }
+    .guideHint{
+      font-size:13px;
+      line-height:1.6;
+      color:#d9e6ff;
+    }
+    .uploadPreview{
+      margin-top:10px;
+      font-size:13px;
+      color:#cfe1ff;
+    }
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V91 Stable</div>
+  <div class="mini">V92 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
     <button class="navbtn" onclick="showTab('addTab')">Add Catch</button>
     <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
     <button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
+    <button class="navbtn" onclick="showTab('fishGuideTab')">Fish ID Guide</button>
     <button class="navbtn" onclick="showTab('logTab')">Log</button>
     <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
   </div>
@@ -296,7 +323,7 @@
       </select>
 
       <label>Coordinates</label>
-      <input id="coords" placeholder="-34.3905,20.8602" />
+      <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
 
       <label>Where Caught</label>
       <input id="whereCaught" placeholder="Editable" />
@@ -352,6 +379,27 @@
     </div>
   </section>
 
+  <section id="fishGuideTab" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Fish ID Guide</div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Identify Unknown Fish</div>
+        <div class="row">
+          <button onclick="openCamera()">Use Camera</button>
+          <button onclick="openGallery()">Use Photo</button>
+        </div>
+        <input type="file" id="fishPhoto" accept="image/*" capture="environment" style="display:none">
+        <div class="uploadPreview" id="uploadPreview">Take a photo or upload one, then compare it with the fish guide below.</div>
+      </div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Visual Fish ID Guide (20 Local Species)</div>
+        <div id="fishGuideList" class="guideGrid"></div>
+      </div>
+    </div>
+  </section>
+
   <section id="logTab" style="display:none;">
     <div class="card">
       <div class="row">
@@ -369,14 +417,14 @@
         Bag limit: check current permit.<br><br>
         Mixed species total: check current permit.<br><br>
         Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
-        Hawe reference point in this build: <b>-34.385542, 21.425433</b>
+        Harbour reference point in this build: <b>-34.385542, 21.425433</b>
       </div>
     </div>
   </section>
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V91 Stable
+    Build version: V92 Stable
   </div>
 
   <script>
@@ -395,10 +443,10 @@
     ];
 
     const BAIT_BY_SPECIES = {
-      "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Pilchard","Chokka","Sardine","Mullet strip","Yo-Zuri minnow","Yo-Zuri deep diver"],
+      "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Pilchard","Chokka","Sardine","Mullet strip","Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail"],
       "Yellowtail":["Live Makriel","Live bait","Pilchard strip","Metal spoon","Surface plug","Yo-Zuri minnow","Yo-Zuri deep diver","Paddle tail soft plastic","Stickbait","Popper"],
       "Bonito":["Pilchard strip","Small spoon","Feather lure","Makriel","Yo-Zuri minnow","Small plug","Trolling lure"],
-      "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine"],
+      "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine","Redbait"],
       "Snapper":["Chokka","Pilchard","Redbait","Squid","Sardine"],
       "Silverfish":["Chokka strip","Pilchard strip","Pilchard","Small sardine strip"],
       "Red Steenbras":["Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait"],
@@ -428,60 +476,54 @@
 
     const FISH_INFO = {
       "Cape Kob":{
-        identifier:{
-          body:"Long strong predator body",
-          colour:"Silver-grey with darker back",
-          tail:"Strong tail, streamlined shape",
-          found:"Reef edges, sandy channels, deeper structure",
-          giveaway:"Big mouth and classic kob body"
-        },
+        identifier:{ body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail, streamlined shape", found:"Reef edges, sandy channels, deeper structure", giveaway:"Big mouth and classic kob body" },
         naturalBait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver",
-        hook:"Bo hook 7/0, onder hook 8/0 of 9/0 Kendal / J hooks",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail",
+        hook:"Top hook 7/0, bottom hook 8/0 or 9/0 Kendal / J hooks",
         sinker:"6oz to 8oz grapnel / bottle sinker",
-        strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm lank",
-        rigType:"Stilbaai Groot Kabeljou Strop (Double Strop Rig)",
+        strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm long",
+        rigType:"Big Kob Double Strop Rig",
         status:"Check current permit / stock status",
         statusClass:"statusNeutral",
         season:"Best spring to autumn",
         closed:"Check current permit rules",
-        why:`✔ Kabeljou vat dikwels aas wat net bo die bodem hang
-✔ Twee hooks hou die aas reguit
-✔ Minder kans dat aas spin in stroom
-✔ Groot kabeljou vat hom maklik
+        why:`✔ Kob often takes bait hanging just above the bottom
+✔ Two hooks keep the bait straight
+✔ Less chance of bait spinning in current
+✔ Big kob takes this rig confidently
 
-Klein maar belangrike kabeljou tip:
-Baie ervare hengelaars maak die onderste hook groter.
-Bo: 7/0
-Onder: 8/0 of 9/0
-Want kabeljou vat gewoonlik die onderste aas eerste.`,
-        sketch:`STILBAAI GROOT KABELJOU STROP
-(DOUBLE STROP RIG)
+Small but important kob tip:
+Many experienced anglers make the bottom hook bigger.
+Top: 7/0
+Bottom: 8/0 or 9/0
+Kob often takes the lower bait first.`,
+        make:`How to make it:
+1. Tie 40-50 lb braid to a strong barrel swivel.
+2. Add a 0.80 - 1.0 mm nylon leader about 80 cm long.
+3. Tie the top hook first.
+4. Tie the lower hook slightly bigger.
+5. Attach a 6-8 oz grapnel or bottle sinker at the end.
+6. Make sure the bait sits straight and does not spin.`,
+        sketch:`BIG KOB DOUBLE STROP RIG
 
-Hooflyn
+Main line
 40-50 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.80 - 1.0 mm nylon
-± 80 cm lank
+± 80 cm long
   |
-Bo hook snoot ---- 7/0 hook
+Top hook snoot ---- 7/0 hook
   |
-Onder hook snoot - 8/0 of 9/0 hook
+Bottom hook snoot - 8/0 or 9/0 hook
   |
 6-8 oz grapnel / bottle sinker`
       },
 
       "Yellowtail":{
-        identifier:{
-          body:"Long torpedo-shaped fast fish",
-          colour:"Blue-green back with lighter silver sides",
-          tail:"Strong forked tail",
-          found:"Open water, bait balls, surface action",
-          giveaway:"Fast-moving pelagic fish with yellow tail tone"
-        },
+        identifier:{ body:"Long torpedo-shaped fast fish", colour:"Blue-green back with lighter silver sides", tail:"Strong forked tail", found:"Open water, bait balls, surface action", giveaway:"Fast pelagic fish with yellow tail tone" },
         naturalBait:"Live Makriel, Live bait, Pilchard strip",
         lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic",
         hook:"5/0 to 7/0 for live bait",
@@ -492,15 +534,20 @@ Onder hook snoot - 8/0 of 9/0 hook
         statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
-        why:`✔ Yellowtail jag vinnig
-✔ Ligte leader gee beter aksie
-✔ Werk goed met lewendige aas`,
-        sketch:`YELLOWTAIL
+        why:`✔ Yellowtail hunts fast
+✔ Light leader gives better action
+✔ Works well with live bait`,
+        make:`How to make it:
+1. Tie braid to a strong swivel.
+2. Add a 0.60 - 0.70 mm leader.
+3. Use a single live bait hook or lure clip.
+4. Keep the rig light for better lure or bait action.`,
+        sketch:`YELLOWTAIL RIG
 
-Hooflyn
+Main line
 40-50 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.60 - 0.70 mm nylon
@@ -509,36 +556,35 @@ Leader
 4/0 - 6/0 hooks
 
 Sinker
-Geen sinker`
+No sinker`
       },
 
       "Bonito":{
-        identifier:{
-          body:"Slim fast tuna-like body",
-          colour:"Dark back with silvery sides",
-          tail:"Forked tail built for speed",
-          found:"Surface feeding schools chasing bait",
-          giveaway:"Fast compact body and surface action"
-        },
-        naturalBait:"Lewendige aas, klein aasvis, Pilchard strip",
+        identifier:{ body:"Slim fast tuna-like body", colour:"Dark back with silvery sides", tail:"Forked tail built for speed", found:"Surface feeding schools chasing bait", giveaway:"Fast compact body and surface action" },
+        naturalBait:"Live bait, small baitfish, Pilchard strip",
         lures:"Feather lure, Small spoon, Yo-Zuri minnow, Small plug, Trolling lure",
         hook:"3/0 - 4/0 hooks",
-        sinker:"Geen sinker",
+        sinker:"No sinker",
         strop:"0.60 mm nylon, ± 1 m",
         rigType:"Bonito live bait rig / feather rig",
         status:"Check current permit / stock status",
         statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
-        why:`✔ Vinnig jag vis
-✔ Werk goed met lewendige aas
-✔ Ligte leader gee beter byt`,
-        sketch:`BONITO
+        why:`✔ Fast hunting fish
+✔ Works well with live bait
+✔ Light leader gives better bite`,
+        make:`How to make it:
+1. Use 30-40 lb braid.
+2. Tie to a strong swivel.
+3. Add ±1 m of 0.60 mm nylon.
+4. Fish a small lure, feather or live bait naturally.`,
+        sketch:`BONITO RIG
 
-Hooflyn
+Main line
 30-40 lb braid
   |
-Sterk swivel
+Strong swivel
   |
 Leader
 0.60 mm nylon
@@ -547,29 +593,28 @@ Leader
 3/0 - 4/0 hooks
 
 Sinker
-Geen sinker`
+No sinker`
       },
 
       "Red Roman":{
-        identifier:{
-          body:"Thick reef fish body",
-          colour:"Red to orange-red",
-          tail:"Rounded reef-fish tail",
-          found:"Rocky reef and structure",
-          giveaway:"Deep red body and classic reef shape"
-        },
-        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine",
+        identifier:{ body:"Thick reef fish body", colour:"Red to orange-red", tail:"Rounded reef-fish tail", found:"Rocky reef and structure", giveaway:"Deep red body and classic reef shape" },
+        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine, Redbait",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
         sinker:"6oz - 8oz",
-        strop:"Kort snoots 20 - 30 cm",
+        strop:"Short snoots 20 - 30 cm",
         rigType:"2-hook bottom rig / short reef rig",
         status:"Sensitive species - handle carefully",
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
-        why:`✔ Kort snoots hou aas naby rif
-✔ Werk goed op reef structure`,
+        why:`✔ Short snoots keep bait near reef
+✔ Works well on reef structure`,
+        make:`How to make it:
+1. Tie main line to swivel.
+2. Add two short hook snoots.
+3. Keep both snoots short.
+4. Attach sinker at the bottom.`,
         sketch:`RED ROMAN REEF RIG
 
 Main line
@@ -584,13 +629,7 @@ Sinker 6-8 oz`
       },
 
       "Snapper":{
-        identifier:{
-          body:"Medium reef fish body",
-          colour:"Pink-red to silvery red",
-          tail:"Compact tail, reef fish profile",
-          found:"Reef and deeper bottom structure",
-          giveaway:"Snapper profile and bottom-feeding reef behaviour"
-        },
+        identifier:{ body:"Medium reef fish body", colour:"Pink-red to silvery red", tail:"Compact tail, reef fish profile", found:"Reef and deeper bottom structure", giveaway:"Snapper profile and bottom-feeding reef behaviour" },
         naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
@@ -601,8 +640,13 @@ Sinker 6-8 oz`
         statusClass:"statusMed",
         season:"Good all year",
         closed:"Check current permit rules",
-        why:`✔ Kompakte rig hou bodem goed
-✔ Hou aas in strike zone`,
+        why:`✔ Compact rig holds bottom well
+✔ Keeps bait in the strike zone`,
+        make:`How to make it:
+1. Tie braid to swivel.
+2. Add short hook snoot.
+3. Fit 6-8 oz sinker.
+4. Keep the bait close to bottom.`,
         sketch:`SNAPPER BOTTOM RIG
 
 Main line
@@ -615,13 +659,7 @@ Hook snoot 20-40 cm`
       },
 
       "Silverfish":{
-        identifier:{
-          body:"Smaller streamlined body",
-          colour:"Silver body",
-          tail:"Small forked tail",
-          found:"Over reef and calmer workable areas",
-          giveaway:"Small bright silver fish with lighter rig preference"
-        },
+        identifier:{ body:"Smaller streamlined body", colour:"Silver body", tail:"Small forked tail", found:"Over reef and calmer workable areas", giveaway:"Small bright silver fish with lighter rig preference" },
         naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip",
         lures:"Usually natural bait preferred",
         hook:"2/0 - 4/0 hooks",
@@ -632,7 +670,11 @@ Hook snoot 20-40 cm`
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        why:`✔ Lighter setup laat kleiner aas natuurlik werk`,
+        why:`✔ Lighter setup lets smaller bait work naturally`,
+        make:`How to make it:
+1. Use a lighter sinker.
+2. Keep trace short and neat.
+3. Present smaller bait close to bottom.`,
         sketch:`SILVERFISH LIGHT RIG
 
 Main line
@@ -645,13 +687,7 @@ Single hook snoot 20-30 cm`
       },
 
       "Red Steenbras":{
-        identifier:{
-          body:"Large strong bottom fish body",
-          colour:"Pale silver to pinkish tones",
-          tail:"Strong tail, heavy body profile",
-          found:"Bottom structure and deeper working ground",
-          giveaway:"Big powerful body and sensitive conservation status"
-        },
+        identifier:{ body:"Large strong bottom fish body", colour:"Pale silver to pinkish tones", tail:"Strong tail, heavy body profile", found:"Bottom structure and deeper working ground", giveaway:"Big powerful body and sensitive conservation status" },
         naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait",
         lures:"Usually natural bait preferred",
         hook:"6/0 - 8/0 hooks",
@@ -662,8 +698,13 @@ Single hook snoot 20-30 cm`
         statusClass:"statusHigh",
         season:"Sensitive species",
         closed:"Closed season: 1 Sep - 30 Nov",
-        why:`✔ Sterk trace help in swaar toestande
-✔ Hanteer versigtig en volg permit reëls`,
+        why:`✔ Strong trace helps in heavy conditions
+✔ Handle carefully and follow permit rules`,
+        make:`How to make it:
+1. Use a heavy swivel and strong leader.
+2. Use a long snoot.
+3. Fit a strong 6/0 - 8/0 hook.
+4. Match the sinker to current and sea conditions.`,
         sketch:`RED STEENBRAS STRONG RIG
 
 Main line
@@ -678,13 +719,7 @@ Long snoot 70-120 cm
       },
 
       "Yellow Belly":{
-        identifier:{
-          body:"Reef fish with deeper body shape",
-          colour:"Yellowish belly with darker top",
-          tail:"Compact reef-fish tail",
-          found:"Reef patches and bottom structure",
-          giveaway:"Yellow belly tone underneath"
-        },
+        identifier:{ body:"Reef fish with deeper body shape", colour:"Yellowish belly with darker top", tail:"Compact reef-fish tail", found:"Reef patches and bottom structure", giveaway:"Yellow belly tone underneath" },
         naturalBait:"Chokka, Pilchard, Sardine",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
@@ -695,7 +730,11 @@ Long snoot 70-120 cm
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        why:`✔ Simple bottom presentation werk goed op reef patches`,
+        why:`✔ Simple bottom presentation works well on reef patches`,
+        make:`How to make it:
+1. Keep the rig simple.
+2. Use medium snoot length.
+3. Present the bait cleanly on bottom.`,
         sketch:`YELLOW BELLY BOTTOM RIG
 
 Main line
@@ -708,14 +747,8 @@ Hook trace 30-50 cm`
       },
 
       "Hottentot":{
-        identifier:{
-          body:"Shorter deeper body",
-          colour:"Grey-silver with darker patterning",
-          tail:"Smaller tail, compact shape",
-          found:"Reef and shallow structure",
-          giveaway:"Compact body and smaller-mouth profile"
-        },
-        naturalBait:"Klein aas, chokka stukke, Redbait, Mussel, Sardine piece",
+        identifier:{ body:"Shorter deeper body", colour:"Grey-silver with darker patterning", tail:"Smaller tail, compact shape", found:"Reef and shallow structure", giveaway:"Compact body and smaller-mouth profile" },
+        naturalBait:"Small bait, Chokka pieces, Redbait, Mussel, Sardine piece",
         lures:"Usually natural bait preferred",
         hook:"2/0 - 3/0 hooks",
         sinker:"4oz - 5oz sinker",
@@ -725,12 +758,16 @@ Hook trace 30-50 cm`
         statusClass:"statusNeutral",
         season:"Good all year",
         closed:"Check current permit rules",
-        why:`✔ Klein aas werk beste
-✔ Kort leader hou aas by bodem
-✔ Perfek vir chokka stukke`,
+        why:`✔ Small bait works best
+✔ Short leader keeps bait near the bottom
+✔ Perfect for chokka pieces`,
+        make:`How to make it:
+1. Use a medium swivel.
+2. Keep the rig light.
+3. Short trace and small bait work best.`,
         sketch:`HOTTENTOT
 
-Hooflyn
+Main line
 20-30 lb braid
   |
 Medium barrel swivel
@@ -745,51 +782,44 @@ Leader
       },
 
       "Geelbek":{
-        identifier:{
-          body:"Long powerful mid-water predator",
-          colour:"Silvery sides with darker upper body",
-          tail:"Strong forked tail",
-          found:"Mid-water and baitfish zones",
-          giveaway:"Fast predator often moving above bottom"
-        },
-        naturalBait:"Groot sardine, Chokka, Live bait",
+        identifier:{ body:"Long powerful mid-water predator", colour:"Silvery sides with darker upper body", tail:"Strong forked tail", found:"Mid-water and baitfish zones", giveaway:"Fast predator often moving above bottom" },
+        naturalBait:"Large sardine, Chokka, Live bait",
         lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Small plug",
         hook:"6/0 - 8/0 hooks",
-        sinker:"Geen of klein 3-4 oz sinker",
-        strop:"0.70 - 0.80 mm nylon, ± 1 m lank",
+        sinker:"No sinker or small 3-4 oz sinker",
+        strop:"0.70 - 0.80 mm nylon, ± 1 m long",
         rigType:"Cape Salmon / Geelbek bait rig",
         status:"Check current permit / stock status",
         statusClass:"statusNeutral",
         season:"Check current permit / local conditions",
         closed:"Check current permit rules",
-        why:`✔ Geelbek jag aasvis bo bodem
-✔ Lang leader laat aas natuurlik beweeg
-✔ Groot sardine of chokka werk goed`,
+        why:`✔ Geelbek hunts baitfish above the bottom
+✔ Long leader lets bait move naturally
+✔ Large sardine or chokka works well`,
+        make:`How to make it:
+1. Use 40-50 lb braid to a strong swivel.
+2. Add ±1 m of 0.70 - 0.80 mm nylon.
+3. Fish with little or no sinker.
+4. Keep the bait moving naturally.`,
         sketch:`GEELBEK (Cape Salmon)
 
-Hooflyn
+Main line
 40-50 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.70 - 0.80 mm nylon
-± 1 m lank
+± 1 m long
   |
 6/0 - 8/0 hooks
 
 Sinker
-Geen of klein 3-4 oz sinker`
+No sinker or small 3-4 oz sinker`
       },
 
       "Santer":{
-        identifier:{
-          body:"Compact reef fish body",
-          colour:"Pink-red reef tones",
-          tail:"Compact tail",
-          found:"Near reef and structure",
-          giveaway:"Fast-biting reef fish close to bottom"
-        },
+        identifier:{ body:"Compact reef fish body", colour:"Pink-red reef tones", tail:"Compact tail", found:"Near reef and structure", giveaway:"Fast-biting reef fish close to bottom" },
         naturalBait:"Chokka, Sardine, Pilchard",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 5/0 hooks",
@@ -800,15 +830,19 @@ Geen of klein 3-4 oz sinker`
         statusClass:"statusNeutral",
         season:"Check current permit / local conditions",
         closed:"Check current permit rules",
-        why:`✔ Santer byt vinnig
-✔ Kort leader hou aas naby rif
-✔ Perfek vir chokka of sardine`,
+        why:`✔ Santer bites fast
+✔ Short leader keeps bait near reef
+✔ Perfect for chokka or sardine`,
+        make:`How to make it:
+1. Keep the leader short.
+2. Use a bottle sinker to hold bottom.
+3. Present chokka or sardine close to structure.`,
         sketch:`SANTER
 
-Hooflyn
+Main line
 30-40 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.60 - 0.70 mm nylon
@@ -820,13 +854,7 @@ Leader
       },
 
       "Carpenter":{
-        identifier:{
-          body:"Large strong reef fish body",
-          colour:"Darker reef colour tones",
-          tail:"Strong tail for reef power",
-          found:"Heavy reef and rocky structure",
-          giveaway:"Big reef fish with brute pulling power"
-        },
+        identifier:{ body:"Large strong reef fish body", colour:"Darker reef colour tones", tail:"Strong tail for reef power", found:"Heavy reef and rocky structure", giveaway:"Big reef fish with brute pulling power" },
         naturalBait:"Chokka, Pilchard, Sardine",
         lures:"Usually natural bait preferred",
         hook:"6/0 - 7/0 hooks",
@@ -837,15 +865,19 @@ Leader
         statusClass:"statusNeutral",
         season:"Check current permit / local conditions",
         closed:"Check current permit rules",
-        why:`✔ Groot rif vis
-✔ Sterk leader keer breek op rotse
-✔ Werk goed met chokka`,
+        why:`✔ Big reef fish
+✔ Strong leader helps prevent break-offs on rocks
+✔ Works well with chokka`,
+        make:`How to make it:
+1. Use a strong barrel swivel.
+2. Add heavy leader.
+3. Use a grapnel if sea movement is strong.`,
         sketch:`CARPENTER
 
-Hooflyn
+Main line
 40-50 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.80 - 1.0 mm nylon
@@ -857,13 +889,7 @@ Leader
       },
 
       "Dageraad":{
-        identifier:{
-          body:"Big heavy bottom fish body",
-          colour:"Deeper darker reef tones",
-          tail:"Strong tail",
-          found:"Heavy bottom and reef zones",
-          giveaway:"Large strong reef-associated fish"
-        },
+        identifier:{ body:"Big heavy bottom fish body", colour:"Deeper darker reef tones", tail:"Strong tail", found:"Heavy bottom and reef zones", giveaway:"Large strong reef-associated fish" },
         naturalBait:"Big chokka bait, Pilchard, Redbait, Squid",
         lures:"Usually natural bait preferred",
         hook:"7/0 - 9/0 hooks",
@@ -874,15 +900,19 @@ Leader
         statusClass:"statusNeutral",
         season:"Check current permit / local conditions",
         closed:"Check current permit rules",
-        why:`✔ Groot sterk vis
-✔ Dik leader beskerm teen rif
-✔ Groot aas lok groter vis`,
+        why:`✔ Large powerful fish
+✔ Thick leader protects against reef
+✔ Bigger bait attracts bigger fish`,
+        make:`How to make it:
+1. Use heavy braid and a strong swivel.
+2. Add thick leader.
+3. Match hook and sinker to big bait and strong ground.`,
         sketch:`DAGERAAD
 
-Hooflyn
+Main line
 40-50 lb braid
   |
-Sterk barrel swivel
+Strong barrel swivel
   |
 Leader
 0.90 - 1.0 mm nylon
@@ -894,19 +924,43 @@ Leader
       }
     };
 
-    const KEY_LOG = "tanya_v91_log";
+    const FISH_GUIDE = [
+      {name:"Cape Kob", body:"Long strong predator", colour:"Silver-grey", tail:"Strong tail", found:"Reef edges and channels", clue:"Big mouth"},
+      {name:"Yellowtail", body:"Torpedo-shaped", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast surface fish"},
+      {name:"Bonito", body:"Slim tuna-like", colour:"Dark back silver sides", tail:"Forked", found:"Surface schools", clue:"Fast and compact"},
+      {name:"Red Roman", body:"Deep reef body", colour:"Red-orange", tail:"Rounded", found:"Rocky reef", clue:"Classic red reef fish"},
+      {name:"Snapper", body:"Medium reef body", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face"},
+      {name:"Silverfish", body:"Smaller streamlined", colour:"Silver", tail:"Small fork", found:"Over reef", clue:"Bright silver"},
+      {name:"Red Steenbras", body:"Large heavy body", colour:"Pale silver-pink", tail:"Strong", found:"Bottom structure", clue:"Sensitive species"},
+      {name:"Yellow Belly", body:"Deeper body", colour:"Yellow belly", tail:"Compact", found:"Reef patches", clue:"Yellow underneath"},
+      {name:"Hottentot", body:"Short compact", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"},
+      {name:"Geelbek", body:"Long predator", colour:"Silvery", tail:"Forked", found:"Mid-water", clue:"Baitfish hunter"},
+      {name:"Santer", body:"Compact reef fish", colour:"Pink-red", tail:"Compact", found:"Near reef", clue:"Fast biter"},
+      {name:"Carpenter", body:"Large reef body", colour:"Dark reef tones", tail:"Strong", found:"Heavy reef", clue:"Strong puller"},
+      {name:"Dageraad", body:"Big bottom fish", colour:"Dark reef tones", tail:"Strong", found:"Reef bottom", clue:"Heavy powerful body"},
+      {name:"Roman", body:"Deep reef body", colour:"Red", tail:"Rounded", found:"Reef", clue:"Deep red profile"},
+      {name:"Musselcracker", body:"Thick heavy body", colour:"Dark bronze-grey", tail:"Strong", found:"Rocky reef", clue:"Powerful jaws"},
+      {name:"Yellowbelly Rockcod", body:"Reef body", colour:"Mottled dark top", tail:"Rounded", found:"Reef holes", clue:"Rockcod shape"},
+      {name:"Elf / Shad", body:"Long slim body", colour:"Silver", tail:"Forked", found:"Mid-water", clue:"Sharp predator profile"},
+      {name:"Snoek", body:"Very long slim body", colour:"Blue-silver", tail:"Forked", found:"Pelagic shoals", clue:"Long toothy shape"},
+      {name:"Mackerel", body:"Slim baitfish body", colour:"Blue-green striped back", tail:"Forked", found:"Bait schools", clue:"Striped back"},
+      {name:"Hake", body:"Long softer body", colour:"Grey-brown", tail:"Tapered", found:"Deeper bottom", clue:"Deep-water body"}
+    ];
+
+    const KEY_LOG = "tanya_v92_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
       document.getElementById(id).style.display = "block";
 
       document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","logTab","rulesTab"];
+      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","fishGuideTab","logTab","rulesTab"];
       const idx = ids.indexOf(id);
       if(idx >= 0) document.querySelectorAll(".navbtn")[idx].classList.add("active");
 
       if(id === "weatherTab") loadWeekForecast();
       if(id === "fishInfoTab") renderFishInfo();
+      if(id === "fishGuideTab") renderFishGuide();
       if(id === "logTab") renderLog();
     }
 
@@ -1109,6 +1163,21 @@ Leader
       }, 2000);
     }
 
+    function clearCatchForm(){
+      document.getElementById("species").value = "";
+      document.getElementById("minSize").value = "";
+      document.getElementById("sizeCaught").value = "";
+      document.getElementById("sizeWarning").textContent = "";
+      document.getElementById("bait").innerHTML = '<option value="">Choose...</option>';
+      document.getElementById("area").value = "";
+      document.getElementById("coords").value = "";
+      document.getElementById("whereCaught").value = "";
+      document.getElementById("coordAreaText").textContent = "";
+      document.getElementById("notes").value = "";
+      document.getElementById("saveMsg").textContent = "";
+      document.getElementById("minSizeNote").textContent = "Choose species to load minimum size.";
+    }
+
     function renderLog(){
       const box = document.getElementById("logBox");
       const list = getLog();
@@ -1219,24 +1288,67 @@ Leader
             <div class="infoBox infoTeal"><b>Lures</b>${info.lures}</div>
             <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook}</div>
             <div class="infoBox infoPurple"><b>Sinker / Weight</b>${info.sinker}</div>
-            <div class="infoBox infoGrey"><b>Strop Length</b>${info.strop}</div>
+            <div class="infoBox infoGold"><b>Strop Length</b>${info.strop}</div>
             <div class="infoBox infoBlue"><b>Rig Type</b>${info.rigType}</div>
-            <div class="infoBox infoGold"><b>Best Season</b>${info.season}</div>
+            <div class="infoBox infoOrange"><b>Best Season</b>${info.season}</div>
             <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed}</div>
           </div>
 
           <div class="identifyBox">
-            <div class="identifyTitle">Why This Rig Works</div>
+            <div class="identifyTitle">How to make it</div>
+            <div class="bigText">${(info.make || "").replace(/\n/g,"<br>")}</div>
+          </div>
+
+          <div class="identifyBox">
+            <div class="identifyTitle">Why this rig works</div>
             <div class="bigText">${(info.why || "").replace(/\n/g,"<br>")}</div>
           </div>
 
           <div class="identifyBox">
-            <div class="identifyTitle">Rig Sketch</div>
+            <div class="identifyTitle">Rig Diagram</div>
             <pre class="rig">${info.sketch}</pre>
           </div>
         </div>
       `;
     }
+
+    function renderFishGuide(){
+      let html = "";
+      FISH_GUIDE.forEach(f => {
+        html += `
+          <div class="guideCard">
+            <div class="guideName">${f.name}</div>
+            <div class="guideHint">
+              <b>Body:</b> ${f.body}<br>
+              <b>Colour:</b> ${f.colour}<br>
+              <b>Tail:</b> ${f.tail}<br>
+              <b>Found:</b> ${f.found}<br>
+              <b>Key clue:</b> ${f.clue}
+            </div>
+          </div>
+        `;
+      });
+      document.getElementById("fishGuideList").innerHTML = html;
+    }
+
+    function openCamera(){
+      const el = document.getElementById("fishPhoto");
+      el.setAttribute("capture","environment");
+      el.click();
+    }
+
+    function openGallery(){
+      const el = document.getElementById("fishPhoto");
+      el.removeAttribute("capture");
+      el.click();
+    }
+
+    document.getElementById("fishPhoto").addEventListener("change", function(){
+      const file = this.files && this.files[0];
+      const name = file ? file.name : "Photo loaded";
+      document.getElementById("uploadPreview").textContent =
+        `${name} loaded. Compare it with the Fish ID Guide below.`;
+    });
 
     document.getElementById("species").addEventListener("change", () => {
       fillBaitOptions();
@@ -1258,6 +1370,7 @@ Leader
     updateMinSize();
     checkSizeWarning();
     renderFishInfo();
+    renderFishGuide();
     renderLog();
   </script>
 </body>
