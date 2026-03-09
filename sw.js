@@ -1,54 +1,36 @@
-const CACHE_NAME = "tanya-deep-sea-v75";
+const CACHE_NAME="tanya-deep-sea-v75"
 
-const APP_SHELL = [
-  "./",
-  "./index.html",
-  "./manifest.webmanifest",
-  "./icon-192.png",
-  "./icon-512.png"
-];
+const FILES=[
 
-self.addEventListener("install", event => {
-  event.waitUntil(
-    caches.open(CACHE_NAME).then(cache => cache.addAll(APP_SHELL))
-  );
-  self.skipWaiting();
-});
+"./",
+"./index.html",
+"./style.css",
+"./app.js",
+"./spots.js",
+"./manifest.webmanifest"
 
-self.addEventListener("activate", event => {
-  event.waitUntil(
-    caches.keys().then(keys =>
-      Promise.all(
-        keys
-          .filter(key => key !== CACHE_NAME)
-          .map(key => caches.delete(key))
-      )
-    )
-  );
-  self.clients.claim();
-});
+]
 
-self.addEventListener("fetch", event => {
-  const req = event.request;
-  if (req.method !== "GET") return;
+self.addEventListener("install",e=>{
 
-  event.respondWith(
-    caches.match(req).then(cached => {
-      if (cached) return cached;
+e.waitUntil(
 
-      return fetch(req)
-        .then(response => {
-          const copy = response.clone();
-          if (req.url.startsWith(self.location.origin)) {
-            caches.open(CACHE_NAME).then(cache => cache.put(req, copy));
-          }
-          return response;
-        })
-        .catch(() => {
-          if (req.mode === "navigate") {
-            return caches.match("./index.html");
-          }
-        });
-    })
-  );
-});
+caches.open(CACHE_NAME)
+
+.then(c=>c.addAll(FILES))
+
+)
+
+})
+
+self.addEventListener("fetch",e=>{
+
+e.respondWith(
+
+caches.match(e.request)
+
+.then(r=>r||fetch(e.request))
+
+)
+
+})
