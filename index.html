@@ -294,6 +294,7 @@
     <button class="navbtn" id="btnWeather" onclick="showTab('weather')">2 Week Weather</button>
     <button class="navbtn" id="btnMoon" onclick="showTab('moonTab')">Tide & Moon</button>
     <button class="navbtn" id="btnExtra" onclick="showTab('extraTab')">Extra Info</button>
+    <button class="navbtn" id="btnBoatGuide" onclick="showTab('boatGuideTab')">Boat Guide</button>
   </div>
 
   <section id="add">
@@ -549,6 +550,13 @@
     <div class="card">
       <b>Extra Info</b>
       <div id="extraBox" style="margin-top:10px;"></div>
+    </div>
+  </section>
+
+  <section id="boatGuideTab">
+    <div class="card">
+      <b>Boat Guide</b>
+      <div id="boatGuideBox" style="margin-top:10px;"></div>
     </div>
   </section>
 
@@ -1127,7 +1135,8 @@
         fishid:"btnFish",
         weather:"btnWeather",
         moonTab:"btnMoon",
-        extraTab:"btnExtra"
+        extraTab:"btnExtra",
+        boatGuideTab:"btnBoatGuide"
       };
       const btn = document.getElementById(mapIds[id]);
       if(btn) btn.classList.add("active");
@@ -1154,6 +1163,7 @@
         renderFishingMeter();
       }
       if(id === "extraTab") renderExtraInfo();
+      if(id === "boatGuideTab") renderBoatGuide();
     }
 
     function updateMinSize(){
@@ -1709,7 +1719,7 @@
         return;
       }
       if(lastDetectedFish.species === "Galjoen"){
-        alert("Galjoen kept in Extra Info / other species notes.");
+        alert("Galjoen kept in Boat Guide / notes.");
         return;
       }
       species.value = lastDetectedFish.species;
@@ -2414,6 +2424,18 @@
 
       box.innerHTML = "";
 
+      const threatGuide = document.createElement("div");
+      threatGuide.className = "card";
+      threatGuide.innerHTML = `
+        <b>Threat Colour Guide</b>
+        <div style="margin-top:8px;"><span class="threatBadge threat-5">CR</span> <span class="mini">Highest concern</span></div>
+        <div style="margin-top:6px;"><span class="threatBadge threat-4">EN</span> <span class="mini">Very high concern</span></div>
+        <div style="margin-top:6px;"><span class="threatBadge threat-3">Collapsed</span> <span class="mini">Collapsed / sensitive stock</span></div>
+        <div style="margin-top:6px;"><span class="threatBadge threat-2">Check</span> <span class="mini">Check carefully</span></div>
+        <div style="margin-top:6px;"><span class="threatBadge threat-1">Open</span> <span class="mini">Open now / lower concern</span></div>
+      `;
+      box.appendChild(threatGuide);
+
       [...SPECIES_TIPS]
         .sort((a, b) => getThreatInfo(b.species).level - getThreatInfo(a.species).level)
         .forEach(item => {
@@ -2455,18 +2477,13 @@
 
           box.appendChild(card);
         });
+    }
 
-      const threatGuide = document.createElement("div");
-      threatGuide.className = "card";
-      threatGuide.innerHTML = `
-        <b>Threat Colour Guide</b>
-        <div style="margin-top:8px;"><span class="threatBadge threat-5">CR</span> <span class="mini">Highest concern</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-4">EN</span> <span class="mini">Very high concern</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-3">Collapsed</span> <span class="mini">Collapsed / sensitive stock</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-2">Check</span> <span class="mini">Check carefully</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-1">Open</span> <span class="mini">Open now / lower concern</span></div>
-      `;
-      box.appendChild(threatGuide);
+    function renderBoatGuide(){
+      const box = document.getElementById("boatGuideBox");
+      if(!box) return;
+
+      box.innerHTML = "";
 
       const seasonGuide = document.createElement("div");
       seasonGuide.className = "card";
@@ -2479,26 +2496,26 @@
       `;
       box.appendChild(seasonGuide);
 
-      const extraSpecies = document.createElement("div");
-      extraSpecies.className = "card";
-      extraSpecies.innerHTML = `
+      const otherNotes = document.createElement("div");
+      otherNotes.className = "card";
+      otherNotes.innerHTML = `
         <b>Other / Less Boat-Focused Notes</b>
-        <div class="mini" style="margin-top:8px;"><b>Galjoen:</b> mostly more relevant around rocky structure and shore-style fishing.</div>
+        <div class="mini" style="margin-top:8px;">Galjoen: mostly more relevant around rocky structure and shore-style fishing.</div>
         <div class="mini">Closed season: 15 Oct - end Feb.</div>
-        <div class="mini">Kept here in Extra Info so the main app stays boat-focused.</div>
+        <div class="mini">Kept here so the main app stays boat-focused.</div>
       `;
-      box.appendChild(extraSpecies);
+      box.appendChild(otherNotes);
 
-      const rigGuide = document.createElement("div");
-      rigGuide.className = "card";
-      rigGuide.innerHTML = `
+      const quickGuide = document.createElement("div");
+      quickGuide.className = "card";
+      quickGuide.innerHTML = `
         <b>Quick Boat Guide</b>
         <div class="mini" style="margin-top:8px;">Pelagic fish → Drift</div>
         <div class="mini">Reef / Bottom fish → Anchor</div>
         <div class="mini">Drift first to find fish, then anchor on the mark.</div>
         <div class="mini">Use the Map + Drift tabs together before every drop.</div>
       `;
-      box.appendChild(rigGuide);
+      box.appendChild(quickGuide);
 
       const safetyGuide = document.createElement("div");
       safetyGuide.className = "card";
@@ -2752,7 +2769,7 @@
 ${waypoints}
 </gpx>`;
 
-        const blob = new Blob([gpx], { type:"application/gpx+xml" });
+        const blob = new Blob([gpx], { type:"application/octet-stream" });
         const url = URL.createObjectURL(blob);
         const a = document.createElement("a");
         a.href = url;
@@ -2774,29 +2791,43 @@ ${waypoints}
       if(!file) return;
 
       const reader = new FileReader();
+
       reader.onload = () => {
         try{
-          const data = JSON.parse(reader.result);
-          if(!data || typeof data !== "object") throw new Error("Invalid backup");
+          const raw = String(reader.result || "").trim();
+          const data = JSON.parse(raw);
 
-          if(Array.isArray(data.catches)) saveAllCatches(data.catches);
-
-          if(Array.isArray(data.spots)){
-            const cleanedSpots = data.spots.map(s => ({
-              id: s.id || ("c" + Date.now() + Math.random()),
-              name: s.name || "Spot",
-              type: s.type || "Spot",
-              coords: s.coords || "",
-              preset: Boolean(s.preset && String(s.id).startsWith("s"))
-            })).filter(s => s.coords);
-
-            const customImported = cleanedSpots.filter(s => !isPresetSpot(s));
-            saveAllSpots(customImported);
+          if(!data || typeof data !== "object"){
+            throw new Error("Invalid JSON structure");
           }
 
-          if(Array.isArray(data.fishHelpers)) saveFishHelpers(data.fishHelpers);
+          if(Array.isArray(data.catches)){
+            saveAllCatches(data.catches);
+          }
 
-          loadKnownSpotsIntoSaved();
+          if(Array.isArray(data.fishHelpers)){
+            saveFishHelpers(data.fishHelpers);
+          }
+
+          if(Array.isArray(data.spots)){
+            const existingPresets = KNOWN_SPOTS.map(k => ({ ...k, preset:true }));
+
+            const importedCustoms = data.spots
+              .map(s => ({
+                id: s.id || ("c" + Date.now() + Math.random()),
+                name: s.name || "Spot",
+                type: s.type || "Spot",
+                coords: s.coords || "",
+                preset: false
+              }))
+              .filter(s => s.coords)
+              .filter(s => !String(s.id).startsWith("s"));
+
+            saveAllSpots([...importedCustoms, ...existingPresets]);
+          } else {
+            loadKnownSpotsIntoSaved();
+          }
+
           fillSpotPick();
           fillBaitPick();
           fillLocalAreaPick();
@@ -2810,16 +2841,25 @@ ${waypoints}
           renderDriftPanel();
           renderFishingMeter();
           renderExtraInfo();
+          renderBoatGuide();
           renderSeasonWarning();
 
-          backupMsg.textContent = "Backup imported.";
+          backupMsg.textContent = "Backup imported successfully.";
           setTimeout(() => backupMsg.textContent = "", 2500);
-        }catch{
-          alert("Invalid backup JSON file.");
+
+        }catch(err){
+          alert("Import failed. Make sure it is a valid Tanya Deep Sea backup JSON file.");
+          console.error(err);
         }finally{
           importBackupEl.value = "";
         }
       };
+
+      reader.onerror = () => {
+        alert("Could not read backup file.");
+        importBackupEl.value = "";
+      };
+
       reader.readAsText(file);
     });
 
@@ -2846,6 +2886,7 @@ ${waypoints}
       renderDriftPanel();
       renderFishingMeter();
       renderExtraInfo();
+      renderBoatGuide();
       renderSeasonWarning();
     }
 
@@ -2864,6 +2905,7 @@ ${waypoints}
     renderDriftPanel();
     renderFishingMeter();
     renderExtraInfo();
+    renderBoatGuide();
     renderSeasonWarning();
   </script>
 
@@ -2873,4 +2915,4 @@ ${waypoints}
     }
   </script>
 </body>
-  </html>
+        </html>
