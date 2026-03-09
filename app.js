@@ -1,50 +1,98 @@
-document.addEventListener("DOMContentLoaded", () => {
-  setupTabs();
-  loadSpots();
-  loadWeather();
-});
+function showTab(id){
 
-function setupTabs(){
-  const buttons = document.querySelectorAll(".tab-btn");
-  const tabs = document.querySelectorAll(".tab");
+document.querySelectorAll("section").forEach(s=>s.style.display="none")
 
-  buttons.forEach(button => {
-    button.addEventListener("click", () => {
-      buttons.forEach(btn => btn.classList.remove("active"));
-      tabs.forEach(tab => tab.classList.remove("active"));
+document.getElementById(id).style.display="block"
 
-      button.classList.add("active");
-      document.getElementById(button.dataset.tab).classList.add("active");
-    });
-  });
 }
 
-function loadSpots(){
-  const box = document.getElementById("spotsList");
-  if(!box) return;
+function setCurrentLocation(){
 
-  box.innerHTML = "";
+navigator.geolocation.getCurrentPosition(pos=>{
 
-  fishingSpots.forEach(spot => {
-    const div = document.createElement("div");
-    div.className = "spot-item";
-    div.innerHTML = `
-      <strong>${spot.name}</strong><br>
-      Depth: ${spot.depth}<br>
-      Fish: ${spot.fish}<br>
-      Coords: ${spot.lat}, ${spot.lng}
-    `;
-    box.appendChild(div);
-  });
+const lat=pos.coords.latitude
+const lon=pos.coords.longitude
+
+document.getElementById("coords").value=lat+","+lon
+
+loadWeather(lat,lon)
+
+})
+
 }
 
-function loadWeather(){
-  const weatherBox = document.getElementById("weatherBox");
-  if(!weatherBox) return;
+async function loadWeather(lat,lon){
 
-  weatherBox.textContent = "Wind: -- | Swell: -- | Sea Temp: --";
+try{
+
+const w=await fetch(`https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m`)
+
+const m=await fetch(`https://marine-api.open-meteo.com/v1/marine?latitude=${lat}&longitude=${lon}&current=wave_height,swell_wave_height,sea_surface_temperature`)
+
+const weather=await w.json()
+const marine=await m.json()
+
+document.getElementById("conditions").innerHTML=
+
+"Wind: "+weather.current.wind_speed_10m+" km/h<br>"+
+"Swell: "+marine.current.swell_wave_height+" m<br>"+
+"Sea Temp: "+marine.current.sea_surface_temperature+" °C"
+
+}catch{
+
+document.getElementById("conditions").innerHTML="Weather unavailable"
+
 }
 
-function testApp(){
-  alert("Fishing app werk!");
+}
+
+function startNavigation(){
+
+const speed=document.getElementById("boatSpeed").value
+const coords=document.getElementById("nextSpot").value
+
+if(!coords)return
+
+const [lat,lon]=coords.split(",")
+
+navigator.geolocation.getCurrentPosition(pos=>{
+
+const dist=distance(pos.coords.latitude,pos.coords.longitude,lat,lon)
+
+const eta=dist/speed
+
+document.getElementById("navResult").innerHTML=
+
+"Distance: "+dist.toFixed(2)+" km<br>"+
+"ETA: "+eta.toFixed(2)+" h"
+
+})
+
+}
+
+function distance(a,b,c,d){
+
+const R=6371
+
+const dLat=(c-a)*Math.PI/180
+const dLon=(d-b)*Math.PI/180
+
+const x=
+
+Math.sin(dLat/2)**2+
+
+Math.cos(a*Math.PI/180)*
+
+Math.cos(c*Math.PI/180)*
+
+Math.sin(dLon/2)**2
+
+return R*2*Math.atan2(Math.sqrt(x),Math.sqrt(1-x))
+
+}
+
+function saveCatch(){
+
+alert("Catch Saved")
+
 }
