@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en"> 
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -162,23 +162,17 @@
       color:var(--warn);
       font-weight:bold;
     }
-    .seasonHead{
-      font-size:17px;
-      font-weight:bold;
-      margin-bottom:10px;
-    }
-    .seasonBig{
-      font-size:15px;
-      line-height:1.65;
-    }
+    .statusHigh{color:#ff8c42;font-weight:bold}
+    .statusMed{color:#ffd166;font-weight:bold}
+    .statusLow{color:#39d98a;font-weight:bold}
     pre.rig{
       background:#081632;
       color:#d7e6ff;
-      padding:10px;
+      padding:12px;
       border-radius:10px;
       overflow:auto;
-      font-size:12px;
-      line-height:1.3;
+      font-size:13px;
+      line-height:1.35;
       white-space:pre-wrap;
       margin-top:8px;
     }
@@ -187,7 +181,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V87 Stable</div>
+  <div class="mini">V88 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -195,7 +189,6 @@
     <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
     <button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
     <button class="navbtn" onclick="showTab('logTab')">Log</button>
-    <button class="navbtn" onclick="showTab('seasonTab')">Season Guide</button>
     <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
   </div>
 
@@ -306,50 +299,6 @@
     </div>
   </section>
 
-  <section id="seasonTab" style="display:none;">
-    <div class="card">
-      <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Season Guide</div>
-
-      <div class="seasonHead">In Season / Good Boat Species</div>
-      <div class="seasonBig">
-        <b>Red Steenbras</b> — <span style="color:#ff8c42;">Most Endangered</span><br>
-        Sensitive species. Handle carefully. Closed season applies separately.<br><br>
-
-        <b>Cape Kob</b><br>
-        Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
-
-        <b>Yellowtail</b><br>
-        Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
-
-        <b>Bonito</b><br>
-        Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
-
-        <b>Red Roman</b><br>
-        Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
-
-        <b>Snapper</b><br>
-        Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
-
-        <b>Silverfish</b><br>
-        Good all year. Usually better over reef in calmer workable conditions.<br><br>
-
-        <b>Hottentot</b><br>
-        Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
-
-        <b>Yellow Belly</b><br>
-        Good all year. Focus on reef patches, current and proper bait on the bottom.
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="seasonHead">Out of Season / Closed</div>
-      <div class="seasonBig">
-        <b>Red Steenbras</b><br>
-        Closed season: <span style="color:#ff8c42;">1 Sep - 30 Nov</span>
-      </div>
-    </div>
-  </section>
-
   <section id="rulesTab" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Rules & Limits</div>
@@ -362,7 +311,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V87 Stable
+    Build version: V88 Stable
   </div>
 
   <script>
@@ -404,91 +353,145 @@
       "Hottentot":22
     };
 
-    const RIG_INFO = {
+    const FISH_INFO = {
       "Cape Kob":{
         bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly",
         rigs:["2-hook bottom rig","Live bait rig","Sliding sinker trace"],
-        sketch:`Main line
+        status:"Endangered",
+        statusClass:"statusHigh",
+        season:"Best spring to autumn",
+        closed:"Check current permit rules",
+        sketch:`Rod tip
+  |
+Main line
+  |
+Running sinker
+  |
+Bead
   |
 Swivel
   |
-Sinker snoot
+Leader 60-100 cm
   |
-Trace ---- hook
+Hook
+
+OR 2-hook bottom rig:
+
+Main line
   |
-Trace ---- hook`
+Swivel
+  |
+Top snoot ---- hook
+  |
+Bottom snoot - hook
+  |
+Sinker`
       },
       "Yellowtail":{
         bait:"Live Makriel, Pilchard strip, Metal spoon, Surface plug",
         rigs:["Spinning lure rig","Live bait trace"],
-        sketch:`Main line
+        status:"Lower concern",
+        statusClass:"statusLow",
+        season:"Best summer to autumn",
+        closed:"Check current permit rules",
+        sketch:`Rod tip
+  |
+Main line
   |
 Swivel
   |
 Leader
   |
-Lure / spoon / live bait hook`
+Spoon / Plug / Live bait hook`
       },
       "Bonito":{
         bait:"Pilchard strip, Small spoon, Feather lure",
         rigs:["Feather rig","Small spoon spinning rig"],
-        sketch:`Main line
+        status:"Lower concern",
+        statusClass:"statusLow",
+        season:"Best summer to autumn",
+        closed:"Check current permit rules",
+        sketch:`Rod tip
+  |
+Main line
   |
 Small swivel
   |
 Leader
   |
-Feather / spoon`
+Feather lure / spoon`
       },
       "Red Roman":{
         bait:"Chokka, Pilchard, Octopus, Squid",
         rigs:["2-hook bottom rig","Short snoot reef rig"],
+        status:"Caution",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
         sketch:`Main line
   |
 Swivel
   |
-Sinker
+Top short snoot ---- hook
   |
-Short hook snoot
+Bottom short snoot - hook
   |
-Short hook snoot`
+Sinker`
       },
       "Snapper":{
         bait:"Chokka, Pilchard, Redbait, Squid",
         rigs:["Bottom rig","Short hook trace"],
+        status:"Caution",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
         sketch:`Main line
   |
 Swivel
   |
 Sinker
   |
-Hook snoot`
+Short hook snoot`
       },
       "Silverfish":{
         bait:"Chokka strip, Pilchard strip, Pilchard",
         rigs:["Light bottom rig"],
+        status:"Caution",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
         sketch:`Main line
   |
 Swivel
   |
 Small sinker
   |
-Hook snoot`
+Single hook snoot`
       },
       "Red Steenbras":{
         bait:"Chokka, Pilchard, Redbait, Squid",
         rigs:["Strong bottom rig","Longer hook snoot"],
+        status:"Most endangered",
+        statusClass:"statusHigh",
+        season:"Sensitive species",
+        closed:"Closed season: 1 Sep - 30 Nov",
         sketch:`Main line
   |
-Swivel
+Heavy swivel
   |
 Sinker
   |
-Long hook snoot`
+Long snoot
+  |
+Strong hook`
       },
       "Yellow Belly":{
         bait:"Chokka, Pilchard",
         rigs:["Bottom rig"],
+        status:"Caution",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
         sketch:`Main line
   |
 Swivel
@@ -500,24 +503,30 @@ Hook trace`
       "Hottentot":{
         bait:"Chokka, Pilchard, Redbait, Mussel",
         rigs:["Light bottom rig","Short reef trace"],
+        status:"Caution",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
         sketch:`Main line
   |
 Swivel
   |
-Sinker
+Light sinker
   |
-Short trace`
+Short trace
+  |
+Hook`
       }
     };
 
-    const KEY_LOG = "tanya_v87_log";
+    const KEY_LOG = "tanya_v88_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
       document.getElementById(id).style.display = "block";
 
       document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","logTab","seasonTab","rulesTab"];
+      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","logTab","rulesTab"];
       const idx = ids.indexOf(id);
       if(idx >= 0) document.querySelectorAll(".navbtn")[idx].classList.add("active");
 
@@ -798,14 +807,17 @@ Short trace`
 
     function renderFishInfo(){
       const species = document.getElementById("fishSelect").value;
-      const info = RIG_INFO[species];
+      const info = FISH_INFO[species];
       if(!info) return;
 
       document.getElementById("fishInfoBox").innerHTML = `
         <div class="spotCard">
           <div class="spotTitle">${species}</div>
-          <div class="spotSub">Preferred bait and rig setup</div>
+          <div class="spotSub">Bait, rig, status and season info</div>
+          <div class="mini" style="margin-top:8px;"><b>Status:</b> <span class="${info.statusClass}">${info.status}</span></div>
           <div class="mini" style="margin-top:8px;"><b>Preferred Bait:</b> ${info.bait}</div>
+          <div class="mini" style="margin-top:8px;"><b>Best Season:</b> ${info.season}</div>
+          <div class="mini" style="margin-top:8px;"><b>Closed Season:</b> ${info.closed}</div>
           <div class="mini" style="margin-top:8px;"><b>Rigs:</b> ${info.rigs.join(", ")}</div>
           <div class="mini" style="margin-top:8px;"><b>Rig Sketch:</b></div>
           <pre class="rig">${info.sketch}</pre>
@@ -835,4 +847,4 @@ Short trace`
     renderLog();
   </script>
 </body>
-</html>
+  </html>
