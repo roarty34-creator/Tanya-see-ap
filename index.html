@@ -1,172 +1,196 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-
-<title>Tanya Deep Sea Fishing App</title>
-
-<link rel="stylesheet" href="style.css">
-<link rel="manifest" href="manifest.webmanifest">
-
-<meta name="theme-color" content="#061225">
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Deep Sea Fishing App</title>
+  <link rel="stylesheet" href="./style.css" />
+  <link rel="manifest" href="./manifest.webmanifest" />
+  <meta name="theme-color" content="#061225" />
 </head>
-
 <body>
+  <h1>Tanya Deep Sea Fishing App</h1>
 
-<h1>Tanya Deep Sea Fishing App</h1>
+  <div class="topnav">
+    <button class="navbtn active" data-tab-btn="add" onclick="showTab('add')">Add Catch</button>
+    <button class="navbtn" data-tab-btn="spots" onclick="showTab('spots')">Spots &amp; Navigate</button>
+    <button class="navbtn" data-tab-btn="drift" onclick="showTab('drift')">Drift</button>
+    <button class="navbtn" data-tab-btn="log" onclick="showTab('log')">Log</button>
+    <button class="navbtn" data-tab-btn="stats" onclick="showTab('stats')">Stats</button>
+    <button class="navbtn" data-tab-btn="guide" onclick="showTab('guide')">Boat Guide</button>
+  </div>
 
-<div class="topnav">
+  <section id="add">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Add Catch</div>
 
-<button onclick="showTab('add')">Add Catch</button>
-<button onclick="showTab('spots')">Spots & Navigate</button>
-<button onclick="showTab('drift')">Drift</button>
-<button onclick="showTab('log')">Log</button>
-<button onclick="showTab('stats')">Stats</button>
-<button onclick="showTab('guide')">Boat Guide</button>
+      <label for="species">Species</label>
+      <select id="species">
+        <option value="">Choose...</option>
+        <option>Cape Kob</option>
+        <option>Yellowtail</option>
+        <option>Bonito</option>
+        <option>Red Roman</option>
+        <option>Snapper</option>
+        <option>Silverfish</option>
+        <option>Red Steenbras</option>
+        <option>Yellow Belly</option>
+        <option>Hottentot</option>
+      </select>
 
-</div>
+      <label for="bait">Bait Used</label>
+      <select id="bait">
+        <option value="">Choose...</option>
+      </select>
 
-<section id="add">
+      <label for="localArea">Local Area</label>
+      <select id="localArea">
+        <option value="">Choose area...</option>
+      </select>
 
-<div class="card">
+      <label for="coords">Coordinates</label>
+      <div class="row">
+        <input id="coords" readonly />
+        <button type="button" onclick="getGPSForCatch()">Get GPS</button>
+      </div>
 
-<h2>Add Catch</h2>
+      <label for="whereCaught">Where Caught</label>
+      <input id="whereCaught" readonly value="Deep Sea" />
 
-<label>Species</label>
-<select id="species">
+      <div class="mini tipText">Tip: Save every catch with the correct Local Area Name so Stats can show your hottest reefs correctly.</div>
 
-<option>Cape Kob</option>
-<option>Yellowtail</option>
-<option>Bonito</option>
-<option>Red Roman</option>
-<option>Snapper</option>
-<option>Silverfish</option>
-<option>Yellow Belly</option>
-<option>Hottentot</option>
+      <div class="conditionsRow">
+        <div class="chip" id="chipWind">Wind: loading...</div>
+        <div class="chip" id="chipSwell">Swell: loading...</div>
+        <div class="chip" id="chipTemp">Sea Temp: loading...</div>
+        <div class="chip" id="chipCurrent">Current: loading...</div>
+      </div>
 
-</select>
+      <button onclick="saveCatch()">Save Catch</button>
+      <div id="saveMsg" class="mini successText"></div>
+    </div>
+  </section>
 
-<label>Bait Used</label>
-<select id="bait">
+  <section id="spots" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Spots &amp; Navigate</div>
 
-<option>Pilchard</option>
-<option>Makriel</option>
-<option>Chokka</option>
-<option>Squid</option>
-<option>Octopus</option>
+      <div class="row">
+        <button onclick="setCurrentLocation()">Use Current Location</button>
+        <button class="dark" onclick="saveCurrentSpot()">Save Current Spot</button>
+      </div>
 
-</select>
+      <div id="currentAreaBox" class="mini"></div>
 
-<label>Local Area</label>
-<input id="localArea">
+      <label for="boatSpeed">Boat Speed (km/h)</label>
+      <input id="boatSpeed" type="number" value="25" />
 
-<label>Coordinates</label>
-<input id="coords">
+      <label for="nextSpot">Choose Next Spot</label>
+      <select id="nextSpot">
+        <option value="">Choose next spot...</option>
+      </select>
 
-<button onclick="saveCatch()">Save Catch</button>
+      <div class="row">
+        <button onclick="startNavigation()">Start Navigation</button>
+        <button class="dark" onclick="refreshAllConditions()">Refresh</button>
+      </div>
 
-</div>
+      <div id="navResult" class="mini"></div>
 
-</section>
+      <label for="routeSpot">Route Chain</label>
+      <select id="routeSpot">
+        <option value="">Add spot to route chain...</option>
+      </select>
 
-<section id="spots" style="display:none">
+      <div class="row">
+        <button onclick="addRouteSpot()">Add To Route</button>
+        <button class="dark" onclick="startRouteChain()">Start Route Chain</button>
+        <button class="danger" onclick="clearRouteChain()">Clear Chain</button>
+      </div>
 
-<div class="card">
+      <div id="routeChainBox" class="mini"></div>
+    </div>
 
-<h2>Spots & Navigate</h2>
+    <div class="card">
+      <b>Nearby Spots Within 12 km</b>
+      <div class="mini">Get current location first to see nearby spots.</div>
+    </div>
 
-<button onclick="setCurrentLocation()">Use Current Location</button>
+    <div id="spotsList"></div>
+  </section>
 
-<div id="conditions"></div>
+  <section id="drift" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Drift</div>
+      <div id="driftBox" class="mini"></div>
+    </div>
+  </section>
 
-<label>Boat Speed (km/h)</label>
-<input id="boatSpeed" value="25">
+  <section id="log" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Log</div>
+      <div class="row">
+        <b>Catch Log</b>
+        <button class="danger" onclick="clearLog()">Delete All</button>
+      </div>
+      <div class="mini">Tip: keep Local Area Name correct so Stats can rank your hottest reefs.</div>
+    </div>
+    <div id="logBox"></div>
+  </section>
 
-<label>Choose Next Spot</label>
-<select id="nextSpot"></select>
+  <section id="stats" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Stats</div>
+      <div id="statsBox" class="mini"></div>
+    </div>
+  </section>
 
-<button onclick="startNavigation()">Start Navigation</button>
+  <section id="guide" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Boat Guide</div>
 
-<div id="navResult"></div>
+      <b>Boat Species Season Guide</b>
+      <div class="mini guideBlock">
+        <b>Cape Kob</b> — Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
+        <b>Yellowtail</b> — Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
+        <b>Bonito</b> — Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
+        <b>Red Roman</b> — Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
+        <b>Snapper</b> — Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
+        <b>Silverfish</b> — Good all year. Usually better over reef in calmer workable conditions.<br><br>
+        <b>Hottentot</b> — Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
+        <b>Yellow Belly</b> — Good all year. Focus on reef patches, current and proper bait on the bottom.<br><br>
+        <b>Red Steenbras</b> — Closed season: <b>1 Sep - 30 Nov</b>. Sensitive species. Handle carefully.
+      </div>
+    </div>
 
-</div>
+    <div class="card">
+      <b>Boat Safety Notes</b>
+      <div class="mini guideBlock">
+        <b>Check wind + swell before launch</b><br>
+        Good wind: under 15 km/h = comfortable, 15–25 km/h = workable, above 25 km/h = rougher, above 30 km/h = poor boat day.<br><br>
 
-<div id="spotsList"></div>
+        Good swell: under 1.5 m = comfortable, 1.5–2.5 m = workable, above 2.5 m = rough, above 3 m = usually poor for bottom fishing.<br><br>
 
-</section>
+        <b>If current is too strong, drift may be too fast for bottom fishing — how to know</b><br>
+        You will struggle to hold bottom, your line will angle away fast, sinkers won’t stay down properly, and the boat will drift over the reef too quickly before your bait stays in the strike zone.<br><br>
 
-<section id="drift" style="display:none">
+        <b>Use navigation between saved spots</b><br>
+        Example: choose a saved next spot in Spots &amp; Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.<br><br>
 
-<div class="card">
+        <b>Log catches with area names</b><br>
+        Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.
+      </div>
+    </div>
+  </section>
 
-<h2>Drift Info</h2>
+  <div class="version">
+    Tanya Deep Sea Fishing App<br>
+    Core system: V69<br>
+    Cache system: V71-style<br>
+    Build version: V75 Stable
+  </div>
 
-<div id="driftBox"></div>
-
-</div>
-
-</section>
-
-<section id="log" style="display:none">
-
-<div class="card">
-
-<h2>Catch Log</h2>
-
-<div id="logBox"></div>
-
-</div>
-
-</section>
-
-<section id="stats" style="display:none">
-
-<div class="card">
-
-<h2>Stats</h2>
-
-<div id="statsBox"></div>
-
-</div>
-
-</section>
-
-<section id="guide" style="display:none">
-
-<div class="card">
-
-<h2>Boat Safety Notes</h2>
-
-<p>
-Good wind: under 15 km/h comfortable.<br>
-15-25 km/h workable.<br>
-Above 25 km/h rough.
-</p>
-
-<p>
-Good swell: under 1.5 m comfortable.<br>
-1.5-2.5 m workable.<br>
-Above 2.5 m rough.
-</p>
-
-</div>
-
-</section>
-
-<div class="version">
-
-Tanya Deep Sea Fishing App<br>
-Core system: V69<br>
-Cache system: V71-style<br>
-Build version: V75 Stable
-
-</div>
-
-<script src="spots.js"></script>
-<script src="app.js"></script>
-
+  <script src="./spots.js"></script>
+  <script src="./app.js"></script>
 </body>
-</html>
+          </html>
