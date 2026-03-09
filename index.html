@@ -1,22 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Deep Sea Fishing App</title>
 
-<title>Tanya Deep Sea Fishing App</title>
-
-<link rel="stylesheet" href="style.css">
-
+  <link rel="manifest" href="manifest.webmanifest" />
+  <link rel="stylesheet" href="style.css" />
 </head>
-
 <body>
 
-<h1>Stilbaai Fishing Spots</h1>
+  <header class="topbar">
+    <h1>Tanya Deep Sea Fishing App</h1>
+  </header>
 
-<div id="map"></div>
+  <nav class="tabs">
+    <button class="tab-btn active" data-tab="home">Home</button>
+    <button class="tab-btn" data-tab="spots">Spots</button>
+    <button class="tab-btn" data-tab="weather">Weather</button>
+    <button class="tab-btn" data-tab="tools">Tools</button>
+  </nav>
 
-<script src="app.js"></script>
+  <main>
+    <section id="home" class="tab active">
+      <div class="card">
+        <h2>Welkom</h2>
+        <p>Jou Stilbaai deep sea fishing app.</p>
+      </div>
+    </section>
 
+    <section id="spots" class="tab">
+      <div class="card">
+        <h2>Fishing Spots</h2>
+        <div id="spotsList"></div>
+      </div>
+    </section>
+
+    <section id="weather" class="tab">
+      <div class="card">
+        <h2>Current Conditions</h2>
+        <p id="weatherBox">Laai weer...</p>
+      </div>
+    </section>
+
+    <section id="tools" class="tab">
+      <div class="card">
+        <h2>Tools</h2>
+        <button onclick="testApp()">Test App</button>
+      </div>
+    </section>
+  </main>
+
+  <script src="spots.js"></script>
+  <script src="app.js"></script>
 </body>
 </html>
