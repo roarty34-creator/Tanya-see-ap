@@ -1,1 +1,10 @@
+body{
+background:#061225;
+color:white;
+font-family:Arial;
+}
 
+#map{
+height:100vh;
+width:100%;
+}
