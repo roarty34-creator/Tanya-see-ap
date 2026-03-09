@@ -18,6 +18,12 @@
       --warn:#ff8c42;
       --line:#1a2c52;
       --danger:#b23b4d;
+      --blue:#0d2a52;
+      --green:#153924;
+      --orange:#4e2d14;
+      --purple:#35204f;
+      --teal:#133943;
+      --gold:#4b3b10;
     }
     *{box-sizing:border-box}
     body{
@@ -29,12 +35,12 @@
     }
     h1{
       margin:0 0 4px;
-      font-size:26px;
+      font-size:28px;
     }
     .mini{
       font-size:12px;
       color:var(--muted);
-      line-height:1.45;
+      line-height:1.5;
     }
     .topnav{
       display:flex;
@@ -120,7 +126,7 @@
       margin-top:10px;
     }
     .spotTitle{
-      font-size:17px;
+      font-size:18px;
       font-weight:bold;
     }
     .spotSub{
@@ -169,20 +175,68 @@
     pre.rig{
       background:#081632;
       color:#d7e6ff;
-      padding:12px;
-      border-radius:10px;
+      padding:14px;
+      border-radius:12px;
       overflow:auto;
-      font-size:14px;
-      line-height:1.45;
+      font-size:15px;
+      line-height:1.5;
       white-space:pre-wrap;
       margin-top:8px;
     }
+    .fishMainTitle{
+      font-size:24px;
+      font-weight:bold;
+      margin-bottom:6px;
+    }
+    .fishSub{
+      font-size:14px;
+      color:#cfe1ff;
+      margin-bottom:12px;
+    }
+    .identifyBox{
+      background:#0c2344;
+      padding:16px;
+      border-radius:14px;
+      margin-top:12px;
+    }
+    .identifyTitle{
+      font-size:20px;
+      font-weight:bold;
+      margin-bottom:10px;
+    }
+    .bigText{
+      font-size:15px;
+      line-height:1.7;
+    }
+    .infoGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+    .infoBox{
+      padding:14px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.6;
+    }
+    .infoBox b{
+      display:block;
+      font-size:16px;
+      margin-bottom:6px;
+    }
+    .infoBlue{background:var(--blue)}
+    .infoGreen{background:var(--green)}
+    .infoOrange{background:var(--orange)}
+    .infoPurple{background:var(--purple)}
+    .infoTeal{background:var(--teal)}
+    .infoGold{background:var(--gold)}
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V90 Stable</div>
+  <div class="mini">V91 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -217,6 +271,10 @@
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
         <option>Hottentot</option>
+        <option>Geelbek</option>
+        <option>Santer</option>
+        <option>Carpenter</option>
+        <option>Dageraad</option>
       </select>
 
       <label>Minimum Size</label>
@@ -227,7 +285,7 @@
       <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
       <div id="sizeWarning" class="mini"></div>
 
-      <label>Preferred Bait</label>
+      <label>Preferred Bait / Lure Used</label>
       <select id="bait">
         <option value="">Choose...</option>
       </select>
@@ -285,6 +343,10 @@
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
         <option>Hottentot</option>
+        <option>Geelbek</option>
+        <option>Santer</option>
+        <option>Carpenter</option>
+        <option>Dageraad</option>
       </select>
       <div id="fishInfoBox"></div>
     </div>
@@ -314,7 +376,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V90 Stable
+    Build version: V91 Stable
   </div>
 
   <script>
@@ -333,15 +395,19 @@
     ];
 
     const BAIT_BY_SPECIES = {
-      "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Chokka","Pilchard"],
-      "Yellowtail":["Live Makriel","Pilchard strip","Metal spoon","Surface plug","Live bait"],
-      "Bonito":["Pilchard strip","Small spoon","Feather lure","Makriel"],
-      "Red Roman":["Chokka","Pilchard","Octopus","Squid"],
-      "Snapper":["Chokka","Pilchard","Redbait","Squid"],
-      "Silverfish":["Chokka strip","Pilchard strip","Pilchard"],
-      "Red Steenbras":["Chokka","Pilchard","Redbait","Squid"],
-      "Yellow Belly":["Chokka","Pilchard"],
-      "Hottentot":["Chokka","Pilchard","Redbait","Mussel"]
+      "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Pilchard","Chokka","Sardine","Mullet strip","Yo-Zuri minnow","Yo-Zuri deep diver"],
+      "Yellowtail":["Live Makriel","Live bait","Pilchard strip","Metal spoon","Surface plug","Yo-Zuri minnow","Yo-Zuri deep diver","Paddle tail soft plastic","Stickbait","Popper"],
+      "Bonito":["Pilchard strip","Small spoon","Feather lure","Makriel","Yo-Zuri minnow","Small plug","Trolling lure"],
+      "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine"],
+      "Snapper":["Chokka","Pilchard","Redbait","Squid","Sardine"],
+      "Silverfish":["Chokka strip","Pilchard strip","Pilchard","Small sardine strip"],
+      "Red Steenbras":["Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait"],
+      "Yellow Belly":["Chokka","Pilchard","Sardine"],
+      "Hottentot":["Chokka","Pilchard","Redbait","Mussel","Sardine piece"],
+      "Geelbek":["Groot sardine","Chokka","Yo-Zuri minnow","Yo-Zuri deep diver","Small plug","Live bait"],
+      "Santer":["Chokka","Sardine","Pilchard"],
+      "Carpenter":["Chokka","Pilchard","Sardine"],
+      "Dageraad":["Big chokka bait","Pilchard","Redbait","Squid"]
     };
 
     const MIN_SIZE = {
@@ -353,20 +419,33 @@
       "Silverfish":25,
       "Red Steenbras":60,
       "Yellow Belly":30,
-      "Hottentot":22
+      "Hottentot":22,
+      "Geelbek":0,
+      "Santer":0,
+      "Carpenter":0,
+      "Dageraad":0
     };
-const FISH_INFO = {
-  "Cape Kob":{
-    bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly",
-    hook:"Bo hook 7/0, onder hook 8/0 of 9/0 Kendal / J hooks",
-    sinker:"6oz to 8oz grapnel / bottle sinker",
-    strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm lank",
-    rigType:"Stilbaai Groot Kabeljou Strop (Double Strop Rig)",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Best spring to autumn",
-    closed:"Check current permit rules",
-    why:`✔ Kabeljou vat dikwels aas wat net bo die bodem hang
+
+    const FISH_INFO = {
+      "Cape Kob":{
+        identifier:{
+          body:"Long strong predator body",
+          colour:"Silver-grey with darker back",
+          tail:"Strong tail, streamlined shape",
+          found:"Reef edges, sandy channels, deeper structure",
+          giveaway:"Big mouth and classic kob body"
+        },
+        naturalBait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver",
+        hook:"Bo hook 7/0, onder hook 8/0 of 9/0 Kendal / J hooks",
+        sinker:"6oz to 8oz grapnel / bottle sinker",
+        strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm lank",
+        rigType:"Stilbaai Groot Kabeljou Strop (Double Strop Rig)",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Best spring to autumn",
+        closed:"Check current permit rules",
+        why:`✔ Kabeljou vat dikwels aas wat net bo die bodem hang
 ✔ Twee hooks hou die aas reguit
 ✔ Minder kans dat aas spin in stroom
 ✔ Groot kabeljou vat hom maklik
@@ -376,7 +455,7 @@ Baie ervare hengelaars maak die onderste hook groter.
 Bo: 7/0
 Onder: 8/0 of 9/0
 Want kabeljou vat gewoonlik die onderste aas eerste.`,
-    sketch:`STILBAAI GROOT KABELJOU STROP
+        sketch:`STILBAAI GROOT KABELJOU STROP
 (DOUBLE STROP RIG)
 
 Hooflyn
@@ -393,22 +472,30 @@ Bo hook snoot ---- 7/0 hook
 Onder hook snoot - 8/0 of 9/0 hook
   |
 6-8 oz grapnel / bottle sinker`
-  },
+      },
 
-  "Yellowtail":{
-    bait:"Live bait / sardine / chokka",
-    hook:"4/0 - 6/0 hooks",
-    sinker:"Geen sinker",
-    strop:"0.60 - 0.70 mm nylon, ± 1 - 1.5 m",
-    rigType:"Yellowtail live bait rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Best summer to autumn",
-    closed:"Check current permit rules",
-    why:`✔ Yellowtail jag vinnig
+      "Yellowtail":{
+        identifier:{
+          body:"Long torpedo-shaped fast fish",
+          colour:"Blue-green back with lighter silver sides",
+          tail:"Strong forked tail",
+          found:"Open water, bait balls, surface action",
+          giveaway:"Fast-moving pelagic fish with yellow tail tone"
+        },
+        naturalBait:"Live Makriel, Live bait, Pilchard strip",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic",
+        hook:"5/0 to 7/0 for live bait",
+        sinker:"Usually no sinker or very light",
+        strop:"80 cm to 150 cm leader",
+        rigType:"Live bait trace / lure rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Best summer to autumn",
+        closed:"Check current permit rules",
+        why:`✔ Yellowtail jag vinnig
 ✔ Ligte leader gee beter aksie
 ✔ Werk goed met lewendige aas`,
-    sketch:`YELLOWTAIL
+        sketch:`YELLOWTAIL
 
 Hooflyn
 40-50 lb braid
@@ -423,22 +510,30 @@ Leader
 
 Sinker
 Geen sinker`
-  },
+      },
 
-  "Bonito":{
-    bait:"Lewendige aas / klein aasvis",
-    hook:"3/0 - 4/0 hooks",
-    sinker:"Geen sinker",
-    strop:"0.60 mm nylon, ± 1 m",
-    rigType:"Bonito live bait rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Best summer to autumn",
-    closed:"Check current permit rules",
-    why:`✔ Vinnig jag vis
+      "Bonito":{
+        identifier:{
+          body:"Slim fast tuna-like body",
+          colour:"Dark back with silvery sides",
+          tail:"Forked tail built for speed",
+          found:"Surface feeding schools chasing bait",
+          giveaway:"Fast compact body and surface action"
+        },
+        naturalBait:"Lewendige aas, klein aasvis, Pilchard strip",
+        lures:"Feather lure, Small spoon, Yo-Zuri minnow, Small plug, Trolling lure",
+        hook:"3/0 - 4/0 hooks",
+        sinker:"Geen sinker",
+        strop:"0.60 mm nylon, ± 1 m",
+        rigType:"Bonito live bait rig / feather rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Best summer to autumn",
+        closed:"Check current permit rules",
+        why:`✔ Vinnig jag vis
 ✔ Werk goed met lewendige aas
 ✔ Ligte leader gee beter byt`,
-    sketch:`BONITO
+        sketch:`BONITO
 
 Hooflyn
 30-40 lb braid
@@ -453,21 +548,29 @@ Leader
 
 Sinker
 Geen sinker`
-  },
+      },
 
-  "Red Roman":{
-    bait:"Chokka, Pilchard, Octopus, Squid",
-    hook:"4/0 - 6/0 hooks",
-    sinker:"6oz - 8oz",
-    strop:"Kort snoots 20 - 30 cm",
-    rigType:"2-hook bottom rig / short reef rig",
-    status:"Sensitive species - handle carefully",
-    statusClass:"statusMed",
-    season:"Good all year",
-    closed:"Check current permit rules",
-    why:`✔ Kort snoots hou aas naby rif
+      "Red Roman":{
+        identifier:{
+          body:"Thick reef fish body",
+          colour:"Red to orange-red",
+          tail:"Rounded reef-fish tail",
+          found:"Rocky reef and structure",
+          giveaway:"Deep red body and classic reef shape"
+        },
+        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine",
+        lures:"Usually natural bait preferred",
+        hook:"4/0 - 6/0 hooks",
+        sinker:"6oz - 8oz",
+        strop:"Kort snoots 20 - 30 cm",
+        rigType:"2-hook bottom rig / short reef rig",
+        status:"Sensitive species - handle carefully",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
+        why:`✔ Kort snoots hou aas naby rif
 ✔ Werk goed op reef structure`,
-    sketch:`RED ROMAN REEF RIG
+        sketch:`RED ROMAN REEF RIG
 
 Main line
   |
@@ -478,21 +581,29 @@ Top short snoot 20-30 cm ---- hook
 Bottom short snoot 20-30 cm - hook
   |
 Sinker 6-8 oz`
-  },
+      },
 
-  "Snapper":{
-    bait:"Chokka, Pilchard, Redbait, Squid",
-    hook:"4/0 - 6/0 hooks",
-    sinker:"6oz - 8oz",
-    strop:"20 - 40 cm",
-    rigType:"Bottom rig / short hook trace",
-    status:"Sensitive species - handle carefully",
-    statusClass:"statusMed",
-    season:"Good all year",
-    closed:"Check current permit rules",
-    why:`✔ Kompakte rig hou bodem goed
+      "Snapper":{
+        identifier:{
+          body:"Medium reef fish body",
+          colour:"Pink-red to silvery red",
+          tail:"Compact tail, reef fish profile",
+          found:"Reef and deeper bottom structure",
+          giveaway:"Snapper profile and bottom-feeding reef behaviour"
+        },
+        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine",
+        lures:"Usually natural bait preferred",
+        hook:"4/0 - 6/0 hooks",
+        sinker:"6oz - 8oz",
+        strop:"20 - 40 cm",
+        rigType:"Bottom rig / short hook trace",
+        status:"Sensitive species - handle carefully",
+        statusClass:"statusMed",
+        season:"Good all year",
+        closed:"Check current permit rules",
+        why:`✔ Kompakte rig hou bodem goed
 ✔ Hou aas in strike zone`,
-    sketch:`SNAPPER BOTTOM RIG
+        sketch:`SNAPPER BOTTOM RIG
 
 Main line
   |
@@ -501,20 +612,28 @@ Swivel
 Sinker 6-8 oz
   |
 Hook snoot 20-40 cm`
-  },
+      },
 
-  "Silverfish":{
-    bait:"Chokka strip, Pilchard strip, Pilchard",
-    hook:"2/0 - 4/0 hooks",
-    sinker:"4oz - 6oz",
-    strop:"20 - 30 cm",
-    rigType:"Light bottom rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Good all year",
-    closed:"Check current permit rules",
-    why:`✔ Lighter setup laat kleiner aas natuurlik werk`,
-    sketch:`SILVERFISH LIGHT RIG
+      "Silverfish":{
+        identifier:{
+          body:"Smaller streamlined body",
+          colour:"Silver body",
+          tail:"Small forked tail",
+          found:"Over reef and calmer workable areas",
+          giveaway:"Small bright silver fish with lighter rig preference"
+        },
+        naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip",
+        lures:"Usually natural bait preferred",
+        hook:"2/0 - 4/0 hooks",
+        sinker:"4oz - 6oz",
+        strop:"20 - 30 cm",
+        rigType:"Light bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Good all year",
+        closed:"Check current permit rules",
+        why:`✔ Lighter setup laat kleiner aas natuurlik werk`,
+        sketch:`SILVERFISH LIGHT RIG
 
 Main line
   |
@@ -523,21 +642,29 @@ Swivel
 Small sinker 4-6 oz
   |
 Single hook snoot 20-30 cm`
-  },
+      },
 
-  "Red Steenbras":{
-    bait:"Chokka, Pilchard, Redbait, Squid",
-    hook:"6/0 - 8/0 hooks",
-    sinker:"7oz - 9oz",
-    strop:"70 - 120 cm",
-    rigType:"Strong bottom rig / longer hook snoot",
-    status:"Most endangered / very sensitive",
-    statusClass:"statusHigh",
-    season:"Sensitive species",
-    closed:"Closed season: 1 Sep - 30 Nov",
-    why:`✔ Sterk trace help in swaar toestande
+      "Red Steenbras":{
+        identifier:{
+          body:"Large strong bottom fish body",
+          colour:"Pale silver to pinkish tones",
+          tail:"Strong tail, heavy body profile",
+          found:"Bottom structure and deeper working ground",
+          giveaway:"Big powerful body and sensitive conservation status"
+        },
+        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait",
+        lures:"Usually natural bait preferred",
+        hook:"6/0 - 8/0 hooks",
+        sinker:"7oz - 9oz",
+        strop:"70 - 120 cm",
+        rigType:"Strong bottom rig / longer hook snoot",
+        status:"Most endangered / very sensitive",
+        statusClass:"statusHigh",
+        season:"Sensitive species",
+        closed:"Closed season: 1 Sep - 30 Nov",
+        why:`✔ Sterk trace help in swaar toestande
 ✔ Hanteer versigtig en volg permit reëls`,
-    sketch:`RED STEENBRAS STRONG RIG
+        sketch:`RED STEENBRAS STRONG RIG
 
 Main line
   |
@@ -548,20 +675,28 @@ Sinker 7-9 oz
 Long snoot 70-120 cm
   |
 6/0 - 8/0 strong hook`
-  },
+      },
 
-  "Yellow Belly":{
-    bait:"Chokka, Pilchard",
-    hook:"4/0 - 6/0 hooks",
-    sinker:"6oz - 8oz",
-    strop:"30 - 50 cm",
-    rigType:"Bottom rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Good all year",
-    closed:"Check current permit rules",
-    why:`✔ Simple bottom presentation werk goed op reef patches`,
-    sketch:`YELLOW BELLY BOTTOM RIG
+      "Yellow Belly":{
+        identifier:{
+          body:"Reef fish with deeper body shape",
+          colour:"Yellowish belly with darker top",
+          tail:"Compact reef-fish tail",
+          found:"Reef patches and bottom structure",
+          giveaway:"Yellow belly tone underneath"
+        },
+        naturalBait:"Chokka, Pilchard, Sardine",
+        lures:"Usually natural bait preferred",
+        hook:"4/0 - 6/0 hooks",
+        sinker:"6oz - 8oz",
+        strop:"30 - 50 cm",
+        rigType:"Bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Good all year",
+        closed:"Check current permit rules",
+        why:`✔ Simple bottom presentation werk goed op reef patches`,
+        sketch:`YELLOW BELLY BOTTOM RIG
 
 Main line
   |
@@ -570,22 +705,30 @@ Swivel
 Sinker 6-8 oz
   |
 Hook trace 30-50 cm`
-  },
+      },
 
-  "Hottentot":{
-    bait:"Klein aas / chokka stukke",
-    hook:"2/0 - 3/0 hooks",
-    sinker:"4oz - 5oz sinker",
-    strop:"0.50 - 0.60 mm nylon, ± 60 cm",
-    rigType:"Light bottom rig / short reef trace",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Good all year",
-    closed:"Check current permit rules",
-    why:`✔ Klein aas werk beste
+      "Hottentot":{
+        identifier:{
+          body:"Shorter deeper body",
+          colour:"Grey-silver with darker patterning",
+          tail:"Smaller tail, compact shape",
+          found:"Reef and shallow structure",
+          giveaway:"Compact body and smaller-mouth profile"
+        },
+        naturalBait:"Klein aas, chokka stukke, Redbait, Mussel, Sardine piece",
+        lures:"Usually natural bait preferred",
+        hook:"2/0 - 3/0 hooks",
+        sinker:"4oz - 5oz sinker",
+        strop:"0.50 - 0.60 mm nylon, ± 60 cm",
+        rigType:"Light bottom rig / short reef trace",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Good all year",
+        closed:"Check current permit rules",
+        why:`✔ Klein aas werk beste
 ✔ Kort leader hou aas by bodem
 ✔ Perfek vir chokka stukke`,
-    sketch:`HOTTENTOT
+        sketch:`HOTTENTOT
 
 Hooflyn
 20-30 lb braid
@@ -599,22 +742,30 @@ Leader
 2/0 - 3/0 hooks
   |
 4-5 oz sinker`
-  },
+      },
 
-  "Geelbek":{
-    bait:"Groot sardine of chokka",
-    hook:"6/0 - 8/0 hooks",
-    sinker:"Geen of klein 3-4 oz sinker",
-    strop:"0.70 - 0.80 mm nylon, ± 1 m lank",
-    rigType:"Cape Salmon / Geelbek bait rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Check current permit / local conditions",
-    closed:"Check current permit rules",
-    why:`✔ Geelbek jag aasvis bo bodem
+      "Geelbek":{
+        identifier:{
+          body:"Long powerful mid-water predator",
+          colour:"Silvery sides with darker upper body",
+          tail:"Strong forked tail",
+          found:"Mid-water and baitfish zones",
+          giveaway:"Fast predator often moving above bottom"
+        },
+        naturalBait:"Groot sardine, Chokka, Live bait",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Small plug",
+        hook:"6/0 - 8/0 hooks",
+        sinker:"Geen of klein 3-4 oz sinker",
+        strop:"0.70 - 0.80 mm nylon, ± 1 m lank",
+        rigType:"Cape Salmon / Geelbek bait rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Check current permit / local conditions",
+        closed:"Check current permit rules",
+        why:`✔ Geelbek jag aasvis bo bodem
 ✔ Lang leader laat aas natuurlik beweeg
 ✔ Groot sardine of chokka werk goed`,
-    sketch:`GEELBEK (Cape Salmon)
+        sketch:`GEELBEK (Cape Salmon)
 
 Hooflyn
 40-50 lb braid
@@ -629,22 +780,30 @@ Leader
 
 Sinker
 Geen of klein 3-4 oz sinker`
-  },
+      },
 
-  "Santer":{
-    bait:"Chokka of sardine",
-    hook:"4/0 - 5/0 hooks",
-    sinker:"6 oz bottle sinker",
-    strop:"0.60 - 0.70 mm nylon, ± 60 cm",
-    rigType:"Short reef bottom rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Check current permit / local conditions",
-    closed:"Check current permit rules",
-    why:`✔ Santer byt vinnig
+      "Santer":{
+        identifier:{
+          body:"Compact reef fish body",
+          colour:"Pink-red reef tones",
+          tail:"Compact tail",
+          found:"Near reef and structure",
+          giveaway:"Fast-biting reef fish close to bottom"
+        },
+        naturalBait:"Chokka, Sardine, Pilchard",
+        lures:"Usually natural bait preferred",
+        hook:"4/0 - 5/0 hooks",
+        sinker:"6 oz bottle sinker",
+        strop:"0.60 - 0.70 mm nylon, ± 60 cm",
+        rigType:"Short reef bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Check current permit / local conditions",
+        closed:"Check current permit rules",
+        why:`✔ Santer byt vinnig
 ✔ Kort leader hou aas naby rif
 ✔ Perfek vir chokka of sardine`,
-    sketch:`SANTER
+        sketch:`SANTER
 
 Hooflyn
 30-40 lb braid
@@ -658,22 +817,30 @@ Leader
 4/0 - 5/0 hooks
   |
 6 oz bottle sinker`
-  },
+      },
 
-  "Carpenter":{
-    bait:"Chokka",
-    hook:"6/0 - 7/0 hooks",
-    sinker:"7-8 oz grapnel",
-    strop:"0.80 - 1.0 mm nylon, ± 70 cm",
-    rigType:"Heavy reef rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Check current permit / local conditions",
-    closed:"Check current permit rules",
-    why:`✔ Groot rif vis
+      "Carpenter":{
+        identifier:{
+          body:"Large strong reef fish body",
+          colour:"Darker reef colour tones",
+          tail:"Strong tail for reef power",
+          found:"Heavy reef and rocky structure",
+          giveaway:"Big reef fish with brute pulling power"
+        },
+        naturalBait:"Chokka, Pilchard, Sardine",
+        lures:"Usually natural bait preferred",
+        hook:"6/0 - 7/0 hooks",
+        sinker:"7-8 oz grapnel",
+        strop:"0.80 - 1.0 mm nylon, ± 70 cm",
+        rigType:"Heavy reef rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Check current permit / local conditions",
+        closed:"Check current permit rules",
+        why:`✔ Groot rif vis
 ✔ Sterk leader keer breek op rotse
 ✔ Werk goed met chokka`,
-    sketch:`CARPENTER
+        sketch:`CARPENTER
 
 Hooflyn
 40-50 lb braid
@@ -687,22 +854,30 @@ Leader
 6/0 - 7/0 hooks
   |
 7-8 oz grapnel`
-  },
+      },
 
-  "Dageraad":{
-    bait:"Groot aas",
-    hook:"7/0 - 9/0 hooks",
-    sinker:"6-8 oz grapnel",
-    strop:"0.90 - 1.0 mm nylon, ± 70 cm",
-    rigType:"Heavy bottom rig",
-    status:"Check current permit / stock status",
-    statusClass:"statusNeutral",
-    season:"Check current permit / local conditions",
-    closed:"Check current permit rules",
-    why:`✔ Groot sterk vis
+      "Dageraad":{
+        identifier:{
+          body:"Big heavy bottom fish body",
+          colour:"Deeper darker reef tones",
+          tail:"Strong tail",
+          found:"Heavy bottom and reef zones",
+          giveaway:"Large strong reef-associated fish"
+        },
+        naturalBait:"Big chokka bait, Pilchard, Redbait, Squid",
+        lures:"Usually natural bait preferred",
+        hook:"7/0 - 9/0 hooks",
+        sinker:"6-8 oz grapnel",
+        strop:"0.90 - 1.0 mm nylon, ± 70 cm",
+        rigType:"Heavy bottom rig",
+        status:"Check current permit / stock status",
+        statusClass:"statusNeutral",
+        season:"Check current permit / local conditions",
+        closed:"Check current permit rules",
+        why:`✔ Groot sterk vis
 ✔ Dik leader beskerm teen rif
 ✔ Groot aas lok groter vis`,
-    sketch:`DAGERAAD
+        sketch:`DAGERAAD
 
 Hooflyn
 40-50 lb braid
@@ -716,10 +891,10 @@ Leader
 7/0 - 9/0 hooks
   |
 6-8 oz grapnel`
-  }
+      }
     };
 
-    const KEY_LOG = "tanya_v90_log";
+    const KEY_LOG = "tanya_v91_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
@@ -950,7 +1125,7 @@ Leader
             <b>${c.species}</b><br>
             <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
             <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
-            <span class="mini">Preferred Bait: ${c.bait || "-"}</span><br>
+            <span class="mini">Preferred Bait / Lure: ${c.bait || "-"}</span><br>
             <span class="mini">Area: ${c.area || "-"}</span><br>
             <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
             <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
@@ -1024,368 +1199,41 @@ Leader
 
       document.getElementById("fishInfoBox").innerHTML = `
         <div class="spotCard">
-          <div class="spotTitle">${species}</div>
-          <div class="spotSub">Bait, status, season and full rig setup</div>
-          <div class="mini" style="margin-top:8px;"><b>Status:</b> <span class="${info.statusClass}">${info.status}</span></div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Bait:</b> ${info.bait}</div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Hook Size:</b> ${info.hook}</div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Sinker / Weight:</b> ${info.sinker}</div>
-          <div class="mini" style="margin-top:8px;"><b>Strop Length:</b> ${info.strop}</div>
-          <div class="mini" style="margin-top:8px;"><b>Rig Type:</b> ${info.rigType}</div>
-          <div class="mini" style="margin-top:8px;"><b>Best Season:</b> ${info.season}</div>
-          <div class="mini" style="margin-top:8px;"><b>Closed Season:</b> ${info.closed}</div>
-          <div class="mini" style="margin-top:8px;"><b>Why this rig works:</b><br>${(info.why || "").replace(/\n/g,"<br>")}</div>
-          <div class="mini" style="margin-top:8px;"><b>Rig Sketch:</b></div>
-          <pre class="rig">${info.sketch}</pre>
-        </div>
-      `;
-    }
+          <div class="fishMainTitle">${species}</div>
+          <div class="fishSub">Fish info, identifier and full rig setup</div>
 
-    document.getElementById("species").addEventListener("change", () => {
-      fillBaitOptions();
-      updateMinSize();
-      checkSizeWarning();
-    });
-
-    document.getElementById("sizeCaught").addEventListener("input", checkSizeWarning);
-
-    document.getElementById("coords").addEventListener("input", () => {
-      const coord = document.getElementById("coords").value.trim();
-      document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
-      tryAutoMatchAreaFromCoords(coord);
-    });
-
-    renderSpotList();
-    fillAreaDropdown();
-    fillBaitOptions();
-    updateMinSize();
-    checkSizeWarning();
-    renderFishInfo();
-    renderLog();
-  </script>
-</body>
-</html>
-        
-        };
-
-    const KEY_LOG = "tanya_v90_log";
-
-    function showTab(id){
-      document.querySelectorAll("section").forEach(s => s.style.display = "none");
-      document.getElementById(id).style.display = "block";
-
-      document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","logTab","rulesTab"];
-      const idx = ids.indexOf(id);
-      if(idx >= 0) document.querySelectorAll(".navbtn")[idx].classList.add("active");
-
-      if(id === "weatherTab") loadWeekForecast();
-      if(id === "fishInfoTab") renderFishInfo();
-      if(id === "logTab") renderLog();
-    }
-
-    function describeSeaAreaFromLon(lon){
-      if(lon > MARINE_LINE_LON) return "East towards marine area";
-      if(lon < MARINE_LINE_LON) return "West towards Jongensfontein area";
-      return "On harbour line";
-    }
-
-    function describeSeaAreaFromCoord(coordStr){
-      if(!coordStr || !coordStr.includes(",")) return "";
-      const p = coordStr.split(",");
-      const lon = Number(p[1]);
-      if(!Number.isFinite(lon)) return "";
-      return describeSeaAreaFromLon(lon);
-    }
-
-    function copyCoord(text){
-      navigator.clipboard.writeText(text);
-      alert("Coordinates copied");
-    }
-
-    function renderSpotList(){
-      let html = "";
-      SPOTS.forEach(s => {
-        const area = describeSeaAreaFromCoord(s.coord);
-        html += `
-          <div class="spotCard">
-            <div class="spotTitle">${s.name}</div>
-            <div class="spotSub">${area}</div>
-            <div style="margin-top:6px;"><span class="chip">${s.coord}</span></div>
-            <div class="row" style="margin-top:10px;">
-              <button onclick="copyCoord('${s.coord}')">Copy Coordinates</button>
-              <button class="dark" onclick="useSpotInCatch('${s.name.replaceAll("'","&#39;")}','${s.coord}')">Use In Catch</button>
+          <div class="identifyBox">
+            <div class="identifyTitle">Fish Identifier</div>
+            <div class="bigText">
+              <b>Body Shape:</b> ${info.identifier?.body || "-"}<br>
+              <b>Colour:</b> ${info.identifier?.colour || "-"}<br>
+              <b>Tail Shape:</b> ${info.identifier?.tail || "-"}<br>
+              <b>Where Usually Found:</b> ${info.identifier?.found || "-"}<br>
+              <b>Key Giveaway:</b> ${info.identifier?.giveaway || "-"}
             </div>
           </div>
-        `;
-      });
-      document.getElementById("spotList").innerHTML = html;
-    }
 
-    function fillAreaDropdown(){
-      const area = document.getElementById("area");
-      const current = area.value;
-      area.innerHTML = '<option value="">Choose saved area...</option>';
-
-      SPOTS.forEach(s => {
-        const opt = document.createElement("option");
-        opt.value = s.name;
-        opt.textContent = s.name;
-        opt.dataset.coords = s.coord;
-        area.appendChild(opt);
-      });
-
-      if([...area.options].some(o => o.value === current)) area.value = current;
-    }
-
-    function fillBaitOptions(){
-      const species = document.getElementById("species").value;
-      const bait = document.getElementById("bait");
-      const current = bait.value;
-      const list = BAIT_BY_SPECIES[species] || [];
-
-      bait.innerHTML = '<option value="">Choose...</option>';
-      list.forEach(item => {
-        const opt = document.createElement("option");
-        opt.value = item;
-        opt.textContent = item;
-        bait.appendChild(opt);
-      });
-
-      if(list.includes(current)) bait.value = current;
-    }
-
-    function updateMinSize(){
-      const species = document.getElementById("species").value;
-      const minSizeEl = document.getElementById("minSize");
-      const note = document.getElementById("minSizeNote");
-
-      if(!species){
-        minSizeEl.value = "";
-        note.textContent = "Choose species to load minimum size.";
-        return;
-      }
-
-      const min = MIN_SIZE[species] ?? "";
-      minSizeEl.value = min;
-
-      if(min === 0){
-        note.textContent = "No minimum size set in app for this species.";
-      } else {
-        note.textContent = "Minimum size loaded for selected species.";
-      }
-    }
-
-    function checkSizeWarning(){
-      const species = document.getElementById("species").value;
-      const size = Number(document.getElementById("sizeCaught").value || 0);
-      const min = Number(document.getElementById("minSize").value || 0);
-      const box = document.getElementById("sizeWarning");
-
-      if(!species || !size){
-        box.textContent = "";
-        box.className = "mini";
-        return;
-      }
-
-      if(min > 0 && size < min){
-        box.textContent = `Warning: undersize fish. Minimum size for ${species} is ${min} cm.`;
-        box.className = "mini warnText";
-      } else if(min > 0){
-        box.textContent = `Size is above minimum (${min} cm).`;
-        box.className = "mini ok";
-      } else {
-        box.textContent = "No minimum size loaded for this species.";
-        box.className = "mini";
-      }
-    }
-
-    function tryAutoMatchAreaFromCoords(coordStr){
-      const normalized = coordStr.replace(/\s+/g,"").trim();
-      const match = SPOTS.find(s => s.coord.replace(/\s+/g,"").trim() === normalized);
-      if(match){
-        document.getElementById("area").value = match.name;
-        if(!document.getElementById("whereCaught").value.trim()){
-          document.getElementById("whereCaught").value = match.name;
-        }
-      }
-    }
-
-    function fillFromArea(){
-      const area = document.getElementById("area");
-      const selected = area.options[area.selectedIndex];
-      if(selected.value && !document.getElementById("whereCaught").value.trim()){
-        document.getElementById("whereCaught").value = selected.value;
-      }
-      if(selected.dataset.coords){
-        document.getElementById("coords").value = selected.dataset.coords;
-        document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(selected.dataset.coords);
-      }
-    }
-
-    function useSpotInCatch(name, coord){
-      showTab("addTab");
-      document.getElementById("area").value = name;
-      document.getElementById("coords").value = coord;
-      document.getElementById("whereCaught").value = name;
-      document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
-    }
-
-    function getLog(){
-      return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
-    }
-
-    function saveLog(list){
-      localStorage.setItem(KEY_LOG, JSON.stringify(list));
-    }
-
-    function saveCatch(){
-      const species = document.getElementById("species").value;
-      const bait = document.getElementById("bait").value;
-      const coords = document.getElementById("coords").value.trim();
-      const whereCaught = document.getElementById("whereCaught").value.trim();
-      const notes = document.getElementById("notes").value.trim();
-      const minSize = document.getElementById("minSize").value || "";
-      const sizeCaught = document.getElementById("sizeCaught").value || "";
-
-      if(!species){
-        alert("Choose species first.");
-        return;
-      }
-
-      if(!coords){
-        alert("Enter coordinates first.");
-        return;
-      }
-
-      tryAutoMatchAreaFromCoords(coords);
-
-      const list = getLog();
-      list.unshift({
-        species,
-        bait,
-        area: document.getElementById("area").value,
-        coords,
-        whereCaught,
-        notes,
-        minSize,
-        sizeCaught,
-        seaArea: describeSeaAreaFromCoord(coords),
-        date: new Date().toLocaleString()
-      });
-      saveLog(list);
-
-      document.getElementById("saveMsg").textContent = "Catch saved to log.";
-      renderLog();
-
-      setTimeout(() => {
-        document.getElementById("saveMsg").textContent = "";
-      }, 2000);
-    }
-
-    function renderLog(){
-      const box = document.getElementById("logBox");
-      const list = getLog();
-
-      if(!list.length){
-        box.innerHTML = '<div class="mini" style="margin-top:10px;">No catches saved yet.</div>';
-        return;
-      }
-
-      let html = "";
-      list.forEach(c => {
-        html += `
-          <div class="spotCard">
-            <b>${c.species}</b><br>
-            <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
-            <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
-            <span class="mini">Preferred Bait: ${c.bait || "-"}</span><br>
-            <span class="mini">Area: ${c.area || "-"}</span><br>
-            <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
-            <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
-            <span class="mini">Coords: ${c.coords}</span><br>
-            ${c.notes ? `<span class="mini">Notes: ${c.notes}</span><br>` : ""}
-            <span class="mini">${c.date}</span>
+          <div class="infoGrid">
+            <div class="infoBox infoBlue"><b>Status</b><span class="${info.statusClass}">${info.status}</span></div>
+            <div class="infoBox infoGreen"><b>Natural Bait</b>${info.naturalBait}</div>
+            <div class="infoBox infoTeal"><b>Lures</b>${info.lures}</div>
+            <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook}</div>
+            <div class="infoBox infoPurple"><b>Sinker / Weight</b>${info.sinker}</div>
+            <div class="infoBox infoGrey"><b>Strop Length</b>${info.strop}</div>
+            <div class="infoBox infoBlue"><b>Rig Type</b>${info.rigType}</div>
+            <div class="infoBox infoGold"><b>Best Season</b>${info.season}</div>
+            <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed}</div>
           </div>
-        `;
-      });
 
-      box.innerHTML = html;
-    }
+          <div class="identifyBox">
+            <div class="identifyTitle">Why This Rig Works</div>
+            <div class="bigText">${(info.why || "").replace(/\n/g,"<br>")}</div>
+          </div>
 
-    function clearLog(){
-      if(!confirm("Delete all catches?")) return;
-      localStorage.removeItem(KEY_LOG);
-      renderLog();
-    }
-
-    async function loadWeekForecast(){
-      try{
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${HARBOUR.lat}&longitude=${HARBOUR.lon}&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max&forecast_days=7&timezone=Africa%2FJohannesburg`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        const days = data?.daily?.time || [];
-        const maxs = data?.daily?.temperature_2m_max || [];
-        const mins = data?.daily?.temperature_2m_min || [];
-        const winds = data?.daily?.wind_speed_10m_max || [];
-
-        let html = `<table>
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Max</th>
-              <th>Min</th>
-              <th>Wind</th>
-              <th>Sea Day</th>
-            </tr>
-          </thead>
-          <tbody>`;
-
-        for(let i = 0; i < days.length; i++){
-          const date = new Date(days[i]);
-          const label = date.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
-          const wind = Math.round(winds[i] || 0);
-          const seaGood = wind <= 20 ? `<span class="goodSea">Good</span>` : `<span class="badSea">Not ideal</span>`;
-
-          html += `
-            <tr>
-              <td>${label}</td>
-              <td>${Math.round(maxs[i])}°C</td>
-              <td>${Math.round(mins[i])}°C</td>
-              <td>${wind} km/h</td>
-              <td>${seaGood}</td>
-            </tr>
-          `;
-        }
-
-        html += `</tbody></table>`;
-        document.getElementById("weekForecast").innerHTML = html;
-      }catch{
-        document.getElementById("weekForecast").innerHTML = "Could not load 7 day forecast.";
-      }
-    }
-
-    function renderFishInfo(){
-      const species = document.getElementById("fishSelect").value;
-      const info = FISH_INFO[species];
-      if(!info) return;
-
-      document.getElementById("fishInfoBox").innerHTML = `
-        <div class="spotCard">
-          <div class="spotTitle">${species}</div>
-          <div class="spotSub">Bait, status, season and full rig setup</div>
-          <div class="mini" style="margin-top:8px;"><b>Status:</b> <span class="${info.statusClass}">${info.status}</span></div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Bait:</b> ${info.bait}</div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Hook Size:</b> ${info.hook}</div>
-          <div class="mini" style="margin-top:8px;"><b>Preferred Sinker / Weight:</b> ${info.sinker}</div>
-          <div class="mini" style="margin-top:8px;"><b>Strop Length:</b> ${info.strop}</div>
-          <div class="mini" style="margin-top:8px;"><b>Rig Type:</b> ${info.rigType}</div>
-          <div class="mini" style="margin-top:8px;"><b>Best Season:</b> ${info.season}</div>
-          <div class="mini" style="margin-top:8px;"><b>Closed Season:</b> ${info.closed}</div>
-          <div class="mini" style="margin-top:8px;"><b>Why this rig works:</b><br>${(info.why || "").replace(/\n/g,"<br>")}</div>
-          <div class="mini" style="margin-top:8px;"><b>Rig Sketch:</b></div>
-          <pre class="rig">${info.sketch}</pre>
+          <div class="identifyBox">
+            <div class="identifyTitle">Rig Sketch</div>
+            <pre class="rig">${info.sketch}</pre>
+          </div>
         </div>
       `;
     }
@@ -1413,4 +1261,4 @@ Leader
     renderLog();
   </script>
 </body>
-</html>
+  </html>
