@@ -7,7 +7,6 @@
 
   <link rel="manifest" href="./manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
 
   <style>
     :root{
@@ -154,11 +153,6 @@
       font-family:ui-monospace,SFMono-Regular,Menlo,Monaco,Consolas,monospace;
     }
     section{display:none}
-    #map{
-      height:430px;
-      border-radius:12px;
-      overflow:hidden;
-    }
     img.photo{
       width:100%;
       border-radius:12px;
@@ -285,7 +279,6 @@
 
   <div class="topnav">
     <button class="navbtn" id="btnAdd" onclick="showTab('add')">Add Catch</button>
-    <button class="navbtn" id="btnMap" onclick="showTab('mapTab')">Map</button>
     <button class="navbtn" id="btnNavigate" onclick="showTab('navigateTab')">Navigate</button>
     <button class="navbtn" id="btnDrift" onclick="showTab('driftTab')">Drift</button>
     <button class="navbtn" id="btnSpots" onclick="showTab('spots')">Saved Spots</button>
@@ -342,7 +335,6 @@
       <div class="row">
         <input id="coords" readonly>
         <button type="button" onclick="getGPS()">Get GPS</button>
-        <button type="button" class="dark" onclick="showTab('mapTab')">Open Map</button>
       </div>
 
       <label>Where Caught</label>
@@ -352,7 +344,8 @@
       <select id="localArea">
         <option value="">Choose local area</option>
       </select>
-      <div class="mini">Auto-fills from nearest spot or map selection.</div>
+      <div class="mini">Auto-fills from nearest spot or selected spot.</div>
+      <div class="mini">Tip: Save every catch with the correct Local Area Name so Stats can show your hottest reefs correctly.</div>
 
       <div class="row">
         <div class="chip" id="chipWind">Wind: —</div>
@@ -379,19 +372,6 @@
         <button class="dark" onclick="clearCatchForm()">Clear</button>
       </div>
     </div>
-  </section>
-
-  <section id="mapTab">
-    <div class="card">
-      <div class="row">
-        <button onclick="toggleSatellite()">Satellite ON/OFF</button>
-        <button class="dark" onclick="toggleReefOverlay()">Show Reef Areas</button>
-        <button class="dark" onclick="clearRouteLine()">Clear Route</button>
-      </div>
-      <div class="mini" style="margin-top:8px;">Tap the map to choose coordinates and area name.</div>
-      <div class="mini" style="margin-top:8px;">Spot colors: blue/yellow normal • orange = more catches logged there.</div>
-    </div>
-    <div id="map"></div>
   </section>
 
   <section id="navigateTab">
@@ -463,7 +443,7 @@
         <div><b>Catch Log</b></div>
         <button class="danger" onclick="resetAll()">Delete All</button>
       </div>
-      <div class="mini">Log reloads from saved storage every time you open it.</div>
+      <div class="mini">Tip: keep Local Area Name correct so Stats can rank your hottest reefs.</div>
     </div>
     <div id="catchList"></div>
   </section>
@@ -601,7 +581,6 @@
     Build version: V74 Stable
   </div>
 
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
     const KEY_CATCHES = "tanya_deepsea_catches";
     const KEY_SPOTS = "tanya_deepsea_spots";
@@ -633,52 +612,7 @@
       { id:"s2", name:"Blinde Rif", type:"Reef", coords:"-34.401500,20.880100", preset:true },
       { id:"s3", name:"Kabeljou Ridge", type:"Reef", coords:"-34.375000,20.870000", preset:true },
       { id:"s4", name:"Roman Bank", type:"Reef", coords:"-34.410000,20.872000", preset:true },
-      { id:"s5", name:"Die Gat", type:"Reef", coords:"-34.395500,20.845000", preset:true },
-      { id:"s6", name:"Skulpbank", type:"Reef", coords:"-34.412000,20.835000", preset:true },
-      { id:"s7", name:"South Deep", type:"Reef", coords:"-34.430000,20.880000", preset:true },
-      { id:"s8", name:"Kob Line", type:"Reef", coords:"-34.388000,20.875000", preset:true },
-      { id:"s9", name:"West Reef", type:"Reef", coords:"-34.415000,20.845000", preset:true },
-      { id:"s10", name:"Outer Bank", type:"Reef", coords:"-34.430500,20.835500", preset:true },
-      { id:"s11", name:"Middle Reef", type:"Reef", coords:"-34.392500,20.870500", preset:true },
-      { id:"s12", name:"North Bank", type:"Reef", coords:"-34.370000,20.860000", preset:true },
-      { id:"s13", name:"East Drift", type:"Reef", coords:"-34.398000,20.885000", preset:true },
-      { id:"s14", name:"Far North", type:"Reef", coords:"-34.360000,20.880000", preset:true },
-      { id:"s15", name:"Southwest Deep", type:"Reef", coords:"-34.430500,20.835500", preset:true },
-      { id:"s16", name:"Kob Kop", type:"Reef", coords:"-34.384200,20.866800", preset:true },
-      { id:"s17", name:"Kob Kop East", type:"Reef", coords:"-34.383100,20.872600", preset:true },
-      { id:"s18", name:"Rooibank", type:"Reef", coords:"-34.399800,20.852400", preset:true },
-      { id:"s19", name:"Rooibank South", type:"Reef", coords:"-34.406500,20.853900", preset:true },
-      { id:"s20", name:"Stomp Rif", type:"Reef", coords:"-34.389600,20.848800", preset:true },
-      { id:"s21", name:"Stomp Rif East", type:"Reef", coords:"-34.389200,20.856200", preset:true },
-      { id:"s22", name:"Outer Skulpbank", type:"Reef", coords:"-34.418700,20.828600", preset:true },
-      { id:"s23", name:"Skulpbank Noord", type:"Reef", coords:"-34.407900,20.832700", preset:true },
-      { id:"s24", name:"Roman Lip", type:"Reef", coords:"-34.412900,20.876400", preset:true },
-      { id:"s25", name:"Roman South Lip", type:"Reef", coords:"-34.417600,20.873500", preset:true },
-      { id:"s26", name:"Blinde Rif Noord", type:"Reef", coords:"-34.396100,20.878800", preset:true },
-      { id:"s27", name:"Blinde Rif Suid", type:"Reef", coords:"-34.406300,20.882900", preset:true },
-      { id:"s28", name:"Die Gat West", type:"Reef", coords:"-34.394000,20.839900", preset:true },
-      { id:"s29", name:"Die Gat East", type:"Reef", coords:"-34.395900,20.849300", preset:true },
-      { id:"s30", name:"Sand-Klip Lyn", type:"Spot", coords:"-34.387700,20.862300", preset:true },
-      { id:"s31", name:"Kabeljou Plaat", type:"Reef", coords:"-34.379600,20.864100", preset:true },
-      { id:"s32", name:"Kabeljou Plaat Suid", type:"Reef", coords:"-34.384900,20.868000", preset:true },
-      { id:"s33", name:"Vlak Rif", type:"Reef", coords:"-34.376800,20.855300", preset:true },
-      { id:"s34", name:"Vlak Rif East", type:"Reef", coords:"-34.377900,20.861600", preset:true },
-      { id:"s35", name:"Buffel Drift", type:"Spot", coords:"-34.402700,20.867800", preset:true },
-      { id:"s36", name:"Buffel Deep", type:"Reef", coords:"-34.409900,20.868600", preset:true },
-      { id:"s37", name:"Outer Kob Drift", type:"Spot", coords:"-34.391800,20.879500", preset:true },
-      { id:"s38", name:"Tail Bank", type:"Reef", coords:"-34.421800,20.861200", preset:true },
-      { id:"s39", name:"Tail Bank East", type:"Reef", coords:"-34.420200,20.870100", preset:true },
-      { id:"s40", name:"South Tail", type:"Reef", coords:"-34.428700,20.865400", preset:true },
-      { id:"s41", name:"North Tail", type:"Reef", coords:"-34.372400,20.872300", preset:true },
-      { id:"s42", name:"North Tail East", type:"Reef", coords:"-34.369300,20.878100", preset:true },
-      { id:"s43", name:"Verby Die Gat", type:"Reef", coords:"-34.398800,20.836100", preset:true },
-      { id:"s44", name:"Verby Die Gat Suid", type:"Reef", coords:"-34.404900,20.838700", preset:true },
-      { id:"s45", name:"West Klippe", type:"Reef", coords:"-34.410800,20.840600", preset:true },
-      { id:"s46", name:"Stilbaai Deep Line", type:"Spot", coords:"-34.425300,20.848200", preset:true },
-      { id:"s47", name:"Roman Drift", type:"Spot", coords:"-34.414800,20.879100", preset:true },
-      { id:"s48", name:"Die Lang Lyn", type:"Reef", coords:"-34.386000,20.882700", preset:true },
-      { id:"s49", name:"Die Lang Lyn Suid", type:"Reef", coords:"-34.392600,20.884500", preset:true },
-      { id:"s50", name:"Boesman Bank", type:"Reef", coords:"-34.423900,20.832000", preset:true }
+      { id:"s5", name:"Die Gat", type:"Reef", coords:"-34.395500,20.845000", preset:true }
     ];
 
     const MIN_SIZE = {
@@ -690,14 +624,12 @@
       "Silverfish":25,
       "Red Steenbras":60,
       "Yellow Belly":30,
-      "Galjoen":35,
       "Hottentot":22
     };
 
     const SPECIES_THREAT = {
       "Red Steenbras": { level:5, status:"Critically Endangered", short:"CR" },
       "Cape Kob": { level:4, status:"Endangered", short:"EN" },
-      "Galjoen": { level:3, status:"Collapsed stock / Check rules", short:"Collapsed" },
       "Red Roman": { level:2, status:"Use caution", short:"Check" },
       "Snapper": { level:2, status:"Use caution", short:"Check" },
       "Silverfish": { level:2, status:"Use caution", short:"Check" },
@@ -716,14 +648,13 @@
       "Silverfish": { best:"All year", note:"Often steady on reef when conditions are good.", closed:"Check current rules" },
       "Red Steenbras": { best:"Cooler months / reef edges", note:"Sensitive species. Handle carefully.", closed:"Closed season: 1 Sep - 30 Nov" },
       "Yellow Belly": { best:"All year", note:"Usually linked to reef structure and decent current.", closed:"Check current rules" },
-      "Galjoen": { best:"Winter to early Spring", note:"Mostly shore / rocky structure species.", closed:"Closed season: 15 Oct - end Feb" },
       "Hottentot": { best:"All year", note:"Common reef fish in workable conditions.", closed:"Check current rules" }
     };
 
     const SPECIES_TIPS = [
       { species:"Cape Kob", method:"Anchor", bait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly", depth:"20m – 50m", time:"Early morning, late afternoon, pushing tide, new/full moon", rig:"2-hook bottom rig or live bait rig", note:"Best on reef edges, gullies and sandy channels." },
       { species:"Yellowtail", method:"Drift", bait:"Live Makriel, Pilchard strip, Metal spoon, Surface plug", depth:"Surface – 40m", time:"Early morning when birds are working", rig:"Spinning lure rig or live bait trace", note:"Work birds, bait balls and pinnacles." },
-      { species:"Bonito", method:"Drift", bait:"Pilchard strip, small spoon, feather lure", depth:"Surface – 30m", time:"Morning feeding schools", rig:"Small spoon / feather rig", note:"Usually mid-water schools." },
+      { species:"Bonito", method:"Drift", bait:"Pilchard strip, Small spoon, Feather lure", depth:"Surface – 30m", time:"Morning feeding schools", rig:"Small spoon / feather rig", note:"Usually mid-water schools." },
       { species:"Red Roman", method:"Anchor", bait:"Chokka, Pilchard, Octopus", depth:"25m – 60m", time:"Morning or late afternoon", rig:"2-hook bottom rig", note:"Fish tight to reef structure." },
       { species:"Snapper", method:"Anchor", bait:"Chokka, Pilchard, Redbait", depth:"20m – 50m", time:"Morning bite window", rig:"Short snoot bottom rig", note:"Keep bait on reef bottom." },
       { species:"Silverfish", method:"Anchor", bait:"Chokka strip, Pilchard strip", depth:"20m – 45m", time:"Morning and slack tide", rig:"Light bottom rig", note:"Usually caught on reef bottom." },
@@ -756,15 +687,6 @@
 
     let photoData = "";
     let fishPhotoData = "";
-    let map, osm, satLayer, satOn = false;
-    let catchMarkers = [];
-    let spotMarkers = [];
-    let reefOverlayMarkers = [];
-    let routeLine = null;
-    let myBoatMarker = null;
-    let tempClickMarker = null;
-    let navTargetMarker = null;
-    let reefOverlayOn = false;
     let lastDetectedFish = null;
     let lastWindDir = "—";
     let routeChain = [];
@@ -881,12 +803,6 @@
     function getFishHelpers(){ return getJSON(KEY_FISH, []); }
     function saveFishHelpers(v){ setJSON(KEY_FISH, v); }
 
-    function clearLayers(arr){
-      if(!map) return;
-      arr.forEach(m => { try{ map.removeLayer(m); }catch{} });
-      arr.length = 0;
-    }
-
     function normalizeName(name){
       return String(name || "").trim().toLowerCase();
     }
@@ -946,23 +862,17 @@
       if(state.status === "CLOSED NOW"){
         box.innerHTML = `
           <span class="threatBadge ${state.colorClass}">${state.status}</span>
-          <div class="mini" style="margin-top:6px;">
-            ${safe(sp)} closed season: ${safe(season.closed)}
-          </div>
+          <div class="mini" style="margin-top:6px;">${safe(sp)} closed season: ${safe(season.closed)}</div>
         `;
       } else if(state.status === "OPEN NOW"){
         box.innerHTML = `
           <span class="threatBadge ${state.colorClass}">${state.status}</span>
-          <div class="mini" style="margin-top:6px;">
-            Best season: ${safe(season.best)}
-          </div>
+          <div class="mini" style="margin-top:6px;">Best season: ${safe(season.best)}</div>
         `;
       } else {
         box.innerHTML = `
           <span class="threatBadge ${state.colorClass}">${state.status}</span>
-          <div class="mini" style="margin-top:6px;">
-            Closed season not confirmed here. Always check current rules.
-          </div>
+          <div class="mini" style="margin-top:6px;">Closed season not confirmed here. Always check current rules.</div>
         `;
       }
     }
@@ -973,14 +883,12 @@
       const tip = getSpeciesTip(selectedSpecies);
       fillBaitPick();
       if(tip && tip.bait){
-        if(BAIT_OPTIONS.includes(tip.bait)){
-          baitEl.value = tip.bait;
+        const first = String(tip.bait).split(",").map(x => x.trim()).filter(Boolean)[0] || "";
+        if(BAIT_OPTIONS.includes(first)){
+          baitEl.value = first;
         } else {
-          const opt = document.createElement("option");
-          opt.value = tip.bait;
-          opt.textContent = tip.bait;
-          baitEl.appendChild(opt);
-          baitEl.value = tip.bait;
+          baitEl.value = "";
+          manualBaitEl.value = first;
         }
       } else {
         baitEl.value = "";
@@ -1082,12 +990,9 @@
     function fillNextSpotPick(){
       const sel = document.getElementById("nextSpotPick");
       if(!sel) return;
-
       const current = sel.value || "";
       const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-
       sel.innerHTML = `<option value="">Choose next spot</option>`;
-
       spots.forEach(sp => {
         const label = `${sp.name} (${sp.type}${isPresetSpot(sp) ? " • Preset" : " • Custom"})`;
         const opt = document.createElement("option");
@@ -1095,21 +1000,15 @@
         opt.textContent = label;
         sel.appendChild(opt);
       });
-
-      if([...sel.options].some(o => o.value === current)){
-        sel.value = current;
-      }
+      if([...sel.options].some(o => o.value === current)) sel.value = current;
     }
 
     function fillRouteChainPick(){
       const sel = document.getElementById("routeChainPick");
       if(!sel) return;
-
       const current = sel.value || "";
       const spots = getAllSpots().slice().sort((a,b)=>String(a.name).localeCompare(String(b.name)));
-
       sel.innerHTML = `<option value="">Add spot to route chain</option>`;
-
       spots.forEach(sp => {
         const label = `${sp.name} (${sp.type}${isPresetSpot(sp) ? " • Preset" : " • Custom"})`;
         const opt = document.createElement("option");
@@ -1117,10 +1016,7 @@
         opt.textContent = label;
         sel.appendChild(opt);
       });
-
-      if([...sel.options].some(o => o.value === current)){
-        sel.value = current;
-      }
+      if([...sel.options].some(o => o.value === current)) sel.value = current;
     }
 
     function addAreaOptionIfMissing(areaName){
@@ -1168,13 +1064,6 @@
       }).length;
     }
 
-    function getSpotMarkerColor(spot){
-      const count = getSpotCatchCount(spot);
-      if(count >= 5) return "#ff8c42";
-      if(count >= 2) return "#ffd166";
-      return spot.type === "Reef" ? "#ffd166" : "#59d0ff";
-    }
-
     function getSpotHeatLabel(spot){
       const count = getSpotCatchCount(spot);
       if(count >= 5) return "Hot Spot";
@@ -1209,7 +1098,6 @@
       document.querySelectorAll(".navbtn").forEach(b => b.classList.remove("active"));
       const mapIds = {
         add:"btnAdd",
-        mapTab:"btnMap",
         navigateTab:"btnNavigate",
         driftTab:"btnDrift",
         spots:"btnSpots",
@@ -1228,13 +1116,6 @@
       fillBaitPick();
       fillLocalAreaPick();
 
-      if(id === "mapTab"){
-        initMap();
-        setTimeout(() => {
-          map.invalidateSize();
-          renderMap();
-        }, 200);
-      }
       if(id === "navigateTab"){
         fillNextSpotPick();
         fillRouteChainPick();
@@ -1295,22 +1176,10 @@
       const coordStr = e.target.value;
       if(!coordStr) return;
       coordsEl.value = coordStr;
-
       const s = getAllSpots().find(x => x.coords === coordStr);
       if(s){
         addAreaOptionIfMissing(s.name);
         updateWhereCaughtDisplay(s.type || "Area");
-      }
-
-      const p = parseCoords(coordStr);
-      if(p){
-        saveWeatherCoords(p.lat, p.lng);
-        estimateCurrentStrength(p.lat, p.lng).then(() => {
-          renderWeatherPanel();
-          render14DayWeather();
-          renderDriftPanel();
-          renderFishingMeter();
-        });
       }
     });
 
@@ -1333,11 +1202,6 @@
       return dirs[Math.round(deg / 45) % 8];
     }
 
-    function compassToArrow(dir){
-      const map = { "N":"↑","NE":"↗","E":"→","SE":"↘","S":"↓","SW":"↙","W":"←","NW":"↖","—":"•" };
-      return map[dir] || "•";
-    }
-
     function oppositeCompass(dir){
       const opposite = { "N":"S","NE":"SW","E":"W","SE":"NW","S":"N","SW":"NE","W":"E","NW":"SE","—":"—" };
       return opposite[dir] || "—";
@@ -1347,13 +1211,11 @@
       const R = 6371;
       const dLat = (lat2 - lat1) * Math.PI / 180;
       const dLon = (lon2 - lon1) * Math.PI / 180;
-
       const a =
         Math.sin(dLat/2) * Math.sin(dLat/2) +
         Math.cos(lat1 * Math.PI / 180) *
         Math.cos(lat2 * Math.PI / 180) *
         Math.sin(dLon/2) * Math.sin(dLon/2);
-
       const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a));
       return R * c;
     }
@@ -1363,12 +1225,10 @@
       const φ2 = lat2 * Math.PI / 180;
       const λ1 = lon1 * Math.PI / 180;
       const λ2 = lon2 * Math.PI / 180;
-
       const y = Math.sin(λ2 - λ1) * Math.cos(φ2);
       const x =
         Math.cos(φ1) * Math.sin(φ2) -
         Math.sin(φ1) * Math.cos(φ2) * Math.cos(λ2 - λ1);
-
       let brng = Math.atan2(y, x) * 180 / Math.PI;
       brng = (brng + 360) % 360;
       return brng;
@@ -1389,6 +1249,16 @@
       return `${m} min`;
     }
 
+    function openCoordsInGoogleMaps(coordStr){
+      const p = parseCoords(coordStr);
+      if(!p){
+        alert("Invalid coordinates.");
+        return;
+      }
+      const url = `https://www.google.com/maps?q=${p.lat},${p.lng}`;
+      window.open(url, "_blank");
+    }
+
     async function estimateCurrentStrength(lat, lon){
       try{
         const weatherUrl = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=wind_speed_10m,wind_direction_10m&timezone=Africa%2FJohannesburg`;
@@ -1404,7 +1274,6 @@
         const swell = Number(m?.current?.swell_wave_height || 0);
 
         lastWindDir = degreesToCompass(windDirDeg);
-
         chipWind.textContent = `Wind: ${wind.toFixed(0)} km/h ${lastWindDir}`;
         chipSwell.textContent = `Swell: ${swell.toFixed(2)} m`;
         chipTemp.textContent = `Sea Temp: ${Number(m?.current?.sea_surface_temperature || 0).toFixed(1)} °C`;
@@ -1448,32 +1317,16 @@
           <div class="chip">Suggested Drift: ${safe(driftDir)}</div>
           <div class="chip">${safe(driftLabel)}</div>
         </div>
-
-        <div class="driftArrow">${compassToArrow(driftDir)}</div>
-        <div class="mini" style="text-align:center;">Likely drift direction</div>
+        <div class="driftArrow">${driftDir}</div>
         <div class="mini" style="margin-top:10px;">${safe(setup)}</div>
-
-        <div class="compassGrid">
-          <div class="compassCell">NW ↖</div>
-          <div class="compassCell">N ↑</div>
-          <div class="compassCell">NE ↗</div>
-          <div class="compassCell">W ←</div>
-          <div class="compassCell">•</div>
-          <div class="compassCell">E →</div>
-          <div class="compassCell">SW ↙</div>
-          <div class="compassCell">S ↓</div>
-          <div class="compassCell">SE ↘</div>
-        </div>
       `;
     }
 
     function calculateFishingScore(){
       let score = 50;
-
       const wind = getChipNumber(chipWind.textContent);
       const swell = getChipNumber(chipSwell.textContent);
       const current = getChipNumber(chipCurrent.textContent);
-
       const moonBoost = getMoonBoost(new Date());
       score += moonBoost;
 
@@ -1495,8 +1348,7 @@
         else score -= 10;
       }
 
-      score = Math.max(0, Math.min(100, Math.round(score)));
-      return score;
+      return Math.max(0, Math.min(100, Math.round(score)));
     }
 
     function renderFishingMeter(){
@@ -1540,7 +1392,6 @@
       navigator.geolocation.getCurrentPosition(pos => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-
         coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
         saveWeatherCoords(lat, lng);
 
@@ -1554,12 +1405,6 @@
         const box = document.getElementById("navInfoBox");
         if(box){
           box.innerHTML = `<div class="chip">Current: ${lat.toFixed(6)}, ${lng.toFixed(6)}</div>`;
-        }
-
-        if(map){
-          if(myBoatMarker) map.removeLayer(myBoatMarker);
-          myBoatMarker = L.marker([lat, lng]).addTo(map);
-          myBoatMarker.bindPopup("Your Boat");
         }
       }, () => {
         alert("Could not get current location");
@@ -1595,22 +1440,20 @@
       const bearing = calcBearing(currentPos.lat, currentPos.lng, nextPos.lat, nextPos.lng);
       const eta = calcETA(distanceKm, speed);
 
-      const box = document.getElementById("navInfoBox");
-      if(box){
-        box.innerHTML = `
-          <div class="card">
-            <b>Navigation Ready</b>
-            <div class="mini" style="margin-top:8px;">From: ${safe(coordsEl.value)}</div>
-            <div class="mini">To: ${safe(targetSpot?.name || "Next Spot")}</div>
-            <div class="mini mono">Target: ${safe(nextCoords)}</div>
-            <div class="mini" style="margin-top:8px;"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
-            <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
-            <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
+      document.getElementById("navInfoBox").innerHTML = `
+        <div class="card">
+          <b>Navigation Ready</b>
+          <div class="mini" style="margin-top:8px;">From: ${safe(coordsEl.value)}</div>
+          <div class="mini">To: ${safe(targetSpot?.name || "Next Spot")}</div>
+          <div class="mini mono">Target: ${safe(nextCoords)}</div>
+          <div class="mini" style="margin-top:8px;"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
+          <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
+          <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
+          <div class="row">
+            <button onclick="openCoordsInGoogleMaps('${safe(nextCoords)}')">Open in Google Maps</button>
           </div>
-        `;
-      }
-
-      navigateToSpotInternal(nextPos.lat, nextPos.lng);
+        </div>
+      `;
     }
 
     function addSpotToRouteChain(){
@@ -1667,8 +1510,7 @@
       routeChain = [];
       routeChainIndex = 0;
       renderRouteChainList();
-      const box = document.getElementById("navInfoBox");
-      if(box) box.innerHTML = "";
+      document.getElementById("navInfoBox").innerHTML = "";
     }
 
     function startRouteChain(){
@@ -1689,15 +1531,12 @@
 
     function navigateToRouteChainStep(fromLat, fromLng){
       if(routeChainIndex >= routeChain.length){
-        const box = document.getElementById("navInfoBox");
-        if(box){
-          box.innerHTML = `
-            <div class="card">
-              <b>Route Chain Complete</b>
-              <div class="mini" style="margin-top:8px;">All route points done.</div>
-            </div>
-          `;
-        }
+        document.getElementById("navInfoBox").innerHTML = `
+          <div class="card">
+            <b>Route Chain Complete</b>
+            <div class="mini" style="margin-top:8px;">All route points done.</div>
+          </div>
+        `;
         return;
       }
 
@@ -1710,24 +1549,20 @@
       const bearing = calcBearing(fromLat, fromLng, p.lat, p.lng);
       const eta = calcETA(distanceKm, speed);
 
-      const box = document.getElementById("navInfoBox");
-      if(box){
-        box.innerHTML = `
-          <div class="card">
-            <b>Route Step ${routeChainIndex + 1} of ${routeChain.length}</b>
-            <div class="mini" style="margin-top:8px;"><b>Next Spot:</b> ${safe(target.name)}</div>
-            <div class="mini mono">${safe(target.coords)}</div>
-            <div class="mini"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
-            <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
-            <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
-            <div class="row">
-              <button onclick="markRouteStepDone()">Next Reached</button>
-            </div>
+      document.getElementById("navInfoBox").innerHTML = `
+        <div class="card">
+          <b>Route Step ${routeChainIndex + 1} of ${routeChain.length}</b>
+          <div class="mini" style="margin-top:8px;"><b>Next Spot:</b> ${safe(target.name)}</div>
+          <div class="mini mono">${safe(target.coords)}</div>
+          <div class="mini"><b>Distance:</b> ${distanceKm.toFixed(2)} km</div>
+          <div class="mini"><b>Bearing:</b> ${bearing.toFixed(0)}° (${bearingToCompass(bearing)})</div>
+          <div class="mini"><b>ETA:</b> ${safe(eta)} at ${speed || 0} km/h</div>
+          <div class="row">
+            <button onclick="openCoordsInGoogleMaps('${safe(target.coords)}')">Open in Google Maps</button>
+            <button class="dark" onclick="markRouteStepDone()">Next Reached</button>
           </div>
-        `;
-      }
-
-      navigateToSpotInternal(p.lat, p.lng);
+        </div>
+      `;
     }
 
     function markRouteStepDone(){
@@ -1759,7 +1594,6 @@
       navigator.geolocation.getCurrentPosition(async pos => {
         const lat = pos.coords.latitude;
         const lng = pos.coords.longitude;
-
         coordsEl.value = lat.toFixed(6) + "," + lng.toFixed(6);
         saveWeatherCoords(lat, lng);
 
@@ -1773,15 +1607,7 @@
           placeEl.value = "Deep Sea";
         }
 
-        if(map){
-          if(myBoatMarker) map.removeLayer(myBoatMarker);
-          myBoatMarker = L.marker([lat,lng]).addTo(map);
-          myBoatMarker.bindPopup("Your Boat").openPopup();
-          map.setView([lat,lng],13);
-        }
-
         await estimateCurrentStrength(lat, lng);
-        renderMap();
         renderWeatherPanel();
         render14DayWeather();
         renderDriftPanel();
@@ -1864,7 +1690,6 @@
       clearCatchForm();
       renderLog();
       renderStats();
-      renderMap();
       renderSpots();
       renderWeatherPanel();
       render14DayWeather();
@@ -1903,42 +1728,27 @@
       } else {
         updateWhereCaughtDisplay("Area");
       }
-
-      const p = parseCoords(coordStr);
-      if(p){
-        saveWeatherCoords(p.lat, p.lng);
-        estimateCurrentStrength(p.lat, p.lng).then(() => {
-          renderWeatherPanel();
-          render14DayWeather();
-          renderDriftPanel();
-          renderFishingMeter();
-        });
-      }
       showTab("add");
-    }
-
-    function navAreaMap(coordStr, areaName){
-      const p = parseCoords(coordStr);
-      if(!p) return;
-      addAreaOptionIfMissing(areaName);
-      navigateToSpot(p.lat, p.lng);
     }
 
     function useSuggestedBait(speciesName, baitText){
       species.value = speciesName || "";
       fillBaitPick();
 
-      if(BAIT_OPTIONS.includes(baitText)){
-        baitEl.value = baitText;
+      const baitParts = String(baitText || "").split(",").map(x => x.trim()).filter(Boolean);
+      const firstBait = baitParts[0] || "";
+
+      if(firstBait && BAIT_OPTIONS.includes(firstBait)){
+        baitEl.value = firstBait;
+        manualBaitEl.value = "";
+      } else if(firstBait){
+        baitEl.value = "";
+        manualBaitEl.value = firstBait;
       } else {
-        const opt = document.createElement("option");
-        opt.value = baitText;
-        opt.textContent = baitText;
-        baitEl.appendChild(opt);
-        baitEl.value = baitText;
+        baitEl.value = "";
+        manualBaitEl.value = "";
       }
 
-      manualBaitEl.value = "";
       updateMinSize();
       renderSeasonWarning();
       showTab("add");
@@ -1964,7 +1774,6 @@
         "Silverfish":0,
         "Red Steenbras":0,
         "Yellow Belly":0,
-        "Galjoen":0,
         "Hottentot":0
       };
 
@@ -1982,7 +1791,6 @@
         scores["Red Roman"] += 4;
         scores["Snapper"] += 4;
         scores["Red Steenbras"] += 3;
-        scores["Galjoen"] += 3;
         scores["Hottentot"] += 3;
       }
 
@@ -2001,7 +1809,6 @@
         scores["Yellow Belly"] += 2;
       }
       if(colour === "brown"){
-        scores["Galjoen"] += 4;
         scores["Hottentot"] += 3;
       }
 
@@ -2015,7 +1822,6 @@
         scores["Hottentot"] += 2;
       }
       if(pattern === "bars"){
-        scores["Galjoen"] += 3;
         scores["Yellow Belly"] += 2;
       }
 
@@ -2057,9 +1863,7 @@
       fishRecognitionResult.innerHTML = `
         <div class="card">
           <b>Most Likely Fish:</b> ${safe(best[0])}
-          <div>
-            <span class="threatBadge ${confClass}">${safe(confidence)} confidence</span>
-          </div>
+          <div><span class="threatBadge ${confClass}">${safe(confidence)} confidence</span></div>
           <div class="mini" style="margin-top:8px;">2nd guess: ${safe(ranked[1]?.[0] || "—")}</div>
           <div class="mini">3rd guess: ${safe(ranked[2]?.[0] || "—")}</div>
         </div>
@@ -2069,10 +1873,6 @@
     function copyDetectedFishToCatch(){
       if(!lastDetectedFish || !lastDetectedFish.species){
         alert("Analyze fish first.");
-        return;
-      }
-      if(lastDetectedFish.species === "Galjoen"){
-        alert("Galjoen kept in Boat Guide / notes.");
         return;
       }
       species.value = lastDetectedFish.species;
@@ -2107,11 +1907,13 @@
           ${c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : ""}
           <div class="row">
             <button class="btn-use">Use Log</button>
+            <button class="dark btn-open-gmaps">Google Maps</button>
             <button class="dark btn-edit">Edit</button>
             <button class="danger btn-delete">Delete</button>
           </div>
         `;
         wrap.querySelector(".btn-use").onclick = () => useLogCoords(c.coords);
+        wrap.querySelector(".btn-open-gmaps").onclick = () => openCoordsInGoogleMaps(c.coords);
         wrap.querySelector(".btn-edit").onclick = () => editCatch(c.id);
         wrap.querySelector(".btn-delete").onclick = () => deleteCatch(c.id);
         box.appendChild(wrap);
@@ -2124,28 +1926,17 @@
         alert("No valid coordinates in this log entry.");
         return;
       }
-
       coordsEl.value = coordStr;
-      saveWeatherCoords(p.lat, p.lng);
-
-      estimateCurrentStrength(p.lat, p.lng).then(() => {
-        renderWeatherPanel();
-        render14DayWeather();
-        renderDriftPanel();
-        renderFishingMeter();
-      });
-
-      showTab("mapTab");
-      setTimeout(() => {
-        map.setView([p.lat, p.lng], 15);
-        if(tempClickMarker) map.removeLayer(tempClickMarker);
-        tempClickMarker = L.marker([p.lat, p.lng]).addTo(map);
-        if(!satOn){
-          satOn = true;
-          if(map.hasLayer(osm)) map.removeLayer(osm);
-          satLayer.addTo(map);
-        }
-      }, 250);
+      showTab("navigateTab");
+      document.getElementById("navInfoBox").innerHTML = `
+        <div class="card">
+          <b>Log Coordinates Loaded</b>
+          <div class="mini mono">${safe(coordStr)}</div>
+          <div class="row">
+            <button onclick="openCoordsInGoogleMaps('${safe(coordStr)}')">Open in Google Maps</button>
+          </div>
+        </div>
+      `;
     }
 
     function editCatch(id){
@@ -2180,12 +1971,10 @@
       } else {
         placeEl.value = c.place || "Deep Sea";
       }
+
       notesEl.value = c.notes || "";
       photoData = c.photo || "";
       photoPreview.innerHTML = c.photo ? `<img class="photo" src="${c.photo}" alt="fish">` : "";
-
-      const p = parseCoords(c.coords);
-      if(p) saveWeatherCoords(p.lat, p.lng);
 
       saveAllCatches(list.filter(x => String(x.id) !== String(id)));
       renderSeasonWarning();
@@ -2198,7 +1987,6 @@
       saveAllCatches(getAllCatches().filter(c => String(c.id) !== String(id)));
       renderLog();
       renderStats();
-      renderMap();
       renderSpots();
       renderWeatherPanel();
       render14DayWeather();
@@ -2229,7 +2017,6 @@
           bySpot[spotKey] = { count:0, coords:c.coords || "" };
         }
         bySpot[spotKey].count += 1;
-        if(!bySpot[spotKey].coords && c.coords) bySpot[spotKey].coords = c.coords;
       });
 
       box.innerHTML = "";
@@ -2265,199 +2052,27 @@
           <div class="mini"><b>${idx + 1}. ${safe(spot)}</b> — ${data.count} catches</div>
           ${data.coords ? `<div class="mini mono">📍 ${safe(data.coords)}</div>` : ""}
           <div class="row">
-            ${data.coords ? `<button class="btn-open">Open Map</button>` : ""}
+            ${data.coords ? `<button class="btn-open">Google Maps</button>` : ""}
             ${data.coords ? `<button class="dark btn-area">Use Area</button>` : ""}
             ${data.coords ? `<button class="dark btn-nav">Navigate</button>` : ""}
           </div>
         `;
         if(data.coords){
-          item.querySelector(".btn-open").onclick = () => goToSpotOnMap(data.coords);
+          item.querySelector(".btn-open").onclick = () => openCoordsInGoogleMaps(data.coords);
           item.querySelector(".btn-area").onclick = () => useBestSpot(data.coords, spot);
-          item.querySelector(".btn-nav").onclick = () => navAreaMap(data.coords, spot);
+          item.querySelector(".btn-nav").onclick = () => {
+            showTab("navigateTab");
+            document.getElementById("nextSpotPick").value = data.coords;
+          };
         }
         bestCard.appendChild(item);
       });
     }
 
-    function initMap(){
-      if(map) return;
-
-      map = L.map("map").setView([BASE.lat, BASE.lng], 10);
-      osm = L.tileLayer("https://{s}.tile.openstreetmap.org/{z}/{y}/{x}.png", { maxZoom: 19 }).addTo(map);
-      satLayer = L.tileLayer(
-        "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
-        { maxZoom: 19 }
-      );
-
-      map.on("click", e => {
-        const lat = e.latlng.lat.toFixed(6);
-        const lng = e.latlng.lng.toFixed(6);
-
-        coordsEl.value = lat + "," + lng;
-        placeEl.value = "Deep Sea";
-        saveWeatherCoords(Number(lat), Number(lng));
-
-        const nearest = getNearestSpot(Number(lat), Number(lng));
-        if(nearest){
-          manualSpotPick.value = nearest.coords;
-          addAreaOptionIfMissing(nearest.name);
-          updateWhereCaughtDisplay(nearest.type || "Area");
-        } else {
-          const typedArea = prompt("Area name for this map spot?", "");
-          if(typedArea !== null && typedArea.trim()){
-            addAreaOptionIfMissing(typedArea.trim());
-            updateWhereCaughtDisplay("Area");
-          }
-        }
-
-        if(tempClickMarker) map.removeLayer(tempClickMarker);
-        tempClickMarker = L.marker([lat, lng]).addTo(map);
-        map.setView([lat, lng], 15);
-      });
-    }
-
-    function renderMap(){
-      if(!map) return;
-      clearLayers(catchMarkers);
-      clearLayers(spotMarkers);
-      clearLayers(reefOverlayMarkers);
-
-      getAllCatches().slice(-100).forEach(c => {
-        const p = parseCoords(c.coords);
-        if(!p) return;
-        const m = L.circleMarker([p.lat, p.lng], {
-          radius: 6, color: "#59d0ff", weight: 2, fillOpacity: 0.8
-        }).addTo(map);
-
-        m.bindPopup(`
-          <b>${safe(c.species)}</b><br>
-          ${safe(c.coords || "")}<br>
-          Area: ${safe(c.localArea || "Unknown")}
-        `);
-        catchMarkers.push(m);
-      });
-
-      getAllSpots().forEach(s => {
-        const p = parseCoords(s.coords);
-        if(!p) return;
-
-        const count = getSpotCatchCount(s);
-        const color = getSpotMarkerColor(s);
-        const sourceLabel = isPresetSpot(s) ? "Preset" : "Custom";
-        const heatLabel = getSpotHeatLabel(s);
-
-        const m = L.circleMarker([p.lat, p.lng], {
-          radius: count >= 5 ? 10 : count >= 2 ? 9 : 8,
-          color: color, weight:2, fillOpacity:0.75
-        }).addTo(map);
-
-        m.bindPopup(`
-          <b>${safe(s.type)} • ${safe(s.name)}</b><br>
-          <span class="mini mono">${safe(s.coords)}</span><br>
-          <span class="mini">Source: ${safe(sourceLabel)}</span><br>
-          <span class="mini">Catches here: ${count}</span><br>
-          <span class="mini">Status: ${safe(heatLabel)}</span><br><br>
-          <button onclick="window.useBestSpotFromPopup('${safe(s.coords)}', '${safe(s.name)}')">Use Area</button>
-          <button onclick="window.navigateToSpotFromPopup(${p.lat}, ${p.lng})">Navigate</button>
-        `);
-        spotMarkers.push(m);
-      });
-
-      if(reefOverlayOn) renderReefOverlay();
-    }
-
-    window.useBestSpotFromPopup = function(coordStr, areaName){
-      useBestSpot(coordStr, areaName);
-    };
-
-    window.navigateToSpotFromPopup = function(lat, lng){
-      navigateToSpotInternal(lat, lng);
-    };
-
-    function toggleSatellite(){
-      if(!map) return;
-      satOn = !satOn;
-      if(satOn){
-        if(map.hasLayer(osm)) map.removeLayer(osm);
-        satLayer.addTo(map);
-      } else {
-        if(map.hasLayer(satLayer)) map.removeLayer(satLayer);
-        osm.addTo(map);
-      }
-    }
-
-    function clearRouteLine(){
-      if(routeLine && map){
-        map.removeLayer(routeLine);
-        routeLine = null;
-      }
-      if(myBoatMarker && map){
-        map.removeLayer(myBoatMarker);
-        myBoatMarker = null;
-      }
-      if(navTargetMarker && map){
-        map.removeLayer(navTargetMarker);
-        navTargetMarker = null;
-      }
-    }
-
-    function navigateToSpotInternal(lat, lng){
-      showTab("mapTab");
-      setTimeout(() => {
-        if(!map) return;
-
-        navigator.geolocation.getCurrentPosition(pos => {
-          const myLat = pos.coords.latitude;
-          const myLng = pos.coords.longitude;
-          const targetLat = Number(lat);
-          const targetLng = Number(lng);
-
-          clearRouteLine();
-
-          if(!satOn){
-            satOn = true;
-            if(map.hasLayer(osm)) map.removeLayer(osm);
-            satLayer.addTo(map);
-          }
-
-          myBoatMarker = L.marker([myLat, myLng]).addTo(map);
-          myBoatMarker.bindPopup("Your Boat");
-
-          navTargetMarker = L.marker([targetLat, targetLng]).addTo(map);
-          navTargetMarker.bindPopup("Target Spot");
-
-          routeLine = L.polyline([[myLat, myLng],[targetLat, targetLng]], { color:"red", weight:4 }).addTo(map);
-
-          const km = calcDistanceKm(myLat, myLng, targetLat, targetLng).toFixed(2);
-          map.fitBounds(routeLine.getBounds(), { padding:[30,30] });
-
-          setTimeout(() => {
-            L.popup()
-              .setLatLng([targetLat, targetLng])
-              .setContent(`
-                <b>Navigation Loaded</b><br>
-                Spot: ${targetLat.toFixed(6)}, ${targetLng.toFixed(6)}<br>
-                Distance: ${km} km
-              `)
-              .openOn(map);
-          }, 250);
-        }, () => {
-          alert("Could not get current location for navigation.");
-        }, {
-          enableHighAccuracy:true,
-          timeout:10000
-        });
-      }, 250);
-    }
-
-    function navigateToSpot(lat, lng){
-      navigateToSpotInternal(lat, lng);
-    }
-
     function saveSpotFromCoords(){
       const c = coordsEl.value;
       if(!c){
-        alert("Choose a spot on the map or get GPS first.");
+        alert("Get GPS first.");
         return;
       }
 
@@ -2496,7 +2111,6 @@
       fillNextSpotPick();
       fillRouteChainPick();
       renderSpots();
-      renderMap();
     }
 
     function renderSpots(){
@@ -2521,7 +2135,6 @@
       }
 
       spots.forEach(s => {
-        const p = parseCoords(s.coords);
         const preset = isPresetSpot(s);
         const count = getSpotCatchCount(s);
         const heat = getSpotHeatLabel(s);
@@ -2537,7 +2150,7 @@
           </div>
           <div class="mini mono">📍 ${safe(s.coords)}</div>
           <div class="row">
-            <button class="btn-open-map">Open on Map</button>
+            <button class="btn-open-map">Open in Google Maps</button>
             <button class="dark btn-use-spot">Use Spot</button>
             <button class="dark btn-nav">Navigate</button>
             ${preset ? `<button class="locked" disabled>Preset Locked</button>` : `<button class="dark btn-edit">Edit</button>`}
@@ -2545,7 +2158,7 @@
           </div>
         `;
 
-        wrap.querySelector(".btn-open-map").onclick = () => goToSpotOnMap(s.coords);
+        wrap.querySelector(".btn-open-map").onclick = () => openCoordsInGoogleMaps(s.coords);
         wrap.querySelector(".btn-use-spot").onclick = () => useSpotCoords(s.coords, s.name, s.type);
         wrap.querySelector(".btn-nav").onclick = () => {
           document.getElementById("nextSpotPick").value = s.coords;
@@ -2560,33 +2173,11 @@
       });
     }
 
-    function goToSpotOnMap(coordStr){
-      const p = parseCoords(coordStr);
-      if(!p) return;
-      showTab("mapTab");
-      setTimeout(() => {
-        map.setView([p.lat,p.lng], 15);
-        if(tempClickMarker) map.removeLayer(tempClickMarker);
-        tempClickMarker = L.marker([p.lat,p.lng]).addTo(map);
-      }, 200);
-    }
-
     function useSpotCoords(coordStr, name, type){
       coordsEl.value = coordStr;
       manualSpotPick.value = coordStr;
       addAreaOptionIfMissing(name);
       updateWhereCaughtDisplay(type || "Area");
-
-      const p = parseCoords(coordStr);
-      if(p){
-        saveWeatherCoords(p.lat, p.lng);
-        estimateCurrentStrength(p.lat, p.lng).then(() => {
-          renderWeatherPanel();
-          render14DayWeather();
-          renderDriftPanel();
-          renderFishingMeter();
-        });
-      }
       showTab("add");
     }
 
@@ -2613,7 +2204,6 @@
       fillNextSpotPick();
       fillRouteChainPick();
       renderSpots();
-      renderMap();
     }
 
     function deleteSpot(id){
@@ -2629,7 +2219,6 @@
         fillNextSpotPick();
         fillRouteChainPick();
         renderSpots();
-        renderMap();
         return;
       }
 
@@ -2642,30 +2231,6 @@
       fillNextSpotPick();
       fillRouteChainPick();
       renderSpots();
-      renderMap();
-    }
-
-    function toggleReefOverlay(){
-      reefOverlayOn = !reefOverlayOn;
-      renderMap();
-    }
-
-    function renderReefOverlay(){
-      const spots = getAllSpots().filter(s => s.type === "Reef");
-      spots.forEach(s => {
-        const p = parseCoords(s.coords);
-        if(!p) return;
-        const m = L.circle([p.lat, p.lng], {
-          radius: 700,
-          color: "#ffd166",
-          weight: 2,
-          fillColor: "#ffd166",
-          fillOpacity: 0.22
-        }).addTo(map);
-
-        m.bindPopup(`<b>Reef Area</b><br>${safe(s.name)}`);
-        reefOverlayMarkers.push(m);
-      });
     }
 
     function saveFishHelper(){
@@ -2740,7 +2305,7 @@
       const item = getFishHelpers().find(x => String(x.id) === String(id));
       if(!item) return;
 
-      if(item.species && item.species !== "Galjoen"){
+      if(item.species){
         species.value = item.species;
         minSizeEl.value = MIN_SIZE[item.species] ?? "";
         checkFishSize();
@@ -2767,7 +2332,7 @@
         return;
       }
 
-      if(sp && sp !== "Galjoen"){
+      if(sp){
         species.value = sp;
         minSizeEl.value = MIN_SIZE[sp] ?? "";
         checkFishSize();
@@ -2794,7 +2359,6 @@
         <b>Threat Colour Guide</b>
         <div style="margin-top:8px;"><span class="threatBadge threat-5">CR</span> <span class="mini">Highest concern</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-4">EN</span> <span class="mini">Very high concern</span></div>
-        <div style="margin-top:6px;"><span class="threatBadge threat-3">Collapsed</span> <span class="mini">Collapsed / sensitive stock</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-2">Check</span> <span class="mini">Check carefully</span></div>
         <div style="margin-top:6px;"><span class="threatBadge threat-1">Open</span> <span class="mini">Open now / lower concern</span></div>
       `;
@@ -2803,7 +2367,6 @@
       [...SPECIES_TIPS]
         .sort((a, b) => getThreatInfo(b.species).level - getThreatInfo(a.species).level)
         .forEach(item => {
-          const isAnchor = item.method === "Anchor";
           const threat = getThreatInfo(item.species);
           const threatClass = getThreatClass(threat.level);
           const season = getSeasonInfo(item.species);
@@ -2813,13 +2376,11 @@
           card.className = "card";
           card.innerHTML = `
             <b>${safe(item.species)}</b>
-
             <div style="margin-top:6px;">
-              <span class="tag ${isAnchor ? "preset" : "custom"}">${safe(item.method)}</span>
+              <span class="tag">${safe(item.method)}</span>
               <span class="threatBadge ${threatClass}">${safe(threat.short)}</span>
               <span class="threatBadge ${seasonState.colorClass}">${safe(seasonState.status)}</span>
             </div>
-
             <div class="mini" style="margin-top:8px;"><b>Threat Status:</b> ${safe(threat.status)}</div>
             <div class="mini" style="margin-top:6px;"><b>Best Season:</b> ${safe(season.best)}</div>
             <div class="mini" style="margin-top:6px;"><b>Season Note:</b> ${safe(season.note)}</div>
@@ -2829,16 +2390,11 @@
             <div class="mini" style="margin-top:6px;"><b>Best Time:</b> ${safe(item.time)}</div>
             <div class="mini" style="margin-top:6px;"><b>Best Rig:</b> ${safe(item.rig)}</div>
             <div class="mini" style="margin-top:8px;">${safe(item.note)}</div>
-
             <div class="row">
               <button class="btn-bait">Use Suggested Bait</button>
             </div>
           `;
-
-          card.querySelector(".btn-bait").onclick = () => {
-            useSuggestedBait(item.species, item.bait);
-          };
-
+          card.querySelector(".btn-bait").onclick = () => useSuggestedBait(item.species, item.bait);
           box.appendChild(card);
         });
     }
@@ -2847,50 +2403,37 @@
       const box = document.getElementById("boatGuideBox");
       if(!box) return;
 
-      box.innerHTML = "";
+      box.innerHTML = `
+        <div class="card">
+          <b>Boat Species Season Guide</b>
+          <div class="mini" style="margin-top:10px;"><b>Cape Kob</b> — Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.</div>
+          <div class="mini" style="margin-top:8px;"><b>Yellowtail</b> — Best from summer to autumn. Best when warm water, birds and bait balls are active. More surface and mid-water focused.</div>
+          <div class="mini" style="margin-top:8px;"><b>Bonito</b> — Best from summer to autumn. Usually better with warm water and fast surface feeding action.</div>
+          <div class="mini" style="margin-top:8px;"><b>Red Roman</b> — Good all year. More dependent on reef structure, stable sea and correct bottom bait presentation.</div>
+          <div class="mini" style="margin-top:8px;"><b>Snapper</b> — Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.</div>
+          <div class="mini" style="margin-top:8px;"><b>Silverfish</b> — Good all year. Usually better over reef in calmer workable conditions.</div>
+          <div class="mini" style="margin-top:8px;"><b>Hottentot</b> — Good all year. Common reef fish where positioning and bait matter more than season.</div>
+          <div class="mini" style="margin-top:8px;"><b>Yellow Belly</b> — Good all year. Focus on reef patches, current and proper bait on the bottom.</div>
+          <div class="mini" style="margin-top:8px;"><b>Red Steenbras</b> — Closed season: <b>1 Sep - 30 Nov</b>. Sensitive species. Handle carefully.</div>
+        </div>
 
-      const seasonGuide = document.createElement("div");
-      seasonGuide.className = "card";
-      seasonGuide.innerHTML = `
-        <b>Boat Species Season Guide</b>
-        <div class="mini" style="margin-top:8px;">Red Steenbras: closed season 1 Sep - 30 Nov</div>
-        <div class="mini">Cape Kob: often better from spring to autumn</div>
-        <div class="mini">Yellowtail / Bonito: best in warmer months with bait and bird activity</div>
-        <div class="mini">Red Roman / Snapper / Hottentot / Silverfish: reef structure matters more than calendar alone</div>
-      `;
-      box.appendChild(seasonGuide);
+        <div class="card">
+          <b>Boat Safety Notes</b>
 
-      const otherNotes = document.createElement("div");
-      otherNotes.className = "card";
-      otherNotes.innerHTML = `
-        <b>Other / Less Boat-Focused Notes</b>
-        <div class="mini" style="margin-top:8px;">Galjoen: mostly more relevant around rocky structure and shore-style fishing.</div>
-        <div class="mini">Closed season: 15 Oct - end Feb.</div>
-        <div class="mini">Kept here so the main app stays boat-focused.</div>
-      `;
-      box.appendChild(otherNotes);
+          <div class="mini" style="margin-top:10px;"><b>Check wind + swell before launch</b></div>
+          <div class="mini">Good wind: under 15 km/h = comfortable, 15–25 km/h = workable, above 25 km/h = rougher, above 30 km/h = poor boat day.</div>
+          <div class="mini" style="margin-top:8px;">Good swell: under 1.5 m = comfortable, 1.5–2.5 m = workable, above 2.5 m = rough, above 3 m = usually poor for bottom fishing.</div>
 
-      const quickGuide = document.createElement("div");
-      quickGuide.className = "card";
-      quickGuide.innerHTML = `
-        <b>Quick Boat Guide</b>
-        <div class="mini" style="margin-top:8px;">Pelagic fish → Drift</div>
-        <div class="mini">Reef / Bottom fish → Anchor</div>
-        <div class="mini">Drift first to find fish, then anchor on the mark.</div>
-        <div class="mini">Use the Map + Drift tabs together before every drop.</div>
-      `;
-      box.appendChild(quickGuide);
+          <div class="mini" style="margin-top:10px;"><b>If current is too strong, drift may be too fast for bottom fishing — how to know</b></div>
+          <div class="mini">You will struggle to hold bottom, your line will angle away fast, sinkers won’t stay down properly, and the boat will drift over the reef too quickly before your bait stays in the strike zone.</div>
 
-      const safetyGuide = document.createElement("div");
-      safetyGuide.className = "card";
-      safetyGuide.innerHTML = `
-        <b>Boat Safety Notes</b>
-        <div class="mini" style="margin-top:8px;">Check wind + swell before launch.</div>
-        <div class="mini">If current is too strong, drift may be too fast for bottom fishing.</div>
-        <div class="mini">Use route line on Map to move cleanly between saved spots.</div>
-        <div class="mini">Log catches with area names so Stats can show your hottest reefs.</div>
+          <div class="mini" style="margin-top:10px;"><b>Use navigation between saved spots</b></div>
+          <div class="mini">Example: choose a saved next spot in Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.</div>
+
+          <div class="mini" style="margin-top:10px;"><b>Log catches with area names</b></div>
+          <div class="mini">Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.</div>
+        </div>
       `;
-      box.appendChild(safetyGuide);
     }
 
     function getMoonPhaseFraction(date = new Date()){
@@ -3200,7 +2743,6 @@ ${waypoints}
           renderLog();
           renderSpots();
           renderStats();
-          renderMap();
           renderFishHelpers();
           renderWeatherPanel();
           render14DayWeather();
@@ -3242,7 +2784,6 @@ ${waypoints}
       renderLog();
       renderSpots();
       renderStats();
-      renderMap();
       renderFishHelpers();
       fillSpotPick();
       fillBaitPick();
@@ -3268,7 +2809,6 @@ ${waypoints}
     fillRouteChainPick();
     updateMinSize();
     showTab("add");
-    initMap();
     renderLog();
     renderSpots();
     renderStats();
@@ -3288,4 +2828,4 @@ ${waypoints}
     }
   </script>
 </body>
-        </html>
+  </html>
