@@ -18,7 +18,6 @@
       --muted:#9fb0d0;
       --danger:#b23b4d;
       --ok:#39d98a;
-      --warn:#ffd166;
       --alert:#ff8c42;
     }
     *{box-sizing:border-box}
@@ -36,7 +35,7 @@
     .mini{
       font-size:12px;
       color:var(--muted);
-      line-height:1.4;
+      line-height:1.45;
     }
     .topnav{
       display:flex;
@@ -158,12 +157,21 @@
     }
     .ok{color:var(--ok)}
     .warnText{color:var(--alert)}
+    .seasonBig{
+      font-size:15px;
+      line-height:1.65;
+    }
+    .seasonHead{
+      font-size:17px;
+      font-weight:bold;
+      margin-bottom:10px;
+    }
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V83 Stable</div>
+  <div class="mini">V84 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('add')">Add Catch</button>
@@ -294,6 +302,8 @@
         <span class="chip" id="chipTemp">Sea Temp: loading...</span>
         <span class="chip" id="chipCurrent">Current: loading...</span>
       </div>
+
+      <div id="weekForecast" class="mini" style="margin-top:12px;"></div>
     </div>
   </section>
 
@@ -309,17 +319,44 @@
 
   <section id="seasonTab" style="display:none;">
     <div class="card">
-      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Species Season Guide</div>
-      <div class="mini">
-        Cape Kob — Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
-        Yellowtail — Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
-        Bonito — Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
-        Red Roman — Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
-        Snapper — Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
-        Silverfish — Good all year. Usually better over reef in calmer workable conditions.<br><br>
-        Hottentot — Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
-        Yellow Belly — Good all year. Focus on reef patches, current and proper bait on the bottom.<br><br>
-        Red Steenbras — Closed season: 1 Sep - 30 Nov. Sensitive species. Handle carefully.
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Season Guide</div>
+
+      <div class="seasonHead">In Season / Good Boat Species</div>
+      <div class="seasonBig">
+        <b>Red Steenbras</b> — <span style="color:#ff8c42;">Most Endangered</span><br>
+        Sensitive species. Handle carefully. Closed season applies separately.<br><br>
+
+        <b>Cape Kob</b><br>
+        Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
+
+        <b>Yellowtail</b><br>
+        Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
+
+        <b>Bonito</b><br>
+        Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
+
+        <b>Red Roman</b><br>
+        Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
+
+        <b>Snapper</b><br>
+        Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
+
+        <b>Silverfish</b><br>
+        Good all year. Usually better over reef in calmer workable conditions.<br><br>
+
+        <b>Hottentot</b><br>
+        Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
+
+        <b>Yellow Belly</b><br>
+        Good all year. Focus on reef patches, current and proper bait on the bottom.
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="seasonHead">Out of Season / Closed</div>
+      <div class="seasonBig">
+        <b>Red Steenbras</b><br>
+        Closed season: <span style="color:#ff8c42;">1 Sep - 30 Nov</span>
       </div>
     </div>
   </section>
@@ -338,7 +375,7 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V83 Stable
+    Build version: V84 Stable
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
@@ -388,8 +425,8 @@
       "Hottentot":22
     };
 
-    const KEY_SPOTS = "tanya_v83_spots";
-    const KEY_LOG = "tanya_v83_log";
+    const KEY_SPOTS = "tanya_v84_spots";
+    const KEY_LOG = "tanya_v84_log";
 
     let map;
     let osmLayer;
@@ -704,7 +741,7 @@
             <span class="mini">Coords: ${c.coords}</span><br>
             ${c.notes ? `<span class="mini">Notes: ${c.notes}</span><br>` : ""}
             <span class="mini">${c.date}</span><br><br>
-            <button onclick="satNavFromString('${c.coords}')">Satellite Nav</button>
+            <button onclick="satNavFromString('${c.coords}')">Open Google Maps Satellite</button>
           </div>
         `;
       });
@@ -830,7 +867,7 @@
             <div class="row">
               <button onclick="useSpot('${s.name.replaceAll("'","&#39;")}',${s.lat},${s.lon})">Use Spot</button>
               <button class="dark" onclick="navigateDirect(${s.lat},${s.lon})">Navigate</button>
-              <button class="dark" onclick="satNav(${s.lat},${s.lon})">Satellite</button>
+              <button class="dark" onclick="satNav(${s.lat},${s.lon})">Google Maps</button>
             </div>
           </div>
         `;
@@ -849,7 +886,7 @@
 
     function startNavigation(){
       const value = document.getElementById("nextSpot").value;
-      if(!value){
+      if(!value || !value.includes(",")){
         alert("Choose next spot first");
         return;
       }
@@ -857,19 +894,24 @@
       const p = value.split(",");
       const lat = Number(p[0]);
       const lon = Number(p[1]);
-      const speed = Number(document.getElementById("boatSpeed").value || 25);
 
+      if(!Number.isFinite(lat) || !Number.isFinite(lon)){
+        alert("Invalid spot coordinates");
+        return;
+      }
+
+      const speed = Number(document.getElementById("boatSpeed").value || 25);
       const d = distanceKm(HARBOUR.lat, HARBOUR.lon, lat, lon);
       const bearing = getBearing(HARBOUR.lat, HARBOUR.lon, lat, lon);
       const compass = bearingToCompass(bearing);
-      const etaMin = Math.round((d / speed) * 60);
+      const etaMin = speed > 0 ? Math.round((d / speed) * 60) : 0;
 
       document.getElementById("navResult").innerHTML =
-        "Start: Stilbaai Harbour<br>" +
+        "Start: " + HARBOUR.name + "<br>" +
         "Distance: " + d.toFixed(2) + " km<br>" +
         "Bearing: " + bearing.toFixed(0) + "° (" + compass + ")<br>" +
         "ETA: " + etaMin + " min<br><br>" +
-        "<button onclick='satNav(" + lat + "," + lon + ")'>Open Satellite Navigation</button>";
+        "<button onclick='satNav(" + lat + "," + lon + ")'>Open Google Maps Satellite</button>";
     }
 
     function navigateDirect(lat, lon){
@@ -887,7 +929,7 @@
     }
 
     function satNav(lat, lon){
-      window.open("https://www.google.com/maps?q=" + lat + "," + lon + "&t=k", "_blank");
+      window.open("https://www.google.com/maps/search/?api=1&query=" + lat + "," + lon + "&basemap=satellite", "_blank");
     }
 
     function satNavFromString(coordStr){
@@ -921,6 +963,32 @@
         renderDrift();
       }catch{
         document.getElementById("fishMeterText").textContent = "Conditions unavailable";
+        document.getElementById("weekForecast").textContent = "Could not load 7 day forecast.";
+      }
+    }
+
+    async function loadWeekForecast(){
+      try{
+        const url = `https://api.open-meteo.com/v1/forecast?latitude=${HARBOUR.lat}&longitude=${HARBOUR.lon}&daily=weather_code,temperature_2m_max,temperature_2m_min,wind_speed_10m_max&forecast_days=7&timezone=Africa%2FJohannesburg`;
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const days = data?.daily?.time || [];
+        const maxs = data?.daily?.temperature_2m_max || [];
+        const mins = data?.daily?.temperature_2m_min || [];
+        const winds = data?.daily?.wind_speed_10m_max || [];
+
+        let html = "<b>7 Day Forecast</b><br><br>";
+
+        for(let i = 0; i < days.length; i++){
+          const date = new Date(days[i]);
+          const label = date.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
+          html += `${label} — Max ${Math.round(maxs[i])}°C • Min ${Math.round(mins[i])}°C • Wind ${Math.round(winds[i])} km/h<br>`;
+        }
+
+        document.getElementById("weekForecast").innerHTML = html;
+      }catch{
+        document.getElementById("weekForecast").innerHTML = "Could not load 7 day forecast.";
       }
     }
 
@@ -984,6 +1052,7 @@
     updateMinSize();
     checkSizeWarning();
     loadConditions();
+    loadWeekForecast();
   </script>
 </body>
-        </html>
+  </html>
