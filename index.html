@@ -19,6 +19,7 @@
       --danger:#b23b4d;
       --ok:#39d98a;
       --warn:#ffd166;
+      --alert:#ff8c42;
     }
     *{box-sizing:border-box}
     body{
@@ -156,18 +157,18 @@
       background:linear-gradient(90deg,#39d98a,#ffd166,#ff8c42);
     }
     .ok{color:var(--ok)}
+    .warnText{color:var(--alert)}
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V82 Stable</div>
+  <div class="mini">V83 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('add')">Add Catch</button>
-    <button class="navbtn" onclick="showTab('mapTab')">Map</button>
     <button class="navbtn" onclick="showTab('spotsTab')">Spots & Navigate</button>
-    <button class="navbtn" onclick="showTab('driftTab')">Drift</button>
+    <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
     <button class="navbtn" onclick="showTab('logTab')">Log</button>
     <button class="navbtn" onclick="showTab('seasonTab')">Season Guide</button>
     <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
@@ -195,6 +196,10 @@
       <input id="minSize" readonly />
       <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
 
+      <label>Size Caught (cm)</label>
+      <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
+      <div id="sizeWarning" class="mini"></div>
+
       <label>Bait Used</label>
       <select id="bait">
         <option value="">Choose...</option>
@@ -209,7 +214,7 @@
       <div class="row">
         <input id="coords" readonly />
         <button type="button" onclick="getGPS()">Get GPS</button>
-        <button type="button" class="dark" onclick="showTab('mapTab')">Open Map</button>
+        <button type="button" class="dark" onclick="showTab('spotsTab')">Open Map</button>
       </div>
 
       <label>Where Caught</label>
@@ -223,31 +228,11 @@
         Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.
       </div>
 
-      <div style="margin-top:10px;">
-        <span class="chip" id="chipWind">Wind: loading...</span>
-        <span class="chip" id="chipSwell">Swell: loading...</span>
-        <span class="chip" id="chipTemp">Sea Temp: loading...</span>
-        <span class="chip" id="chipCurrent">Current: loading...</span>
-      </div>
-
       <div class="row" style="margin-top:12px;">
         <button onclick="saveCatch()">Save Catch</button>
         <button class="danger" onclick="clearCatchForm()">Clear</button>
       </div>
       <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
-    </div>
-  </section>
-
-  <section id="mapTab" style="display:none;">
-    <div class="card">
-      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Map</div>
-      <div class="mini">Tap the map to choose coordinates. Save that point as a spot. Satellite can be toggled on/off.</div>
-      <div class="row" style="margin-top:10px;">
-        <button onclick="toggleSatellite()">Satellite ON/OFF</button>
-        <button class="dark" onclick="goHarbour()">Harbour</button>
-        <button class="dark" onclick="saveSpotFromMap()">Save Spot</button>
-      </div>
-      <div id="map"></div>
     </div>
   </section>
 
@@ -258,12 +243,6 @@
       <div class="mini">
         Use navigation between saved spots.<br>
         Example: choose a saved next spot in Spots & Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.
-      </div>
-
-      <div class="card" style="margin-top:12px;">
-        <b>Best Fishing Time Today</b>
-        <div class="meterWrap"><div id="fishMeter" class="meterFill"></div></div>
-        <div id="fishMeterText" class="mini" style="margin-top:8px;">Loading conditions...</div>
       </div>
 
       <label>Choose Next Spot</label>
@@ -277,10 +256,16 @@
       <div class="row" style="margin-top:10px;">
         <button onclick="startNavigation()">Start Navigation</button>
         <button class="dark" onclick="openSelectedSatellite()">Satellite View</button>
-        <button class="dark" onclick="showTab('mapTab')">Open Map</button>
+        <button class="dark" onclick="toggleSatellite()">Satellite ON/OFF</button>
+        <button class="dark" onclick="goHarbour()">Harbour</button>
+        <button class="dark" onclick="saveSpotFromMap()">Save Spot</button>
       </div>
 
       <div id="navResult" class="mini" style="margin-top:10px;"></div>
+
+      <div id="map"></div>
+
+      <div id="driftBox" class="mini" style="margin-top:10px;">Drift line will show after boat GPS / coordinates are loaded.</div>
     </div>
 
     <div class="card">
@@ -289,10 +274,26 @@
     </div>
   </section>
 
-  <section id="driftTab" style="display:none;">
+  <section id="weatherTab" style="display:none;">
     <div class="card">
-      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Drift</div>
-      <div id="driftBox" class="mini">Drift line will show after boat GPS / coordinates are loaded.</div>
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Weather</div>
+
+      <div id="weatherSummary" class="mini">
+        Check wind and swell before launch.<br><br>
+        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
+        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.<br><br>
+        If current is too strong, drift may be too fast for bottom fishing. Your line will angle away fast and sinkers may not hold bottom properly.
+      </div>
+
+      <div class="meterWrap"><div id="fishMeter" class="meterFill"></div></div>
+      <div id="fishMeterText" class="mini" style="margin-top:8px;">Loading conditions...</div>
+
+      <div style="margin-top:10px;">
+        <span class="chip" id="chipWind">Wind: loading...</span>
+        <span class="chip" id="chipSwell">Swell: loading...</span>
+        <span class="chip" id="chipTemp">Sea Temp: loading...</span>
+        <span class="chip" id="chipCurrent">Current: loading...</span>
+      </div>
     </div>
   </section>
 
@@ -328,11 +329,7 @@
       <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Rules & Limits</div>
       <div class="mini">
         Bag limit: check current permit.<br><br>
-        Mixed species total: check current permit.<br><br>
-        Check wind and swell before launch.<br><br>
-        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
-        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.<br><br>
-        If current is too strong, drift may be too fast for bottom fishing. Your line will angle away fast and sinkers may not hold bottom properly.
+        Mixed species total: check current permit.
       </div>
     </div>
   </section>
@@ -341,12 +338,12 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V82 Stable
+    Build version: V83 Stable
   </div>
 
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
   <script>
-    // CHANGE THIS ONE LINE TO YOUR CORRECT HARBOUR COORDS
+    // PUT YOUR CORRECT HARBOUR COORDS HERE FROM GOOGLE EARTH
     const HARBOUR = { lat:-34.3695, lon:20.8500, name:"Stilbaai Harbour" };
 
     const DEFAULT_SPOTS = [
@@ -391,8 +388,8 @@
       "Hottentot":22
     };
 
-    const KEY_SPOTS = "tanya_v82_spots";
-    const KEY_LOG = "tanya_v82_log";
+    const KEY_SPOTS = "tanya_v83_spots";
+    const KEY_LOG = "tanya_v83_log";
 
     let map;
     let osmLayer;
@@ -437,17 +434,15 @@
       document.getElementById(id).style.display = "block";
 
       document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["add","mapTab","spotsTab","driftTab","logTab","seasonTab","rulesTab"];
+      const ids = ["add","spotsTab","weatherTab","logTab","seasonTab","rulesTab"];
       const idx = ids.indexOf(id);
       if(idx >= 0) document.querySelectorAll(".navbtn")[idx].classList.add("active");
 
-      if(id === "mapTab"){
-        initMap();
-        setTimeout(() => map.invalidateSize(), 200);
-      }
       if(id === "spotsTab"){
+        initMap();
         fillSpotDropdowns();
         renderSavedSpots();
+        setTimeout(() => map.invalidateSize(), 200);
       }
       if(id === "logTab"){
         renderLog();
@@ -523,6 +518,30 @@
       }
     }
 
+    function checkSizeWarning(){
+      const species = document.getElementById("species").value;
+      const size = Number(document.getElementById("sizeCaught").value || 0);
+      const min = Number(document.getElementById("minSize").value || 0);
+      const box = document.getElementById("sizeWarning");
+
+      if(!species || !size){
+        box.textContent = "";
+        box.className = "mini";
+        return;
+      }
+
+      if(min > 0 && size < min){
+        box.textContent = `Warning: undersize fish. Minimum size for ${species} is ${min} cm.`;
+        box.className = "mini warnText";
+      } else if(min > 0){
+        box.textContent = `Size is above minimum (${min} cm).`;
+        box.className = "mini ok";
+      } else {
+        box.textContent = "No minimum size loaded for this species.";
+        box.className = "mini";
+      }
+    }
+
     function fillAreaDropdown(){
       const area = document.getElementById("area");
       const current = area.value;
@@ -559,12 +578,13 @@
     function fillFromArea(){
       const area = document.getElementById("area");
       const selected = area.options[area.selectedIndex];
-      if(selected.value){
+      if(selected.value && !document.getElementById("whereCaught").value.trim()){
         document.getElementById("whereCaught").value = selected.value;
       }
       if(selected.dataset.coords){
         document.getElementById("coords").value = selected.dataset.coords;
       }
+      renderDrift();
     }
 
     function nearestSpot(lat, lon){
@@ -591,10 +611,10 @@
 
         const near = nearestSpot(lat, lon);
         if(near){
+          document.getElementById("area").value = near.name;
           if(!document.getElementById("whereCaught").value.trim()){
             document.getElementById("whereCaught").value = near.name;
           }
-          document.getElementById("area").value = near.name;
         }
 
         renderDrift();
@@ -612,9 +632,12 @@
       document.getElementById("coords").value = "";
       document.getElementById("whereCaught").value = "";
       document.getElementById("area").value = "";
+      document.getElementById("sizeCaught").value = "";
+      document.getElementById("sizeWarning").textContent = "";
       fillBaitOptions();
       updateMinSize();
       document.getElementById("saveMsg").textContent = "";
+      renderDrift();
     }
 
     function saveCatch(){
@@ -625,6 +648,7 @@
       const whereCaught = document.getElementById("whereCaught").value.trim();
       const notes = document.getElementById("notes").value.trim();
       const minSize = document.getElementById("minSize").value || "";
+      const sizeCaught = document.getElementById("sizeCaught").value || "";
 
       if(!species){
         alert("Choose species first.");
@@ -645,6 +669,7 @@
         whereCaught,
         notes,
         minSize,
+        sizeCaught,
         date:new Date().toLocaleString()
       });
       saveLog(list);
@@ -672,6 +697,7 @@
           <div class="spotCard">
             <b>${c.species}</b><br>
             <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
+            <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
             <span class="mini">Bait: ${c.bait || "-"}</span><br>
             <span class="mini">Area: ${c.area || "-"}</span><br>
             <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
@@ -722,6 +748,8 @@
             document.getElementById("whereCaught").value = near.name;
           }
         }
+
+        renderDrift();
       });
     }
 
@@ -815,6 +843,7 @@
       document.getElementById("area").value = name;
       document.getElementById("whereCaught").value = name;
       document.getElementById("coords").value = lat.toFixed(6) + "," + lon.toFixed(6);
+      renderDrift();
       showTab("add");
     }
 
@@ -942,7 +971,10 @@
     document.getElementById("species").addEventListener("change", () => {
       fillBaitOptions();
       updateMinSize();
+      checkSizeWarning();
     });
+
+    document.getElementById("sizeCaught").addEventListener("input", checkSizeWarning);
 
     fillBaitOptions();
     fillAreaDropdown();
@@ -950,7 +982,8 @@
     renderLog();
     renderSavedSpots();
     updateMinSize();
+    checkSizeWarning();
     loadConditions();
   </script>
 </body>
-  </html>
+        </html>
