@@ -18,6 +18,7 @@
     <button class="navbtn" onclick="showTab('log')">Log</button>
     <button class="navbtn" onclick="showTab('stats')">Stats</button>
     <button class="navbtn" onclick="showTab('guide')">Boat Guide</button>
+    <button class="navbtn" onclick="showTab('season')">Season Guide</button>
     <button class="navbtn" onclick="showTab('rules')">Rules &amp; Limits</button>
   </div>
 
@@ -46,7 +47,7 @@
 
       <label for="localArea">Local Area</label>
       <select id="localArea">
-        <option value="">Choose area...</option>
+        <option value="">Choose saved area...</option>
       </select>
 
       <label for="coords">Coordinates</label>
@@ -58,8 +59,10 @@
       <label for="whereCaught">Where Caught</label>
       <input id="whereCaught" readonly placeholder="Auto-filled from area name" />
 
-      <div class="mini tipText">Tip: Save every catch with the correct Local Area Name so Stats can show your hottest reefs correctly.</div>
-      <div class="mini tipText">Log catches with area names. Stats uses the correct Local Area Name to rank your hottest reefs.</div>
+      <div class="mini tipText">
+        Log catches with area names.<br>
+        Always save catches with the correct Local Area Name. Stats uses that name to rank your hottest reefs and best producing areas.
+      </div>
 
       <div class="conditionsRow">
         <div class="chip" id="chipWind">Wind: loading...</div>
@@ -83,6 +86,11 @@
       </div>
 
       <div id="currentAreaBox" class="mini"></div>
+
+      <div class="mini tipText">
+        Use navigation between saved spots.<br>
+        Example: choose a saved next spot in Spots &amp; Navigate, then the app shows target coordinates, distance in km, bearing and ETA so you can move cleanly from one mark to the next.
+      </div>
 
       <label for="boatSpeed">Boat Speed (km/h)</label>
       <input id="boatSpeed" type="number" value="25" />
@@ -115,7 +123,7 @@
 
     <div class="card">
       <b>Spots from Stilbaai Harbour (max 20 km)</b>
-      <div class="mini">Starts from Stilbaai harbour. If GPS is loaded, it uses your current boat position.</div>
+      <div class="mini">Navigation and nearby spots always start from Stilbaai harbour.</div>
     </div>
 
     <div id="spotsList"></div>
@@ -150,22 +158,6 @@
   <section id="guide" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Boat Guide</div>
-
-      <b>Boat Species Season Guide</b>
-      <div class="mini guideBlock">
-        <b>Cape Kob</b> — Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.<br><br>
-        <b>Yellowtail</b> — Best from summer to autumn. Best when warm water, birds and bait balls are active.<br><br>
-        <b>Bonito</b> — Best from summer to autumn. Usually better with warm water and fast surface feeding action.<br><br>
-        <b>Red Roman</b> — Good all year. More dependent on reef structure and correct bottom bait presentation.<br><br>
-        <b>Snapper</b> — Good all year. More dependent on reef, depth, current and bottom bait than calendar alone.<br><br>
-        <b>Silverfish</b> — Good all year. Usually better over reef in calmer workable conditions.<br><br>
-        <b>Hottentot</b> — Good all year. Common reef fish where positioning and bait matter more than season.<br><br>
-        <b>Yellow Belly</b> — Good all year. Focus on reef patches, current and proper bait on the bottom.<br><br>
-        <b>Red Steenbras</b> — Closed season: <b>1 Sep - 30 Nov</b>. Sensitive species. Handle carefully.
-      </div>
-    </div>
-
-    <div class="card">
       <b>Boat Safety Notes</b>
       <div class="mini guideBlock">
         <b>Check wind + swell before launch</b><br>
@@ -181,6 +173,13 @@
     </div>
   </section>
 
+  <section id="season" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Species Season Guide</div>
+      <div id="seasonBox" class="mini"></div>
+    </div>
+  </section>
+
   <section id="rules" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Fishing App</b> • Rules &amp; Limits</div>
@@ -192,10 +191,10 @@
     Tanya Deep Sea Fishing App<br>
     Core system: V69<br>
     Cache system: V71-style<br>
-    Build version: V76 Stable
+    Build version: V77 Stable
   </div>
 
   <script src="./spots.js"></script>
   <script src="./app.js"></script>
 </body>
-</html>
+  </html>
