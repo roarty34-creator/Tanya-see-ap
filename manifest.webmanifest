@@ -6,7 +6,7 @@
   "background_color": "#061225",
   "theme_color": "#061225",
   "orientation": "portrait",
-  "description": "Boat-focused Stilbaai deep sea fishing log with GPS spots, drift direction, tides, moon phase, bite prediction, weather and extra species info.",
+  "description": "Boat-focused Stilbaai deep sea fishing log with GPS spots, drift direction, tides, moon phase, best fishing time meter, weather, extra info and boat guide.",
   "icons": [
     {
       "src": "./icon-192.png",
