@@ -170,7 +170,6 @@
     }
     .statusHigh{color:#ff8c42;font-weight:bold}
     .statusMed{color:#ffd166;font-weight:bold}
-    .statusLow{color:#39d98a;font-weight:bold}
     .statusNeutral{color:#9fb0d0;font-weight:bold}
     pre.rig{
       background:#081632;
@@ -269,13 +268,20 @@
       border-radius:12px;
       padding:12px;
       margin-top:10px;
+      font-size:14px;
+      line-height:1.6;
+    }
+    a.chatlink{
+      color:#7fc6ff;
+      text-decoration:none;
+      font-weight:bold;
     }
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V94 Stable</div>
+  <div class="mini">V95 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -283,7 +289,6 @@
     <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
     <button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
     <button class="navbtn" onclick="showTab('fishGuideTab')">Fish ID Guide</button>
-    <button class="navbtn" onclick="showTab('logTab')">Log</button>
     <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
   </div>
 
@@ -296,36 +301,7 @@
         <div class="identifyTitle">Local Launch Guidance – Stilbaai Harbour</div>
         <div class="bigText">
           Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
-          Harbour reference point in this build: <b>-34.385542, 21.425433</b><br><br>
-
-          <b>Basic local route note</b><br>
-          1. Move slowly out of the harbour. Stay near the middle of the river. Do not run too close to the western side because of shifting sandbanks.<br><br>
-
-          2. Near the river mouth:<br>
-          • Left (west): large shifting sandbank<br>
-          • Right (east): rock / reef areas near the point<br>
-          Keep slightly right of centre when exiting.<br><br>
-
-          3. Approximate line used by many boats:<br>
-          • -34.3869, 21.4226<br>
-          • -34.3895, 21.4245<br>
-          • -34.3920, 21.4255<br><br>
-
-          4. Watch for:<br>
-          • rocks on the eastern side<br>
-          • sandbank on the western side<br>
-          • breaking waves over shallow areas<br><br>
-
-          5. Read the water:<br>
-          • dark water = deeper channel<br>
-          • light brown water = sandbank<br>
-          • breaking water = shallow / rocks<br><br>
-
-          6. First productive areas offshore:<br>
-          • 30–35 m line<br>
-          • Stilbaai Reef<br>
-          • Kabeljou Ridge<br>
-          • Blinde Rif
+          Harbour reference point in this build: <b>-34.385542, 21.425433</b>
         </div>
       </div>
 
@@ -384,11 +360,25 @@
       <label>Notes</label>
       <textarea id="notes" placeholder="Optional notes"></textarea>
 
+      <label>Fish Photo</label>
+      <div class="row">
+        <button type="button" onclick="openCatchCamera()">Take Fish Photo</button>
+        <button type="button" class="dark" onclick="openCatchGallery()">Choose Fish Photo</button>
+      </div>
+      <input type="file" id="catchPhoto" accept="image/*" capture="environment" style="display:none">
+      <img id="catchPreview" class="previewImg" alt="Catch preview" />
+      <div class="mini" id="catchPhotoText" style="margin-top:8px;">No fish photo selected yet.</div>
+
       <div class="row" style="margin-top:12px;">
         <button onclick="saveCatch()">Save Catch</button>
         <button class="danger" onclick="clearCatchForm()">Clear</button>
       </div>
       <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Saved Catches</div>
+      <div id="logBox"></div>
     </div>
   </section>
 
@@ -399,8 +389,7 @@
       <div class="mini">
         Check wind and swell before launch.<br><br>
         Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
-        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.<br><br>
-        If current is too strong, drift may be too fast for bottom fishing. Your line will angle away fast and sinkers may not hold bottom properly.
+        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
       </div>
 
       <div id="weekForecast"></div>
@@ -446,16 +435,42 @@
 
       <div class="identifyBox">
         <div class="identifyTitle">Identify Unknown Fish</div>
+
         <div class="row">
           <button onclick="openCamera()">Use Camera</button>
           <button onclick="openGallery()">Use Photo</button>
         </div>
+
         <input type="file" id="fishPhoto" accept="image/*" capture="environment" style="display:none">
-        <div class="uploadPreview" id="uploadPreview">Take a photo or upload one, then compare it with the guide or use the smart identifier below.</div>
+
+        <div class="uploadPreview" id="uploadPreview">
+          Take a photo or upload one, then compare it with the guide or use the smart identifier below.
+        </div>
+
         <img id="previewImg" class="previewImg" alt="Fish preview" />
+
         <div class="row" style="margin-top:12px;">
           <button class="dark" onclick="showGuideHint()">Compare with Fish ID Guide</button>
           <button class="dark" onclick="sendToChatGPTHint()">Send to ChatGPT for identification</button>
+        </div>
+
+        <div class="suggestionCard">
+          <b>Compare with Fish ID Guide</b><br>
+          Use your fish photo and compare it with the guide below.<br>
+          Look at:
+          <br>• body shape
+          <br>• mouth shape
+          <br>• colour
+          <br>• tail shape
+          <br>• where it was caught
+        </div>
+
+        <div class="suggestionCard">
+          <b>Send to ChatGPT for identification</b><br>
+          Open ChatGPT, upload the fish photo, and ask:
+          <br><b>Identify this fish from the photo</b>
+          <br><br>
+          <a class="chatlink" href="https://chatgpt.com" target="_blank">Open ChatGPT</a>
         </div>
       </div>
 
@@ -516,19 +531,9 @@
       </div>
 
       <div class="identifyBox">
-        <div class="identifyTitle">Visual Fish ID Guide (20 Local Species)</div>
+        <div class="identifyTitle">Visual Fish ID Guide</div>
         <div id="fishGuideList" class="guideGrid"></div>
       </div>
-    </div>
-  </section>
-
-  <section id="logTab" style="display:none;">
-    <div class="card">
-      <div class="row">
-        <div class="sectionTitle" style="margin-bottom:0;"><b>Tanya Deep Sea Garmin Edition</b> • Log</div>
-        <button class="danger" onclick="clearLog()">Delete All</button>
-      </div>
-      <div id="logBox"></div>
     </div>
   </section>
 
@@ -546,7 +551,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V94 Stable
+    Build version: V95 Stable
   </div>
 
   <script>
@@ -599,10 +604,7 @@
         statusClass:"statusNeutral",
         season:"Best spring to autumn",
         closed:"Check current permit rules",
-        why:`✔ Kob often takes bait hanging just above the bottom
-✔ Two hooks keep the bait straight
-✔ Less chance of bait spinning in current
-✔ Big kob takes this rig confidently`,
+        why:`Kob often takes bait hanging just above the bottom. Two hooks keep the bait straight and reduce spinning in current.`,
         make:`1. Tie braid to a strong barrel swivel.
 2. Add 0.80 - 1.0 mm nylon leader.
 3. Tie top hook 7/0.
@@ -637,9 +639,7 @@ Bottom hook snoot - 8/0 or 9/0 hook
         statusClass:"statusNeutral",
         season:"Best summer to autumn",
         closed:"Check current permit rules",
-        why:`✔ Yellowtail hunts fast
-✔ Light leader gives better action
-✔ Works well with live bait`,
+        why:`Yellowtail hunts fast. Light leader gives better action and works well with live bait and lures.`,
         make:`1. Tie braid to swivel.
 2. Add leader 80-150 cm.
 3. Use live bait hook or lure clip.
@@ -659,339 +659,6 @@ Leader
 
 Sinker
 No sinker`
-      },
-      "Bonito":{
-        identifier:{ body:"Slim fast tuna-like body", colour:"Dark back with silvery sides", tail:"Forked tail built for speed", found:"Surface feeding schools chasing bait", giveaway:"Fast compact body and surface action" },
-        naturalBait:"Live bait, small baitfish, Pilchard strip, Sardine strip, Makriel",
-        lures:"Feather lure, Small spoon, Yo-Zuri minnow, Small plug, Trolling lure",
-        hook:"3/0 - 4/0 hooks",
-        sinker:"No sinker",
-        strop:"0.60 mm nylon, ± 1 m",
-        rigType:"Bonito live bait rig / feather rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Best summer to autumn",
-        closed:"Check current permit rules",
-        why:`✔ Fast hunting fish
-✔ Works well with live bait
-✔ Light leader gives better bite`,
-        make:`1. Use 30-40 lb braid.
-2. Tie to strong swivel.
-3. Add ±1 m leader.
-4. Fish lure or live bait naturally.`,
-        sketch:`BONITO RIG
-
-Main line
-30-40 lb braid
-  |
-Strong swivel
-  |
-Leader
-0.60 mm nylon
-± 1 m
-  |
-3/0 - 4/0 hooks
-
-Sinker
-No sinker`
-      },
-      "Red Roman":{
-        identifier:{ body:"Thick reef fish body", colour:"Red to orange-red", tail:"Rounded reef-fish tail", found:"Rocky reef and structure", giveaway:"Deep red body and classic reef shape" },
-        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine, Redbait, Mussel",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6oz - 8oz",
-        strop:"Short snoots 20 - 30 cm",
-        rigType:"2-hook bottom rig / short reef rig",
-        status:"Sensitive species - handle carefully",
-        statusClass:"statusMed",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        why:`✔ Short snoots keep bait near reef
-✔ Works well on reef structure`,
-        make:`1. Tie main line to swivel.
-2. Add two short hook snoots.
-3. Attach sinker at bottom.`,
-        sketch:`RED ROMAN REEF RIG
-
-Main line
-  |
-Swivel
-  |
-Top short snoot 20-30 cm ---- hook
-  |
-Bottom short snoot 20-30 cm - hook
-  |
-Sinker 6-8 oz`
-      },
-      "Snapper":{
-        identifier:{ body:"Medium reef fish body", colour:"Pink-red to silvery red", tail:"Compact tail, reef fish profile", found:"Reef and deeper bottom structure", giveaway:"Snapper profile and bottom-feeding reef behaviour" },
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Mussel, Chokka + Pilchard combo",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6oz - 8oz",
-        strop:"20 - 40 cm",
-        rigType:"Bottom rig / short hook trace",
-        status:"Sensitive species - handle carefully",
-        statusClass:"statusMed",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        why:`✔ Compact rig holds bottom well
-✔ Keeps bait in strike zone`,
-        make:`1. Tie braid to swivel.
-2. Add short hook snoot.
-3. Fit 6-8 oz sinker.`,
-        sketch:`SNAPPER BOTTOM RIG
-
-Main line
-  |
-Swivel
-  |
-Sinker 6-8 oz
-  |
-Hook snoot 20-40 cm`
-      },
-      "Silverfish":{
-        identifier:{ body:"Smaller streamlined body", colour:"Silver body", tail:"Small forked tail", found:"Over reef and calmer workable areas", giveaway:"Small bright silver fish" },
-        naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip, Mussel, Redbait",
-        lures:"Usually natural bait preferred",
-        hook:"2/0 - 4/0 hooks",
-        sinker:"4oz - 6oz",
-        strop:"20 - 30 cm",
-        rigType:"Light bottom rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        why:`✔ Light setup suits smaller bait`,
-        make:`1. Use lighter sinker.
-2. Keep trace short.
-3. Present smaller bait close to bottom.`,
-        sketch:`SILVERFISH LIGHT RIG
-
-Main line
-  |
-Swivel
-  |
-Small sinker 4-6 oz
-  |
-Single hook snoot 20-30 cm`
-      },
-      "Red Steenbras":{
-        identifier:{ body:"Large strong bottom fish body", colour:"Pale silver to pinkish tones", tail:"Strong tail, heavy body profile", found:"Bottom structure and deeper working ground", giveaway:"Big powerful body and sensitive conservation status" },
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait, Octopus",
-        lures:"Usually natural bait preferred",
-        hook:"6/0 - 8/0 hooks",
-        sinker:"7oz - 9oz",
-        strop:"70 - 120 cm",
-        rigType:"Strong bottom rig / longer hook snoot",
-        status:"Most endangered / very sensitive",
-        statusClass:"statusHigh",
-        season:"Sensitive species",
-        closed:"Closed season: 1 Sep - 30 Nov",
-        why:`✔ Strong trace helps in heavy conditions
-✔ Handle carefully and follow permit rules`,
-        make:`1. Use heavy swivel and strong leader.
-2. Use long snoot.
-3. Fit strong hook and heavy sinker.`,
-        sketch:`RED STEENBRAS STRONG RIG
-
-Main line
-  |
-Heavy swivel
-  |
-Sinker 7-9 oz
-  |
-Long snoot 70-120 cm
-  |
-6/0 - 8/0 strong hook`
-      },
-      "Yellow Belly":{
-        identifier:{ body:"Reef fish with deeper body shape", colour:"Yellowish belly with darker top", tail:"Compact reef-fish tail", found:"Reef patches and bottom structure", giveaway:"Yellow belly tone underneath" },
-        naturalBait:"Chokka, Pilchard, Sardine, Squid, Redbait",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6oz - 8oz",
-        strop:"30 - 50 cm",
-        rigType:"Bottom rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        why:`✔ Simple bottom presentation works well`,
-        make:`1. Keep rig simple.
-2. Use medium trace.
-3. Present bait cleanly on bottom.`,
-        sketch:`YELLOW BELLY BOTTOM RIG
-
-Main line
-  |
-Swivel
-  |
-Sinker 6-8 oz
-  |
-Hook trace 30-50 cm`
-      },
-      "Hottentot":{
-        identifier:{ body:"Shorter deeper body", colour:"Grey-silver with darker patterning", tail:"Smaller tail, compact shape", found:"Reef and shallow structure", giveaway:"Compact body and smaller-mouth profile" },
-        naturalBait:"Small bait, Chokka pieces, Redbait, Mussel, Sardine piece, Pilchard",
-        lures:"Usually natural bait preferred",
-        hook:"2/0 - 3/0 hooks",
-        sinker:"4oz - 5oz sinker",
-        strop:"0.50 - 0.60 mm nylon, ± 60 cm",
-        rigType:"Light bottom rig / short reef trace",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        why:`✔ Small bait works best
-✔ Short leader keeps bait near the bottom`,
-        make:`1. Use medium swivel.
-2. Keep rig light.
-3. Short trace and small bait work best.`,
-        sketch:`HOTTENTOT
-
-Main line
-20-30 lb braid
-  |
-Medium barrel swivel
-  |
-Leader
-0.50 - 0.60 mm nylon
-± 60 cm
-  |
-2/0 - 3/0 hooks
-  |
-4-5 oz sinker`
-      },
-      "Geelbek":{
-        identifier:{ body:"Long powerful mid-water predator", colour:"Silvery sides with darker upper body", tail:"Strong forked tail", found:"Mid-water and baitfish zones", giveaway:"Fast predator above bottom" },
-        naturalBait:"Large sardine, Chokka, Live bait, Pilchard strip",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Small plug, Stickbait",
-        hook:"6/0 - 8/0 hooks",
-        sinker:"No sinker or small 3-4 oz sinker",
-        strop:"0.70 - 0.80 mm nylon, ± 1 m long",
-        rigType:"Cape Salmon / Geelbek bait rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Check current permit / local conditions",
-        closed:"Check current permit rules",
-        why:`✔ Hunts baitfish above the bottom
-✔ Long leader lets bait move naturally`,
-        make:`1. Use 40-50 lb braid to strong swivel.
-2. Add ±1 m leader.
-3. Fish with little or no sinker.`,
-        sketch:`GEELBEK
-
-Main line
-40-50 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.70 - 0.80 mm nylon
-± 1 m long
-  |
-6/0 - 8/0 hooks
-
-Sinker
-No sinker or small 3-4 oz`
-      },
-      "Santer":{
-        identifier:{ body:"Compact reef fish body", colour:"Pink-red reef tones", tail:"Compact tail", found:"Near reef and structure", giveaway:"Fast-biting reef fish close to bottom" },
-        naturalBait:"Chokka, Sardine, Pilchard, Redbait, Squid",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 5/0 hooks",
-        sinker:"6 oz bottle sinker",
-        strop:"0.60 - 0.70 mm nylon, ± 60 cm",
-        rigType:"Short reef bottom rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Check current permit / local conditions",
-        closed:"Check current permit rules",
-        why:`✔ Bites fast
-✔ Short leader keeps bait near reef`,
-        make:`1. Keep leader short.
-2. Use bottle sinker.
-3. Present bait close to structure.`,
-        sketch:`SANTER
-
-Main line
-30-40 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.60 - 0.70 mm nylon
-± 60 cm
-  |
-4/0 - 5/0 hooks
-  |
-6 oz bottle sinker`
-      },
-      "Carpenter":{
-        identifier:{ body:"Large strong reef fish body", colour:"Darker reef colour tones", tail:"Strong tail for reef power", found:"Heavy reef and rocky structure", giveaway:"Big reef fish with brute pulling power" },
-        naturalBait:"Chokka, Pilchard, Sardine, Redbait, Squid",
-        lures:"Usually natural bait preferred",
-        hook:"6/0 - 7/0 hooks",
-        sinker:"7-8 oz grapnel",
-        strop:"0.80 - 1.0 mm nylon, ± 70 cm",
-        rigType:"Heavy reef rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Check current permit / local conditions",
-        closed:"Check current permit rules",
-        why:`✔ Big reef fish
-✔ Strong leader helps on rocks`,
-        make:`1. Use strong swivel.
-2. Add heavy leader.
-3. Use grapnel in stronger movement.`,
-        sketch:`CARPENTER
-
-Main line
-40-50 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.80 - 1.0 mm nylon
-± 70 cm
-  |
-6/0 - 7/0 hooks
-  |
-7-8 oz grapnel`
-      },
-      "Dageraad":{
-        identifier:{ body:"Big heavy bottom fish body", colour:"Deeper darker reef tones", tail:"Strong tail", found:"Heavy bottom and reef zones", giveaway:"Large strong reef-associated fish" },
-        naturalBait:"Big chokka bait, Pilchard, Redbait, Squid, Octopus",
-        lures:"Usually natural bait preferred",
-        hook:"7/0 - 9/0 hooks",
-        sinker:"6-8 oz grapnel",
-        strop:"0.90 - 1.0 mm nylon, ± 70 cm",
-        rigType:"Heavy bottom rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Check current permit / local conditions",
-        closed:"Check current permit rules",
-        why:`✔ Large powerful fish
-✔ Thick leader protects against reef`,
-        make:`1. Use heavy braid and strong swivel.
-2. Add thick leader.
-3. Match hook and sinker to big bait.`,
-        sketch:`DAGERAAD
-
-Main line
-40-50 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.90 - 1.0 mm nylon
-± 70 cm
-  |
-7/0 - 9/0 hooks
-  |
-6-8 oz grapnel`
       }
     };
 
@@ -1001,38 +668,25 @@ Leader
       {name:"Bonito", body:"Slim tuna-like", colour:"Dark back silver sides", tail:"Forked", found:"Surface schools", clue:"Fast and compact", mouth:"hooked", bodyKey:"slim", colourKey:"silver", tailKey:"forked", whereKey:"surface"},
       {name:"Red Roman", body:"Deep reef body", colour:"Red", tail:"Rounded", found:"Reef", clue:"Deep red profile", mouth:"small", bodyKey:"deep", colourKey:"red", tailKey:"rounded", whereKey:"reef"},
       {name:"Snapper", body:"Reef body", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face", mouth:"big", bodyKey:"deep", colourKey:"red", tailKey:"rounded", whereKey:"bottom"},
-      {name:"Silverfish", body:"Small streamlined", colour:"Silver", tail:"Forked", found:"Reef areas", clue:"Bright silver", mouth:"small", bodyKey:"slim", colourKey:"silver", tailKey:"forked", whereKey:"reef"},
-      {name:"Red Steenbras", body:"Large heavy body", colour:"Pale silver-pink", tail:"Strong", found:"Bottom ground", clue:"Very powerful", mouth:"big", bodyKey:"deep", colourKey:"silver", tailKey:"strong", whereKey:"bottom"},
-      {name:"Yellow Belly", body:"Deeper body", colour:"Yellow belly", tail:"Compact", found:"Reef patches", clue:"Yellow underneath", mouth:"small", bodyKey:"deep", colourKey:"yellow", tailKey:"rounded", whereKey:"reef"},
-      {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth", mouth:"small", bodyKey:"compact", colourKey:"silver", tailKey:"rounded", whereKey:"shallow"},
-      {name:"Geelbek", body:"Long predator", colour:"Silvery", tail:"Forked", found:"Mid-water", clue:"Baitfish hunter", mouth:"big", bodyKey:"long", colourKey:"silver", tailKey:"forked", whereKey:"mid"},
-      {name:"Santer", body:"Compact reef fish", colour:"Pink-red", tail:"Compact", found:"Near reef", clue:"Fast biter", mouth:"small", bodyKey:"compact", colourKey:"red", tailKey:"rounded", whereKey:"reef"},
-      {name:"Carpenter", body:"Large reef body", colour:"Dark reef tones", tail:"Strong", found:"Heavy reef", clue:"Strong puller", mouth:"big", bodyKey:"deep", colourKey:"dark", tailKey:"strong", whereKey:"reef"},
-      {name:"Dageraad", body:"Big bottom fish", colour:"Dark reef tones", tail:"Strong", found:"Reef bottom", clue:"Heavy powerful body", mouth:"big", bodyKey:"deep", colourKey:"dark", tailKey:"strong", whereKey:"bottom"},
-      {name:"Roman", body:"Deep reef body", colour:"Red", tail:"Rounded", found:"Reef", clue:"Red profile", mouth:"small", bodyKey:"deep", colourKey:"red", tailKey:"rounded", whereKey:"reef"},
-      {name:"Musselcracker", body:"Thick heavy body", colour:"Dark bronze-grey", tail:"Strong", found:"Rocky reef", clue:"Powerful jaws", mouth:"big", bodyKey:"deep", colourKey:"dark", tailKey:"strong", whereKey:"reef"},
-      {name:"Yellowbelly Rockcod", body:"Reef body", colour:"Mottled dark top", tail:"Rounded", found:"Reef holes", clue:"Rockcod shape", mouth:"big", bodyKey:"compact", colourKey:"dark", tailKey:"rounded", whereKey:"reef"},
-      {name:"Elf / Shad", body:"Long slim body", colour:"Silver", tail:"Forked", found:"Mid-water", clue:"Sharp predator profile", mouth:"hooked", bodyKey:"long", colourKey:"silver", tailKey:"forked", whereKey:"mid"},
-      {name:"Snoek", body:"Very long slim body", colour:"Blue-silver", tail:"Forked", found:"Pelagic shoals", clue:"Long toothy shape", mouth:"beak", bodyKey:"long", colourKey:"silver", tailKey:"forked", whereKey:"surface"},
-      {name:"Mackerel", body:"Slim baitfish", colour:"Blue-green striped back", tail:"Forked", found:"Bait schools", clue:"Striped back", mouth:"small", bodyKey:"slim", colourKey:"silver", tailKey:"forked", whereKey:"mid"},
-      {name:"Hake", body:"Long softer body", colour:"Grey-brown", tail:"Tapered", found:"Deeper bottom", clue:"Deep-water body", mouth:"big", bodyKey:"long", colourKey:"dark", tailKey:"strong", whereKey:"bottom"}
+      {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth", mouth:"small", bodyKey:"compact", colourKey:"silver", tailKey:"rounded", whereKey:"shallow"}
     ];
 
     const KEY_LOG = "tanya_master_log";
+    let currentCatchPhoto = "";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
       document.getElementById(id).style.display = "block";
 
       document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","fishGuideTab","logTab","rulesTab"];
+      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","fishGuideTab","rulesTab"];
       const idx = ids.indexOf(id);
       if(idx >= 0) document.querySelectorAll(".navbtn")[idx].classList.add("active");
 
       if(id === "weatherTab") loadWeekForecast();
       if(id === "fishInfoTab") renderFishInfo();
       if(id === "fishGuideTab") renderFishGuide();
-      if(id === "logTab") renderLog();
+      if(id === "addTab") renderLog();
     }
 
     function describeSeaAreaFromLon(lon){
@@ -1075,9 +729,7 @@ Leader
 
     function fillAreaDropdown(){
       const area = document.getElementById("area");
-      const current = area.value;
       area.innerHTML = '<option value="">Choose saved area...</option>';
-
       SPOTS.forEach(s => {
         const opt = document.createElement("option");
         opt.value = s.name;
@@ -1085,8 +737,6 @@ Leader
         opt.dataset.coords = s.coord;
         area.appendChild(opt);
       });
-
-      if([...area.options].some(o => o.value === current)) area.value = current;
     }
 
     function fillBaitOptions(){
@@ -1110,7 +760,6 @@ Leader
         opt.textContent = item;
         bait.appendChild(opt);
       });
-
       if(list.includes(current)) bait.value = current;
     }
 
@@ -1118,21 +767,14 @@ Leader
       const species = document.getElementById("species").value;
       const minSizeEl = document.getElementById("minSize");
       const note = document.getElementById("minSizeNote");
-
       if(!species){
         minSizeEl.value = "";
         note.textContent = "Choose species to load minimum size.";
         return;
       }
-
       const min = MIN_SIZE[species] ?? "";
       minSizeEl.value = min;
-
-      if(min === 0){
-        note.textContent = "No minimum size set in app for this species.";
-      } else {
-        note.textContent = "Minimum size loaded for selected species.";
-      }
+      note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
     }
 
     function checkSizeWarning(){
@@ -1216,11 +858,6 @@ Leader
         return;
       }
 
-      if(!coords){
-        const proceed = confirm("No coordinates entered. Save catch without coordinates?");
-        if(!proceed) return;
-      }
-
       if(coords){
         tryAutoMatchAreaFromCoords(coords);
       }
@@ -1235,6 +872,7 @@ Leader
         minSize,
         sizeCaught,
         seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
+        photo: currentCatchPhoto || "",
         date: new Date().toLocaleString()
       };
 
@@ -1248,21 +886,6 @@ Leader
       setTimeout(() => {
         document.getElementById("saveMsg").textContent = "";
       }, 2000);
-    }
-
-    function clearCatchForm(){
-      document.getElementById("species").value = "";
-      document.getElementById("minSize").value = "";
-      document.getElementById("sizeCaught").value = "";
-      document.getElementById("sizeWarning").textContent = "";
-      document.getElementById("bait").innerHTML = '<option value="">Choose...</option>';
-      document.getElementById("area").value = "";
-      document.getElementById("coords").value = "";
-      document.getElementById("whereCaught").value = "";
-      document.getElementById("coordAreaText").textContent = "";
-      document.getElementById("notes").value = "";
-      document.getElementById("saveMsg").textContent = "";
-      document.getElementById("minSizeNote").textContent = "Choose species to load minimum size.";
     }
 
     function renderLog(){
@@ -1287,6 +910,7 @@ Leader
             <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
             <span class="mini">Coords: ${c.coords || "-"}</span><br>
             ${c.notes ? `<span class="mini">Notes: ${c.notes}</span><br>` : ""}
+            ${c.photo ? `<img src="${c.photo}" class="previewImg" style="display:block;max-width:220px;">` : ""}
             <span class="mini">${c.date}</span>
           </div>
         `;
@@ -1295,10 +919,24 @@ Leader
       box.innerHTML = html;
     }
 
-    function clearLog(){
-      if(!confirm("Delete all catches?")) return;
-      localStorage.removeItem(KEY_LOG);
-      renderLog();
+    function clearCatchForm(){
+      document.getElementById("species").value = "";
+      document.getElementById("minSize").value = "";
+      document.getElementById("sizeCaught").value = "";
+      document.getElementById("sizeWarning").textContent = "";
+      document.getElementById("bait").innerHTML = '<option value="">Choose...</option>';
+      document.getElementById("area").value = "";
+      document.getElementById("coords").value = "";
+      document.getElementById("whereCaught").value = "";
+      document.getElementById("coordAreaText").textContent = "";
+      document.getElementById("notes").value = "";
+      document.getElementById("saveMsg").textContent = "";
+      document.getElementById("minSizeNote").textContent = "Choose species to load minimum size.";
+      currentCatchPhoto = "";
+      document.getElementById("catchPreview").src = "";
+      document.getElementById("catchPreview").style.display = "none";
+      document.getElementById("catchPhoto").value = "";
+      document.getElementById("catchPhotoText").textContent = "No fish photo selected yet.";
     }
 
     async function loadWeekForecast(){
@@ -1351,7 +989,10 @@ Leader
     function renderFishInfo(){
       const species = document.getElementById("fishSelect").value;
       const info = FISH_INFO[species];
-      if(!info) return;
+      if(!info){
+        document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
+        return;
+      }
 
       document.getElementById("fishInfoBox").innerHTML = `
         <div class="spotCard">
@@ -1447,10 +1088,9 @@ Leader
     function sendToChatGPTHint(){
       document.getElementById("fishIdResults").innerHTML = `
         <div class="suggestionCard">
-          To use ChatGPT for identification:<br><br>
-          1. Upload the fish photo in ChatGPT<br>
-          2. Ask: <b>Identify this fish from the photo</b><br>
-          3. Compare the result with the Fish ID Guide in this app
+          Open ChatGPT, upload the fish photo, and ask:<br>
+          <b>Identify this fish from the photo</b><br><br>
+          <a class="chatlink" href="https://chatgpt.com" target="_blank">Open ChatGPT</a>
         </div>
       `;
     }
@@ -1524,6 +1164,34 @@ Leader
       document.getElementById("fishPhoto").value = "";
     }
 
+    function openCatchCamera(){
+      const el = document.getElementById("catchPhoto");
+      el.setAttribute("capture","environment");
+      el.click();
+    }
+
+    function openCatchGallery(){
+      const el = document.getElementById("catchPhoto");
+      el.removeAttribute("capture");
+      el.click();
+    }
+
+    document.getElementById("catchPhoto").addEventListener("change", function(){
+      const file = this.files && this.files[0];
+      const preview = document.getElementById("catchPreview");
+
+      if(file){
+        const reader = new FileReader();
+        reader.onload = function(e){
+          currentCatchPhoto = e.target.result;
+          preview.src = currentCatchPhoto;
+          preview.style.display = "block";
+          document.getElementById("catchPhotoText").textContent = file.name + " loaded.";
+        };
+        reader.readAsDataURL(file);
+      }
+    });
+
     document.getElementById("species").addEventListener("change", () => {
       fillBaitOptions();
       updateMinSize();
@@ -1548,4 +1216,4 @@ Leader
     renderLog();
   </script>
 </body>
-  </html>
+          </html>
