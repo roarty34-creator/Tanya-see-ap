@@ -129,7 +129,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V99 Stable</div>
+  <div class="mini">V100 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -198,7 +198,7 @@
       <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
 
       <label>Where Caught</label>
-      <input id="whereCaught" placeholder="Editable" />
+      <input id="whereCaught" placeholder="Auto-filled from Local Area, or edit manually" />
 
       <div id="coordAreaText" class="mini" style="margin-top:8px;"></div>
 
@@ -338,7 +338,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V99 Stable
+    Build version: V100 Stable
   </div>
 
   <script>
@@ -765,6 +765,14 @@ Leader
       if(id === "addTab") renderLog();
     }
 
+    function getAreaSideFromCoord(coordStr){
+      if(!coordStr || !coordStr.includes(",")) return "Area";
+      const p = coordStr.split(",");
+      const lon = Number(p[1]);
+      if(!Number.isFinite(lon)) return "Area";
+      return lon > MARINE_LINE_LON ? "East" : "West";
+    }
+
     function describeSeaAreaFromLon(lon){
       if(lon > MARINE_LINE_LON) return "East towards marine area";
       if(lon < MARINE_LINE_LON) return "West towards Jongensfontein area";
@@ -787,11 +795,11 @@ Leader
     function renderSpotList(){
       let html = "";
       SPOTS.forEach(s => {
-        const area = describeSeaAreaFromCoord(s.coord);
+        const side = getAreaSideFromCoord(s.coord);
         html += `
           <div class="spotCard">
-            <div class="spotTitle">${s.name}</div>
-            <div class="spotSub">${area}</div>
+            <div class="spotTitle">${side} - ${s.name}</div>
+            <div class="spotSub">${describeSeaAreaFromCoord(s.coord)}</div>
             <div style="margin-top:6px;"><span class="chip">${s.coord}</span></div>
             <div class="row" style="margin-top:10px;">
               <button onclick="copyCoord('${s.coord}')">Copy Coordinates</button>
@@ -806,11 +814,16 @@ Leader
     function fillAreaDropdown(){
       const area = document.getElementById("area");
       area.innerHTML = '<option value="">Choose saved area...</option>';
+
       SPOTS.forEach(s => {
+        const side = getAreaSideFromCoord(s.coord);
+        const label = `${side} - ${s.name}`;
+
         const opt = document.createElement("option");
-        opt.value = s.name;
-        opt.textContent = s.name;
+        opt.value = label;
+        opt.textContent = label;
         opt.dataset.coords = s.coord;
+        opt.dataset.spotname = s.name;
         area.appendChild(opt);
       });
     }
@@ -891,10 +904,15 @@ Leader
     function tryAutoMatchAreaFromCoords(coordStr){
       const normalized = coordStr.replace(/\s+/g,"").trim();
       const match = SPOTS.find(s => s.coord.replace(/\s+/g,"").trim() === normalized);
+
       if(match){
-        document.getElementById("area").value = match.name;
+        const side = getAreaSideFromCoord(match.coord);
+        const label = `${side} - ${match.name}`;
+
+        document.getElementById("area").value = label;
+
         if(!document.getElementById("whereCaught").value.trim()){
-          document.getElementById("whereCaught").value = match.name;
+          document.getElementById("whereCaught").value = label;
         }
       }
     }
@@ -902,9 +920,11 @@ Leader
     function fillFromArea(){
       const area = document.getElementById("area");
       const selected = area.options[area.selectedIndex];
-      if(selected.value && !document.getElementById("whereCaught").value.trim()){
+
+      if(selected.value){
         document.getElementById("whereCaught").value = selected.value;
       }
+
       if(selected.dataset.coords){
         document.getElementById("coords").value = selected.dataset.coords;
         document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(selected.dataset.coords);
@@ -913,9 +933,12 @@ Leader
 
     function useSpotInCatch(name, coord){
       showTab("addTab");
-      document.getElementById("area").value = name;
+      const side = getAreaSideFromCoord(coord);
+      const label = `${side} - ${name}`;
+
+      document.getElementById("area").value = label;
       document.getElementById("coords").value = coord;
-      document.getElementById("whereCaught").value = name;
+      document.getElementById("whereCaught").value = label;
       document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
     }
 
@@ -992,7 +1015,7 @@ Leader
             <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
             <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
             <span class="mini">Preferred Bait / Lure: ${c.bait || "-"}</span><br>
-            <span class="mini">Area: ${c.area || "-"}</span><br>
+            <span class="mini">Local Area: ${c.area || "-"}</span><br>
             <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
             <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
             <span class="mini">Coords: ${c.coords || "-"}</span><br>
@@ -1229,4 +1252,4 @@ Leader
     });
   </script>
 </body>
-          </html>
+        </html>
