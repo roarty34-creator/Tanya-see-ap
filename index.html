@@ -113,7 +113,7 @@
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V106 Full Rebuild</div>
+  <div class="mini">V106 Fixed</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -210,35 +210,34 @@
       <div id="logBox"></div>
     </div>
   </section>
-  
-<section id="weatherTab" style="display:none;">
-  <div class="card">
-    <div class="sectionTitle"><b>Weather</b></div>
 
-    <div class="identifyBox">
-      <div class="identifyTitle">7-Day Wind Forecast</div>
-      <div class="bigText">Use this together with swell, current and launch conditions.</div>
+  <section id="weatherTab" style="display:none;">
+    <div class="card">
+      <div class="sectionTitle"><b>Weather</b></div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">7-Day Wind Forecast</div>
+        <div class="bigText">Use this together with swell, current and launch conditions.</div>
+      </div>
+
+      <div class="mini">
+        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
+        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
+      </div>
+
+      <div id="weekForecast"></div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Tides</div>
+        <div id="tideBox" class="bigText">Loading tide section...</div>
+      </div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Fishing Window Note</div>
+        <div id="fishingWindowBox" class="bigText">Loading fishing note...</div>
+      </div>
     </div>
-
-    <div class="mini">
-      Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
-      Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
-    </div>
-
-    <div id="weekForecast"></div>
-
-    <div class="identifyBox">
-      <div class="identifyTitle">Tides</div>
-      <div id="tideBox" class="bigText">Loading tide section...</div>
-    </div>
-
-    <div class="identifyBox">
-      <div class="identifyTitle">Fishing Window Note</div>
-      <div id="fishingWindowBox" class="bigText">Loading fishing note...</div>
-    </div>
-  </div>
-</section>
-      
+  </section>
 
   <section id="fishInfoTab" style="display:none;">
     <div class="card">
@@ -309,7 +308,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Fishing App<br>
-    Build version: V106 Full Rebuild
+    Build version: V106 Fixed
   </div>
 
 <script>
@@ -325,7 +324,6 @@ const SPOTS = [
   { name:"Kabeljou Ridge", coord:"-34.3750,20.8700" },
   { name:"Die Gat", coord:"-34.3955,20.8450" },
   { name:"Stilbaai Reef", coord:"-34.3888,20.8570" },
-
   { name:"East Reef 1", coord:"-34.3898,21.4305" },
   { name:"East Reef 2", coord:"-34.3925,21.4360" },
   { name:"East Dropoff", coord:"-34.3980,21.4425" },
@@ -334,21 +332,18 @@ const SPOTS = [
   { name:"Marine Side Reef", coord:"-34.3945,21.4385" },
   { name:"East Bank 1", coord:"-34.4008,21.4465" },
   { name:"East Bank 2", coord:"-34.4082,21.4521" },
-
   { name:"West Bank 1", coord:"-34.3892,21.4105" },
   { name:"West Bank 2", coord:"-34.3921,21.4058" },
   { name:"West Reef 1", coord:"-34.3950,21.3990" },
   { name:"West Reef 2", coord:"-34.4012,21.3920" },
   { name:"Jongensfontein Edge 1", coord:"-34.4050,21.3840" },
   { name:"Jongensfontein Edge 2", coord:"-34.4108,21.3775" },
-
   { name:"Deep Channel 1", coord:"-34.3995,21.4212" },
   { name:"Deep Channel 2", coord:"-34.4042,21.4248" },
   { name:"South Ridge 1", coord:"-34.4120,21.4315" },
   { name:"South Ridge 2", coord:"-34.4188,21.4372" },
   { name:"South Bank 1", coord:"-34.4215,21.4200" },
   { name:"South Bank 2", coord:"-34.4258,21.4125" },
-
   { name:"Outer Reef 1", coord:"-34.4305,21.4455" },
   { name:"Outer Reef 2", coord:"-34.4362,21.4380" },
   { name:"Outer Bank 1", coord:"-34.4395,21.4210" },
@@ -390,30 +385,25 @@ const BAIT_BY_SPECIES = {
   ],
   "Hottentot":[
     "Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"
-  ]
+  ],
   "Geelbek":[
-  "Chokka","Sardine","Pilchard","Live bait","Live Makriel","Yo-Zuri minnow"
-],
-
-"Carpenter":[
-  "Chokka","Squid","Pilchard","Octopus"
-],
-
-"Dageraad":[
-  "Chokka","Pilchard","Redbait","Squid","Big bait"
-],
-
-"Santer":[
-  "Chokka","Sardine","Pilchard strip"
-],
-
-"Elf / Shad":[
-  "Sardine","Pilchard","Spoon","Surface lure","Plug"
-],
-
-"Garrick / Leervis":[
-  "Live bait","Mullet strip","Plug","Stickbait","Surface lure"
-],
+    "Chokka","Sardine","Pilchard","Live bait","Live Makriel","Yo-Zuri minnow"
+  ],
+  "Carpenter":[
+    "Chokka","Squid","Pilchard","Octopus"
+  ],
+  "Dageraad":[
+    "Chokka","Pilchard","Redbait","Squid","Big bait"
+  ],
+  "Santer":[
+    "Chokka","Sardine","Pilchard strip"
+  ],
+  "Elf / Shad":[
+    "Sardine","Pilchard","Spoon","Surface lure","Plug"
+  ],
+  "Garrick / Leervis":[
+    "Live bait","Mullet strip","Plug","Stickbait","Surface lure"
+  ]
 };
 
 const MIN_SIZE = {
@@ -425,17 +415,7 @@ const MIN_SIZE = {
   "Silverfish":25,
   "Red Steenbras":60,
   "Yellow Belly":30,
-  "Hottentot":22
-  "Cape Kob":60,
-  "Yellowtail":60,
-  "Bonito":0,
-  "Red Roman":30,
-  "Snapper":30,
-  "Silverfish":25,
-  "Red Steenbras":60,
-  "Yellow Belly":30,
   "Hottentot":22,
-
   "Geelbek":60,
   "Carpenter":40,
   "Dageraad":40,
@@ -443,276 +423,284 @@ const MIN_SIZE = {
   "Elf / Shad":30,
   "Garrick / Leervis":70
 };
-};
+
+function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier){
+  return {
+    speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier
+  };
+}
 
 const FISH_INFO = {
-  "Cape Kob":{
-    speciesNote:"Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
-    bestBait:"Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
-    favoriteBait:"Chokka + Pilchard combo",
-    identifier:{
-      body:"Long strong predator body",
-      colour:"Silver-grey with darker back",
-      tail:"Strong tail",
-      found:"Reef edges and sandy channels",
-      giveaway:"Big mouth and classic kob shape"
-    },
-    status:"Check current permit / stock status",
-    naturalBait:"Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
-    lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
-    hook:"Top hook 7/0, bottom hook 8/0 or 9/0",
-    sinker:"6 oz to 8 oz grapnel or bottle sinker",
-    strop:"0.80 – 1.0 mm nylon, ± 80 cm",
-    rigType:"Big Kob Double Strop Rig",
-    season:"Spring to Autumn",
-    closed:"Check permit rules",
-    make:"1. Tie braid to a strong barrel swivel.\n2. Add 0.80 - 1.0 mm nylon leader.\n3. Tie the top hook 7/0.\n4. Tie the bottom hook 8/0 or 9/0.\n5. Add a 6-8 oz grapnel or bottle sinker.",
-    why:"Kob often takes bait hanging just above the bottom.\nTwo hooks keep the bait straight and reduce spinning in current.",
-    sketch:"BIG KOB DOUBLE STROP RIG\n\nMain line\n40-50 lb braid\n  |\nStrong barrel swivel\n  |\nLeader\n0.80 - 1.0 mm nylon\n± 80 cm long\n  |\nTop hook snoot ---- 7/0 hook\n  |\nBottom hook snoot - 8/0 or 9/0 hook\n  |\n6-8 oz grapnel / bottle sinker"
-  },
-
-  "Yellowtail":{
-    speciesNote:"Best from summer to autumn when warm water pushes bait to the surface.",
-    bestBait:"Live Makriel, Sardine strip, Yo-Zuri minnow, Metal spoon",
-    favoriteBait:"Live Makriel",
-    identifier:{
-      body:"Long torpedo shaped body",
-      colour:"Blue-green back with silver sides",
-      tail:"Strong forked tail",
-      found:"Open water around bait balls",
-      giveaway:"Fast swimming pelagic fish"
-    },
-    status:"Check current permit",
-    naturalBait:"Live Makriel, Live bait, Pilchard strip, Sardine",
-    lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Stickbait, Popper",
-    hook:"4/0 – 6/0",
-    sinker:"Usually none",
-    strop:"0.60 – 0.70 mm nylon ± 1 – 1.5 m",
-    rigType:"Yellowtail live bait rig",
-    season:"Summer to Autumn",
-    closed:"Check permit rules",
-    make:"1. Tie braid to swivel.\n2. Add leader.\n3. Use live bait hook or lure clip.\n4. Keep the setup light.",
-    why:"Yellowtail hunts fast and likes lively bait or fast moving lures.",
-    sketch:"YELLOWTAIL RIG\n\nMain line\n40-50 lb braid\n  |\nSwivel\n  |\nLeader 1 - 1.5 m\n  |\n4/0 - 6/0 hook\n\nNo sinker"
-  },
-
-  "Bonito":{
-    speciesNote:"Best from summer to autumn when birds and bait balls are active.",
-    bestBait:"Feather lure, Sardine strip, Pilchard strip, Yo-Zuri minnow",
-    favoriteBait:"Feather lure",
-    identifier:{
-      body:"Slim tuna shaped body",
-      colour:"Dark back with silver sides",
-      tail:"Forked tail",
-      found:"Surface feeding schools",
-      giveaway:"Very fast surface hunter"
-    },
-    status:"Check current permit",
-    naturalBait:"Pilchard strip, Sardine strip, Makriel",
-    lures:"Feather lure, Small spoon, Yo-Zuri minnow, Trolling lure",
-    hook:"3/0 – 4/0",
-    sinker:"None",
-    strop:"0.60 mm nylon ± 1 m",
-    rigType:"Bonito trolling rig",
-    season:"Summer to Autumn",
-    closed:"Check permit rules",
-    make:"1. Use light fast setup.\n2. Run feather or spoon.\n3. Keep lure moving.",
-    why:"Bonito feeds fast near surface and reacts well to moving lures.",
-    sketch:"BONITO RIG\n\nMain line\n30-40 lb braid\n  |\nSwivel\n  |\nLeader 1 m\n  |\nFeather / small lure"
-  },
-
-  "Red Roman":{
-    speciesNote:"Good all year. Prefers reef structure and bottom bait presentation.",
-    bestBait:"Chokka, Pilchard, Octopus, Squid",
-    favoriteBait:"Chokka",
-    identifier:{
-      body:"Deep reef fish body",
-      colour:"Red to orange",
-      tail:"Rounded reef fish tail",
-      found:"Rocky reef areas",
-      giveaway:"Deep red colour"
-    },
-    status:"Sensitive species",
-    naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine",
-    lures:"Usually natural bait",
-    hook:"4/0 – 6/0",
-    sinker:"6 oz – 8 oz",
-    strop:"Short traces 20 – 30 cm",
-    rigType:"2 hook reef bottom rig",
-    season:"All year",
-    closed:"Check permit rules",
-    make:"1. Keep traces short.\n2. Present bait close to reef.\n3. Hold bottom.",
-    why:"Roman stays tight to reef and likes natural bait near structure.",
-    sketch:"RED ROMAN RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook snoot\n  |\nSinker 6-8 oz"
-  },
-
-  "Snapper":{
-    speciesNote:"Good all year. Mostly structure dependent.",
-    bestBait:"Chokka, Pilchard, Redbait, Squid",
-    favoriteBait:"Chokka",
-    identifier:{
-      body:"Medium reef fish",
-      colour:"Pink red",
-      tail:"Compact tail",
-      found:"Reef structure",
-      giveaway:"Classic snapper head shape"
-    },
-    status:"Sensitive species",
-    naturalBait:"Chokka, Pilchard, Redbait, Squid",
-    lures:"Mostly natural bait",
-    hook:"4/0 – 6/0",
-    sinker:"6 oz – 8 oz",
-    strop:"20 – 40 cm",
-    rigType:"Bottom bait rig",
-    season:"All year",
-    closed:"Check permit rules",
-    make:"1. Use short bottom trace.\n2. Keep bait neat.\n3. Fish over reef.",
-    why:"Snapper bites well on clean natural bait close to bottom.",
-    sketch:"SNAPPER RIG\n\nMain line\n  |\nSwivel\n  |\nHook snoot\n  |\nSinker"
-  },
-
-  "Silverfish":{
-    speciesNote:"Good all year. Often over reef in calmer conditions.",
-    bestBait:"Chokka strip, Pilchard strip, Mussel",
-    favoriteBait:"Chokka strip",
-    identifier:{
-      body:"Small streamlined body",
-      colour:"Bright silver",
-      tail:"Small forked tail",
-      found:"Over reef",
-      giveaway:"Bright silver body"
-    },
-    status:"Check permit",
-    naturalBait:"Chokka strip, Pilchard strip, Mussel",
-    lures:"Rarely used",
-    hook:"2/0 – 4/0",
-    sinker:"4 oz – 6 oz",
-    strop:"20 – 30 cm",
-    rigType:"Light bottom rig",
-    season:"All year",
-    closed:"Check permit rules",
-    make:"1. Use light rig.\n2. Smaller bait.\n3. Stay near bottom.",
-    why:"Light presentation suits smaller fish feeding over reef.",
-    sketch:"SILVERFISH RIG\n\nMain line\n  |\nSwivel\n  |\nShort snoot\n  |\nSmall sinker"
-  },
-
-  "Red Steenbras":{
-    speciesNote:"Sensitive species. Closed season 1 Sep – 30 Nov.",
-    bestBait:"Big chokka bait, Pilchard, Redbait",
-    favoriteBait:"Big chokka bait",
-    identifier:{
-      body:"Large powerful body",
-      colour:"Silver pink",
-      tail:"Strong tail",
-      found:"Deeper bottom structure",
-      giveaway:"Large powerful fish"
-    },
-    status:"Protected species",
-    naturalBait:"Chokka, Pilchard, Redbait",
-    lures:"Natural bait preferred",
-    hook:"6/0 – 8/0",
-    sinker:"7 oz – 9 oz",
-    strop:"70 – 120 cm",
-    rigType:"Strong bottom rig",
-    season:"All year except closed season",
-    closed:"Closed season 1 Sep – 30 Nov",
-    make:"1. Use heavy swivel and strong leader.\n2. Use strong hook.\n3. Match sinker to current.",
-    why:"This species needs stronger tackle and careful handling.",
-    sketch:"RED STEENBRAS RIG\n\nMain line\n  |\nHeavy swivel\n  |\nLong snoot\n  |\nHeavy sinker"
-  },
-
-  "Yellow Belly":{
-    speciesNote:"Good all year. Focus on reef patches and current.",
-    bestBait:"Chokka, Pilchard, Sardine",
-    favoriteBait:"Chokka",
-    identifier:{
-      body:"Deep reef body",
-      colour:"Yellow belly underside",
-      tail:"Compact tail",
-      found:"Reef patches",
-      giveaway:"Yellow belly colour"
-    },
-    status:"Check permit",
-    naturalBait:"Chokka, Pilchard, Sardine",
-    lures:"Mostly natural bait",
-    hook:"4/0 – 6/0",
-    sinker:"6 oz – 8 oz",
-    strop:"30 – 50 cm",
-    rigType:"Bottom rig",
-    season:"All year",
-    closed:"Check permit rules",
-    make:"1. Simple bottom rig.\n2. Keep bait clean.\n3. Fish reef edges.",
-    why:"Bottom bait presentation works best over reef patches.",
-    sketch:"YELLOW BELLY RIG\n\nMain line\n  |\nSwivel\n  |\nHook trace\n  |\nSinker"
-  },
-
-  "Hottentot":{
-    speciesNote:"Good all year. Small bait works best.",
-    bestBait:"Mussel, Redbait, Chokka strip",
-    favoriteBait:"Mussel",
-    identifier:{
-      body:"Short compact body",
-      colour:"Grey silver",
-      tail:"Small tail",
-      found:"Shallow reef",
-      giveaway:"Small mouth reef fish"
-    },
-    status:"Check permit",
-    naturalBait:"Chokka strip, Pilchard, Mussel, Redbait",
-    lures:"Natural bait preferred",
-    hook:"2/0 – 3/0",
-    sinker:"4 oz – 5 oz",
-    strop:"0.50 – 0.60 mm nylon ± 60 cm",
-    rigType:"Light reef rig",
-    season:"All year",
-    closed:"Check permit rules",
-    make:"1. Small hook.\n2. Small neat bait.\n3. Fish shallow reef.",
-    why:"Small mouth fish respond better to small natural baits.",
-    sketch:"HOTTENTOT RIG\n\nMain line\n  |\nSmall swivel\n  |\nShort trace\n  |\nLight sinker"
-  }
-  ,
-
-"Geelbek":{
-  speciesNote:"Often caught over reef and channels when baitfish are present.",
-  bestBait:"Chokka, Sardine, Pilchard, Live Makriel",
-  favoriteBait:"Chokka",
-  status:"Check current permit"
-},
-
-"Carpenter":{
-  speciesNote:"Strong reef fish that prefers structure and tough bait.",
-  bestBait:"Chokka, Squid, Pilchard, Octopus",
-  favoriteBait:"Chokka",
-  status:"Check permit"
-},
-
-"Dageraad":{
-  speciesNote:"Large reef species that prefers bigger bait and stable conditions.",
-  bestBait:"Chokka, Pilchard, Redbait, Squid",
-  favoriteBait:"Chokka",
-  status:"Check permit carefully"
-},
-
-"Santer":{
-  speciesNote:"Common reef fish around structure and reef patches.",
-  bestBait:"Chokka, Sardine, Pilchard strip",
-  favoriteBait:"Chokka",
-  status:"Check permit"
-},
-
-"Elf / Shad":{
-  speciesNote:"Fast predator that hunts baitfish in current and surface activity.",
-  bestBait:"Sardine, Pilchard, Spoon, Surface lure",
-  favoriteBait:"Sardine",
-  status:"Check permit"
-},
-
-"Garrick / Leervis":{
-  speciesNote:"Predator that hunts live bait and baitfish in moving water.",
-  bestBait:"Live bait, Mullet strip, Plug, Stickbait",
-  favoriteBait:"Live bait",
-  status:"Check permit"
-  }
+  "Cape Kob": fullInfo(
+    "Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
+    "Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
+    "Chokka + Pilchard combo",
+    "Check current permit / stock status",
+    "Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
+    "Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
+    "Top hook 7/0, bottom hook 8/0 or 9/0",
+    "6 oz to 8 oz grapnel or bottle sinker",
+    "0.80 – 1.0 mm nylon, ± 80 cm",
+    "Big Kob Double Strop Rig",
+    "Spring to Autumn",
+    "Check permit rules",
+    "1. Tie braid to a strong barrel swivel.\n2. Add 0.80 - 1.0 mm nylon leader.\n3. Tie the top hook 7/0.\n4. Tie the bottom hook 8/0 or 9/0.\n5. Add a 6-8 oz grapnel or bottle sinker.",
+    "Kob often takes bait hanging just above the bottom.\nTwo hooks keep the bait straight and reduce spinning in current.",
+    "BIG KOB DOUBLE STROP RIG\n\nMain line\n40-50 lb braid\n  |\nStrong barrel swivel\n  |\nLeader\n0.80 - 1.0 mm nylon\n± 80 cm long\n  |\nTop hook snoot ---- 7/0 hook\n  |\nBottom hook snoot - 8/0 or 9/0 hook\n  |\n6-8 oz grapnel / bottle sinker",
+    { body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail", found:"Reef edges and sandy channels", giveaway:"Big mouth and classic kob shape" }
+  ),
+  "Yellowtail": fullInfo(
+    "Best from summer to autumn when warm water pushes bait to the surface.",
+    "Live Makriel, Sardine strip, Yo-Zuri minnow, Metal spoon",
+    "Live Makriel",
+    "Check current permit",
+    "Live Makriel, Live bait, Pilchard strip, Sardine",
+    "Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Stickbait, Popper",
+    "4/0 – 6/0",
+    "Usually none",
+    "0.60 – 0.70 mm nylon ± 1 – 1.5 m",
+    "Yellowtail live bait rig",
+    "Summer to Autumn",
+    "Check permit rules",
+    "1. Tie braid to swivel.\n2. Add leader.\n3. Use live bait hook or lure clip.\n4. Keep the setup light.",
+    "Yellowtail hunts fast and likes lively bait or fast moving lures.",
+    "YELLOWTAIL RIG\n\nMain line\n40-50 lb braid\n  |\nSwivel\n  |\nLeader 1 - 1.5 m\n  |\n4/0 - 6/0 hook\n\nNo sinker",
+    { body:"Long torpedo shaped body", colour:"Blue-green back with silver sides", tail:"Strong forked tail", found:"Open water around bait balls", giveaway:"Fast swimming pelagic fish" }
+  ),
+  "Bonito": fullInfo(
+    "Best from summer to autumn when birds and bait balls are active.",
+    "Feather lure, Sardine strip, Pilchard strip, Yo-Zuri minnow",
+    "Feather lure",
+    "Check current permit",
+    "Pilchard strip, Sardine strip, Makriel",
+    "Feather lure, Small spoon, Yo-Zuri minnow, Trolling lure",
+    "3/0 – 4/0",
+    "None",
+    "0.60 mm nylon ± 1 m",
+    "Bonito trolling rig",
+    "Summer to Autumn",
+    "Check permit rules",
+    "1. Use light fast setup.\n2. Run feather or spoon.\n3. Keep lure moving.",
+    "Bonito feeds fast near surface and reacts well to moving lures.",
+    "BONITO RIG\n\nMain line\n30-40 lb braid\n  |\nSwivel\n  |\nLeader 1 m\n  |\nFeather / small lure",
+    { body:"Slim tuna shaped body", colour:"Dark back with silver sides", tail:"Forked tail", found:"Surface feeding schools", giveaway:"Very fast surface hunter" }
+  ),
+  "Red Roman": fullInfo(
+    "Good all year. Prefers reef structure and bottom bait presentation.",
+    "Chokka, Pilchard, Octopus, Squid",
+    "Chokka",
+    "Sensitive species",
+    "Chokka, Pilchard, Octopus, Squid, Sardine",
+    "Usually natural bait",
+    "4/0 – 6/0",
+    "6 oz – 8 oz",
+    "Short traces 20 – 30 cm",
+    "2 hook reef bottom rig",
+    "All year",
+    "Check permit rules",
+    "1. Keep traces short.\n2. Present bait close to reef.\n3. Hold bottom.",
+    "Roman stays tight to reef and likes natural bait near structure.",
+    "RED ROMAN RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook snoot\n  |\nSinker 6-8 oz",
+    { body:"Deep reef fish body", colour:"Red to orange", tail:"Rounded reef fish tail", found:"Rocky reef areas", giveaway:"Deep red colour" }
+  ),
+  "Snapper": fullInfo(
+    "Good all year. Mostly structure dependent.",
+    "Chokka, Pilchard, Redbait, Squid",
+    "Chokka",
+    "Sensitive species",
+    "Chokka, Pilchard, Redbait, Squid",
+    "Mostly natural bait",
+    "4/0 – 6/0",
+    "6 oz – 8 oz",
+    "20 – 40 cm",
+    "Bottom bait rig",
+    "All year",
+    "Check permit rules",
+    "1. Use short bottom trace.\n2. Keep bait neat.\n3. Fish over reef.",
+    "Snapper bites well on clean natural bait close to bottom.",
+    "SNAPPER RIG\n\nMain line\n  |\nSwivel\n  |\nHook snoot\n  |\nSinker",
+    { body:"Medium reef fish", colour:"Pink red", tail:"Compact tail", found:"Reef structure", giveaway:"Classic snapper head shape" }
+  ),
+  "Silverfish": fullInfo(
+    "Good all year. Often over reef in calmer conditions.",
+    "Chokka strip, Pilchard strip, Mussel",
+    "Chokka strip",
+    "Check permit",
+    "Chokka strip, Pilchard strip, Mussel",
+    "Rarely used",
+    "2/0 – 4/0",
+    "4 oz – 6 oz",
+    "20 – 30 cm",
+    "Light bottom rig",
+    "All year",
+    "Check permit rules",
+    "1. Use light rig.\n2. Smaller bait.\n3. Stay near bottom.",
+    "Light presentation suits smaller fish feeding over reef.",
+    "SILVERFISH RIG\n\nMain line\n  |\nSwivel\n  |\nShort snoot\n  |\nSmall sinker",
+    { body:"Small streamlined body", colour:"Bright silver", tail:"Small forked tail", found:"Over reef", giveaway:"Bright silver body" }
+  ),
+  "Red Steenbras": fullInfo(
+    "Sensitive species. Closed season 1 Sep – 30 Nov.",
+    "Big chokka bait, Pilchard, Redbait",
+    "Big chokka bait",
+    "Protected species",
+    "Chokka, Pilchard, Redbait",
+    "Natural bait preferred",
+    "6/0 – 8/0",
+    "7 oz – 9 oz",
+    "70 – 120 cm",
+    "Strong bottom rig",
+    "All year except closed season",
+    "Closed season 1 Sep – 30 Nov",
+    "1. Use heavy swivel and strong leader.\n2. Use strong hook.\n3. Match sinker to current.",
+    "This species needs stronger tackle and careful handling.",
+    "RED STEENBRAS RIG\n\nMain line\n  |\nHeavy swivel\n  |\nLong snoot\n  |\nHeavy sinker",
+    { body:"Large powerful body", colour:"Silver pink", tail:"Strong tail", found:"Deeper bottom structure", giveaway:"Large powerful fish" }
+  ),
+  "Yellow Belly": fullInfo(
+    "Good all year. Focus on reef patches and current.",
+    "Chokka, Pilchard, Sardine",
+    "Chokka",
+    "Check permit",
+    "Chokka, Pilchard, Sardine",
+    "Mostly natural bait",
+    "4/0 – 6/0",
+    "6 oz – 8 oz",
+    "30 – 50 cm",
+    "Bottom rig",
+    "All year",
+    "Check permit rules",
+    "1. Simple bottom rig.\n2. Keep bait clean.\n3. Fish reef edges.",
+    "Bottom bait presentation works best over reef patches.",
+    "YELLOW BELLY RIG\n\nMain line\n  |\nSwivel\n  |\nHook trace\n  |\nSinker",
+    { body:"Deep reef body", colour:"Yellow belly underside", tail:"Compact tail", found:"Reef patches", giveaway:"Yellow belly colour" }
+  ),
+  "Hottentot": fullInfo(
+    "Good all year. Small bait works best.",
+    "Mussel, Redbait, Chokka strip",
+    "Mussel",
+    "Check permit",
+    "Chokka strip, Pilchard, Mussel, Redbait",
+    "Natural bait preferred",
+    "2/0 – 3/0",
+    "4 oz – 5 oz",
+    "0.50 – 0.60 mm nylon ± 60 cm",
+    "Light reef rig",
+    "All year",
+    "Check permit rules",
+    "1. Small hook.\n2. Small neat bait.\n3. Fish shallow reef.",
+    "Small mouth fish respond better to small natural baits.",
+    "HOTTENTOT RIG\n\nMain line\n  |\nSmall swivel\n  |\nShort trace\n  |\nLight sinker",
+    { body:"Short compact body", colour:"Grey silver", tail:"Small tail", found:"Shallow reef", giveaway:"Small mouth reef fish" }
+  ),
+  "Geelbek": fullInfo(
+    "Often caught over reef and channels when baitfish are present.",
+    "Chokka, Sardine, Pilchard, Live Makriel",
+    "Chokka",
+    "Check current permit",
+    "Chokka, Sardine, Pilchard, Live bait, Live Makriel",
+    "Yo-Zuri minnow, Deep diver, Stickbait",
+    "6/0 - 8/0",
+    "Light to medium depending on current",
+    "0.70 - 0.80 mm leader, ± 1 m",
+    "Single hook drift / bait rig",
+    "Good in active bait periods",
+    "Check permit rules",
+    "1. Tie braid to swivel.\n2. Add ±1 m leader.\n3. Use strong single hook.\n4. Drift or fish slightly off bottom.",
+    "Geelbek often responds to natural bait in the water column around active structure.",
+    "GEELBEK RIG\n\nMain line\n  |\nSwivel\n  |\nLeader 1 m\n  |\nSingle hook",
+    { body:"Long streamlined predator", colour:"Silver with darker back", tail:"Forked tail", found:"Reefs, channels, deeper water column", giveaway:"Strong streamlined body and pelagic look" }
+  ),
+  "Carpenter": fullInfo(
+    "Strong reef fish that prefers structure and tough bait.",
+    "Chokka, Squid, Pilchard, Octopus",
+    "Chokka",
+    "Check permit",
+    "Chokka, Squid, Pilchard, Octopus",
+    "Mostly natural bait",
+    "6/0 - 7/0",
+    "7 oz - 8 oz",
+    "0.80 - 1.0 mm, short strong trace",
+    "Strong reef bottom rig",
+    "All year on reef",
+    "Check permit rules",
+    "1. Use heavy reef trace.\n2. Short strong leader.\n3. Fish directly over reef.",
+    "Carpenter hits hard and needs strong tackle on structure.",
+    "CARPENTER RIG\n\nMain line\n  |\nHeavy swivel\n  |\nShort strong trace\n  |\nSinker",
+    { body:"Deep powerful reef body", colour:"Brown-grey reef tones", tail:"Strong reef fish tail", found:"Hard reef and structure", giveaway:"Powerful reef fish profile" }
+  ),
+  "Dageraad": fullInfo(
+    "Large reef species that prefers bigger bait and stable conditions.",
+    "Chokka, Pilchard, Redbait, Squid",
+    "Chokka",
+    "Check permit carefully",
+    "Chokka, Pilchard, Redbait, Squid, Big bait",
+    "Natural bait preferred",
+    "7/0 - 9/0",
+    "6 oz - 8 oz",
+    "0.90 - 1.0 mm trace",
+    "Heavy bottom rig",
+    "Stable sea conditions",
+    "Check permit rules",
+    "1. Use strong swivel.\n2. Strong short trace.\n3. Fish bigger bait on structure.",
+    "Dageraad is a stronger reef fish and responds to larger clean bait.",
+    "DAGERAAD RIG\n\nMain line\n  |\nStrong swivel\n  |\nHeavy trace\n  |\nSinker",
+    { body:"Large deep reef body", colour:"Pale pink to silver reef fish tone", tail:"Strong tail", found:"Deeper reef and structure", giveaway:"Large heavy reef fish build" }
+  ),
+  "Santer": fullInfo(
+    "Common reef fish around structure and reef patches.",
+    "Chokka, Sardine, Pilchard strip",
+    "Chokka",
+    "Check permit",
+    "Chokka, Sardine, Pilchard strip",
+    "Mostly natural bait",
+    "4/0 - 5/0",
+    "5 oz - 6 oz",
+    "Short trace ± 60 cm",
+    "Short reef rig",
+    "All year on reef",
+    "Check permit rules",
+    "1. Use short trace.\n2. Present neat bait.\n3. Keep it close to structure.",
+    "Santer feeds well on compact bait close to reef.",
+    "SANTER RIG\n\nMain line\n  |\nSwivel\n  |\nShort trace\n  |\nSinker",
+    { body:"Medium reef body", colour:"Silver-red reef tones", tail:"Compact tail", found:"Reef and broken structure", giveaway:"Compact reef fish profile" }
+  ),
+  "Elf / Shad": fullInfo(
+    "Fast predator that hunts baitfish in current and surface activity.",
+    "Sardine, Pilchard, Spoon, Surface lure",
+    "Sardine",
+    "Check permit",
+    "Sardine, Pilchard",
+    "Spoon, Surface lure, Plug",
+    "4/0 - 6/0",
+    "Usually none or light",
+    "Wire or heavier leader if needed",
+    "Casting / bait rig",
+    "Active bait periods",
+    "Check permit rules",
+    "1. Use light casting setup.\n2. Cast lures or fish sardine naturally.\n3. Retrieve actively.",
+    "Elf reacts to movement and baitfish activity.",
+    "ELF RIG\n\nMain line\n  |\nLeader\n  |\nLure / hook",
+    { body:"Long slim predator body", colour:"Silver with darker back", tail:"Forked tail", found:"Bait activity and moving water", giveaway:"Sharp predatory look" }
+  ),
+  "Garrick / Leervis": fullInfo(
+    "Predator that hunts live bait and baitfish in moving water.",
+    "Live bait, Mullet strip, Plug, Stickbait",
+    "Live bait",
+    "Check permit",
+    "Live bait, Mullet strip",
+    "Plug, Stickbait, Surface lure",
+    "5/0 - 7/0",
+    "Usually none or light",
+    "0.70 - 0.80 mm leader",
+    "Live bait / lure rig",
+    "Moving clean water periods",
+    "Check permit rules",
+    "1. Use clean leader.\n2. Fish live bait or cast surface lure.\n3. Work current edges.",
+    "Garrick hunts around current and bait movement.",
+    "GARRICK RIG\n\nMain line\n  |\nLeader\n  |\nLive bait / lure",
+    { body:"Long streamlined predator", colour:"Silver body", tail:"Strong tail", found:"Current edges and bait areas", giveaway:"Clean silver predatory profile" }
+  )
 };
 
 const FISH_GUIDE = [
@@ -721,7 +709,11 @@ const FISH_GUIDE = [
   {name:"Bonito", body:"Slim tuna shape", colour:"Dark back", tail:"Forked", found:"Surface schools", clue:"Fast surface hunter"},
   {name:"Red Roman", body:"Deep reef fish", colour:"Red", tail:"Rounded", found:"Rocky reef", clue:"Deep red profile"},
   {name:"Snapper", body:"Reef fish", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face"},
-  {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"}
+  {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"},
+  {name:"Geelbek", body:"Long streamlined predator", colour:"Silver", tail:"Forked", found:"Reefs / channels", clue:"Pelagic look"},
+  {name:"Carpenter", body:"Deep powerful reef body", colour:"Brown-grey", tail:"Strong", found:"Hard reef", clue:"Heavy reef fish"},
+  {name:"Dageraad", body:"Large deep reef body", colour:"Pink-silver", tail:"Strong", found:"Deep structure", clue:"Large heavy build"},
+  {name:"Santer", body:"Medium reef body", colour:"Silver-red", tail:"Compact", found:"Reef", clue:"Compact reef fish"}
 ];
 
 let currentCatchPhoto = "";
@@ -1072,6 +1064,7 @@ async function loadWeekForecast(){
   }catch{
     document.getElementById("weekForecast").innerHTML = "Could not load 7 day forecast.";
   }
+}
 
 function loadTides(){
   document.getElementById("tideBox").innerHTML = `
@@ -1089,7 +1082,7 @@ function loadTides(){
       </tbody>
     </table>
   `;
-  }
+}
 
 function loadFishingWindow(){
   const month = new Date().getMonth() + 1;
@@ -1102,42 +1095,23 @@ function loadFishingWindow(){
 
   document.getElementById("fishingWindowBox").innerHTML = `
     <b>Moon / window note:</b> ${seasonNote}<br><br>
-
     <b>Cape Kob:</b> Often stronger on lower light, pushing tide, reef edges and sandy channels.<br><br>
-
     <b>Yellowtail:</b> Better when warm clean water pushes bait up, especially with bird activity, bait balls and current lines.<br><br>
-
     <b>Bonito:</b> Better when surface bait is active, birds are working, and current lines hold small baitfish.<br><br>
-
     <b>Red Roman:</b> Usually more reef and structure dependent than season dependent. Focus on clean bait presentation and workable current.<br><br>
-
     <b>Snapper:</b> Better over broken reef and structure with neat natural bait close to bottom, especially in stable sea conditions.<br><br>
-
     <b>Silverfish:</b> Better in calmer workable reef conditions with smaller natural bait and lighter presentation.<br><br>
-
     <b>Red Steenbras:</b> Sensitive species. If legally targeted, focus on deeper bottom structure, clean bait and moderate current. Always check permit and closed season.<br><br>
-
     <b>Yellow Belly:</b> Better around reef patches, current edges and clean bottom presentation with natural bait.<br><br>
-
     <b>Hottentot:</b> Better on shallow reef with small neat bait like mussel, redbait or chokka strip, especially in calmer conditions.<br><br>
-
     <b>Geelbek:</b> Better when baitfish hold over reefs and channels. Fish natural bait slightly off bottom or in the water column.<br><br>
-
     <b>Carpenter:</b> Better on strong reef structure with tougher bait and stronger tackle.<br><br>
-
     <b>Dageraad:</b> Better on reef and deeper structure with larger natural bait and stable conditions.<br><br>
-
     <b>Santer:</b> Better over reef with short traces and neat chokka or sardine bait.<br><br>
-
-    <b>Musselcracker / Black Musselcracker:</b> Very structure dependent. Use tough bait and heavy tackle near reef and rock.<br><br>
-
     <b>Elf / Shad:</b> Better with bait movement, current lines and active baitfish, often in brighter feeding windows.<br><br>
-
-    <b>Garrick / Leervis:</b> Better in cleaner moving water near bait activity and current edges.<br><br>
-
-    <b>Roman / Reef Mix:</b> In general, reef fish improve when current is workable, bait is neat, and bottom presentation stays clean.
+    <b>Garrick / Leervis:</b> Better in cleaner moving water near bait activity and current edges.
   `;
-  }
+}
 
 function renderFishInfo(){
   const species = document.getElementById("fishSelect").value;
