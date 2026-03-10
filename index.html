@@ -975,13 +975,31 @@ function loadTides(){
 
 function loadFishingWindow(){
   const month = new Date().getMonth() + 1;
-  let note = "General fishing note: match weather, current, water colour and bait activity.";
+  let seasonNote = "General fishing note: match weather, current, water colour and bait activity.";
   if(month >= 9 || month <= 4){
-    note = "Warmer water season note: kob, yellowtail and bonito can improve when bait and current line up.";
+    seasonNote = "Warmer water season note: kob, yellowtail and bonito can improve when bait and current line up.";
   }
+
   document.getElementById("fishingWindowBox").innerHTML = `
-    <b>Moon / window note:</b> ${note}<br><br>
-    <b>Cape Kob tip:</b> Often stronger on lower light and pushing tide around reef edges and sandy channels.
+    <b>Moon / window note:</b> ${seasonNote}<br><br>
+
+    <b>Cape Kob:</b> Often stronger on lower light and pushing tide around reef edges and sandy channels.<br><br>
+
+    <b>Yellowtail:</b> Better when warm clean water pushes bait up, especially with bird activity, bait balls and current lines.<br><br>
+
+    <b>Bonito:</b> Better when surface bait is active, birds are working, and current lines hold small baitfish.<br><br>
+
+    <b>Red Roman:</b> Usually more structure dependent than season dependent. Focus on reef, clean bait presentation and workable current.<br><br>
+
+    <b>Snapper:</b> Better over reef and broken structure with neat natural bait close to bottom, especially in stable sea conditions.<br><br>
+
+    <b>Silverfish:</b> Better in calmer workable reef conditions with smaller natural bait and lighter presentation.<br><br>
+
+    <b>Red Steenbras:</b> Sensitive species. If legally targeted, focus on deeper bottom structure, clean bait and moderate current. Always check permit and closed season.<br><br>
+
+    <b>Yellow Belly:</b> Better around reef patches, current edges and clean bottom presentation with natural bait.<br><br>
+
+    <b>Hottentot:</b> Better on shallow reef with small neat bait like mussel, redbait or chokka strip, especially in calmer conditions.
   `;
 }
 
