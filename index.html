@@ -393,358 +393,306 @@
       "Red Steenbras":60,
       "Yellow Belly":30,
       "Hottentot":22
-    };
+    }
+    
+        const FISH_INFO = {
 
-    const FISH_INFO = {
-      "Cape Kob":{
-        favoriteBait:"Chokka + Pilchard combo",
-        identifier:{
-          body:"Long strong predator body",
-          colour:"Silver-grey with darker back",
-          tail:"Strong tail, streamlined shape",
-          found:"Reef edges, sandy channels, deeper structure",
-          giveaway:"Big mouth and classic kob body"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
-        hook:"Top hook 7/0, bottom hook 8/0 or 9/0, Kendal / J hooks",
-        sinker:"6 oz to 8 oz, grapnel / bottle sinker",
-        strop:"0.80 - 1.0 mm nylon, ± 80 cm long",
-        rigType:"Big Kob Double Strop Rig",
-        season:"Best spring to autumn",
-        closed:"Check current permit rules",
-        make:`1. Tie braid to a strong barrel swivel.
-2. Add 0.80 - 1.0 mm nylon leader.
-3. Tie the top hook 7/0.
-4. Tie the bottom hook 8/0 or 9/0.
-5. Add a 6-8 oz grapnel or bottle sinker.`,
-        why:`Kob often takes bait hanging just above the bottom.
-Two hooks keep the bait straight and reduce spinning in current.`,
-        sketch:`BIG KOB DOUBLE STROP RIG
+"Cape Kob":{
+speciesNote:"Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
+bestBait:"Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
+favoriteBait:"Chokka + Pilchard combo",
 
-Main line
-40-50 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.80 - 1.0 mm nylon
-± 80 cm long
-  |
-Top hook snoot ---- 7/0 hook
-  |
-Bottom hook snoot - 8/0 or 9/0 hook
-  |
-6-8 oz grapnel / bottle sinker`
-      },
+identifier:{
+body:"Long strong predator body",
+colour:"Silver-grey with darker back",
+tail:"Strong tail",
+found:"Reef edges and sandy channels",
+giveaway:"Big mouth and classic kob shape"
+},
 
-      "Yellowtail":{
-        favoriteBait:"Live Makriel",
-        identifier:{
-          body:"Long torpedo-shaped fast fish",
-          colour:"Blue-green back with lighter silver sides",
-          tail:"Strong forked tail",
-          found:"Open water, bait balls, surface action",
-          giveaway:"Fast pelagic fish with yellow tail tone"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Live Makriel, Live bait, Pilchard strip, Sardine",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic, Soft plastic jerkbait, Trolling lure",
-        hook:"4/0 to 6/0 hooks, or 5/0 to 7/0 for live bait",
-        sinker:"Usually no sinker or very light",
-        strop:"0.60 - 0.70 mm nylon, ± 1 - 1.5 m",
-        rigType:"Yellowtail live bait rig / lure rig",
-        season:"Best summer to autumn",
-        closed:"Check current permit rules",
-        make:`1. Tie braid to a strong swivel.
-2. Add a 0.60 - 0.70 mm nylon leader.
-3. Use a single live bait hook or lure clip.
-4. Keep the rig light for better action.`,
-        why:`Yellowtail hunts fast.
-A lighter leader gives better lure and bait action.
-Works well with live bait and surface lures.`,
-        sketch:`YELLOWTAIL RIG
+status:"Check current permit / stock status",
 
-Main line
-40-50 lb braid
-  |
-Strong barrel swivel
-  |
-Leader
-0.60 - 0.70 mm nylon
-± 1 - 1.5 m
-  |
-4/0 - 6/0 hooks
+naturalBait:"Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
 
-Sinker
-No sinker`
-      },
+lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
 
-      "Bonito":{
-        favoriteBait:"Feather lure",
-        identifier:{
-          body:"Slim tuna-like body",
-          colour:"Dark back with silver sides",
-          tail:"Forked tail built for speed",
-          found:"Surface feeding schools chasing bait",
-          giveaway:"Fast compact body and surface action"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Pilchard strip, Sardine strip, Makriel, Live bait",
-        lures:"Feather lure, Small spoon, Yo-Zuri minnow, Small plug, Trolling lure",
-        hook:"3/0 - 4/0 hooks",
-        sinker:"No sinker",
-        strop:"0.60 mm nylon, ± 1 m",
-        rigType:"Bonito live bait rig / feather rig",
-        season:"Best summer to autumn",
-        closed:"Check current permit rules",
-        make:`1. Use 30-40 lb braid.
-2. Tie to a strong swivel.
-3. Add ± 1 m of 0.60 mm nylon.
-4. Fish small lure or live bait naturally.`,
-        why:`Bonito is a fast hunting fish.
-Light leader gives better bite and lure action.`,
-        sketch:`BONITO RIG
+hook:"Top hook 7/0, bottom hook 8/0 or 9/0",
 
-Main line
-30-40 lb braid
-  |
-Strong swivel
-  |
-Leader
-0.60 mm nylon
-± 1 m
-  |
-3/0 - 4/0 hooks
+sinker:"6 oz to 8 oz grapnel or bottle sinker",
 
-Sinker
-No sinker`
-      },
+strop:"0.80 – 1.0 mm nylon, ± 80 cm",
 
-      "Red Roman":{
-        favoriteBait:"Chokka",
-        identifier:{
-          body:"Thick reef fish body",
-          colour:"Red to orange-red",
-          tail:"Rounded reef-fish tail",
-          found:"Rocky reef and structure",
-          giveaway:"Deep red body and classic reef fish shape"
-        },
-        status:"Sensitive species - handle carefully",
-        statusClass:"statusMed",
-        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine, Redbait, Mussel",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6 oz - 8 oz",
-        strop:"Short snoots 20 - 30 cm",
-        rigType:"2-hook bottom rig / short reef rig",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        make:`1. Tie main line to swivel.
-2. Add two short hook snoots.
-3. Keep both snoots short.
-4. Attach the sinker at the bottom.`,
-        why:`Short snoots keep bait near reef.
-Works well on reef structure.`,
-        sketch:`RED ROMAN REEF RIG
+rigType:"Big Kob Double Strop Rig",
 
-Main line
-  |
-Swivel
-  |
-Top short snoot 20-30 cm ---- hook
-  |
-Bottom short snoot 20-30 cm - hook
-  |
-Sinker 6-8 oz`
-      },
+season:"Spring to Autumn",
 
-      "Snapper":{
-        favoriteBait:"Chokka",
-        identifier:{
-          body:"Medium reef fish body",
-          colour:"Pink-red to silvery red",
-          tail:"Compact tail",
-          found:"Reef and deeper bottom structure",
-          giveaway:"Snapper profile and bottom-feeding behaviour"
-        },
-        status:"Sensitive species - handle carefully",
-        statusClass:"statusMed",
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Mussel, Chokka + Pilchard combo",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6 oz - 8 oz",
-        strop:"20 - 40 cm",
-        rigType:"Bottom rig / short hook trace",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        make:`1. Tie braid to swivel.
-2. Add a short hook snoot.
-3. Fit a 6-8 oz sinker.
-4. Keep the bait close to bottom.`,
-        why:`Compact rig holds bottom well.
-Keeps bait in the strike zone.`,
-        sketch:`SNAPPER BOTTOM RIG
+closed:"Check permit rules"
+},
 
-Main line
-  |
-Swivel
-  |
-Sinker 6-8 oz
-  |
-Hook snoot 20-40 cm`
-      },
 
-      "Silverfish":{
-        favoriteBait:"Chokka strip",
-        identifier:{
-          body:"Small streamlined body",
-          colour:"Silver body",
-          tail:"Small forked tail",
-          found:"Over reef and calmer workable areas",
-          giveaway:"Small bright silver fish"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip, Mussel, Redbait",
-        lures:"Usually natural bait preferred",
-        hook:"2/0 - 4/0 hooks",
-        sinker:"4 oz - 6 oz",
-        strop:"20 - 30 cm",
-        rigType:"Light bottom rig",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        make:`1. Use a lighter sinker.
-2. Keep the trace short and neat.
-3. Present smaller bait close to bottom.`,
-        why:`Lighter setup suits smaller bait and natural presentation.`,
-        sketch:`SILVERFISH LIGHT RIG
+"Yellowtail":{
+speciesNote:"Best from summer to autumn when warm water pushes bait to the surface.",
+bestBait:"Live Makriel, Live bait, Sardine strip, Yo-Zuri minnow, Metal spoon",
+favoriteBait:"Live Makriel",
 
-Main line
-  |
-Swivel
-  |
-Small sinker 4-6 oz
-  |
-Single hook snoot 20-30 cm`
-      },
+identifier:{
+body:"Long torpedo shaped body",
+colour:"Blue-green back with silver sides",
+tail:"Strong forked tail",
+found:"Open water around bait balls",
+giveaway:"Fast swimming pelagic fish"
+},
 
-      "Red Steenbras":{
-        favoriteBait:"Big chokka bait",
-        identifier:{
-          body:"Large strong bottom fish body",
-          colour:"Pale silver to pinkish tones",
-          tail:"Strong tail",
-          found:"Bottom structure and deeper working ground",
-          giveaway:"Big powerful body and sensitive species"
-        },
-        status:"Most endangered / very sensitive",
-        statusClass:"statusHigh",
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait, Octopus",
-        lures:"Usually natural bait preferred",
-        hook:"6/0 - 8/0 hooks",
-        sinker:"7 oz - 9 oz",
-        strop:"70 - 120 cm",
-        rigType:"Strong bottom rig / longer hook snoot",
-        season:"Sensitive species",
-        closed:"Closed season: 1 Sep - 30 Nov",
-        make:`1. Use a heavy swivel and strong leader.
-2. Use a long snoot.
-3. Fit a strong 6/0 - 8/0 hook.
-4. Match sinker to strong current.`,
-        why:`Strong trace helps in heavy conditions.
-Handle carefully and follow permit rules.`,
-        sketch:`RED STEENBRAS STRONG RIG
+status:"Check current permit",
 
-Main line
-  |
-Heavy swivel
-  |
-Sinker 7-9 oz
-  |
-Long snoot 70-120 cm
-  |
-6/0 - 8/0 strong hook`
-      },
+naturalBait:"Live Makriel, Live bait, Pilchard strip, Sardine",
 
-      "Yellow Belly":{
-        favoriteBait:"Chokka",
-        identifier:{
-          body:"Deeper reef fish body",
-          colour:"Yellowish belly with darker top",
-          tail:"Compact reef-fish tail",
-          found:"Reef patches and bottom structure",
-          giveaway:"Yellow belly tone underneath"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Chokka, Pilchard, Sardine, Squid, Redbait",
-        lures:"Usually natural bait preferred",
-        hook:"4/0 - 6/0 hooks",
-        sinker:"6 oz - 8 oz",
-        strop:"30 - 50 cm",
-        rigType:"Bottom rig",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        make:`1. Keep the rig simple.
-2. Use a medium trace length.
-3. Present the bait cleanly on bottom.`,
-        why:`Simple bottom presentation works well on reef patches.`,
-        sketch:`YELLOW BELLY BOTTOM RIG
+lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Stickbait, Popper",
 
-Main line
-  |
-Swivel
-  |
-Sinker 6-8 oz
-  |
-Hook trace 30-50 cm`
-      },
+hook:"4/0 – 6/0",
 
-      "Hottentot":{
-        favoriteBait:"Mussel",
-        identifier:{
-          body:"Shorter deeper body",
-          colour:"Grey-silver with darker patterning",
-          tail:"Smaller tail, compact shape",
-          found:"Reef and shallow structure",
-          giveaway:"Compact body and smaller-mouth profile"
-        },
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        naturalBait:"Chokka, Small chokka strip, Pilchard, Redbait, Mussel, Sardine piece",
-        lures:"Usually natural bait preferred",
-        hook:"2/0 - 3/0 hooks",
-        sinker:"4 oz - 5 oz",
-        strop:"0.50 - 0.60 mm nylon, ± 60 cm",
-        rigType:"Light bottom rig / short reef trace",
-        season:"Good all year",
-        closed:"Check current permit rules",
-        make:`1. Use a medium swivel.
-2. Keep the rig light.
-3. Short trace and small bait work best.`,
-        why:`Small bait works best.
-Short leader keeps bait near the bottom.`,
-        sketch:`HOTTENTOT RIG
+sinker:"Usually none",
 
-Main line
-20-30 lb braid
-  |
-Medium barrel swivel
-  |
-Leader
-0.50 - 0.60 mm nylon
-± 60 cm
-  |
-2/0 - 3/0 hooks
-  |
-4-5 oz sinker`
-      }
-    };
+strop:"0.60 – 0.70 mm nylon ± 1 – 1.5 m",
+
+rigType:"Yellowtail live bait rig",
+
+season:"Summer to Autumn",
+
+closed:"Check permit rules"
+},
+
+
+"Bonito":{
+speciesNote:"Best from summer to autumn when birds and bait balls are active.",
+bestBait:"Feather lure, Sardine strip, Pilchard strip, Yo-Zuri minnow",
+favoriteBait:"Feather lure",
+
+identifier:{
+body:"Slim tuna shaped body",
+colour:"Dark back with silver sides",
+tail:"Forked tail",
+found:"Surface feeding schools",
+giveaway:"Very fast surface hunter"
+},
+
+status:"Check permit",
+
+naturalBait:"Pilchard strip, Sardine strip, Makriel",
+
+lures:"Feather lure, Small spoon, Yo-Zuri minnow, Trolling lure",
+
+hook:"3/0 – 4/0",
+
+sinker:"None",
+
+strop:"0.60 mm nylon ± 1 m",
+
+rigType:"Bonito trolling rig",
+
+season:"Summer to Autumn",
+
+closed:"Check permit rules"
+},
+
+
+"Red Roman":{
+speciesNote:"Good all year. Mostly structure and reef dependent.",
+bestBait:"Chokka, Pilchard, Octopus, Squid",
+favoriteBait:"Chokka",
+
+identifier:{
+body:"Deep reef fish body",
+colour:"Red to orange",
+tail:"Rounded reef fish tail",
+found:"Rocky reef areas",
+giveaway:"Deep red colour"
+},
+
+status:"Sensitive species",
+
+naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine",
+
+lures:"Usually natural bait",
+
+hook:"4/0 – 6/0",
+
+sinker:"6 oz – 8 oz",
+
+strop:"Short traces 20 – 30 cm",
+
+rigType:"2 hook reef bottom rig",
+
+season:"All year",
+
+closed:"Check permit rules"
+},
+
+
+"Snapper":{
+speciesNote:"Good all year. Depends on reef and bottom bait presentation.",
+bestBait:"Chokka, Pilchard, Redbait, Squid",
+favoriteBait:"Chokka",
+
+identifier:{
+body:"Medium reef fish",
+colour:"Pink red",
+tail:"Compact tail",
+found:"Reef structure",
+giveaway:"Classic snapper head shape"
+},
+
+status:"Sensitive species",
+
+naturalBait:"Chokka, Pilchard, Redbait, Squid",
+
+lures:"Mostly natural bait",
+
+hook:"4/0 – 6/0",
+
+sinker:"6 oz – 8 oz",
+
+strop:"20 – 40 cm",
+
+rigType:"Bottom bait rig",
+
+season:"All year",
+
+closed:"Check permit rules"
+},
+
+
+"Silverfish":{
+speciesNote:"Good all year. Often found over reef in calmer conditions.",
+bestBait:"Chokka strip, Pilchard strip, Mussel",
+favoriteBait:"Chokka strip",
+
+identifier:{
+body:"Small streamlined body",
+colour:"Bright silver",
+tail:"Small forked tail",
+found:"Over reef",
+giveaway:"Bright silver body"
+},
+
+status:"Check permit",
+
+naturalBait:"Chokka strip, Pilchard strip, Mussel",
+
+lures:"Rarely used",
+
+hook:"2/0 – 4/0",
+
+sinker:"4 oz – 6 oz",
+
+strop:"20 – 30 cm",
+
+rigType:"Light bottom rig",
+
+season:"All year",
+
+closed:"Check permit rules"
+},
+
+
+"Red Steenbras":{
+speciesNote:"Sensitive species. Closed season 1 September – 30 November.",
+bestBait:"Big chokka bait, Pilchard, Redbait",
+favoriteBait:"Big chokka bait",
+
+identifier:{
+body:"Large powerful body",
+colour:"Silver pink",
+tail:"Strong tail",
+found:"Deeper bottom structure",
+giveaway:"Large powerful fish"
+},
+
+status:"Sensitive / protected species",
+
+naturalBait:"Chokka, Pilchard, Redbait",
+
+lures:"Natural bait preferred",
+
+hook:"6/0 – 8/0",
+
+sinker:"7 oz – 9 oz",
+
+strop:"70 – 120 cm",
+
+rigType:"Strong bottom rig",
+
+season:"All year except closed season",
+
+closed:"Closed season 1 Sep – 30 Nov"
+},
+
+
+"Yellow Belly":{
+speciesNote:"Good all year. Often around reef patches and current lines.",
+bestBait:"Chokka, Pilchard, Sardine",
+favoriteBait:"Chokka",
+
+identifier:{
+body:"Deep reef body",
+colour:"Yellow belly underside",
+tail:"Compact tail",
+found:"Reef patches",
+giveaway:"Yellow belly colour"
+},
+
+status:"Check permit",
+
+naturalBait:"Chokka, Pilchard, Sardine",
+
+lures:"Mostly natural bait",
+
+hook:"4/0 – 6/0",
+
+sinker:"6 oz – 8 oz",
+
+strop:"30 – 50 cm",
+
+rigType:"Bottom rig",
+
+season:"All year",
+
+closed:"Check permit rules"
+},
+
+
+"Hottentot":{
+speciesNote:"Good all year. Small bait works best.",
+bestBait:"Mussel, Redbait, Chokka strip",
+favoriteBait:"Mussel",
+
+identifier:{
+body:"Short compact body",
+colour:"Grey silver",
+tail:"Small tail",
+found:"Shallow reef",
+giveaway:"Small mouth reef fish"
+},
+
+status:"Check permit",
+
+naturalBait:"Chokka strip, Pilchard, Mussel, Redbait",
+
+lures:"Natural bait preferred",
+
+hook:"2/0 – 3/0",
+
+sinker:"4 oz – 5 oz",
+
+strop:"0.50 – 0.60 mm nylon ± 60 cm",
+
+rigType:"Light reef rig",
+
+season:"All year",
+
+closed:"Check permit rules"
+
+    }
 
     const FISH_GUIDE = [
       {name:"Cape Kob", body:"Long strong predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges and channels", clue:"Big mouth"},
