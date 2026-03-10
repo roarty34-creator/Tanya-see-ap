@@ -1,8 +1,10 @@
-const CACHE_NAME = "tanya-deep-sea-v106";
+const CACHE_NAME = "tanya-deep-sea-v106-fixed";
 const APP_SHELL = [
   "./",
   "./index.html",
-  "./manifest.webmanifest"
+  "./manifest.webmanifest",
+  "./icon-192.png",
+  "./icon-512.png"
 ];
 
 self.addEventListener("install", event => {
