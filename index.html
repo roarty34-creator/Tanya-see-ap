@@ -1050,6 +1050,7 @@ function saveCatch(){
 
     let list = getLog();
     list.unshift(entry);
+    updateFavouriteBait(species, bait);
     list = trimLogToFit(list);
     saveLog(list);
 
@@ -1406,6 +1407,19 @@ function openCatchCamera(){
   el.setAttribute("capture","environment");
   el.click();
 }
+  function updateFavouriteBait(species, bait){
+  if(!species || !bait) return;
+
+  const key = "bait_stats";
+  let stats = JSON.parse(localStorage.getItem(key) || "{}");
+
+  if(!stats[species]) stats[species] = {};
+  if(!stats[species][bait]) stats[species][bait] = 0;
+
+  stats[species][bait]++;
+
+  localStorage.setItem(key, JSON.stringify(stats));
+  }
 
 function openCatchGallery(){
   const el = document.getElementById("catchPhoto");
