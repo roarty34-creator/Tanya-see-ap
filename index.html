@@ -510,7 +510,19 @@ const MIN_SIZE = {
   "Elf / Shad":30,
   "Garrick / Leervis":70
 };
+  
+function getTopBaits(species){
+  const key = "bait_stats";
+  let stats = JSON.parse(localStorage.getItem(key) || "{}");
 
+  if(!stats[species]) return [];
+
+  return Object.entries(stats[species])
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3)
+    .map(item => item[0]);
+  }
+  
 function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier){
   return { speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier };
 }
