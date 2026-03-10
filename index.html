@@ -975,23 +975,25 @@ function loadTides(){
 
 function loadFishingWindow(){
   const month = new Date().getMonth() + 1;
+  const warmSeason = (month >= 9 || month <= 4);
+
   let seasonNote = "General fishing note: match weather, current, water colour and bait activity.";
-  if(month >= 9 || month <= 4){
+  if(warmSeason){
     seasonNote = "Warmer water season note: kob, yellowtail and bonito can improve when bait and current line up.";
   }
 
   document.getElementById("fishingWindowBox").innerHTML = `
     <b>Moon / window note:</b> ${seasonNote}<br><br>
 
-    <b>Cape Kob:</b> Often stronger on lower light and pushing tide around reef edges and sandy channels.<br><br>
+    <b>Cape Kob:</b> Often stronger on lower light, pushing tide, reef edges and sandy channels.<br><br>
 
     <b>Yellowtail:</b> Better when warm clean water pushes bait up, especially with bird activity, bait balls and current lines.<br><br>
 
     <b>Bonito:</b> Better when surface bait is active, birds are working, and current lines hold small baitfish.<br><br>
 
-    <b>Red Roman:</b> Usually more structure dependent than season dependent. Focus on reef, clean bait presentation and workable current.<br><br>
+    <b>Red Roman:</b> Usually more reef and structure dependent than season dependent. Focus on clean bait presentation and workable current.<br><br>
 
-    <b>Snapper:</b> Better over reef and broken structure with neat natural bait close to bottom, especially in stable sea conditions.<br><br>
+    <b>Snapper:</b> Better over broken reef and structure with neat natural bait close to bottom, especially in stable sea conditions.<br><br>
 
     <b>Silverfish:</b> Better in calmer workable reef conditions with smaller natural bait and lighter presentation.<br><br>
 
@@ -999,9 +1001,25 @@ function loadFishingWindow(){
 
     <b>Yellow Belly:</b> Better around reef patches, current edges and clean bottom presentation with natural bait.<br><br>
 
-    <b>Hottentot:</b> Better on shallow reef with small neat bait like mussel, redbait or chokka strip, especially in calmer conditions.
+    <b>Hottentot:</b> Better on shallow reef with small neat bait like mussel, redbait or chokka strip, especially in calmer conditions.<br><br>
+
+    <b>Geelbek:</b> Better when baitfish hold over reefs and channels. Fish natural bait slightly off bottom or in the water column.<br><br>
+
+    <b>Carpenter:</b> Better on strong reef structure with tougher bait and stronger tackle.<br><br>
+
+    <b>Dageraad:</b> Better on reef and deeper structure with larger natural bait and stable conditions.<br><br>
+
+    <b>Santer:</b> Better over reef with short traces and neat chokka or sardine bait.<br><br>
+
+    <b>Musselcracker / Black Musselcracker:</b> Very structure dependent. Use tough bait and heavy tackle near reef and rock.<br><br>
+
+    <b>Elf / Shad:</b> Better with bait movement, current lines and active baitfish, often in brighter feeding windows.<br><br>
+
+    <b>Garrick / Leervis:</b> Better in cleaner moving water near bait activity and current edges.<br><br>
+
+    <b>Roman / Reef Mix:</b> In general, reef fish improve when current is workable, bait is neat, and bottom presentation stays clean.
   `;
-}
+  }
 
 function renderFishInfo(){
   const species = document.getElementById("fishSelect").value;
