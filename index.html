@@ -391,6 +391,29 @@ const BAIT_BY_SPECIES = {
   "Hottentot":[
     "Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"
   ]
+  "Geelbek":[
+  "Chokka","Sardine","Pilchard","Live bait","Live Makriel","Yo-Zuri minnow"
+],
+
+"Carpenter":[
+  "Chokka","Squid","Pilchard","Octopus"
+],
+
+"Dageraad":[
+  "Chokka","Pilchard","Redbait","Squid","Big bait"
+],
+
+"Santer":[
+  "Chokka","Sardine","Pilchard strip"
+],
+
+"Elf / Shad":[
+  "Sardine","Pilchard","Spoon","Surface lure","Plug"
+],
+
+"Garrick / Leervis":[
+  "Live bait","Mullet strip","Plug","Stickbait","Surface lure"
+],
 };
 
 const MIN_SIZE = {
@@ -403,6 +426,23 @@ const MIN_SIZE = {
   "Red Steenbras":60,
   "Yellow Belly":30,
   "Hottentot":22
+  "Cape Kob":60,
+  "Yellowtail":60,
+  "Bonito":0,
+  "Red Roman":30,
+  "Snapper":30,
+  "Silverfish":25,
+  "Red Steenbras":60,
+  "Yellow Belly":30,
+  "Hottentot":22,
+
+  "Geelbek":60,
+  "Carpenter":40,
+  "Dageraad":40,
+  "Santer":30,
+  "Elf / Shad":30,
+  "Garrick / Leervis":70
+};
 };
 
 const FISH_INFO = {
@@ -629,6 +669,49 @@ const FISH_INFO = {
     make:"1. Small hook.\n2. Small neat bait.\n3. Fish shallow reef.",
     why:"Small mouth fish respond better to small natural baits.",
     sketch:"HOTTENTOT RIG\n\nMain line\n  |\nSmall swivel\n  |\nShort trace\n  |\nLight sinker"
+  }
+  ,
+
+"Geelbek":{
+  speciesNote:"Often caught over reef and channels when baitfish are present.",
+  bestBait:"Chokka, Sardine, Pilchard, Live Makriel",
+  favoriteBait:"Chokka",
+  status:"Check current permit"
+},
+
+"Carpenter":{
+  speciesNote:"Strong reef fish that prefers structure and tough bait.",
+  bestBait:"Chokka, Squid, Pilchard, Octopus",
+  favoriteBait:"Chokka",
+  status:"Check permit"
+},
+
+"Dageraad":{
+  speciesNote:"Large reef species that prefers bigger bait and stable conditions.",
+  bestBait:"Chokka, Pilchard, Redbait, Squid",
+  favoriteBait:"Chokka",
+  status:"Check permit carefully"
+},
+
+"Santer":{
+  speciesNote:"Common reef fish around structure and reef patches.",
+  bestBait:"Chokka, Sardine, Pilchard strip",
+  favoriteBait:"Chokka",
+  status:"Check permit"
+},
+
+"Elf / Shad":{
+  speciesNote:"Fast predator that hunts baitfish in current and surface activity.",
+  bestBait:"Sardine, Pilchard, Spoon, Surface lure",
+  favoriteBait:"Sardine",
+  status:"Check permit"
+},
+
+"Garrick / Leervis":{
+  speciesNote:"Predator that hunts live bait and baitfish in moving water.",
+  bestBait:"Live bait, Mullet strip, Plug, Stickbait",
+  favoriteBait:"Live bait",
+  status:"Check permit"
   }
 };
 
