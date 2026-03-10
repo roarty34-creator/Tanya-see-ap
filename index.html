@@ -275,7 +275,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V93 Stable</div>
+  <div class="mini">V94 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -291,6 +291,44 @@
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Spots</div>
       <div class="mini">Spot name + coordinates. Easy to type directly into Garmin.</div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Local Launch Guidance – Stilbaai Harbour</div>
+        <div class="bigText">
+          Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
+          Harbour reference point in this build: <b>-34.385542, 21.425433</b><br><br>
+
+          <b>Basic local route note</b><br>
+          1. Move slowly out of the harbour. Stay near the middle of the river. Do not run too close to the western side because of shifting sandbanks.<br><br>
+
+          2. Near the river mouth:<br>
+          • Left (west): large shifting sandbank<br>
+          • Right (east): rock / reef areas near the point<br>
+          Keep slightly right of centre when exiting.<br><br>
+
+          3. Approximate line used by many boats:<br>
+          • -34.3869, 21.4226<br>
+          • -34.3895, 21.4245<br>
+          • -34.3920, 21.4255<br><br>
+
+          4. Watch for:<br>
+          • rocks on the eastern side<br>
+          • sandbank on the western side<br>
+          • breaking waves over shallow areas<br><br>
+
+          5. Read the water:<br>
+          • dark water = deeper channel<br>
+          • light brown water = sandbank<br>
+          • breaking water = shallow / rocks<br><br>
+
+          6. First productive areas offshore:<br>
+          • 30–35 m line<br>
+          • Stilbaai Reef<br>
+          • Kabeljou Ridge<br>
+          • Blinde Rif
+        </div>
+      </div>
+
       <div id="spotList"></div>
     </div>
   </section>
@@ -508,7 +546,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V93 Stable
+    Build version: V94 Stable
   </div>
 
   <script>
@@ -527,19 +565,19 @@
     ];
 
     const BAIT_BY_SPECIES = {
-      "Cape Kob":["Chokka + Pilchard combo","Live Makriel","Pilchard belly","Pilchard","Chokka","Sardine","Mullet strip","Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail"],
-      "Yellowtail":["Live Makriel","Live bait","Pilchard strip","Metal spoon","Surface plug","Yo-Zuri minnow","Yo-Zuri deep diver","Paddle tail soft plastic","Stickbait","Popper"],
-      "Bonito":["Pilchard strip","Small spoon","Feather lure","Makriel","Yo-Zuri minnow","Small plug","Trolling lure"],
-      "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine","Redbait"],
-      "Snapper":["Chokka","Pilchard","Redbait","Squid","Sardine"],
-      "Silverfish":["Chokka strip","Pilchard strip","Pilchard","Small sardine strip"],
-      "Red Steenbras":["Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait"],
-      "Yellow Belly":["Chokka","Pilchard","Sardine"],
-      "Hottentot":["Chokka","Pilchard","Redbait","Mussel","Sardine piece"],
-      "Geelbek":["Large sardine","Chokka","Yo-Zuri minnow","Yo-Zuri deep diver","Small plug","Live bait"],
-      "Santer":["Chokka","Sardine","Pilchard"],
-      "Carpenter":["Chokka","Pilchard","Sardine"],
-      "Dageraad":["Big chokka bait","Pilchard","Redbait","Squid"]
+      "Cape Kob":["Chokka","Chokka strip","Chokka head","Chokka + Pilchard combo","Pilchard","Pilchard belly","Pilchard fillet","Sardine","Sardine fillet","Mullet strip","Redbait","Squid","Octopus","Live Makriel","Live bait","Soft plastic paddle tail","Soft plastic jerkbait","Yo-Zuri minnow","Yo-Zuri deep diver","Deep diving plug","Stickbait"],
+      "Yellowtail":["Live Makriel","Live bait","Pilchard strip","Sardine","Metal spoon","Surface plug","Popper","Stickbait","Paddle tail soft plastic","Soft plastic jerkbait","Yo-Zuri minnow","Yo-Zuri deep diver","Trolling lure"],
+      "Bonito":["Pilchard strip","Sardine strip","Small spoon","Feather lure","Makriel","Live bait","Yo-Zuri minnow","Small plug","Trolling lure"],
+      "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine","Redbait","Mussel"],
+      "Snapper":["Chokka","Pilchard","Redbait","Squid","Sardine","Mussel","Chokka + Pilchard combo"],
+      "Silverfish":["Chokka strip","Pilchard strip","Pilchard","Small sardine strip","Mussel","Redbait"],
+      "Red Steenbras":["Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait","Octopus"],
+      "Yellow Belly":["Chokka","Pilchard","Sardine","Squid","Redbait"],
+      "Hottentot":["Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"],
+      "Geelbek":["Large sardine","Chokka","Yo-Zuri minnow","Yo-Zuri deep diver","Small plug","Live bait","Pilchard strip","Stickbait"],
+      "Santer":["Chokka","Sardine","Pilchard","Redbait","Squid"],
+      "Carpenter":["Chokka","Pilchard","Sardine","Redbait","Squid"],
+      "Dageraad":["Big chokka bait","Pilchard","Redbait","Squid","Octopus"]
     };
 
     const MIN_SIZE = {
@@ -551,8 +589,8 @@
     const FISH_INFO = {
       "Cape Kob":{
         identifier:{ body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail, streamlined shape", found:"Reef edges, sandy channels, deeper structure", giveaway:"Big mouth and classic kob body" },
-        naturalBait:"Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail",
+        naturalBait:"Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
         hook:"Top hook 7/0, bottom hook 8/0 or 9/0 Kendal / J hooks",
         sinker:"6oz to 8oz grapnel / bottle sinker",
         strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm long",
@@ -589,8 +627,8 @@ Bottom hook snoot - 8/0 or 9/0 hook
       },
       "Yellowtail":{
         identifier:{ body:"Long torpedo-shaped fast fish", colour:"Blue-green back with lighter silver sides", tail:"Strong forked tail", found:"Open water, bait balls, surface action", giveaway:"Fast pelagic fish with yellow tail tone" },
-        naturalBait:"Live Makriel, Live bait, Pilchard strip",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic",
+        naturalBait:"Live Makriel, Live bait, Pilchard strip, Sardine",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic, Soft plastic jerkbait, Trolling lure",
         hook:"5/0 to 7/0 for live bait",
         sinker:"Usually no sinker or very light",
         strop:"80 cm to 150 cm leader",
@@ -624,7 +662,7 @@ No sinker`
       },
       "Bonito":{
         identifier:{ body:"Slim fast tuna-like body", colour:"Dark back with silvery sides", tail:"Forked tail built for speed", found:"Surface feeding schools chasing bait", giveaway:"Fast compact body and surface action" },
-        naturalBait:"Live bait, small baitfish, Pilchard strip",
+        naturalBait:"Live bait, small baitfish, Pilchard strip, Sardine strip, Makriel",
         lures:"Feather lure, Small spoon, Yo-Zuri minnow, Small plug, Trolling lure",
         hook:"3/0 - 4/0 hooks",
         sinker:"No sinker",
@@ -659,7 +697,7 @@ No sinker`
       },
       "Red Roman":{
         identifier:{ body:"Thick reef fish body", colour:"Red to orange-red", tail:"Rounded reef-fish tail", found:"Rocky reef and structure", giveaway:"Deep red body and classic reef shape" },
-        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine, Redbait",
+        naturalBait:"Chokka, Pilchard, Octopus, Squid, Sardine, Redbait, Mussel",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
         sinker:"6oz - 8oz",
@@ -688,7 +726,7 @@ Sinker 6-8 oz`
       },
       "Snapper":{
         identifier:{ body:"Medium reef fish body", colour:"Pink-red to silvery red", tail:"Compact tail, reef fish profile", found:"Reef and deeper bottom structure", giveaway:"Snapper profile and bottom-feeding reef behaviour" },
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine",
+        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Mussel, Chokka + Pilchard combo",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
         sinker:"6oz - 8oz",
@@ -715,7 +753,7 @@ Hook snoot 20-40 cm`
       },
       "Silverfish":{
         identifier:{ body:"Smaller streamlined body", colour:"Silver body", tail:"Small forked tail", found:"Over reef and calmer workable areas", giveaway:"Small bright silver fish" },
-        naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip",
+        naturalBait:"Chokka strip, Pilchard strip, Pilchard, Small sardine strip, Mussel, Redbait",
         lures:"Usually natural bait preferred",
         hook:"2/0 - 4/0 hooks",
         sinker:"4oz - 6oz",
@@ -741,7 +779,7 @@ Single hook snoot 20-30 cm`
       },
       "Red Steenbras":{
         identifier:{ body:"Large strong bottom fish body", colour:"Pale silver to pinkish tones", tail:"Strong tail, heavy body profile", found:"Bottom structure and deeper working ground", giveaway:"Big powerful body and sensitive conservation status" },
-        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait",
+        naturalBait:"Chokka, Pilchard, Redbait, Squid, Sardine, Big chokka bait, Octopus",
         lures:"Usually natural bait preferred",
         hook:"6/0 - 8/0 hooks",
         sinker:"7oz - 9oz",
@@ -770,7 +808,7 @@ Long snoot 70-120 cm
       },
       "Yellow Belly":{
         identifier:{ body:"Reef fish with deeper body shape", colour:"Yellowish belly with darker top", tail:"Compact reef-fish tail", found:"Reef patches and bottom structure", giveaway:"Yellow belly tone underneath" },
-        naturalBait:"Chokka, Pilchard, Sardine",
+        naturalBait:"Chokka, Pilchard, Sardine, Squid, Redbait",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 6/0 hooks",
         sinker:"6oz - 8oz",
@@ -796,7 +834,7 @@ Hook trace 30-50 cm`
       },
       "Hottentot":{
         identifier:{ body:"Shorter deeper body", colour:"Grey-silver with darker patterning", tail:"Smaller tail, compact shape", found:"Reef and shallow structure", giveaway:"Compact body and smaller-mouth profile" },
-        naturalBait:"Small bait, Chokka pieces, Redbait, Mussel, Sardine piece",
+        naturalBait:"Small bait, Chokka pieces, Redbait, Mussel, Sardine piece, Pilchard",
         lures:"Usually natural bait preferred",
         hook:"2/0 - 3/0 hooks",
         sinker:"4oz - 5oz sinker",
@@ -828,8 +866,8 @@ Leader
       },
       "Geelbek":{
         identifier:{ body:"Long powerful mid-water predator", colour:"Silvery sides with darker upper body", tail:"Strong forked tail", found:"Mid-water and baitfish zones", giveaway:"Fast predator above bottom" },
-        naturalBait:"Large sardine, Chokka, Live bait",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Small plug",
+        naturalBait:"Large sardine, Chokka, Live bait, Pilchard strip",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Small plug, Stickbait",
         hook:"6/0 - 8/0 hooks",
         sinker:"No sinker or small 3-4 oz sinker",
         strop:"0.70 - 0.80 mm nylon, ± 1 m long",
@@ -861,7 +899,7 @@ No sinker or small 3-4 oz`
       },
       "Santer":{
         identifier:{ body:"Compact reef fish body", colour:"Pink-red reef tones", tail:"Compact tail", found:"Near reef and structure", giveaway:"Fast-biting reef fish close to bottom" },
-        naturalBait:"Chokka, Sardine, Pilchard",
+        naturalBait:"Chokka, Sardine, Pilchard, Redbait, Squid",
         lures:"Usually natural bait preferred",
         hook:"4/0 - 5/0 hooks",
         sinker:"6 oz bottle sinker",
@@ -893,7 +931,7 @@ Leader
       },
       "Carpenter":{
         identifier:{ body:"Large strong reef fish body", colour:"Darker reef colour tones", tail:"Strong tail for reef power", found:"Heavy reef and rocky structure", giveaway:"Big reef fish with brute pulling power" },
-        naturalBait:"Chokka, Pilchard, Sardine",
+        naturalBait:"Chokka, Pilchard, Sardine, Redbait, Squid",
         lures:"Usually natural bait preferred",
         hook:"6/0 - 7/0 hooks",
         sinker:"7-8 oz grapnel",
@@ -925,7 +963,7 @@ Leader
       },
       "Dageraad":{
         identifier:{ body:"Big heavy bottom fish body", colour:"Deeper darker reef tones", tail:"Strong tail", found:"Heavy bottom and reef zones", giveaway:"Large strong reef-associated fish" },
-        naturalBait:"Big chokka bait, Pilchard, Redbait, Squid",
+        naturalBait:"Big chokka bait, Pilchard, Redbait, Squid, Octopus",
         lures:"Usually natural bait preferred",
         hook:"7/0 - 9/0 hooks",
         sinker:"6-8 oz grapnel",
@@ -980,7 +1018,7 @@ Leader
       {name:"Hake", body:"Long softer body", colour:"Grey-brown", tail:"Tapered", found:"Deeper bottom", clue:"Deep-water body", mouth:"big", bodyKey:"long", colourKey:"dark", tailKey:"strong", whereKey:"bottom"}
     ];
 
-    const KEY_LOG = "tanya_v93_log";
+    const KEY_LOG = "tanya_master_log";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
@@ -1055,7 +1093,15 @@ Leader
       const species = document.getElementById("species").value;
       const bait = document.getElementById("bait");
       const current = bait.value;
-      const list = BAIT_BY_SPECIES[species] || [];
+      const commonExtras = [
+        "Yo-Zuri minnow","Yo-Zuri deep diver","Metal spoon","Surface plug","Popper","Stickbait",
+        "Paddle tail soft plastic","Soft plastic jerkbait","Deep diving plug","Feather lure",
+        "Trolling lure","Live bait","Live Makriel","Pilchard","Pilchard strip","Pilchard belly",
+        "Pilchard fillet","Sardine","Sardine strip","Sardine fillet","Chokka","Chokka strip",
+        "Chokka head","Chokka + Pilchard combo","Squid","Octopus","Redbait","Mussel","Mullet strip"
+      ];
+      const speciesList = BAIT_BY_SPECIES[species] || [];
+      const list = [...new Set([...speciesList, ...commonExtras])];
 
       bait.innerHTML = '<option value="">Choose...</option>';
       list.forEach(item => {
@@ -1145,7 +1191,11 @@ Leader
     }
 
     function getLog(){
-      return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+      try{
+        return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+      }catch(e){
+        return [];
+      }
     }
 
     function saveLog(list){
@@ -1167,25 +1217,29 @@ Leader
       }
 
       if(!coords){
-        alert("Enter coordinates first.");
-        return;
+        const proceed = confirm("No coordinates entered. Save catch without coordinates?");
+        if(!proceed) return;
       }
 
-      tryAutoMatchAreaFromCoords(coords);
+      if(coords){
+        tryAutoMatchAreaFromCoords(coords);
+      }
 
-      const list = getLog();
-      list.unshift({
+      const entry = {
         species,
         bait,
-        area: document.getElementById("area").value,
+        area: document.getElementById("area").value || "",
         coords,
         whereCaught,
         notes,
         minSize,
         sizeCaught,
-        seaArea: describeSeaAreaFromCoord(coords),
+        seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
         date: new Date().toLocaleString()
-      });
+      };
+
+      const list = getLog();
+      list.unshift(entry);
       saveLog(list);
 
       document.getElementById("saveMsg").textContent = "Catch saved to log.";
@@ -1231,7 +1285,7 @@ Leader
             <span class="mini">Area: ${c.area || "-"}</span><br>
             <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
             <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
-            <span class="mini">Coords: ${c.coords}</span><br>
+            <span class="mini">Coords: ${c.coords || "-"}</span><br>
             ${c.notes ? `<span class="mini">Notes: ${c.notes}</span><br>` : ""}
             <span class="mini">${c.date}</span>
           </div>
@@ -1379,8 +1433,13 @@ Leader
     function showGuideHint(){
       document.getElementById("fishIdResults").innerHTML = `
         <div class="suggestionCard">
-          Compare the fish photo with the Visual Fish ID Guide below.<br>
-          Look first at body shape, colour, tail shape and where it was caught.
+          Compare the uploaded fish photo with the Fish ID Guide below.<br><br>
+          Check:<br>
+          • body shape<br>
+          • mouth shape<br>
+          • colour<br>
+          • tail shape<br>
+          • where it was caught
         </div>
       `;
     }
@@ -1388,8 +1447,10 @@ Leader
     function sendToChatGPTHint(){
       document.getElementById("fishIdResults").innerHTML = `
         <div class="suggestionCard">
-          Use the uploaded fish photo in ChatGPT and ask:<br>
-          <b>"Please identify this fish using the photo."</b>
+          To use ChatGPT for identification:<br><br>
+          1. Upload the fish photo in ChatGPT<br>
+          2. Ask: <b>Identify this fish from the photo</b><br>
+          3. Compare the result with the Fish ID Guide in this app
         </div>
       `;
     }
@@ -1474,7 +1535,7 @@ Leader
     document.getElementById("coords").addEventListener("input", () => {
       const coord = document.getElementById("coords").value.trim();
       document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
-      tryAutoMatchAreaFromCoords(coord);
+      if(coord) tryAutoMatchAreaFromCoords(coord);
     });
 
     renderSpotList();
