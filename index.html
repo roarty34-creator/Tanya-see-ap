@@ -129,7 +129,7 @@
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V101 Stable</div>
+  <div class="mini">V102 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -219,6 +219,11 @@
         <button onclick="saveCatch()">Save Catch</button>
         <button class="danger" onclick="clearCatchForm()">Clear</button>
       </div>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
+      </div>
+
       <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
     </div>
 
@@ -339,12 +344,14 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V101 Stable
+    Build version: V102 Stable
   </div>
 
   <script>
     const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
     const MARINE_LINE_LON = HARBOUR.lon;
+    const KEY_LOG = "tanya_master_log";
+    const MAX_LOG_CHARS = 4000000;
 
     const SPOTS = [
       { name:"Skulpbank", coord:"-34.3905,20.8602" },
@@ -748,7 +755,6 @@ Leader
       {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"}
     ];
 
-    const KEY_LOG = "tanya_master_log";
     let currentCatchPhoto = "";
 
     function showTab(id){
@@ -819,7 +825,6 @@ Leader
       SPOTS.forEach(s => {
         const side = getAreaSideFromCoord(s.coord);
         const label = `${side} - ${s.name}`;
-
         const opt = document.createElement("option");
         opt.value = label;
         opt.textContent = label;
@@ -909,7 +914,6 @@ Leader
       if(match){
         const side = getAreaSideFromCoord(match.coord);
         const label = `${side} - ${match.name}`;
-
         document.getElementById("area").value = label;
 
         if(!document.getElementById("whereCaught").value.trim()){
@@ -936,7 +940,6 @@ Leader
       showTab("addTab");
       const side = getAreaSideFromCoord(coord);
       const label = `${side} - ${name}`;
-
       document.getElementById("area").value = label;
       document.getElementById("coords").value = coord;
       document.getElementById("whereCaught").value = label;
@@ -953,6 +956,13 @@ Leader
 
     function saveLog(list){
       localStorage.setItem(KEY_LOG, JSON.stringify(list));
+    }
+
+    function trimLogToFit(list){
+      while (JSON.stringify(list).length > MAX_LOG_CHARS && list.length > 1) {
+        list.pop();
+      }
+      return list;
     }
 
     function saveCatch(){
@@ -989,8 +999,9 @@ Leader
           date: new Date().toLocaleString()
         };
 
-        const list = getLog();
+        let list = getLog();
         list.unshift(entry);
+        list = trimLogToFit(list);
         saveLog(list);
 
         document.getElementById("saveMsg").textContent = "Catch saved to log.";
@@ -1030,6 +1041,14 @@ Leader
       });
 
       box.innerHTML = html;
+    }
+
+    function clearAllLogs(){
+      if(confirm("Delete all saved catches?")){
+        localStorage.removeItem(KEY_LOG);
+        renderLog();
+        document.getElementById("saveMsg").textContent = "All saved catches deleted.";
+      }
     }
 
     function clearCatchForm(){
@@ -1217,17 +1236,31 @@ Leader
     document.getElementById("catchPhoto").addEventListener("change", function(){
       const file = this.files && this.files[0];
       const preview = document.getElementById("catchPreview");
+      if(!file) return;
 
-      if(file){
-        const reader = new FileReader();
-        reader.onload = function(e){
-          currentCatchPhoto = e.target.result;
+      const reader = new FileReader();
+      reader.onload = function(e){
+        const img = new Image();
+        img.onload = function(){
+          const canvas = document.createElement("canvas");
+          const maxWidth = 600;
+          const scale = Math.min(1, maxWidth / img.width);
+
+          canvas.width = Math.round(img.width * scale);
+          canvas.height = Math.round(img.height * scale);
+
+          const ctx = canvas.getContext("2d");
+          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+
+          currentCatchPhoto = canvas.toDataURL("image/jpeg", 0.55);
+
           preview.src = currentCatchPhoto;
           preview.style.display = "block";
-          document.getElementById("catchPhotoText").textContent = file.name + " loaded.";
+          document.getElementById("catchPhotoText").textContent = file.name + " compressed and loaded.";
         };
-        reader.readAsDataURL(file);
-      }
+        img.src = e.target.result;
+      };
+      reader.readAsDataURL(file);
     });
 
     renderSpotList();
