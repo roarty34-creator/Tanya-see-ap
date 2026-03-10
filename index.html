@@ -983,15 +983,24 @@ async function loadWeekForecast(){
   }catch{
     document.getElementById("weekForecast").innerHTML = "Could not load 7 day forecast.";
   }
-}
 
 function loadTides(){
   document.getElementById("tideBox").innerHTML = `
-    <b>High Tide:</b> --<br>
-    <b>Low Tide:</b> --<br>
-    <b>Next Tide:</b> Add live tide API later.
+    <table>
+      <thead>
+        <tr>
+          <th>Tide Type</th>
+          <th>Time</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr><td>High Tide</td><td>--</td></tr>
+        <tr><td>Low Tide</td><td>--</td></tr>
+        <tr><td>Next Tide</td><td>Add live tide API later</td></tr>
+      </tbody>
+    </table>
   `;
-}
+  }
 
 function loadFishingWindow(){
   const month = new Date().getMonth() + 1;
