@@ -112,8 +112,8 @@
 </head>
 <body>
 
-  <h1>Tanya Deep Sea Fishing</h1>
-  <div class="mini">V105 Ultimate Stable</div>
+  <h1>Tanya Deep Sea Fishing App</h1>
+  <div class="mini">V106 Full Rebuild</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -126,7 +126,8 @@
 
   <section id="spotsTab">
     <div class="card">
-      <div class="sectionTitle"><b>Spots</b> • Garmin style coordinate list</div>
+      <div class="sectionTitle"><b>Spots</b> • Local area support</div>
+
       <div class="identifyBox">
         <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
         <div class="bigText">
@@ -135,7 +136,12 @@
           Sandbanks, rocks and the channel can change. Do not rely on this app alone for a safe launch route.
         </div>
       </div>
-      <div id="spotList"></div>
+
+      <div class="mini">
+        Spots are still active for Local Area auto-fill, East/West matching, and Garmin support.
+        They are hidden from the main screen in this build.
+      </div>
+      <div id="spotList" style="display:none;"></div>
     </div>
   </section>
 
@@ -191,9 +197,11 @@
         <button onclick="saveCatch()">Save Catch</button>
         <button class="danger" onclick="clearCatchForm()">Clear</button>
       </div>
+
       <div class="row" style="margin-top:8px;">
         <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
       </div>
+
       <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
     </div>
 
@@ -206,10 +214,12 @@
   <section id="weatherTab" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Weather</b></div>
+
       <div class="mini">
         Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
         Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
       </div>
+
       <div id="weekForecast"></div>
 
       <div class="identifyBox">
@@ -227,8 +237,10 @@
   <section id="fishInfoTab" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Fish Info</b></div>
+
       <label>Species</label>
       <select id="fishSelect" onchange="renderFishInfo()"></select>
+
       <div id="fishInfoBox"></div>
     </div>
   </section>
@@ -239,15 +251,20 @@
 
       <div class="identifyBox">
         <div class="identifyTitle">Identify Unknown Fish</div>
+
         <div class="row">
           <button onclick="openCamera()">Use Camera</button>
           <button onclick="openGallery()">Use Photo</button>
         </div>
+
         <input type="file" id="fishPhoto" accept="image/*" capture="environment" style="display:none">
+
         <div id="uploadPreview" class="mini" style="margin-top:10px;">
           Take a photo or upload one, then compare it with the guide below.
         </div>
+
         <img id="previewImg" class="previewImg" alt="Fish preview" />
+
         <div class="row" style="margin-top:12px;">
           <button class="dark" onclick="showGuideHint()">Compare with Fish ID Guide</button>
           <button class="dark" onclick="sendToChatGPTHint()">Send to ChatGPT for identification</button>
@@ -286,7 +303,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Fishing App<br>
-    Build version: V105 Ultimate Stable
+    Build version: V106 Full Rebuild
   </div>
 
 <script>
@@ -313,15 +330,41 @@ const SPOTS = [
 ];
 
 const BAIT_BY_SPECIES = {
-  "Cape Kob":["Chokka","Chokka strip","Chokka head","Chokka + Pilchard combo","Live Makriel","Pilchard belly","Sardine","Mullet strip","Redbait","Squid","Octopus","Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail","Soft plastic jerkbait"],
-  "Yellowtail":["Live Makriel","Live bait","Pilchard strip","Sardine","Metal spoon","Yo-Zuri minnow","Yo-Zuri deep diver","Stickbait","Popper"],
-  "Bonito":["Pilchard strip","Sardine strip","Feather lure","Yo-Zuri minnow","Small spoon","Trolling lure"],
-  "Red Roman":["Chokka","Pilchard","Octopus","Squid","Sardine"],
-  "Snapper":["Chokka","Pilchard","Redbait","Squid"],
-  "Silverfish":["Chokka strip","Pilchard strip","Mussel"],
-  "Red Steenbras":["Big chokka bait","Pilchard","Redbait"],
-  "Yellow Belly":["Chokka","Pilchard","Sardine"],
-  "Hottentot":["Mussel","Redbait","Chokka strip","Pilchard"]
+  "Cape Kob":[
+    "Chokka","Chokka strip","Chokka head","Chokka + Pilchard combo",
+    "Live Makriel","Live bait","Pilchard","Pilchard strip","Pilchard belly","Pilchard fillet",
+    "Sardine","Sardine strip","Sardine fillet","Mullet strip","Redbait","Squid","Octopus",
+    "Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail",
+    "Soft plastic jerkbait","Deep diving plug","Stickbait"
+  ],
+  "Yellowtail":[
+    "Live Makriel","Live bait","Pilchard strip","Sardine","Sardine fillet",
+    "Metal spoon","Surface plug","Popper","Stickbait",
+    "Paddle tail soft plastic","Soft plastic jerkbait",
+    "Yo-Zuri minnow","Yo-Zuri deep diver","Trolling lure"
+  ],
+  "Bonito":[
+    "Pilchard strip","Sardine strip","Makriel","Live bait",
+    "Feather lure","Small spoon","Yo-Zuri minnow","Small plug","Trolling lure"
+  ],
+  "Red Roman":[
+    "Chokka","Pilchard","Octopus","Squid","Sardine","Redbait","Mussel"
+  ],
+  "Snapper":[
+    "Chokka","Pilchard","Redbait","Squid","Sardine","Mussel","Chokka + Pilchard combo"
+  ],
+  "Silverfish":[
+    "Chokka strip","Pilchard strip","Pilchard","Small sardine strip","Mussel","Redbait"
+  ],
+  "Red Steenbras":[
+    "Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait","Octopus"
+  ],
+  "Yellow Belly":[
+    "Chokka","Pilchard","Sardine","Squid","Redbait"
+  ],
+  "Hottentot":[
+    "Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"
+  ]
 };
 
 const MIN_SIZE = {
@@ -974,6 +1017,7 @@ function renderFishInfo(){
 
       <div class="rigTab">
         <div class="identifyTitle">Rig Tab</div>
+
         <div class="infoGrid">
           <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
           <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook || "-"}</div>
@@ -1097,9 +1141,11 @@ document.getElementById("species").addEventListener("change", () => {
   fillBaitOptions();
   updateMinSize();
   checkSizeWarning();
+
   const species = document.getElementById("species").value;
   const info = FISH_INFO[species];
   const note = document.getElementById("baitAutoNote");
+
   if(info?.favoriteBait){
     note.textContent = `Auto favourite bait: ${info.favoriteBait}. You can still change it manually.`;
   } else {
@@ -1132,4 +1178,4 @@ if("serviceWorker" in navigator){
 }
 </script>
 </body>
-        </html>
+  </html>
