@@ -276,12 +276,31 @@
       text-decoration:none;
       font-weight:bold;
     }
+    .subNav{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      margin-top:12px;
+    }
+    .subBtn{
+      background:#17345e;
+      color:#fff;
+      border:none;
+      border-radius:10px;
+      padding:10px 12px;
+      font-weight:bold;
+      cursor:pointer;
+    }
+    .subBtn.active{
+      background:#2fa4ff;
+      color:#001420;
+    }
   </style>
 </head>
 <body>
 
   <h1>Tanya Deep Sea Garmin Edition</h1>
-  <div class="mini">V95 Stable</div>
+  <div class="mini">V96 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -325,10 +344,6 @@
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
         <option>Hottentot</option>
-        <option>Geelbek</option>
-        <option>Santer</option>
-        <option>Carpenter</option>
-        <option>Dageraad</option>
       </select>
 
       <label>Minimum Size</label>
@@ -409,6 +424,7 @@
   <section id="fishInfoTab" style="display:none;">
     <div class="card">
       <div class="sectionTitle"><b>Tanya Deep Sea Garmin Edition</b> • Fish Info</div>
+
       <label>Species</label>
       <select id="fishSelect" onchange="renderFishInfo()">
         <option>Cape Kob</option>
@@ -420,11 +436,20 @@
         <option>Red Steenbras</option>
         <option>Yellow Belly</option>
         <option>Hottentot</option>
-        <option>Geelbek</option>
-        <option>Santer</option>
-        <option>Carpenter</option>
-        <option>Dageraad</option>
       </select>
+
+      <div id="kobSubNav" class="subNav" style="display:none;">
+        <button class="subBtn active" onclick="showKobSection('bait')">Natural Bait</button>
+        <button class="subBtn" onclick="showKobSection('lures')">Lures</button>
+        <button class="subBtn" onclick="showKobSection('hooks')">Hook Size</button>
+        <button class="subBtn" onclick="showKobSection('sinker')">Sinker Weight</button>
+        <button class="subBtn" onclick="showKobSection('strop')">Strop Length</button>
+        <button class="subBtn" onclick="showKobSection('rigtype')">Rig Type</button>
+        <button class="subBtn" onclick="showKobSection('make')">How to Make It</button>
+        <button class="subBtn" onclick="showKobSection('diagram')">Rig Diagram</button>
+        <button class="subBtn" onclick="showKobSection('full')">Full Rig Setup</button>
+      </div>
+
       <div id="fishInfoBox"></div>
     </div>
   </section>
@@ -475,62 +500,6 @@
       </div>
 
       <div class="identifyBox">
-        <div class="identifyTitle">Smart Fish Identifier</div>
-
-        <label>Mouth Shape</label>
-        <select id="idMouth">
-          <option value="">Choose...</option>
-          <option value="big">Big mouth</option>
-          <option value="small">Small mouth</option>
-          <option value="beak">Pointed / beak-like</option>
-          <option value="hooked">Predator mouth</option>
-        </select>
-
-        <label>Body Shape</label>
-        <select id="idBody">
-          <option value="">Choose...</option>
-          <option value="long">Long / torpedo</option>
-          <option value="deep">Deep / thick</option>
-          <option value="compact">Compact reef fish</option>
-          <option value="slim">Slim / tuna-like</option>
-        </select>
-
-        <label>Colour</label>
-        <select id="idColour">
-          <option value="">Choose...</option>
-          <option value="silver">Silver</option>
-          <option value="red">Red / orange</option>
-          <option value="dark">Dark / bronze</option>
-          <option value="yellow">Yellow tones</option>
-        </select>
-
-        <label>Tail Shape</label>
-        <select id="idTail">
-          <option value="">Choose...</option>
-          <option value="forked">Forked tail</option>
-          <option value="rounded">Rounded tail</option>
-          <option value="strong">Strong broad tail</option>
-        </select>
-
-        <label>Where Caught</label>
-        <select id="idWhere">
-          <option value="">Choose...</option>
-          <option value="surface">Surface / open water</option>
-          <option value="mid">Mid-water</option>
-          <option value="reef">Reef</option>
-          <option value="bottom">Bottom structure</option>
-          <option value="shallow">Shallow reef</option>
-        </select>
-
-        <div class="row" style="margin-top:12px;">
-          <button onclick="runFishIdentifier()">Identify Fish</button>
-          <button class="danger" onclick="clearFishIdentifier()">Clear</button>
-        </div>
-
-        <div id="fishIdResults"></div>
-      </div>
-
-      <div class="identifyBox">
         <div class="identifyTitle">Visual Fish ID Guide</div>
         <div id="fishGuideList" class="guideGrid"></div>
       </div>
@@ -551,7 +520,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Garmin Edition<br>
-    Build version: V95 Stable
+    Build version: V96 Stable
   </div>
 
   <script>
@@ -564,9 +533,7 @@
       { name:"Roman Bank", coord:"-34.4200,20.8650" },
       { name:"Kabeljou Ridge", coord:"-34.3750,20.8700" },
       { name:"Die Gat", coord:"-34.3955,20.8450" },
-      { name:"Stilbaai Reef", coord:"-34.3888,20.8570" },
-      { name:"Outer Bank", coord:"-34.4305,20.8355" },
-      { name:"South Deep", coord:"-34.4300,20.8800" }
+      { name:"Stilbaai Reef", coord:"-34.3888,20.8570" }
     ];
 
     const BAIT_BY_SPECIES = {
@@ -578,39 +545,46 @@
       "Silverfish":["Chokka strip","Pilchard strip","Pilchard","Small sardine strip","Mussel","Redbait"],
       "Red Steenbras":["Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait","Octopus"],
       "Yellow Belly":["Chokka","Pilchard","Sardine","Squid","Redbait"],
-      "Hottentot":["Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"],
-      "Geelbek":["Large sardine","Chokka","Yo-Zuri minnow","Yo-Zuri deep diver","Small plug","Live bait","Pilchard strip","Stickbait"],
-      "Santer":["Chokka","Sardine","Pilchard","Redbait","Squid"],
-      "Carpenter":["Chokka","Pilchard","Sardine","Redbait","Squid"],
-      "Dageraad":["Big chokka bait","Pilchard","Redbait","Squid","Octopus"]
+      "Hottentot":["Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"]
     };
 
     const MIN_SIZE = {
       "Cape Kob":60,"Yellowtail":60,"Bonito":0,"Red Roman":30,"Snapper":30,
-      "Silverfish":25,"Red Steenbras":60,"Yellow Belly":30,"Hottentot":22,
-      "Geelbek":0,"Santer":0,"Carpenter":0,"Dageraad":0
+      "Silverfish":25,"Red Steenbras":60,"Yellow Belly":30,"Hottentot":22
     };
 
-    const FISH_INFO = {
-      "Cape Kob":{
-        identifier:{ body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail, streamlined shape", found:"Reef edges, sandy channels, deeper structure", giveaway:"Big mouth and classic kob body" },
-        naturalBait:"Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
-        hook:"Top hook 7/0, bottom hook 8/0 or 9/0 Kendal / J hooks",
-        sinker:"6oz to 8oz grapnel / bottle sinker",
-        strop:"Leader 0.80 - 1.0 mm nylon, ± 80 cm long",
-        rigType:"Big Kob Double Strop Rig",
-        status:"Check current permit / stock status",
-        statusClass:"statusNeutral",
-        season:"Best spring to autumn",
-        closed:"Check current permit rules",
-        why:`Kob often takes bait hanging just above the bottom. Two hooks keep the bait straight and reduce spinning in current.`,
-        make:`1. Tie braid to a strong barrel swivel.
+    const KOB_INFO = {
+      bait: `Chokka
+Chokka strip
+Chokka head
+Chokka + Pilchard combo
+Live Makriel
+Pilchard belly
+Sardine
+Mullet strip
+Redbait
+Squid
+Octopus`,
+      lures: `Yo-Zuri minnow
+Yo-Zuri deep diver
+Soft plastic paddle tail
+Soft plastic jerkbait
+Deep diving plug
+Stickbait`,
+      hooks: `Top hook: 7/0
+Bottom hook: 8/0 or 9/0
+Kendal / J hooks`,
+      sinker: `6 oz to 8 oz
+Grapnel / bottle sinker`,
+      strop: `0.80 – 1.0 mm nylon
+± 80 cm long`,
+      rigtype: `Big Kob Double Strop Rig`,
+      make: `1. Tie braid to a strong barrel swivel.
 2. Add 0.80 - 1.0 mm nylon leader.
-3. Tie top hook 7/0.
-4. Tie bottom hook 8/0 or 9/0.
-5. Add 6-8 oz sinker.`,
-        sketch:`BIG KOB DOUBLE STROP RIG
+3. Tie the top hook 7/0.
+4. Tie the bottom hook 8/0 or 9/0.
+5. Add a 6-8 oz grapnel or bottle sinker.`,
+      diagram: `BIG KOB DOUBLE STROP RIG
 
 Main line
 40-50 lb braid
@@ -625,12 +599,40 @@ Top hook snoot ---- 7/0 hook
   |
 Bottom hook snoot - 8/0 or 9/0 hook
   |
-6-8 oz grapnel / bottle sinker`
+6-8 oz grapnel / bottle sinker`,
+      full: `FULL RIG SETUP
+
+Natural bait:
+Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus
+
+Lures:
+Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait
+
+Hook size:
+Top hook 7/0
+Bottom hook 8/0 or 9/0
+Kendal / J hooks
+
+Sinker weight:
+6 oz to 8 oz
+Grapnel / bottle sinker
+
+Strop length:
+0.80 – 1.0 mm nylon
+± 80 cm long
+
+Rig type:
+Big Kob Double Strop Rig`
+    };
+
+    const FISH_INFO = {
+      "Cape Kob":{
+        identifier:{ body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail, streamlined shape", found:"Reef edges, sandy channels, deeper structure", giveaway:"Big mouth and classic kob body" }
       },
       "Yellowtail":{
         identifier:{ body:"Long torpedo-shaped fast fish", colour:"Blue-green back with lighter silver sides", tail:"Strong forked tail", found:"Open water, bait balls, surface action", giveaway:"Fast pelagic fish with yellow tail tone" },
         naturalBait:"Live Makriel, Live bait, Pilchard strip, Sardine",
-        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper, Paddle tail soft plastic, Soft plastic jerkbait, Trolling lure",
+        lures:"Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Surface plug, Stickbait, Popper",
         hook:"5/0 to 7/0 for live bait",
         sinker:"Usually no sinker or very light",
         strop:"80 cm to 150 cm leader",
@@ -663,16 +665,17 @@ No sinker`
     };
 
     const FISH_GUIDE = [
-      {name:"Cape Kob", body:"Long strong predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges and channels", clue:"Big mouth", mouth:"big", bodyKey:"long", colourKey:"silver", tailKey:"strong", whereKey:"bottom"},
-      {name:"Yellowtail", body:"Torpedo-shaped", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast surface fish", mouth:"hooked", bodyKey:"long", colourKey:"silver", tailKey:"forked", whereKey:"surface"},
-      {name:"Bonito", body:"Slim tuna-like", colour:"Dark back silver sides", tail:"Forked", found:"Surface schools", clue:"Fast and compact", mouth:"hooked", bodyKey:"slim", colourKey:"silver", tailKey:"forked", whereKey:"surface"},
-      {name:"Red Roman", body:"Deep reef body", colour:"Red", tail:"Rounded", found:"Reef", clue:"Deep red profile", mouth:"small", bodyKey:"deep", colourKey:"red", tailKey:"rounded", whereKey:"reef"},
-      {name:"Snapper", body:"Reef body", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face", mouth:"big", bodyKey:"deep", colourKey:"red", tailKey:"rounded", whereKey:"bottom"},
-      {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth", mouth:"small", bodyKey:"compact", colourKey:"silver", tailKey:"rounded", whereKey:"shallow"}
+      {name:"Cape Kob", body:"Long strong predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges and channels", clue:"Big mouth"},
+      {name:"Yellowtail", body:"Torpedo-shaped", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast surface fish"},
+      {name:"Bonito", body:"Slim tuna-like", colour:"Dark back silver sides", tail:"Forked", found:"Surface schools", clue:"Fast and compact"},
+      {name:"Red Roman", body:"Deep reef body", colour:"Red", tail:"Rounded", found:"Reef", clue:"Deep red profile"},
+      {name:"Snapper", body:"Reef body", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face"},
+      {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"}
     ];
 
     const KEY_LOG = "tanya_master_log";
     let currentCatchPhoto = "";
+    let currentKobSection = "bait";
 
     function showTab(id){
       document.querySelectorAll("section").forEach(s => s.style.display = "none");
@@ -988,6 +991,16 @@ No sinker`
 
     function renderFishInfo(){
       const species = document.getElementById("fishSelect").value;
+      const subNav = document.getElementById("kobSubNav");
+
+      if(species === "Cape Kob"){
+        subNav.style.display = "flex";
+        showKobSection(currentKobSection);
+        return;
+      }
+
+      subNav.style.display = "none";
+
       const info = FISH_INFO[species];
       if(!info){
         document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
@@ -997,7 +1010,7 @@ No sinker`
       document.getElementById("fishInfoBox").innerHTML = `
         <div class="spotCard">
           <div class="fishMainTitle">${species}</div>
-          <div class="fishSub">Fish info, identifier and full rig setup</div>
+          <div class="fishSub">Fish info and rig setup</div>
 
           <div class="identifyBox">
             <div class="identifyTitle">Fish Identifier</div>
@@ -1017,9 +1030,11 @@ No sinker`
             <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook}</div>
             <div class="infoBox infoPurple"><b>Sinker / Weight</b>${info.sinker}</div>
             <div class="infoBox infoGold"><b>Strop Length</b>${info.strop}</div>
-            <div class="infoBox infoBlue"><b>Rig Type</b>${info.rigType}</div>
-            <div class="infoBox infoOrange"><b>Best Season</b>${info.season}</div>
-            <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed}</div>
+          </div>
+
+          <div class="identifyBox">
+            <div class="identifyTitle">Rig Type</div>
+            <div class="bigText">${info.rigType}</div>
           </div>
 
           <div class="identifyBox">
@@ -1035,6 +1050,45 @@ No sinker`
           <div class="identifyBox">
             <div class="identifyTitle">Rig Diagram</div>
             <pre class="rig">${info.sketch}</pre>
+          </div>
+        </div>
+      `;
+    }
+
+    function showKobSection(section){
+      currentKobSection = section;
+      document.querySelectorAll("#kobSubNav .subBtn").forEach(btn => btn.classList.remove("active"));
+
+      const btns = [...document.querySelectorAll("#kobSubNav .subBtn")];
+      const map = {
+        bait:0,lures:1,hooks:2,sinker:3,strop:4,rigtype:5,make:6,diagram:7,full:8
+      };
+      if(map[section] !== undefined) btns[map[section]].classList.add("active");
+
+      let title = "";
+      let content = "";
+
+      if(section === "bait"){ title = "Cape Kob • Natural Bait"; content = KOB_INFO.bait; }
+      if(section === "lures"){ title = "Cape Kob • Lures"; content = KOB_INFO.lures; }
+      if(section === "hooks"){ title = "Cape Kob • Hook Size"; content = KOB_INFO.hooks; }
+      if(section === "sinker"){ title = "Cape Kob • Sinker Weight"; content = KOB_INFO.sinker; }
+      if(section === "strop"){ title = "Cape Kob • Strop Length"; content = KOB_INFO.strop; }
+      if(section === "rigtype"){ title = "Cape Kob • Rig Type"; content = KOB_INFO.rigtype; }
+      if(section === "make"){ title = "Cape Kob • How to Make It"; content = KOB_INFO.make; }
+      if(section === "diagram"){ title = "Cape Kob • Rig Diagram"; content = KOB_INFO.diagram; }
+      if(section === "full"){ title = "Cape Kob • Full Rig Setup"; content = KOB_INFO.full; }
+
+      document.getElementById("fishInfoBox").innerHTML = `
+        <div class="spotCard">
+          <div class="fishMainTitle">Cape Kob</div>
+          <div class="fishSub">${title}</div>
+
+          <div class="identifyBox">
+            <div class="identifyTitle">${title}</div>
+            ${section === "diagram" || section === "full"
+              ? `<pre class="rig">${content}</pre>`
+              : `<div class="bigText">${content.replace(/\n/g,"<br>")}</div>`
+            }
           </div>
         </div>
       `;
@@ -1071,98 +1125,9 @@ No sinker`
       el.click();
     }
 
-    function showGuideHint(){
-      document.getElementById("fishIdResults").innerHTML = `
-        <div class="suggestionCard">
-          Compare the uploaded fish photo with the Fish ID Guide below.<br><br>
-          Check:<br>
-          • body shape<br>
-          • mouth shape<br>
-          • colour<br>
-          • tail shape<br>
-          • where it was caught
-        </div>
-      `;
-    }
+    function showGuideHint(){}
 
-    function sendToChatGPTHint(){
-      document.getElementById("fishIdResults").innerHTML = `
-        <div class="suggestionCard">
-          Open ChatGPT, upload the fish photo, and ask:<br>
-          <b>Identify this fish from the photo</b><br><br>
-          <a class="chatlink" href="https://chatgpt.com" target="_blank">Open ChatGPT</a>
-        </div>
-      `;
-    }
-
-    document.getElementById("fishPhoto").addEventListener("change", function(){
-      const file = this.files && this.files[0];
-      const preview = document.getElementById("previewImg");
-      if(file){
-        const url = URL.createObjectURL(file);
-        preview.src = url;
-        preview.style.display = "block";
-        document.getElementById("uploadPreview").textContent =
-          `${file.name} loaded. Compare it with the Fish ID Guide or use the Smart Fish Identifier below.`;
-      }
-    });
-
-    function runFishIdentifier(){
-      const mouth = document.getElementById("idMouth").value;
-      const body = document.getElementById("idBody").value;
-      const colour = document.getElementById("idColour").value;
-      const tail = document.getElementById("idTail").value;
-      const where = document.getElementById("idWhere").value;
-
-      let scored = FISH_GUIDE.map(f => {
-        let score = 0;
-        if(mouth && f.mouth === mouth) score += 2;
-        if(body && f.bodyKey === body) score += 2;
-        if(colour && f.colourKey === colour) score += 2;
-        if(tail && f.tailKey === tail) score += 2;
-        if(where && f.whereKey === where) score += 2;
-        return {...f, score};
-      }).sort((a,b) => b.score - a.score);
-
-      const top = scored.filter(x => x.score > 0).slice(0,3);
-
-      if(!top.length){
-        document.getElementById("fishIdResults").innerHTML = `
-          <div class="suggestionCard">No strong match yet. Add more fish details or compare with the guide below.</div>
-        `;
-        return;
-      }
-
-      let html = `<div class="identifyTitle" style="margin-top:12px;">Best Match Suggestions</div>`;
-      top.forEach((f, i) => {
-        html += `
-          <div class="suggestionCard">
-            <b>${i+1}. ${f.name}</b><br>
-            Match score: ${f.score}/10<br>
-            Body: ${f.body}<br>
-            Colour: ${f.colour}<br>
-            Tail: ${f.tail}<br>
-            Found: ${f.found}<br>
-            Key clue: ${f.clue}
-          </div>
-        `;
-      });
-
-      document.getElementById("fishIdResults").innerHTML = html;
-    }
-
-    function clearFishIdentifier(){
-      document.getElementById("idMouth").value = "";
-      document.getElementById("idBody").value = "";
-      document.getElementById("idColour").value = "";
-      document.getElementById("idTail").value = "";
-      document.getElementById("idWhere").value = "";
-      document.getElementById("fishIdResults").innerHTML = "";
-      document.getElementById("uploadPreview").textContent = "Take a photo or upload one, then compare it with the guide or use the smart identifier below.";
-      document.getElementById("previewImg").style.display = "none";
-      document.getElementById("previewImg").src = "";
-      document.getElementById("fishPhoto").value = "";
-    }
+    function sendToChatGPTHint(){}
 
     function openCatchCamera(){
       const el = document.getElementById("catchPhoto");
@@ -1216,4 +1181,4 @@ No sinker`
     renderLog();
   </script>
 </body>
-          </html>
+  </html>
