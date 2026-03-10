@@ -1255,6 +1255,7 @@ function renderFishInfo(){
   const species = document.getElementById("fishSelect").value;
   const filter = document.getElementById("fishInfoFilter")?.value || "all";
   const info = FISH_INFO[species];
+  const topBaits = getTopBaits(species);
 
   if(!info){
     document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
@@ -1276,8 +1277,9 @@ function renderFishInfo(){
   if(filter === "all" || filter === "lures"){
     baitBlock += `
       <div class="infoGrid">
-        <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
-      </div>
+  <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
+  <div class="infoBox infoGreen"><b>Top Logged Baits</b>${topBaits.length ? topBaits.join(", ") : "No bait history yet"}</div>
+</div>
     `;
   }
 
@@ -1334,6 +1336,9 @@ function renderFishInfo(){
       <div class="infoGrid">
         <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
       </div>
+      document.getElementById("fishInfoBox").innerHTML = `
+  <div class="spotCard">
+    <div class="fishMainTitle">${species}</div>
 
       ${baitBlock}
       ${rigBlock}
