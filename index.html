@@ -113,7 +113,7 @@
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V106 Fixed</div>
+  <div class="mini">V107 Stable</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -126,7 +126,7 @@
 
   <section id="spotsTab">
     <div class="card">
-      <div class="sectionTitle"><b>Spots</b> • Local area support</div>
+      <div class="sectionTitle"><b>Spots</b> • Garmin style coordinate list</div>
 
       <div class="identifyBox">
         <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
@@ -137,11 +137,7 @@
         </div>
       </div>
 
-      <div class="mini">
-        Spots are still active for Local Area auto-fill, East/West matching, and Garmin support.
-        They are hidden from the main screen in this build.
-      </div>
-      <div id="spotList" style="display:none;"></div>
+      <div id="spotList"></div>
     </div>
   </section>
 
@@ -153,6 +149,10 @@
       <select id="species">
         <option value="">Choose...</option>
       </select>
+
+      <label>Best Depth</label>
+      <input id="bestDepth" readonly />
+      <div id="bestDepthNote" class="mini">Choose species to load best depth suggestion.</div>
 
       <label>Minimum Size</label>
       <input id="minSize" readonly />
@@ -228,8 +228,9 @@
       <div id="weekForecast"></div>
 
       <div class="identifyBox">
-        <div class="identifyTitle">Tides</div>
-        <div id="tideBox" class="bigText">Loading tide section...</div>
+        <div class="identifyTitle">Real Tide Times</div>
+        <div class="bigText mini">Powered by tide API</div>
+        <div id="tideBox" class="bigText">Loading tide times...</div>
       </div>
 
       <div class="identifyBox">
@@ -245,6 +246,14 @@
 
       <label>Species</label>
       <select id="fishSelect" onchange="renderFishInfo()"></select>
+
+      <label>Filter</label>
+      <select id="fishInfoFilter" onchange="renderFishInfo()">
+        <option value="all">All</option>
+        <option value="bait">Natural Bait Only</option>
+        <option value="lures">Lures Only</option>
+        <option value="rig">Rig Only</option>
+      </select>
 
       <div id="fishInfoBox"></div>
     </div>
@@ -288,6 +297,50 @@
       </div>
 
       <div class="identifyBox">
+        <div class="identifyTitle">Fish ID Wizard</div>
+
+        <label>Body Shape</label>
+        <select id="wizBody">
+          <option value="">Choose...</option>
+          <option>Long predator</option>
+          <option>Torpedo shape</option>
+          <option>Deep reef fish</option>
+          <option>Compact reef fish</option>
+          <option>Slim tuna shape</option>
+        </select>
+
+        <label>Colour</label>
+        <select id="wizColour">
+          <option value="">Choose...</option>
+          <option>Silver-grey</option>
+          <option>Blue-green</option>
+          <option>Red / orange</option>
+          <option>Pink-red</option>
+          <option>Yellow belly</option>
+          <option>Brown-grey</option>
+          <option>Bright silver</option>
+        </select>
+
+        <label>Where Found</label>
+        <select id="wizWhere">
+          <option value="">Choose...</option>
+          <option>Reef edge</option>
+          <option>Shallow reef</option>
+          <option>Deep structure</option>
+          <option>Open water</option>
+          <option>Surface feeding</option>
+          <option>Channels</option>
+        </select>
+
+        <div class="row" style="margin-top:12px;">
+          <button onclick="runFishWizard()">Find Match</button>
+          <button class="dark" onclick="clearFishWizard()">Clear</button>
+        </div>
+
+        <div id="fishWizardResult" class="suggestionCard" style="display:none;"></div>
+      </div>
+
+      <div class="identifyBox">
         <div class="identifyTitle">Visual Fish ID Guide</div>
         <div id="fishGuideList" class="guideGrid"></div>
       </div>
@@ -308,7 +361,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Fishing App<br>
-    Build version: V106 Fixed
+    Build version: V107 Stable
   </div>
 
 <script>
@@ -316,6 +369,25 @@ const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
 const MARINE_LINE_LON = HARBOUR.lon;
 const KEY_LOG = "tanya_master_log";
 const MAX_LOG_CHARS = 4000000;
+const TIDE_API_KEY = "PASTE_YOUR_WORLDTIDES_KEY_HERE";
+
+const BEST_DEPTH = {
+  "Cape Kob":"25–45 m • Reef edges • Sand channels",
+  "Yellowtail":"Surface to mid-water • Bait balls • Current lines",
+  "Bonito":"Surface to mid-water • Feeding schools • Birds working",
+  "Red Roman":"20–60 m • Reef structure • Broken reef",
+  "Snapper":"25–60 m • Bottom structure • Broken reef",
+  "Silverfish":"20–45 m • Reef patches • Calm workable reef",
+  "Red Steenbras":"35–80 m • Deeper bottom structure",
+  "Yellow Belly":"25–55 m • Reef patches • Current edges",
+  "Hottentot":"10–35 m • Shallow reef",
+  "Geelbek":"30–70 m • Reefs • Channels • Water column",
+  "Carpenter":"25–60 m • Hard reef structure",
+  "Dageraad":"30–70 m • Deep reef and structure",
+  "Santer":"20–50 m • Reef and broken structure",
+  "Elf / Shad":"Surface to mid-water • Bait activity",
+  "Garrick / Leervis":"Shallow moving water • Current edges • Bait zones"
+};
 
 const SPOTS = [
   { name:"Skulpbank", coord:"-34.3905,20.8602" },
@@ -425,9 +497,7 @@ const MIN_SIZE = {
 };
 
 function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier){
-  return {
-    speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier
-  };
+  return { speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier };
 }
 
 const FISH_INFO = {
@@ -822,6 +892,19 @@ function fillBaitOptions(){
   if(autoFav) bait.value = autoFav;
 }
 
+function updateBestDepth(){
+  const species = document.getElementById("species").value;
+  const box = document.getElementById("bestDepth");
+  const note = document.getElementById("bestDepthNote");
+  if(!species){
+    box.value = "";
+    note.textContent = "Choose species to load best depth suggestion.";
+    return;
+  }
+  box.value = BEST_DEPTH[species] || "";
+  note.textContent = BEST_DEPTH[species] ? "Best depth suggestion loaded." : "No depth suggestion loaded.";
+}
+
 function updateMinSize(){
   const species = document.getElementById("species").value;
   const minSizeEl = document.getElementById("minSize");
@@ -924,6 +1007,7 @@ function saveCatch(){
     const minSize = document.getElementById("minSize").value || "";
     const sizeCaught = document.getElementById("sizeCaught").value || "";
     const area = document.getElementById("area").value || "";
+    const bestDepth = document.getElementById("bestDepth").value || "";
 
     if(!species){
       alert("Choose species first.");
@@ -943,6 +1027,7 @@ function saveCatch(){
       notes: notes || "",
       minSize: minSize || "",
       sizeCaught: sizeCaught || "",
+      bestDepth: bestDepth || "",
       seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
       photo: currentCatchPhoto || "",
       date: new Date().toLocaleString()
@@ -974,6 +1059,7 @@ function renderLog(){
     html += `
       <div class="spotCard">
         <b>${c.species}</b><br>
+        <span class="mini">Best Depth: ${c.bestDepth || "-"}</span><br>
         <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
         <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
         <span class="mini">Preferred Bait / Lure: ${c.bait || "-"}</span><br>
@@ -1000,6 +1086,7 @@ function clearAllLogs(){
 
 function clearCatchForm(){
   document.getElementById("species").value = "";
+  document.getElementById("bestDepth").value = "";
   document.getElementById("minSize").value = "";
   document.getElementById("sizeCaught").value = "";
   document.getElementById("sizeWarning").textContent = "";
@@ -1010,6 +1097,7 @@ function clearCatchForm(){
   document.getElementById("coordAreaText").textContent = "";
   document.getElementById("notes").value = "";
   document.getElementById("saveMsg").textContent = "";
+  document.getElementById("bestDepthNote").textContent = "Choose species to load best depth suggestion.";
   document.getElementById("minSizeNote").textContent = "Choose species to load minimum size.";
   document.getElementById("baitAutoNote").textContent = "Favourite bait will auto-fill when you choose a species.";
   currentCatchPhoto = "";
@@ -1066,22 +1154,44 @@ async function loadWeekForecast(){
   }
 }
 
-function loadTides(){
-  document.getElementById("tideBox").innerHTML = `
-    <table>
-      <thead>
-        <tr>
-          <th>Tide Type</th>
-          <th>Time</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr><td>High Tide</td><td>--</td></tr>
-        <tr><td>Low Tide</td><td>--</td></tr>
-        <tr><td>Next Tide</td><td>Add live tide API later</td></tr>
-      </tbody>
-    </table>
-  `;
+async function loadTides(){
+  const tideBox = document.getElementById("tideBox");
+
+  if(!TIDE_API_KEY || TIDE_API_KEY.includes("PASTE_YOUR_WORLDTIDES_KEY_HERE")){
+    tideBox.innerHTML = `
+      <b>High Tide:</b> Add WorldTides API key<br>
+      <b>Low Tide:</b> Add WorldTides API key<br>
+      <b>Next Tide:</b> Add WorldTides API key
+    `;
+    return;
+  }
+
+  try{
+    const url = `https://www.worldtides.info/api/v3?heights&extremes&lat=${HARBOUR.lat}&lon=${HARBOUR.lon}&days=1&key=${TIDE_API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
+
+    const extremes = data.extremes || [];
+    if(!extremes.length){
+      tideBox.innerHTML = "No tide data returned.";
+      return;
+    }
+
+    const now = Date.now();
+    const next = extremes.find(t => (t.dt * 1000) > now);
+    const highs = extremes.filter(t => t.type === "High");
+    const lows = extremes.filter(t => t.type === "Low");
+    const fmt = unix => new Date(unix * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
+
+    tideBox.innerHTML = `
+      <b>High Tide:</b> ${highs[0] ? fmt(highs[0].dt) : "--"}${highs[0]?.height ? ` (${highs[0].height.toFixed(1)} m)` : ""}<br>
+      <b>Low Tide:</b> ${lows[0] ? fmt(lows[0].dt) : "--"}${lows[0]?.height ? ` (${lows[0].height.toFixed(1)} m)` : ""}<br>
+      <b>Next Tide:</b> ${next ? `${next.type} at ${fmt(next.dt)}` : "--"}
+    `;
+  }catch(err){
+    tideBox.innerHTML = "Could not load tide times.";
+    console.log(err);
+  }
 }
 
 function loadFishingWindow(){
@@ -1095,65 +1205,67 @@ function loadFishingWindow(){
 
   document.getElementById("fishingWindowBox").innerHTML = `
     <b>Moon / window note:</b> ${seasonNote}<br><br>
-    <b>Cape Kob:</b> Often stronger on lower light, pushing tide, reef edges and sandy channels.<br><br>
-    <b>Yellowtail:</b> Better when warm clean water pushes bait up, especially with bird activity, bait balls and current lines.<br><br>
-    <b>Bonito:</b> Better when surface bait is active, birds are working, and current lines hold small baitfish.<br><br>
-    <b>Red Roman:</b> Usually more reef and structure dependent than season dependent. Focus on clean bait presentation and workable current.<br><br>
-    <b>Snapper:</b> Better over broken reef and structure with neat natural bait close to bottom, especially in stable sea conditions.<br><br>
-    <b>Silverfish:</b> Better in calmer workable reef conditions with smaller natural bait and lighter presentation.<br><br>
-    <b>Red Steenbras:</b> Sensitive species. If legally targeted, focus on deeper bottom structure, clean bait and moderate current. Always check permit and closed season.<br><br>
-    <b>Yellow Belly:</b> Better around reef patches, current edges and clean bottom presentation with natural bait.<br><br>
-    <b>Hottentot:</b> Better on shallow reef with small neat bait like mussel, redbait or chokka strip, especially in calmer conditions.<br><br>
-    <b>Geelbek:</b> Better when baitfish hold over reefs and channels. Fish natural bait slightly off bottom or in the water column.<br><br>
+    <b>Cape Kob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
+    <b>Yellowtail:</b> Better when warm clean water pushes bait up, with birds, bait balls and current lines.<br><br>
+    <b>Bonito:</b> Better when surface bait is active and birds are working.<br><br>
+    <b>Red Roman:</b> More reef and structure dependent than season dependent. Focus on clean bait and workable current.<br><br>
+    <b>Snapper:</b> Better over broken reef with neat natural bait close to bottom.<br><br>
+    <b>Silverfish:</b> Better in calmer workable reef conditions with lighter presentation.<br><br>
+    <b>Red Steenbras:</b> If legally targeted, focus on deeper structure, clean bait and moderate current.<br><br>
+    <b>Yellow Belly:</b> Better around reef patches and current edges.<br><br>
+    <b>Hottentot:</b> Better on shallow reef with small neat bait.<br><br>
+    <b>Geelbek:</b> Better when baitfish hold over reefs and channels, slightly off bottom or in the water column.<br><br>
     <b>Carpenter:</b> Better on strong reef structure with tougher bait and stronger tackle.<br><br>
     <b>Dageraad:</b> Better on reef and deeper structure with larger natural bait and stable conditions.<br><br>
     <b>Santer:</b> Better over reef with short traces and neat chokka or sardine bait.<br><br>
-    <b>Elf / Shad:</b> Better with bait movement, current lines and active baitfish, often in brighter feeding windows.<br><br>
+    <b>Elf / Shad:</b> Better with bait movement, current lines and active baitfish.<br><br>
     <b>Garrick / Leervis:</b> Better in cleaner moving water near bait activity and current edges.
   `;
 }
 
 function renderFishInfo(){
   const species = document.getElementById("fishSelect").value;
+  const filter = document.getElementById("fishInfoFilter")?.value || "all";
   const info = FISH_INFO[species];
+
   if(!info){
     document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
     return;
   }
 
-  document.getElementById("fishInfoBox").innerHTML = `
-    <div class="spotCard">
-      <div class="fishMainTitle">${species}</div>
-      <div class="fishSub">${info.speciesNote || ""}</div>
+  let baitBlock = "";
+  let rigBlock = "";
 
-      <div class="identifyBox">
-        <div class="identifyTitle">Fish Identifier</div>
-        <div class="bigText">
-          <b>Body Shape:</b> ${info.identifier?.body || "-"}<br>
-          <b>Colour:</b> ${info.identifier?.colour || "-"}<br>
-          <b>Tail Shape:</b> ${info.identifier?.tail || "-"}<br>
-          <b>Where Usually Found:</b> ${info.identifier?.found || "-"}<br>
-          <b>Key Giveaway:</b> ${info.identifier?.giveaway || "-"}
-        </div>
-      </div>
-
+  if(filter === "all" || filter === "bait"){
+    baitBlock += `
       <div class="infoGrid">
-        <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
         <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
         <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
       </div>
+    `;
+  }
 
+  if(filter === "all" || filter === "lures"){
+    baitBlock += `
+      <div class="infoGrid">
+        <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
+      </div>
+    `;
+  }
+
+  if(filter === "all" || filter === "rig"){
+    rigBlock = `
       <div class="rigTab">
         <div class="identifyTitle">Rig Tab</div>
 
         <div class="infoGrid">
-          <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
           <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook || "-"}</div>
           <div class="infoBox infoPurple"><b>Sinker Weight</b>${info.sinker || "-"}</div>
           <div class="infoBox infoGold"><b>Strop Length</b>${info.strop || "-"}</div>
           <div class="infoBox infoBlue"><b>Rig Type</b>${info.rigType || "-"}</div>
           <div class="infoBox infoOrange"><b>Best Season</b>${info.season || "-"}</div>
           <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed || "-"}</div>
+          <div class="infoBox infoBlue"><b>Best Depth</b>${BEST_DEPTH[species] || "-"}</div>
         </div>
 
         <div class="identifyBox">
@@ -1171,6 +1283,32 @@ function renderFishInfo(){
           <pre class="rig">${info.sketch || ""}</pre>
         </div>
       </div>
+    `;
+  }
+
+  document.getElementById("fishInfoBox").innerHTML = `
+    <div class="spotCard">
+      <div class="fishMainTitle">${species}</div>
+      <div class="fishSub">${info.speciesNote || ""}</div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Fish Identifier</div>
+        <div class="bigText">
+          <b>Body Shape:</b> ${info.identifier?.body || "-"}<br>
+          <b>Colour:</b> ${info.identifier?.colour || "-"}<br>
+          <b>Tail Shape:</b> ${info.identifier?.tail || "-"}<br>
+          <b>Where Usually Found:</b> ${info.identifier?.found || "-"}<br>
+          <b>Key Giveaway:</b> ${info.identifier?.giveaway || "-"}<br><br>
+          <b>Best Depth:</b> ${BEST_DEPTH[species] || "-"}
+        </div>
+      </div>
+
+      <div class="infoGrid">
+        <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
+      </div>
+
+      ${baitBlock}
+      ${rigBlock}
     </div>
   `;
 }
@@ -1192,6 +1330,39 @@ function renderFishGuide(){
     `;
   });
   document.getElementById("fishGuideList").innerHTML = html;
+}
+
+function runFishWizard(){
+  const body = document.getElementById("wizBody").value;
+  const colour = document.getElementById("wizColour").value;
+  const where = document.getElementById("wizWhere").value;
+  const result = document.getElementById("fishWizardResult");
+
+  const matches = [];
+
+  if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape Kob");
+  if(body === "Torpedo shape" && where === "Open water") matches.push("Yellowtail");
+  if(body === "Slim tuna shape" && where === "Surface feeding") matches.push("Bonito");
+  if(body === "Deep reef fish" && colour === "Red / orange") matches.push("Red Roman");
+  if(body === "Deep reef fish" && colour === "Pink-red") matches.push("Snapper");
+  if(colour === "Yellow belly") matches.push("Yellow Belly");
+  if(colour === "Brown-grey" && where === "Deep structure") matches.push("Carpenter");
+  if(body === "Compact reef fish" && where === "Shallow reef") matches.push("Hottentot");
+  if(where === "Channels" && colour === "Silver-grey") matches.push("Geelbek");
+
+  result.style.display = "block";
+  result.innerHTML = matches.length
+    ? `<b>Best match:</b><br>${matches.join("<br>")}`
+    : `<b>No strong match yet.</b><br>Try a different body shape, colour or area.`;
+}
+
+function clearFishWizard(){
+  document.getElementById("wizBody").value = "";
+  document.getElementById("wizColour").value = "";
+  document.getElementById("wizWhere").value = "";
+  const result = document.getElementById("fishWizardResult");
+  result.style.display = "none";
+  result.innerHTML = "";
 }
 
 function openCamera(){
@@ -1267,6 +1438,7 @@ document.getElementById("fishPhoto").addEventListener("change", function(){
 
 document.getElementById("species").addEventListener("change", () => {
   fillBaitOptions();
+  updateBestDepth();
   updateMinSize();
   checkSizeWarning();
 
@@ -1293,6 +1465,7 @@ renderSpotList();
 fillSpecies();
 fillAreaDropdown();
 fillBaitOptions();
+updateBestDepth();
 updateMinSize();
 checkSizeWarning();
 renderFishInfo();
