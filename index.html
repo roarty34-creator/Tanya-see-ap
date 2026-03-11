@@ -1358,14 +1358,14 @@ function renderFishInfo(){
   let rigBlock = "";
 
   if(filter === "all" || filter === "bait"){
-    baitBlock += `
-      <div class="infoGrid">
-        <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
-        <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
-      </div>
-    `;
-  }
-
+  baitBlock += `
+    <div class="infoGrid">
+      <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
+      <div class="infoBox infoBlue"><b>Top Logged Baits</b>${getTopBaits(species) || "No bait history yet"}</div>
+      <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
+    </div>
+  `;
+        }
   if(filter === "all" || filter === "lures"){
     baitBlock += `
       <div class="infoGrid">
@@ -1623,6 +1623,25 @@ checkSizeWarning();
 renderFishInfo();
 renderFishGuide();
 renderLog();
+
+  function getTopBaits(species){
+  let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+  let counts = {};
+
+  log.forEach(c => {
+    if(c.species === species && c.bait){
+      counts[c.bait] = (counts[c.bait] || 0) + 1;
+    }
+  });
+
+  let sorted = Object.entries(counts)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+
+  if(sorted.length === 0) return "";
+
+  return sorted.map(([bait,count]) => `${bait} (${count})`).join("<br>");
+  }
 </script>
 
 <script>
