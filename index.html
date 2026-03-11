@@ -1346,6 +1346,7 @@ function renderFishInfo(){
   const species = document.getElementById("fishSelect").value;
   const filter = document.getElementById("fishInfoFilter")?.value || "all";
   const info = FISH_INFO[species];
+  const rigSteps = RIG_HOW_TO[species] || [];
   const topBaits = getTopBaits(species);
 
   if(!info){
@@ -1395,9 +1396,15 @@ function renderFishInfo(){
         </div>
 
         <div class="identifyBox">
-          <div class="identifyTitle">Why This Rig Works</div>
-          <div class="bigText">${(info.why || "").replace(/\n/g,"<br>")}</div>
-        </div>
+  <div class="identifyTitle">How to Rig</div>
+  <div class="bigText">
+    ${
+      rigSteps.length
+        ? rigSteps.map((step, i) => `<b>Step ${i+1}:</b> ${step}`).join("<br><br>")
+        : (info.make || "").replace(/\n/g,"<br>")
+    }
+  </div>
+</div>
 
         <div class="identifyBox">
           <div class="identifyTitle">Rig Diagram</div>
