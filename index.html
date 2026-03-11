@@ -113,7 +113,7 @@
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V107 Stable</div>
+  <div class="mini">V107 Stable Fixed</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -361,7 +361,7 @@
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Fishing App<br>
-    Build version: V107 Stable
+    Build version: V107 Stable Fixed
   </div>
 
 <script>
@@ -388,7 +388,8 @@ const BEST_DEPTH = {
   "Elf / Shad":"Surface to mid-water • Bait activity",
   "Garrick / Leervis":"Shallow moving water • Current edges • Bait zones"
 };
-  const RIG_HOW_TO = {
+
+const RIG_HOW_TO = {
   "Cape Kob": [
     "Tie your main line to a strong swivel.",
     "Use a heavy nylon leader around 0.80–1.0 mm.",
@@ -397,7 +398,6 @@ const BEST_DEPTH = {
     "Add a 6–8 oz sinker on the bottom drop.",
     "Fish it close to reef edges and sandy channels."
   ],
-
   "Dageraad": [
     "Tie the main line to a strong swivel.",
     "Use a double dropper loop style setup.",
@@ -406,7 +406,6 @@ const BEST_DEPTH = {
     "Add an 8–10 oz sinker at the bottom.",
     "Drop it on deeper reef structure."
   ],
-
   "Snapper": [
     "Tie main line to a swivel.",
     "Use a 1.0–1.2 mm leader.",
@@ -415,7 +414,6 @@ const BEST_DEPTH = {
     "Use an 8–10 oz sinker.",
     "Fish over broken reef and structure."
   ],
-
   "Garrick / Leervis": [
     "Tie main line to a strong swivel.",
     "Use a heavy nylon leader around 0.90–1.0 mm.",
@@ -424,7 +422,6 @@ const BEST_DEPTH = {
     "Add a 4–6 oz sinker.",
     "Work moving water and bait zones."
   ],
-
   "Elf / Shad": [
     "Tie main line to a swivel.",
     "Use a wire trace around 0.60–0.70 mm.",
@@ -433,7 +430,6 @@ const BEST_DEPTH = {
     "Add a 4–6 oz sinker.",
     "Fish where baitfish are active."
   ],
-
   "Silverfish": [
     "Tie main line to a swivel.",
     "Use a double dropper loop setup.",
@@ -442,7 +438,6 @@ const BEST_DEPTH = {
     "Use prawn or small bait.",
     "Add a 4–6 oz sinker and fish over reef."
   ],
-
   "Yellow Belly": [
     "Tie main line to a swivel.",
     "Use a double dropper loop setup.",
@@ -451,7 +446,6 @@ const BEST_DEPTH = {
     "Add a bottom sinker.",
     "Fish reef patches and current edges."
   ],
-
   "Red Steenbras": [
     "Tie main line to a strong swivel.",
     "Use a 1.0–1.2 mm leader.",
@@ -460,7 +454,6 @@ const BEST_DEPTH = {
     "Use a heavy 8–10 oz sinker.",
     "Drop it on deeper bottom structure."
   ],
-
   "Carpenter": [
     "Tie main line to a swivel.",
     "Use a strong bottom trace.",
@@ -469,7 +462,6 @@ const BEST_DEPTH = {
     "Use a 6–8 oz sinker.",
     "Fish hard reef structure."
   ],
-
   "Santer": [
     "Tie main line to a swivel.",
     "Use a short trace with 2/0–3/0 hooks.",
@@ -521,64 +513,50 @@ const BAIT_BY_SPECIES = {
     "Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail",
     "Soft plastic jerkbait","Deep diving plug","Stickbait"
   ],
-
   "Yellowtail":[
     "Live Makriel","Live bait","Pilchard strip","Sardine","Sardine fillet",
     "Metal spoon","Surface plug","Popper","Stickbait",
     "Paddle tail soft plastic","Soft plastic jerkbait",
     "Yo-Zuri minnow","Yo-Zuri deep diver","Trolling lure"
   ],
-
   "Bonito":[
     "Pilchard strip","Sardine strip","Makriel","Live bait",
     "Feather lure","Small spoon","Yo-Zuri minnow","Small plug","Trolling lure"
   ],
-
   "Red Roman":[
     "Chokka","Pilchard","Octopus","Squid","Sardine","Redbait","Mussel"
   ],
-
   "Snapper":[
     "Chokka","Pilchard","Redbait","Squid","Sardine","Mussel","Chokka + Pilchard combo"
   ],
-
   "Silverfish":[
     "Chokka strip","Pilchard strip","Pilchard","Small sardine strip","Mussel","Redbait"
   ],
-
   "Red Steenbras":[
     "Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait","Octopus"
   ],
-
   "Yellow Belly":[
     "Chokka","Pilchard","Sardine","Squid","Redbait"
   ],
-
   "Hottentot":[
     "Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"
   ],
-
   "Geelbek":[
     "Chokka","Sardine","Pilchard","Live bait","Live Makriel",
     "Yo-Zuri minnow","Yo-Zuri deep diver","Stickbait"
   ],
-
   "Carpenter":[
     "Chokka","Squid","Pilchard","Octopus","Redbait"
   ],
-
   "Dageraad":[
     "Chokka","Pilchard","Redbait","Squid","Big bait","Octopus"
   ],
-
   "Santer":[
     "Chokka","Sardine","Pilchard strip","Pilchard","Small squid strip"
   ],
-
   "Elf / Shad":[
     "Sardine","Pilchard","Spoon","Surface lure","Plug","Small stickbait"
   ],
-
   "Garrick / Leervis":[
     "Live bait","Mullet strip","Plug","Stickbait","Surface lure","Soft plastic jerkbait"
   ]
@@ -601,19 +579,7 @@ const MIN_SIZE = {
   "Elf / Shad":30,
   "Garrick / Leervis":70
 };
-  } 
-function getTopBaits(species){
-  const baitStats = JSON.parse(localStorage.getItem("bait_stats") || "{}");
 
-  if(!baitStats[species]) return [];
-
-  const entries = Object.entries(baitStats[species]);
-
-  entries.sort((a,b)=>b[1]-a[1]);
-
-  return entries.slice(0,3).map(e=>e[0]);
-}
-  
 function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier){
   return { speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier };
 }
@@ -906,6 +872,50 @@ const FISH_GUIDE = [
 
 let currentCatchPhoto = "";
 
+function getLog(){
+  try{
+    return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+  }catch(e){
+    return [];
+  }
+}
+
+function saveLog(list){
+  localStorage.setItem(KEY_LOG, JSON.stringify(list));
+}
+
+function trimLogToFit(list){
+  while (JSON.stringify(list).length > MAX_LOG_CHARS && list.length > 1) {
+    list.pop();
+  }
+  return list;
+}
+
+function updateFavouriteBait(species, bait){
+  if(!species || !bait) return;
+  const key = "bait_stats";
+  let stats = JSON.parse(localStorage.getItem(key) || "{}");
+  if(!stats[species]) stats[species] = {};
+  if(!stats[species][bait]) stats[species][bait] = 0;
+  stats[species][bait]++;
+  localStorage.setItem(key, JSON.stringify(stats));
+}
+
+function getTopBaits(species){
+  let log = getLog();
+  let counts = {};
+  log.forEach(c => {
+    if(c.species === species && c.bait){
+      counts[c.bait] = (counts[c.bait] || 0) + 1;
+    }
+  });
+  let sorted = Object.entries(counts)
+    .sort((a,b) => b[1] - a[1])
+    .slice(0,3);
+  if(sorted.length === 0) return "";
+  return sorted.map(([bait,count]) => `${bait} (${count})`).join("<br>");
+}
+
 function showTab(id){
   document.querySelectorAll("section").forEach(s => s.style.display = "none");
   document.getElementById(id).style.display = "block";
@@ -1096,42 +1106,56 @@ function useSpotInCatch(name, coord){
   document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
 }
 
-function getLog(){
-  try{
-    return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
-  }catch(e){
-    return [];
-  }
-}
-
-function saveLog(list){
-  localStorage.setItem(KEY_LOG, JSON.stringify(list));
-}
-
-function trimLogToFit(list){
-  while (JSON.stringify(list).length > MAX_LOG_CHARS && list.length > 1) {
-    list.pop();
-  }
-  return list;
-}
-
 function saveCatch(){
+  try{
+    const species = document.getElementById("species").value;
+    const bait = document.getElementById("bait").value;
+    const sizeCaught = document.getElementById("sizeCaught").value || "";
+    const coords = document.getElementById("coords").value.trim();
+    const whereCaught = document.getElementById("whereCaught").value.trim();
+    const notes = document.getElementById("notes").value.trim();
+    const minSize = document.getElementById("minSize").value || "";
+    const area = document.getElementById("area").value || "";
+    const bestDepth = document.getElementById("bestDepth").value || "";
 
-  let catchData = {
-    species: document.getElementById("speciesInput").value,
-    bait: document.getElementById("baitInput").value,
-    size: document.getElementById("sizeInput").value,
-    coords: document.getElementById("coordsInput").value,
-    where: document.getElementById("whereCaught").value,
-    date: new Date().toISOString()
-  };
-
-  let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
-  log.unshift(catchData);
-  localStorage.setItem(KEY_LOG, JSON.stringify(log));
-
-  renderLog();
+    if(!species){
+      alert("Choose species first.");
+      return;
     }
+
+    if(coords){
+      tryAutoMatchAreaFromCoords(coords);
+    }
+
+    const entry = {
+      species,
+      bait: bait || "",
+      bestDepth: bestDepth || "",
+      minSize: minSize || "",
+      sizeCaught: sizeCaught || "",
+      area: document.getElementById("area").value || area || "",
+      coords: coords || "",
+      whereCaught: whereCaught || document.getElementById("area").value || "",
+      seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
+      notes: notes || "",
+      photo: currentCatchPhoto || "",
+      date: new Date().toLocaleString()
+    };
+
+    let list = getLog();
+    list.unshift(entry);
+    list = trimLogToFit(list);
+    saveLog(list);
+
+    updateFavouriteBait(species, bait);
+
+    document.getElementById("saveMsg").textContent = "Catch saved to log.";
+    renderLog();
+  }catch(err){
+    alert("Save Catch error: " + err.message);
+    console.log(err);
+  }
+}
 
 function renderLog(){
   const box = document.getElementById("logBox");
@@ -1166,6 +1190,7 @@ function renderLog(){
 function clearAllLogs(){
   if(confirm("Delete all saved catches?")){
     localStorage.removeItem(KEY_LOG);
+    localStorage.removeItem("bait_stats");
     renderLog();
     document.getElementById("saveMsg").textContent = "All saved catches deleted.";
   }
@@ -1315,7 +1340,6 @@ function renderFishInfo(){
   const filter = document.getElementById("fishInfoFilter")?.value || "all";
   const info = FISH_INFO[species];
   const rigSteps = RIG_HOW_TO[species] || [];
-  const topBaits = getTopBaits(species);
 
   if(!info){
     document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
@@ -1323,24 +1347,24 @@ function renderFishInfo(){
   }
 
   let baitBlock = "";
+  let lureBlock = "";
   let rigBlock = "";
 
   if(filter === "all" || filter === "bait"){
-  baitBlock += `
-    <div class="infoGrid">
-      <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
-      <div class="infoBox infoBlue"><b>Top Logged Baits</b>${getTopBaits(species) || "No bait history yet"}</div>
-      <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
-    </div>
-  `;
-  }
-        }
-  if(filter === "all" || filter === "lures"){
     baitBlock += `
       <div class="infoGrid">
-  <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
-  <div class="infoBox infoGreen"><b>Top Logged Baits</b>${topBaits.length ? topBaits.join(", ") : "No bait history yet"}</div>
-</div>
+        <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
+        <div class="infoBox infoBlue"><b>Top Logged Baits</b>${getTopBaits(species) || "No bait history yet"}</div>
+        <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
+      </div>
+    `;
+  }
+
+  if(filter === "all" || filter === "lures"){
+    lureBlock += `
+      <div class="infoGrid">
+        <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
+      </div>
     `;
   }
 
@@ -1365,27 +1389,24 @@ function renderFishInfo(){
         </div>
 
         <div class="identifyBox">
-  <div class="identifyTitle">How to Rig</div>
-  <div class="bigText">
-    ${
-      rigSteps.length
-        ? rigSteps.map((step, i) => `<b>Step ${i+1}:</b> ${step}`).join("<br><br>")
-        : (info.make || "").replace(/\n/g,"<br>")
-    }
-  </div>
-</div>
+          <div class="identifyTitle">How to Rig</div>
+          <div class="bigText">
+            ${
+              rigSteps.length
+                ? rigSteps.map((step, i) => `<b>Step ${i+1}:</b> ${step}`).join("<br><br>")
+                : (info.make || "").replace(/\n/g,"<br>")
+            }
+          </div>
+        </div>
+
+        <div class="identifyBox">
+          <div class="identifyTitle">Why This Rig Works</div>
+          <div class="bigText">${(info.why || "").replace(/\n/g,"<br>")}</div>
+        </div>
 
         <div class="identifyBox">
           <div class="identifyTitle">Rig Diagram</div>
           <pre class="rig">${info.sketch || ""}</pre>
-          ${RIG_STEPS[species] ? `
-<div class="identifyBox">
-  <div class="identifyTitle">How to Rig</div>
-  <div class="bigText">
-    ${RIG_STEPS[species].map((step,i)=>`<b>Step ${i+1}:</b> ${step}`).join("<br><br>")}
-  </div>
-</div>
-` : ""}
         </div>
       </div>
     `;
@@ -1411,11 +1432,9 @@ function renderFishInfo(){
       <div class="infoGrid">
         <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
       </div>
-      document.getElementById("fishInfoBox").innerHTML = `
-  <div class="spotCard">
-    <div class="fishMainTitle">${species}</div>
 
       ${baitBlock}
+      ${lureBlock}
       ${rigBlock}
     </div>
   `;
@@ -1499,19 +1518,6 @@ function openCatchCamera(){
   el.setAttribute("capture","environment");
   el.click();
 }
-  function updateFavouriteBait(species, bait){
-  if(!species || !bait) return;
-
-  const key = "bait_stats";
-  let stats = JSON.parse(localStorage.getItem(key) || "{}");
-
-  if(!stats[species]) stats[species] = {};
-  if(!stats[species][bait]) stats[species][bait] = 0;
-
-  stats[species][bait]++;
-
-  localStorage.setItem(key, JSON.stringify(stats));
-  }
 
 function openCatchGallery(){
   const el = document.getElementById("catchPhoto");
@@ -1592,25 +1598,6 @@ checkSizeWarning();
 renderFishInfo();
 renderFishGuide();
 renderLog();
-
-  function getTopBaits(species){
-  let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
-  let counts = {};
-
-  log.forEach(c => {
-    if(c.species === species && c.bait){
-      counts[c.bait] = (counts[c.bait] || 0) + 1;
-    }
-  });
-
-  let sorted = Object.entries(counts)
-    .sort((a,b) => b[1] - a[1])
-    .slice(0,3);
-
-  if(sorted.length === 0) return "";
-
-  return sorted.map(([bait,count]) => `${bait} (${count})`).join("<br>");
-  }
 </script>
 
 <script>
