@@ -1116,54 +1116,22 @@ function trimLogToFit(list){
 }
 
 function saveCatch(){
-  try{
-    const species = document.getElementById("species").value;
-    const bait = document.getElementById("bait").value;
-    const coords = document.getElementById("coords").value.trim();
-    const whereCaught = document.getElementById("whereCaught").value.trim();
-    const notes = document.getElementById("notes").value.trim();
-    const minSize = document.getElementById("minSize").value || "";
-    const sizeCaught = document.getElementById("sizeCaught").value || "";
-    const area = document.getElementById("area").value || "";
-    const bestDepth = document.getElementById("bestDepth").value || "";
 
-    if(!species){
-      alert("Choose species first.");
-      return;
+  let catchData = {
+    species: document.getElementById("speciesInput").value,
+    bait: document.getElementById("baitInput").value,
+    size: document.getElementById("sizeInput").value,
+    coords: document.getElementById("coordsInput").value,
+    where: document.getElementById("whereCaught").value,
+    date: new Date().toISOString()
+  };
+
+  let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+  log.unshift(catchData);
+  localStorage.setItem(KEY_LOG, JSON.stringify(log));
+
+  renderLog();
     }
-
-    if(coords){
-      tryAutoMatchAreaFromCoords(coords);
-    }
-
-    const entry = {
-      species,
-      bait: bait || "",
-      area: document.getElementById("area").value || area || "",
-      coords: coords || "",
-      whereCaught: whereCaught || document.getElementById("area").value || "",
-      notes: notes || "",
-      minSize: minSize || "",
-      sizeCaught: sizeCaught || "",
-      bestDepth: bestDepth || "",
-      seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
-      photo: currentCatchPhoto || "",
-      date: new Date().toLocaleString()
-    };
-
-    let list = getLog();
-    list.unshift(entry);
-    updateFavouriteBait(species, bait);
-    list = trimLogToFit(list);
-    saveLog(list);
-
-    document.getElementById("saveMsg").textContent = "Catch saved to log.";
-    renderLog();
-  }catch(err){
-    alert("Save Catch error: " + err.message);
-    console.log(err);
-  }
-}
 
 function renderLog(){
   const box = document.getElementById("logBox");
