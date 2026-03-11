@@ -1105,58 +1105,24 @@ function useSpotInCatch(name, coord){
   document.getElementById("whereCaught").value = label;
   document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
 }
-
 function saveCatch(){
-  try{
-    const species = document.getElementById("species").value;
-    const bait = document.getElementById("bait").value;
-    const sizeCaught = document.getElementById("sizeCaught").value || "";
-    const coords = document.getElementById("coords").value.trim();
-    const whereCaught = document.getElementById("whereCaught").value.trim();
-    const notes = document.getElementById("notes").value.trim();
-    const minSize = document.getElementById("minSize").value || "";
-    const area = document.getElementById("area").value || "";
-    const bestDepth = document.getElementById("bestDepth").value || "";
 
-    if(!species){
-      alert("Choose species first.");
-      return;
-    }
+  const catchData = {
+    species: document.getElementById("species").value,
+    bait: document.getElementById("bait").value,
+    sizeCaught: document.getElementById("sizeCaught").value,
+    coords: document.getElementById("coords").value,
+    whereCaught: document.getElementById("whereCaught").value,
+    date: new Date().toISOString()
+  };
 
-    if(coords){
-      tryAutoMatchAreaFromCoords(coords);
-    }
+  let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
+  log.unshift(catchData);
 
-    const entry = {
-      species,
-      bait: bait || "",
-      bestDepth: bestDepth || "",
-      minSize: minSize || "",
-      sizeCaught: sizeCaught || "",
-      area: document.getElementById("area").value || area || "",
-      coords: coords || "",
-      whereCaught: whereCaught || document.getElementById("area").value || "",
-      seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
-      notes: notes || "",
-      photo: currentCatchPhoto || "",
-      date: new Date().toLocaleString()
-    };
+  localStorage.setItem(KEY_LOG, JSON.stringify(log));
 
-    let list = getLog();
-    list.unshift(entry);
-    list = trimLogToFit(list);
-    saveLog(list);
-
-    updateFavouriteBait(species, bait);
-
-    document.getElementById("saveMsg").textContent = "Catch saved to log.";
-    renderLog();
-  }catch(err){
-    alert("Save Catch error: " + err.message);
-    console.log(err);
-  }
-}
-
+  renderLog();
+      }
 function renderLog(){
   const box = document.getElementById("logBox");
   const list = getLog();
