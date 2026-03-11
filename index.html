@@ -1409,6 +1409,14 @@ function renderFishInfo(){
         <div class="identifyBox">
           <div class="identifyTitle">Rig Diagram</div>
           <pre class="rig">${info.sketch || ""}</pre>
+          ${RIG_STEPS[species] ? `
+<div class="identifyBox">
+  <div class="identifyTitle">How to Rig</div>
+  <div class="bigText">
+    ${RIG_STEPS[species].map((step,i)=>`<b>Step ${i+1}:</b> ${step}`).join("<br><br>")}
+  </div>
+</div>
+` : ""}
         </div>
       </div>
     `;
