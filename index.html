@@ -1040,7 +1040,26 @@ function updateMinSize(){
   minSizeEl.value = min;
   note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
 }
-
+function getFishImage(species){
+  const map = {
+    "Cape Cob": "fish-cape-cob.png",
+    "Yellowtail": "fish-yellowtail.png",
+    "Bonito": "fish-bonito.png",
+    "Red Roman": "fish-red-roman.png",
+    "Snapper": "fish-snapper.png",
+    "Silverfish": "fish-silverfish.png",
+    "Red Steenbras": "fish-red-steenbras.png",
+    "Yellow Belly": "fish-yellow-belly.png",
+    "Hottentot": "fish-hottentot.png",
+    "Geelbek": "fish-geelbek.png",
+    "Carpenter": "fish-carpenter.png",
+    "Dageraad": "fish-dageraad.png",
+    "Santer": "fish-santer.png",
+    "Elf / Shad": "fish-elf-shad.png",
+    "Garrick / Leervis": "fish-garrick-leervis.png"
+  };
+  return map[species] || "";
+                                          }
 function getRigImage(species){
   const map = {
     "Cape Cob": "rig-cape-cob.png",
