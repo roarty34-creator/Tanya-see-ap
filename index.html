@@ -1595,15 +1595,15 @@ function renderFishInfo(){
       <div class="rigTab">
         <div class="identifyTitle">Rig Tab</div>
 
-        <div class="infoGrid">
-          <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook || "-"}</div>
-          <div class="infoBox infoPurple"><b>Sinker Weight</b>${info.sinker || "-"}</div>
-          <div class="infoBox infoGold"><b>Hook Trace Length</b>${info.hook trace || "-"}</div>
-          <div class="infoBox infoBlue"><b>Rig Type</b>${info.rigType || "-"}</div>
-          <div class="infoBox infoOrange"><b>Best Season</b>${info.season || "-"}</div>
-          <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed || "-"}</div>
-          <div class="infoBox infoBlue"><b>Best Depth</b>${BEST_DEPTH[species] || "-"}</div>
-        </div>
+          <div class="infoGrid">
+  <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook || "-"}</div>
+  <div class="infoBox infoPurple"><b>Sinker Weight</b>${info.sinker || "-"}</div>
+  <div class="infoBox infoGold"><b>Hook Trace Length</b>${info.strop || "-"}</div>
+  <div class="infoBox infoBlue"><b>Rig Setup</b>${info.rigType || "-"}</div>
+  <div class="infoBox infoOrange"><b>Best Season</b>${info.season || "-"}</div>
+  <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed || "-"}</div>
+  <div class="infoBox infoBlue"><b>Best Depth</b>${BEST_DEPTH[species] || "-"}</div>
+</div>
 
         <div class="identifyBox">
           <div class="identifyTitle">How to Make It</div>
