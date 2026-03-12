@@ -563,7 +563,7 @@ const BAIT_BY_SPECIES = {
 };
 
 const MIN_SIZE = {
-  "Cape Kob":60,
+  "Cape cob":60,
   "Yellowtail":60,
   "Bonito":0,
   "Red Roman":30,
@@ -585,7 +585,7 @@ function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lure
 }
 
 const FISH_INFO = {
-  "Cape Kob": fullInfo(
+  "Cape cob": fullInfo(
     "Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
     "Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
     "Chokka + Pilchard combo",
@@ -858,7 +858,7 @@ const FISH_INFO = {
 };
 
 const FISH_GUIDE = [
-  {name:"Cape Kob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
+  {name:"Cape cob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
   {name:"Yellowtail", body:"Torpedo shape", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast pelagic fish"},
   {name:"Bonito", body:"Slim tuna shape", colour:"Dark back", tail:"Forked", found:"Surface schools", clue:"Fast surface hunter"},
   {name:"Red Roman", body:"Deep reef fish", colour:"Red", tail:"Rounded", found:"Rocky reef", clue:"Deep red profile"},
@@ -1317,7 +1317,7 @@ function loadFishingWindow(){
 
   document.getElementById("fishingWindowBox").innerHTML = `
     <b>Moon / window note:</b> ${seasonNote}<br><br>
-    <b>Cape Kob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
+    <b>Cape cob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
     <b>Yellowtail:</b> Better when warm clean water pushes bait up, with birds, bait balls and current lines.<br><br>
     <b>Bonito:</b> Better when surface bait is active and birds are working.<br><br>
     <b>Red Roman:</b> More reef and structure dependent than season dependent. Focus on clean bait and workable current.<br><br>
@@ -1473,7 +1473,7 @@ function runFishWizard(){
 
   const matches = [];
 
-  if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape Kob");
+  if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape cob");
   if(body === "Torpedo shape" && where === "Open water") matches.push("Yellowtail");
   if(body === "Slim tuna shape" && where === "Surface feeding") matches.push("Bonito");
   if(body === "Deep reef fish" && colour === "Red / orange") matches.push("Red Roman");
