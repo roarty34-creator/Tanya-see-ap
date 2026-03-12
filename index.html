@@ -1469,6 +1469,11 @@ function renderFishGuide(){
     html += `
       <div class="guideCard">
         <div class="guideName">${f.name}</div>
+
+        <img src="${getFishImage(f.name)}"
+             style="width:100%;border-radius:12px;margin:8px 0 10px 0;"
+             onerror="this.style.display='none'">
+
         <div class="guideHint">
           <b>Body:</b> ${f.body}<br>
           <b>Colour:</b> ${f.colour}<br>
