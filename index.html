@@ -7,7 +7,7 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
   <style>
-    :root{  
+    :root{
       --bg:#061225;
       --card:#0f1c38;
       --card2:#081632;
@@ -372,7 +372,7 @@ const MAX_LOG_CHARS = 4000000;
 const TIDE_API_KEY = "PASTE_YOUR_WORLDTIDES_KEY_HERE";
 
 const BEST_DEPTH = {
-  "Cape cob":"25–45 m • Reef edges • Sand channels",
+  "Cape Cob":"25–45 m • Reef edges • Sand channels",
   "Yellowtail":"Surface to mid-water • Bait balls • Current lines",
   "Bonito":"Surface to mid-water • Feeding schools • Birds working",
   "Red Roman":"20–60 m • Reef structure • Broken reef",
@@ -390,7 +390,7 @@ const BEST_DEPTH = {
 };
 
 const RIG_HOW_TO = {
-  "Cape cob": [
+  "Cape Cob": [
     "Tie your main line to a strong swivel.",
     "Use a heavy nylon leader around 0.80–1.0 mm.",
     "Add one strong hook on a short side trace.",
@@ -506,7 +506,7 @@ const SPOTS = [
 ];
 
 const BAIT_BY_SPECIES = {
-  "Cape cob":[
+  "Cape Cob":[
     "Chokka","Chokka strip","Chokka head","Chokka + Pilchard combo",
     "Live Makriel","Live bait","Pilchard","Pilchard strip","Pilchard belly","Pilchard fillet",
     "Sardine","Sardine strip","Sardine fillet","Mullet strip","Redbait","Squid","Octopus",
@@ -563,7 +563,7 @@ const BAIT_BY_SPECIES = {
 };
 
 const MIN_SIZE = {
-  "Cape cob":60,
+  "Cape Cob":60,
   "Yellowtail":60,
   "Bonito":0,
   "Red Roman":30,
@@ -585,7 +585,7 @@ function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lure
 }
 
 const FISH_INFO = {
-  "Cape cob": fullInfo(
+  "Cape Cob": fullInfo(
     "Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
     "Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
     "Chokka + Pilchard combo",
@@ -595,13 +595,13 @@ const FISH_INFO = {
     "Top hook 7/0, bottom hook 8/0 or 9/0",
     "6 oz to 8 oz grapnel or bottle sinker",
     "0.80 – 1.0 mm nylon, ± 80 cm",
-    "Big Kob Double Strop Rig",
+    "Big Cob Double Strop Rig",
     "Spring to Autumn",
     "Check permit rules",
     "1. Tie braid to a strong barrel swivel.\n2. Add 0.80 - 1.0 mm nylon leader.\n3. Tie the top hook 7/0.\n4. Tie the bottom hook 8/0 or 9/0.\n5. Add a 6-8 oz grapnel or bottle sinker.",
-    "Kob often takes bait hanging just above the bottom.\nTwo hooks keep the bait straight and reduce spinning in current.",
-    "BIG KOB DOUBLE STROP RIG\n\nMain line\n40-50 lb braid\n  |\nStrong barrel swivel\n  |\nLeader\n0.80 - 1.0 mm nylon\n± 80 cm long\n  |\nTop hook snoot ---- 7/0 hook\n  |\nBottom hook snoot - 8/0 or 9/0 hook\n  |\n6-8 oz grapnel / bottle sinker",
-    { body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail", found:"Reef edges and sandy channels", giveaway:"Big mouth and classic kob shape" }
+    "Cob often takes bait hanging just above the bottom.\nTwo hooks keep the bait straight and reduce spinning in current.",
+    "BIG COB DOUBLE STROP RIG\n\nMain line\n40-50 lb braid\n  |\nStrong barrel swivel\n  |\nLeader\n0.80 - 1.0 mm nylon\n± 80 cm long\n  |\nTop hook snoot ---- 7/0 hook\n  |\nBottom hook snoot - 8/0 or 9/0 hook\n  |\n6-8 oz grapnel / bottle sinker",
+    { body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail", found:"Reef edges and sandy channels", giveaway:"Big mouth and classic cob shape" }
   ),
   "Yellowtail": fullInfo(
     "Best from summer to autumn when warm water pushes bait to the surface.",
@@ -858,7 +858,7 @@ const FISH_INFO = {
 };
 
 const FISH_GUIDE = [
-  {name:"Cape cob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
+  {name:"Cape Cob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
   {name:"Yellowtail", body:"Torpedo shape", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast pelagic fish"},
   {name:"Bonito", body:"Slim tuna shape", colour:"Dark back", tail:"Forked", found:"Surface schools", clue:"Fast surface hunter"},
   {name:"Red Roman", body:"Deep reef fish", colour:"Red", tail:"Rounded", found:"Rocky reef", clue:"Deep red profile"},
@@ -1040,9 +1040,10 @@ function updateMinSize(){
   minSizeEl.value = min;
   note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
 }
-  function getRigImage(species){
+
+function getRigImage(species){
   const map = {
-    "Cape cob": "rig-cob.png",
+    "Cape Cob": "rig-cape-cob.png",
     "Yellowtail": "rig-yellowtail.png",
     "Red Roman": "rig-red-roman.png",
     "Snapper": "rig-snapper.png",
@@ -1052,11 +1053,11 @@ function updateMinSize(){
     "Carpenter": "rig-carpenter.png",
     "Dageraad": "rig-dageraad.png",
     "Santer": "rig-santer.png",
-    "Shad": "rig-shad.png",
+    "Elf / Shad": "rig-elf-shad.png",
     "Garrick / Leervis": "rig-garrick.png"
   };
   return map[species] || "";
-    }
+}
 
 function checkSizeWarning(){
   const species = document.getElementById("species").value;
@@ -1312,12 +1313,12 @@ function loadFishingWindow(){
 
   let seasonNote = "General fishing note: match weather, current, water colour and bait activity.";
   if(warmSeason){
-    seasonNote = "Warmer water season note: kob, yellowtail and bonito can improve when bait and current line up.";
+    seasonNote = "Warmer water season note: cob, yellowtail and bonito can improve when bait and current line up.";
   }
 
   document.getElementById("fishingWindowBox").innerHTML = `
     <b>Moon / window note:</b> ${seasonNote}<br><br>
-    <b>Cape cob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
+    <b>Cape Cob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
     <b>Yellowtail:</b> Better when warm clean water pushes bait up, with birds, bait balls and current lines.<br><br>
     <b>Bonito:</b> Better when surface bait is active and birds are working.<br><br>
     <b>Red Roman:</b> More reef and structure dependent than season dependent. Focus on clean bait and workable current.<br><br>
@@ -1405,15 +1406,12 @@ function renderFishInfo(){
         </div>
 
         <div class="identifyBox">
-  <div class="identifyTitle">Rig Diagram</div>
-
-  <pre class="rig">${info.sketch || ""}</pre>
-
-  <img src="${getRigImage(species)}"
-       style="width:100%;border-radius:12px;margin-top:12px;"
-       onerror="this.style.display='none'">
-
-</div>
+          <div class="identifyTitle">Rig Diagram</div>
+          <pre class="rig">${info.sketch || ""}</pre>
+          <img src="${getRigImage(species)}"
+               style="width:100%;border-radius:12px;margin-top:12px;"
+               onerror="this.style.display='none'">
+        </div>
       </div>
     `;
   }
@@ -1473,7 +1471,7 @@ function runFishWizard(){
 
   const matches = [];
 
-  if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape cob");
+  if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape Cob");
   if(body === "Torpedo shape" && where === "Open water") matches.push("Yellowtail");
   if(body === "Slim tuna shape" && where === "Surface feeding") matches.push("Bonito");
   if(body === "Deep reef fish" && colour === "Red / orange") matches.push("Red Roman");
