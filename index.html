@@ -1040,6 +1040,23 @@ function updateMinSize(){
   minSizeEl.value = min;
   note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
 }
+  function getRigImage(species){
+  const map = {
+    "Cape cob": "rig-cob.png",
+    "Yellowtail": "rig-yellowtail.png",
+    "Red Roman": "rig-red-roman.png",
+    "Snapper": "rig-snapper.png",
+    "Silverfish": "rig-silverfish.png",
+    "Red Steenbras": "rig-red-steenbras.png",
+    "Yellow Belly": "rig-yellow-belly.png",
+    "Carpenter": "rig-carpenter.png",
+    "Dageraad": "rig-dageraad.png",
+    "Santer": "rig-santer.png",
+    "Shad": "rig-shad.png",
+    "Garrick / Leervis": "rig-garrick.png"
+  };
+  return map[species] || "";
+    }
 
 function checkSizeWarning(){
   const species = document.getElementById("species").value;
@@ -1388,9 +1405,15 @@ function renderFishInfo(){
         </div>
 
         <div class="identifyBox">
-          <div class="identifyTitle">Rig Diagram</div>
-          <pre class="rig">${info.sketch || ""}</pre>
-        </div>
+  <div class="identifyTitle">Rig Diagram</div>
+
+  <pre class="rig">${info.sketch || ""}</pre>
+
+  <img src="${getRigImage(species)}"
+       style="width:100%;border-radius:12px;margin-top:12px;"
+       onerror="this.style.display='none'">
+
+</div>
       </div>
     `;
   }
