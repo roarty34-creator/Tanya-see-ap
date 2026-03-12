@@ -1,10 +1,12 @@
 {
   "name": "Tanya Deep Sea Fishing App",
-  "short_name": "DeepSea",
+  "short_name": "Fishing App",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#061225",
   "theme_color": "#061225",
+  "orientation": "portrait",
+  "scope": "./",
   "icons": [
     {
       "src": "icon-192.png",
