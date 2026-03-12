@@ -320,7 +320,7 @@
 <body>
 
   <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V108 Clean</div>
+  <div class="mini">V108 Clean Fixed</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -498,9 +498,9 @@
         </div>
 
         <div class="suggestionCard">
-          <b>Send to ChatGPT for identification</b><br>
-Open ChatGPT, upload the fish photo manually, and ask:<br>
-<b>Identify this fish from the photo</b>
+          <b>Open ChatGPT</b><br>
+          Open ChatGPT, upload the fish photo manually, and ask:<br>
+          <b>Identify this fish from the photo</b>
         </div>
       </div>
 
@@ -569,7 +569,7 @@ Open ChatGPT, upload the fish photo manually, and ask:<br>
 
   <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
     Tanya Deep Sea Fishing App<br>
-    Build version: V108 Clean
+    Build version: V108 Clean Fixed
   </div>
 
 <script>
@@ -1742,6 +1742,7 @@ function runFishWizard(){
   if(colour === "Brown-grey" && where === "Deep structure") matches.push("Carpenter");
   if(body === "Compact reef fish" && where === "Shallow reef") matches.push("Hottentot");
   if(where === "Channels" && colour === "Silver-grey") matches.push("Geelbek");
+  if(body === "Compact reef fish" && colour === "Pink-red") matches.push("Miss Lucy");
 
   result.style.display = "block";
   result.innerHTML = matches.length
@@ -1772,7 +1773,7 @@ function openGallery(){
 
 function showGuideHint(){
   document.getElementById("uploadPreview").textContent =
-    "Compare the fish photo with the guide below. Check body shape, mouth shape, colour, tail shape and where it was caught.";
+    "Compare the fish photo with the guide below, or open ChatGPT and upload the same photo there manually for identification.";
 }
 
 function sendToChatGPTHint(){
@@ -1875,4 +1876,4 @@ if("serviceWorker" in navigator){
 </script>
 
 </body>
-          </html>
+  </html>
