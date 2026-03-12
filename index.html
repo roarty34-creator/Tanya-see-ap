@@ -1,274 +1,608 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanya Deep Sea Fishing App</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Deep Sea Fishing App</title>
+  <link rel="manifest" href="manifest.webmanifest" />
+  <meta name="theme-color" content="#061225" />
 
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#061225">
+  <style>
+    :root{
+      --bg:#061225;
+      --card:#0f1c38;
+      --card2:#081632;
+      --accent:#2fa4ff;
+      --text:#ffffff;
+      --muted:#9fb0d0;
+      --ok:#39d98a;
+      --warn:#ff8c42;
+      --danger:#b23b4d;
+      --line:#1a2c52;
+      --blue:#0d2a52;
+      --green:#153924;
+      --orange:#4e2d14;
+      --purple:#35204f;
+      --teal:#133943;
+      --gold:#4b3b10;
+    }
 
-<style>
-:root{
---bg:#061225;
---card:#0f1c38;
---card2:#081632;
---accent:#2fa4ff;
---text:#ffffff;
---muted:#9fb0d0;
---ok:#39d98a;
---warn:#ff8c42;
---danger:#b23b4d;
---line:#1a2c52;
---blue:#0d2a52;
---green:#153924;
---orange:#4e2d14;
---purple:#35204f;
---teal:#133943;
---gold:#4b3b10;
-}
+    *{box-sizing:border-box}
 
-*{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(#061225,#081b3d);
+      color:var(--text);
+      padding:16px;
+    }
 
-body{
-margin:0;
-font-family:Arial,Helvetica,sans-serif;
-background:linear-gradient(#061225,#081b3d);
-color:var(--text);
-padding:16px;
-}
+    h1{margin:0 0 4px;font-size:28px}
 
-h1{margin:0 0 4px;font-size:28px}
+    .mini{
+      font-size:12px;
+      color:var(--muted);
+      line-height:1.5;
+    }
 
-.mini{
-font-size:12px;
-color:var(--muted);
-line-height:1.5
-}
+    .topnav{
+      display:flex;
+      gap:6px;
+      flex-wrap:wrap;
+      margin:14px 0;
+    }
 
-.topnav{
-display:flex;
-gap:6px;
-flex-wrap:wrap;
-margin:14px 0
-}
+    .navbtn{
+      background:#0f1c38;
+      border:none;
+      padding:10px 12px;
+      border-radius:10px;
+      color:#fff;
+      font-weight:bold;
+      cursor:pointer;
+    }
 
-.navbtn{
-background:#0f1c38;
-border:none;
-padding:10px 12px;
-border-radius:10px;
-color:#fff;
-font-weight:bold;
-cursor:pointer
-}
+    .navbtn.active{
+      background:var(--accent);
+      color:#001420;
+    }
 
-.navbtn.active{
-background:var(--accent);
-color:#001420
-}
+    .card{
+      background:var(--card);
+      padding:14px;
+      border-radius:14px;
+      margin-bottom:12px;
+    }
 
-.card{
-background:var(--card);
-padding:14px;
-border-radius:14px;
-margin-bottom:12px
-}
+    .sectionTitle{
+      font-size:12px;
+      color:var(--muted);
+      margin-bottom:10px;
+    }
 
-.sectionTitle{
-font-size:12px;
-color:var(--muted);
-margin-bottom:10px
-}
+    label{
+      display:block;
+      font-size:12px;
+      color:var(--muted);
+      margin-top:10px;
+      margin-bottom:4px;
+    }
 
-label{
-display:block;
-font-size:12px;
-color:var(--muted);
-margin-top:10px;
-margin-bottom:4px
-}
+    input,select,textarea{
+      width:100%;
+      padding:10px;
+      border:none;
+      border-radius:10px;
+      background:var(--card2);
+      color:#fff;
+      font-size:15px;
+    }
 
-input,select,textarea{
-width:100%;
-padding:10px;
-border:none;
-border-radius:10px;
-background:var(--card2);
-color:#fff;
-font-size:15px
-}
+    textarea{
+      min-height:80px;
+      resize:vertical;
+    }
 
-textarea{
-min-height:80px;
-resize:vertical
-}
+    button{
+      background:var(--accent);
+      border:none;
+      padding:10px 12px;
+      border-radius:10px;
+      color:#001420;
+      font-weight:bold;
+      cursor:pointer;
+    }
 
-button{
-background:var(--accent);
-border:none;
-padding:10px 12px;
-border-radius:10px;
-color:#001420;
-font-weight:bold;
-cursor:pointer
-}
+    button.dark{
+      background:#17345e;
+      color:#fff;
+    }
 
-button.dark{
-background:#17345e;
-color:#fff
-}
+    button.danger{
+      background:var(--danger);
+      color:#fff;
+    }
 
-button.danger{
-background:var(--danger);
-color:#fff
-}
+    .row{
+      display:flex;
+      gap:8px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
 
-.row{
-display:flex;
-gap:8px;
-flex-wrap:wrap;
-align-items:center
-}
+    .row>*{
+      flex:1 1 140px;
+    }
 
-.row>*{
-flex:1 1 140px
-}
+    section{
+      display:none;
+    }
 
-section{
-display:none
-}
+    .spotCard{
+      background:var(--card2);
+      padding:12px;
+      border-radius:12px;
+      margin-top:10px;
+    }
 
-.spotCard{
-background:var(--card2);
-padding:12px;
-border-radius:12px;
-margin-top:10px
-}
+    .spotTitle{
+      font-size:18px;
+      font-weight:bold;
+    }
 
-.spotTitle{
-font-size:18px;
-font-weight:bold
-}
+    .spotSub{
+      font-size:12px;
+      color:var(--muted);
+      margin-top:4px;
+    }
 
-.spotSub{
-font-size:12px;
-color:var(--muted);
-margin-top:4px
-}
+    .chip{
+      display:inline-block;
+      background:#10213f;
+      padding:7px 10px;
+      border-radius:999px;
+      font-size:12px;
+      margin:4px 4px 0 0;
+    }
 
-.chip{
-display:inline-block;
-background:#10213f;
-padding:7px 10px;
-border-radius:999px;
-font-size:12px;
-margin:4px 4px 0 0
-}
+    .ok{color:var(--ok)}
+    .warnText{color:var(--warn)}
 
-.ok{color:var(--ok)}
+    table{
+      width:100%;
+      border-collapse:collapse;
+      margin-top:10px;
+      font-size:13px;
+    }
 
-.warnText{color:var(--warn)}
+    th,td{
+      border-bottom:1px solid var(--line);
+      padding:8px 6px;
+      text-align:left;
+      vertical-align:top;
+    }
 
-table{
-width:100%;
-border-collapse:collapse;
-margin-top:10px;
-font-size:13px
-}
+    th{
+      color:#cfe1ff;
+      background:#10213f;
+    }
 
-th,td{
-border-bottom:1px solid var(--line);
-padding:8px 6px;
-text-align:left;
-vertical-align:top
-}
+    .goodSea{
+      color:var(--ok);
+      font-weight:bold;
+    }
 
-th{
-color:#cfe1ff;
-background:#10213f
-}
+    .badSea{
+      color:var(--warn);
+      font-weight:bold;
+    }
 
-.goodSea{
-color:var(--ok);
-font-weight:bold
-}
+    .previewImg{
+      width:100%;
+      max-width:320px;
+      border-radius:12px;
+      margin-top:12px;
+      display:none;
+    }
 
-.badSea{
-color:var(--warn);
-font-weight:bold
-}
+    .fishMainTitle{
+      font-size:24px;
+      font-weight:bold;
+      margin-bottom:6px;
+    }
 
-.previewImg{
-width:100%;
-max-width:320px;
-border-radius:12px;
-margin-top:12px;
-display:none
-}
+    .fishSub{
+      font-size:14px;
+      color:#cfe1ff;
+      margin-bottom:12px;
+      line-height:1.6;
+    }
 
-</style>
+    .identifyBox{
+      background:#0c2344;
+      padding:16px;
+      border-radius:14px;
+      margin-top:12px;
+    }
+
+    .identifyTitle{
+      font-size:20px;
+      font-weight:bold;
+      margin-bottom:10px;
+    }
+
+    .bigText{
+      font-size:15px;
+      line-height:1.7;
+    }
+
+    .infoGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:12px;
+    }
+
+    .infoBox{
+      padding:14px;
+      border-radius:14px;
+      font-size:15px;
+      line-height:1.6;
+    }
+
+    .infoBox b{
+      display:block;
+      font-size:16px;
+      margin-bottom:6px;
+    }
+
+    .infoBlue{background:var(--blue)}
+    .infoGreen{background:var(--green)}
+    .infoOrange{background:var(--orange)}
+    .infoPurple{background:var(--purple)}
+    .infoTeal{background:var(--teal)}
+    .infoGold{background:var(--gold)}
+
+    .guideGrid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:10px;
+      margin-top:10px;
+    }
+
+    .guideCard{
+      background:#0b2244;
+      border-radius:12px;
+      padding:12px;
+    }
+
+    .guideName{
+      font-size:17px;
+      font-weight:bold;
+      margin-bottom:6px;
+    }
+
+    .guideHint{
+      font-size:13px;
+      line-height:1.6;
+      color:#d9e6ff;
+    }
+
+    .suggestionCard{
+      background:#10213f;
+      border-radius:12px;
+      padding:12px;
+      margin-top:10px;
+      font-size:14px;
+      line-height:1.6;
+    }
+
+    .rigTab{
+      background:#17345e;
+      padding:14px;
+      border-radius:14px;
+      margin-top:12px;
+    }
+
+    pre.rig{
+      background:#081632;
+      color:#d7e6ff;
+      padding:14px;
+      border-radius:12px;
+      overflow:auto;
+      font-size:15px;
+      line-height:1.5;
+      white-space:pre-wrap;
+      margin-top:8px;
+    }
+  </style>
 </head>
-
 <body>
 
-<h1>Tanya Deep Sea Fishing App</h1>
-<div class="mini">V107 Stable</div>
+  <h1>Tanya Deep Sea Fishing App</h1>
+  <div class="mini">V108 Clean</div>
 
-<div class="topnav">
-<button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
-<button class="navbtn" onclick="showTab('addTab')">Add Catch</button>
-<button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
-<button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
-<button class="navbtn" onclick="showTab('fishGuideTab')">Fish ID Guide</button>
-<button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
-</div>
+  <div class="topnav">
+    <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
+    <button class="navbtn" onclick="showTab('addTab')">Add Catch</button>
+    <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
+    <button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
+    <button class="navbtn" onclick="showTab('fishGuideTab')">Fish ID Guide</button>
+    <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
+  </div>
 
-<section id="spotsTab">
-<div class="card">
-<div class="sectionTitle"><b>Stilbaai GPS Spots</b></div>
-<div id="spotList"></div>
-</div>
-</section>
-  <script>
+  <section id="spotsTab" style="display:block;">
+    <div class="card">
+      <div class="sectionTitle"><b>Stilbaai GPS Spots</b></div>
+      <div id="spotList"></div>
+    </div>
+  </section>
+
+  <section id="addTab">
+    <div class="card">
+      <div class="sectionTitle"><b>Add Catch</b></div>
+
+      <label>Species</label>
+      <select id="species">
+        <option value="">Choose...</option>
+      </select>
+
+      <label>Best Depth</label>
+      <input id="bestDepth" readonly />
+      <div id="bestDepthNote" class="mini">Choose species to load best depth suggestion.</div>
+
+      <label>Minimum Size</label>
+      <input id="minSize" readonly />
+      <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
+
+      <label>Size Caught (cm)</label>
+      <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
+      <div id="sizeWarning" class="mini"></div>
+
+      <label>Preferred Bait / Lure Used</label>
+      <select id="bait">
+        <option value="">Choose...</option>
+      </select>
+      <div id="baitAutoNote" class="mini">Favourite bait will auto-fill when you choose a species.</div>
+
+      <label>Local Area</label>
+      <select id="area" onchange="fillFromArea()">
+        <option value="">Choose saved area...</option>
+      </select>
+
+      <label>Coordinates</label>
+      <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
+
+      <label>Where Caught</label>
+      <input id="whereCaught" placeholder="Auto-filled from Local Area, or edit manually" />
+
+      <div id="coordAreaText" class="mini" style="margin-top:8px;"></div>
+
+      <label>Notes</label>
+      <textarea id="notes" placeholder="Optional notes"></textarea>
+
+      <label>Fish Photo</label>
+      <div class="row">
+        <button type="button" onclick="openCatchCamera()">Take Fish Photo</button>
+        <button type="button" class="dark" onclick="openCatchGallery()">Choose Fish Photo</button>
+      </div>
+      <input type="file" id="catchPhoto" accept="image/*" capture="environment" style="display:none">
+      <img id="catchPreview" class="previewImg" alt="Catch preview" />
+      <div class="mini" id="catchPhotoText" style="margin-top:8px;">No fish photo selected yet.</div>
+
+      <div class="row" style="margin-top:12px;">
+        <button onclick="saveCatch()">Save Catch</button>
+        <button class="danger" onclick="clearCatchForm()">Clear</button>
+      </div>
+
+      <div class="row" style="margin-top:8px;">
+        <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
+      </div>
+
+      <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
+    </div>
+
+    <div class="card">
+      <div class="sectionTitle"><b>Saved Catches</b></div>
+      <div id="logBox"></div>
+    </div>
+  </section>
+
+  <section id="weatherTab">
+    <div class="card">
+      <div class="sectionTitle"><b>Weather</b></div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">7-Day Wind Forecast</div>
+        <div class="bigText">Use this together with swell, current and launch conditions.</div>
+      </div>
+
+      <div class="mini">
+        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
+        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
+      </div>
+
+      <div id="weekForecast"></div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Real Tide Times</div>
+        <div class="bigText mini">Powered by tide API</div>
+        <div id="tideBox" class="bigText">Loading tide times...</div>
+      </div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Fishing Window Note</div>
+        <div id="fishingWindowBox" class="bigText">Loading fishing note...</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="fishInfoTab">
+    <div class="card">
+      <div class="sectionTitle"><b>Fish Info</b></div>
+
+      <label>Species</label>
+      <select id="fishSelect" onchange="renderFishInfo()"></select>
+
+      <label>Filter</label>
+      <select id="fishInfoFilter" onchange="renderFishInfo()">
+        <option value="all">All</option>
+        <option value="bait">Natural Bait Only</option>
+        <option value="lures">Lures Only</option>
+        <option value="rig">Rig Only</option>
+      </select>
+
+      <div id="fishInfoBox"></div>
+    </div>
+  </section>
+
+  <section id="fishGuideTab">
+    <div class="card">
+      <div class="sectionTitle"><b>Fish ID Guide</b></div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Identify Unknown Fish</div>
+
+        <div class="row">
+          <button onclick="openCamera()">Use Camera</button>
+          <button onclick="openGallery()">Use Photo</button>
+        </div>
+
+        <input type="file" id="fishPhoto" accept="image/*" capture="environment" style="display:none">
+
+        <div id="uploadPreview" class="mini" style="margin-top:10px;">
+          Take a photo or upload one, then compare it with the guide below.
+        </div>
+
+        <img id="previewImg" class="previewImg" alt="Fish preview" />
+
+        <div class="row" style="margin-top:12px;">
+          <button class="dark" onclick="showGuideHint()">Compare with Fish ID Guide</button>
+          <button class="dark" onclick="sendToChatGPTHint()">Send to ChatGPT for identification</button>
+        </div>
+
+        <div class="suggestionCard">
+          <b>Compare with Fish ID Guide</b><br>
+          Look at body shape, colour, tail shape, mouth, and where it was caught.
+        </div>
+
+        <div class="suggestionCard">
+          <b>Send to ChatGPT for identification</b><br>
+          Open ChatGPT, upload the fish photo, and ask:<br>
+          <b>Identify this fish from the photo</b>
+        </div>
+      </div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Fish ID Wizard</div>
+
+        <label>Body Shape</label>
+        <select id="wizBody">
+          <option value="">Choose...</option>
+          <option>Long predator</option>
+          <option>Torpedo shape</option>
+          <option>Deep reef fish</option>
+          <option>Compact reef fish</option>
+          <option>Slim tuna shape</option>
+        </select>
+
+        <label>Colour</label>
+        <select id="wizColour">
+          <option value="">Choose...</option>
+          <option>Silver-grey</option>
+          <option>Blue-green</option>
+          <option>Red / orange</option>
+          <option>Pink-red</option>
+          <option>Yellow belly</option>
+          <option>Brown-grey</option>
+          <option>Bright silver</option>
+        </select>
+
+        <label>Where Found</label>
+        <select id="wizWhere">
+          <option value="">Choose...</option>
+          <option>Reef edge</option>
+          <option>Shallow reef</option>
+          <option>Deep structure</option>
+          <option>Open water</option>
+          <option>Surface feeding</option>
+          <option>Channels</option>
+        </select>
+
+        <div class="row" style="margin-top:12px;">
+          <button onclick="runFishWizard()">Find Match</button>
+          <button class="dark" onclick="clearFishWizard()">Clear</button>
+        </div>
+
+        <div id="fishWizardResult" class="suggestionCard" style="display:none;"></div>
+      </div>
+
+      <div class="identifyBox">
+        <div class="identifyTitle">Visual Fish ID Guide</div>
+        <div id="fishGuideList" class="guideGrid"></div>
+      </div>
+    </div>
+  </section>
+
+  <section id="rulesTab">
+    <div class="card">
+      <div class="sectionTitle"><b>Rules & Notes</b></div>
+      <div class="mini">
+        Bag limit: check current permit.<br><br>
+        Mixed species total: check current permit.<br><br>
+        Red Steenbras is a sensitive species. Closed season shown in fish info section.<br><br>
+        Use local harbour guidance, marks and current chartplotter data when leaving the harbour.
+      </div>
+    </div>
+  </section>
+
+  <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
+    Tanya Deep Sea Fishing App<br>
+    Build version: V108 Clean
+  </div>
+
+<script>
+const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
+const MARINE_LINE_LON = HARBOUR.lon;
+const KEY_LOG = "tanya_master_log";
+const MAX_LOG_CHARS = 4000000;
+const TIDE_API_KEY = "PASTE_YOUR_WORLDTIDES_KEY_HERE";
+
 const BEST_DEPTH = {
-
-"Cape Cob":"25–45 m • Reef edges • Sand channels",
-"Yellowtail":"Surface to mid-water • Bait balls • Current lines",
-"Bonito":"Surface to mid-water • Feeding schools",
-"Red Roman":"20–60 m • Reef structure",
-"Snapper":"25–60 m • Bottom structure",
-"Silverfish":"20–45 m • Reef patches",
-"Red Steenbras":"35–80 m • Deep structure",
-"Yellow Belly":"25–55 m • Reef patches",
-"Hottentot":"10–35 m • Shallow reef",
-"Geelbek":"30–70 m • Reefs and channels",
-"Carpenter":"25–60 m • Hard reef",
-"Dageraad":"30–70 m • Deep reef",
-"Santer":"20–50 m • Reef structure",
-"Elf-Shad":"Surface to mid-water",
-"Miss Lucy":"25–60 m • Reef structure"
-
+  "Cape Cob":"25–45 m • Reef edges • Sand channels",
+  "Yellowtail":"Surface to mid-water • Bait balls • Current lines",
+  "Bonito":"Surface to mid-water • Feeding schools",
+  "Red Roman":"20–60 m • Reef structure",
+  "Snapper":"25–60 m • Bottom structure",
+  "Silverfish":"20–45 m • Reef patches",
+  "Red Steenbras":"35–80 m • Deep structure",
+  "Yellow Belly":"25–55 m • Reef patches",
+  "Hottentot":"10–35 m • Shallow reef",
+  "Geelbek":"30–70 m • Reefs and channels",
+  "Carpenter":"25–60 m • Hard reef",
+  "Dageraad":"30–70 m • Deep reef",
+  "Santer":"20–50 m • Reef structure",
+  "Elf-Shad":"Surface to mid-water",
+  "Miss Lucy":"25–60 m • Reef structure"
 };
- const MIN_SIZE = {
 
-"Cape Cob":60,
-"Yellowtail":60,
-"Bonito":0,
-"Red Roman":30,
-"Snapper":30,
-"Silverfish":25,
-"Red Steenbras":60,
-"Yellow Belly":30,
-"Hottentot":22,
-"Geelbek":60,
-"Carpenter":40,
-"Dageraad":40,
-"Santer":30,
-"Elf-Shad":30,
-"Miss Lucy":30
-
-};   
+const MIN_SIZE = {
+  "Cape Cob":60,
+  "Yellowtail":60,
+  "Bonito":0,
+  "Red Roman":30,
+  "Snapper":30,
+  "Silverfish":25,
+  "Red Steenbras":60,
+  "Yellow Belly":30,
+  "Hottentot":22,
+  "Geelbek":60,
+  "Carpenter":40,
+  "Dageraad":40,
+  "Santer":30,
+  "Elf-Shad":30,
+  "Miss Lucy":30
+};
 
 const RIG_HOW_TO = {
   "Cape Cob": [
@@ -295,22 +629,21 @@ const RIG_HOW_TO = {
     "Use an 8–10 oz sinker.",
     "Fish over broken reef and structure."
   ],
-"Elf-Shad": [
-  "Tie main line to a swivel.",
-  "Use a wire trace around 0.60–0.70 mm.",
-  "Rig a 4/0–5/0 hook.",
-  "Use whole or cut baitfish.",
-  "Add a 4–6 oz sinker.",
-  "Fish where baitfish are active."
-],
-"Miss Lucy":[
-  "Tie main line to a swivel.",
-  "Use a short strong trace.",
-  "Rig a 4/0–6/0 hook.",
-  "Use chokka, pilchard or sardine.",
-  "Add a 6–8 oz sinker.",
-  "Fish over reef and broken structure."
-],
+  "Elf-Shad": [
+    "Tie main line to a swivel.",
+    "Use a wire trace around 0.60–0.70 mm.",
+    "Rig a 4/0–5/0 hook.",
+    "Use whole or cut baitfish.",
+    "Add a 4–6 oz sinker.",
+    "Fish where baitfish are active."
+  ],
+  "Miss Lucy":[
+    "Tie main line to a swivel.",
+    "Use a short strong trace.",
+    "Rig a 4/0–6/0 hook.",
+    "Use chokka, pilchard or sardine.",
+    "Add a 6–8 oz sinker.",
+    "Fish over reef and broken structure."
   ],
   "Silverfish": [
     "Tie main line to a swivel.",
@@ -436,12 +769,12 @@ const BAIT_BY_SPECIES = {
   "Santer":[
     "Chokka","Sardine","Pilchard strip","Pilchard","Small squid strip"
   ],
-"Elf-Shad":[
-  "Sardine","Pilchard","Spoon","Surface lure","Plug","Small stickbait"
-],
-"Miss Lucy":[
-  "Chokka","Pilchard","Sardine","Squid","Redbait"
-]
+  "Elf-Shad":[
+    "Sardine","Pilchard","Spoon","Surface lure","Plug","Small stickbait"
+  ],
+  "Miss Lucy":[
+    "Chokka","Pilchard","Sardine","Squid","Redbait"
+  ]
 };
 
 function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, strop, rigType, season, closed, make, why, sketch, identifier){
@@ -684,41 +1017,43 @@ const FISH_INFO = {
     { body:"Medium reef body", colour:"Silver-red reef tones", tail:"Compact tail", found:"Reef and broken structure", giveaway:"Compact reef fish profile" }
   ),
   "Elf-Shad": fullInfo(
-  "Fast predator that hunts baitfish in current and surface activity.",
-  "Sardine, Pilchard, Spoon, Surface lure",
-  "Sardine",
-  "Check permit",
-  "Sardine, Pilchard",
-  "Spoon, Surface lure, Plug",
-  "4/0 - 6/0",
-  "Usually none or light",
-  "Wire or heavier leader if needed",
-  "Casting / bait rig",
-  "Active bait periods",
-  "Check permit rules",
-  "1. Use light casting setup.\n2. Cast lures or fish sardine naturally.\n3. Retrieve actively.",
-  "Elf-Shad reacts to movement and baitfish activity.",
-  "ELF-SHAD RIG\n\nMain line\n  |\nLeader\n  |\nLure / hook",
-  { body:"Long slim predator body", colour:"Silver with darker back", tail:"Forked tail", found:"Bait activity and moving water", giveaway:"Sharp predatory look" }
-),
-"Miss Lucy": fullInfo(
-  "Common reef fish on structure and broken reef.",
-  "Chokka, Pilchard, Sardine, Squid, Redbait",
-  "Chokka",
-  "Check permit",
-  "Chokka, Pilchard, Sardine, Squid, Redbait",
-  "Mostly natural bait",
-  "4/0 - 6/0",
-  "6 oz - 8 oz",
-  "20 – 40 cm",
-  "Bottom reef rig",
-  "All year",
-  "Check permit rules",
-  "1. Tie main line to a swivel.\n2. Use a short strong trace.\n3. Rig a 4/0 - 6/0 hook.\n4. Add a 6-8 oz sinker.\n5. Fish neat bait over reef.",
-  "Miss Lucy feeds well on neat natural bait close to reef and structure.",
-  "MISS LUCY RIG\n\nMain line\n  |\nSwivel\n  |\nShort trace\n  |\nHook\n  |\nSinker",
-  { body:"Deep reef fish body", colour:"Pink-red", tail:"Compact tail", found:"Reef structure", giveaway:"Bright pink-red reef fish" }
-)
+    "Fast predator that hunts baitfish in current and surface activity.",
+    "Sardine, Pilchard, Spoon, Surface lure",
+    "Sardine",
+    "Check permit",
+    "Sardine, Pilchard",
+    "Spoon, Surface lure, Plug",
+    "4/0 - 6/0",
+    "Usually none or light",
+    "Wire or heavier leader if needed",
+    "Casting / bait rig",
+    "Active bait periods",
+    "Check permit rules",
+    "1. Use light casting setup.\n2. Cast lures or fish sardine naturally.\n3. Retrieve actively.",
+    "Elf-Shad reacts to movement and baitfish activity.",
+    "ELF-SHAD RIG\n\nMain line\n  |\nLeader\n  |\nLure / hook",
+    { body:"Long slim predator body", colour:"Silver with darker back", tail:"Forked tail", found:"Bait activity and moving water", giveaway:"Sharp predatory look" }
+  ),
+  "Miss Lucy": fullInfo(
+    "Common reef fish on structure and broken reef.",
+    "Chokka, Pilchard, Sardine, Squid, Redbait",
+    "Chokka",
+    "Check permit",
+    "Chokka, Pilchard, Sardine, Squid, Redbait",
+    "Mostly natural bait",
+    "4/0 - 6/0",
+    "6 oz - 8 oz",
+    "20 – 40 cm",
+    "Bottom reef rig",
+    "All year",
+    "Check permit rules",
+    "1. Tie main line to a swivel.\n2. Use a short strong trace.\n3. Rig a 4/0 - 6/0 hook.\n4. Add a 6-8 oz sinker.\n5. Fish neat bait over reef.",
+    "Miss Lucy feeds well on neat natural bait close to reef and structure.",
+    "MISS LUCY RIG\n\nMain line\n  |\nSwivel\n  |\nShort trace\n  |\nHook\n  |\nSinker",
+    { body:"Deep reef fish body", colour:"Pink-red", tail:"Compact tail", found:"Reef structure", giveaway:"Bright pink-red reef fish" }
+  )
+};
+
 const FISH_GUIDE = [
   {name:"Cape Cob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
   {name:"Yellowtail", body:"Torpedo shape", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast pelagic fish"},
@@ -733,6 +1068,7 @@ const FISH_GUIDE = [
   {name:"Elf-Shad", body:"Long slim predator", colour:"Silver", tail:"Forked", found:"Bait activity / moving water", clue:"Fast bait hunter"},
   {name:"Miss Lucy", body:"Deep reef fish", colour:"Pink-red", tail:"Compact", found:"Reef structure", clue:"Bright pink-red reef fish"}
 ];
+
 let currentCatchPhoto = "";
 
 function getLog(){
@@ -741,17 +1077,6 @@ function getLog(){
   }catch(e){
     return [];
   }
-}
-
-function saveLog(list){
-  localStorage.setItem(KEY_LOG, JSON.stringify(list));
-}
-
-function trimLogToFit(list){
-  while (JSON.stringify(list).length > MAX_LOG_CHARS && list.length > 1) {
-    list.pop();
-  }
-  return list;
 }
 
 function getTopBaits(species){
@@ -769,8 +1094,47 @@ function getTopBaits(species){
     .slice(0,3);
 
   if(sorted.length === 0) return "No bait history yet";
-
   return sorted.map(([bait,count]) => `${bait} (${count})`).join("<br>");
+}
+
+function getFishImage(species){
+  const map = {
+    "Cape Cob":"fish-cape-cob.png",
+    "Yellowtail":"fish-yellowtail.png",
+    "Bonito":"fish-bonito.png",
+    "Red Roman":"fish-red-roman.png",
+    "Snapper":"fish-snapper.png",
+    "Silverfish":"fish-silverfish.png",
+    "Red Steenbras":"fish-red-steenbras.png",
+    "Yellow Belly":"fish-yellow-belly.png",
+    "Hottentot":"fish-hottentot.png",
+    "Geelbek":"fish-geelbek.png",
+    "Carpenter":"fish-carpenter.png",
+    "Dageraad":"fish-dageraad.png",
+    "Santer":"fish-santer.png",
+    "Elf-Shad":"fish-elf-shad.png",
+    "Miss Lucy":"fish-miss-lucy.png"
+  };
+  return map[species] || "";
+}
+
+function getRigImage(species){
+  const map = {
+    "Cape Cob":"rig-cape-cob.png",
+    "Yellowtail":"rig-yellowtail.png",
+    "Red Roman":"rig-red-roman.png",
+    "Snapper":"rig-snapper.png",
+    "Silverfish":"rig-silverfish.png",
+    "Red Steenbras":"rig-red-steenbras.png",
+    "Yellow Belly":"rig-yellow-belly.png",
+    "Hottentot":"rig-hottentot.png",
+    "Carpenter":"rig-carpenter.png",
+    "Dageraad":"rig-dageraad.png",
+    "Santer":"rig-santer.png",
+    "Elf-Shad":"rig-elf-shad.png",
+    "Miss Lucy":"rig-miss-lucy.png"
+  };
+  return map[species] || "";
 }
 
 function showTab(id){
@@ -841,8 +1205,10 @@ function renderSpotList(){
 function fillSpecies(){
   const species = document.getElementById("species");
   const fishSelect = document.getElementById("fishSelect");
+
   species.innerHTML = '<option value="">Choose...</option>';
   fishSelect.innerHTML = "";
+
   Object.keys(FISH_INFO).forEach(sp => {
     species.innerHTML += `<option>${sp}</option>`;
     fishSelect.innerHTML += `<option>${sp}</option>`;
@@ -852,6 +1218,7 @@ function fillSpecies(){
 function fillAreaDropdown(){
   const area = document.getElementById("area");
   area.innerHTML = '<option value="">Choose saved area...</option>';
+
   SPOTS.forEach(s => {
     const side = getAreaSideFromCoord(s.coord);
     const label = `${side} - ${s.name}`;
@@ -867,6 +1234,7 @@ function fillBaitOptions(){
   const species = document.getElementById("species").value;
   const bait = document.getElementById("bait");
   bait.innerHTML = '<option value="">Choose...</option>';
+
   if(!species || !BAIT_BY_SPECIES[species]) return;
 
   BAIT_BY_SPECIES[species].forEach(item => {
@@ -881,11 +1249,13 @@ function updateBestDepth(){
   const species = document.getElementById("species").value;
   const box = document.getElementById("bestDepth");
   const note = document.getElementById("bestDepthNote");
+
   if(!species){
     box.value = "";
     note.textContent = "Choose species to load best depth suggestion.";
     return;
   }
+
   box.value = BEST_DEPTH[species] || "";
   note.textContent = BEST_DEPTH[species] ? "Best depth suggestion loaded." : "No depth suggestion loaded.";
 }
@@ -894,53 +1264,18 @@ function updateMinSize(){
   const species = document.getElementById("species").value;
   const minSizeEl = document.getElementById("minSize");
   const note = document.getElementById("minSizeNote");
+
   if(!species){
     minSizeEl.value = "";
     note.textContent = "Choose species to load minimum size.";
     return;
   }
+
   const min = MIN_SIZE[species] ?? "";
   minSizeEl.value = min;
   note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
 }
-function getFishImage(species){
-  const map = {
-    "Cape Cob": "fish-cape-cob.png",
-    "Yellowtail": "fish-yellowtail.png",
-    "Bonito": "fish-bonito.png",
-    "Red Roman": "fish-red-roman.png",
-    "Snapper": "fish-snapper.png",
-    "Silverfish": "fish-silverfish.png",
-    "Red Steenbras": "fish-red-steenbras.png",
-    "Yellow Belly": "fish-yellow-belly.png",
-    "Hottentot": "fish-hottentot.png",
-    "Geelbek": "fish-geelbek.png",
-    "Carpenter": "fish-carpenter.png",
-    "Dageraad": "fish-dageraad.png",
-    "Santer": "fish-santer.png",
-    "Elf-Shad": "fish-elf-shad.png",
-"Miss Lucy": "fish-miss-lucy.png"
-  };
-  return map[species] || "";
-                                          }
-function getRigImage(species){
-  const map = {
-    "Cape Cob": "rig-cape-cob.png",
-    "Yellowtail": "rig-yellowtail.png",
-    "Red Roman": "rig-red-roman.png",
-    "Snapper": "rig-snapper.png",
-    "Silverfish": "rig-silverfish.png",
-    "Red Steenbras": "rig-red-steenbras.png",
-    "Yellow Belly": "rig-yellow-belly.png",
-    "Hottentot": "rig-hottentot.png",
-    "Carpenter": "rig-carpenter.png",
-    "Dageraad": "rig-dageraad.png",
-    "Santer": "rig-santer.png",
-    "Elf / Shad": "rig-elf-shad.png",
-    "Garrick / Leervis": "rig-garrick.png"
-  };
-  return map[species] || "";
-  }
+
 function checkSizeWarning(){
   const species = document.getElementById("species").value;
   const size = Number(document.getElementById("sizeCaught").value || 0);
@@ -968,10 +1303,12 @@ function checkSizeWarning(){
 function tryAutoMatchAreaFromCoords(coordStr){
   const normalized = coordStr.replace(/\s+/g,"").trim();
   const match = SPOTS.find(s => s.coord.replace(/\s+/g,"").trim() === normalized);
+
   if(match){
     const side = getAreaSideFromCoord(match.coord);
     const label = `${side} - ${match.name}`;
     document.getElementById("area").value = label;
+
     if(!document.getElementById("whereCaught").value.trim()){
       document.getElementById("whereCaught").value = label;
     }
@@ -981,9 +1318,11 @@ function tryAutoMatchAreaFromCoords(coordStr){
 function fillFromArea(){
   const area = document.getElementById("area");
   const selected = area.options[area.selectedIndex];
+
   if(selected.value){
     document.getElementById("whereCaught").value = selected.value;
   }
+
   if(selected.dataset.coords){
     document.getElementById("coords").value = selected.dataset.coords;
     document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(selected.dataset.coords);
@@ -1033,7 +1372,6 @@ function saveCatch(){
 
   let log = JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
   log.unshift(catchData);
-
   localStorage.setItem(KEY_LOG, JSON.stringify(log));
 
   renderLog();
@@ -1043,6 +1381,7 @@ function saveCatch(){
 function renderLog(){
   const box = document.getElementById("logBox");
   const list = getLog();
+
   if(!list.length){
     box.innerHTML = '<div class="mini" style="margin-top:10px;">No catches saved yet.</div>';
     return;
@@ -1067,13 +1406,13 @@ function renderLog(){
       </div>
     `;
   });
+
   box.innerHTML = html;
 }
 
 function clearAllLogs(){
   if(confirm("Delete all saved catches?")){
     localStorage.removeItem(KEY_LOG);
-    localStorage.removeItem("bait_stats");
     renderLog();
     document.getElementById("saveMsg").textContent = "All saved catches deleted.";
   }
@@ -1214,7 +1553,7 @@ function loadFishingWindow(){
     <b>Dageraad:</b> Better on reef and deeper structure with larger natural bait and stable conditions.<br><br>
     <b>Santer:</b> Better over reef with short traces and neat chokka or sardine bait.<br><br>
     <b>Elf-Shad:</b> Better with bait movement, current lines and active baitfish.<br><br>
-<b>Miss Lucy:</b> Better over reef and broken structure with neat natural bait.
+    <b>Miss Lucy:</b> Better over reef and broken structure with neat natural bait.
   `;
 }
 
@@ -1328,6 +1667,7 @@ function renderFishInfo(){
 
 function renderFishGuide(){
   let html = "";
+
   FISH_GUIDE.forEach(f => {
     html += `
       <div class="guideCard">
@@ -1347,6 +1687,7 @@ function renderFishGuide(){
       </div>
     `;
   });
+
   document.getElementById("fishGuideList").innerHTML = html;
 }
 
@@ -1362,8 +1703,7 @@ function runFishWizard(){
   if(body === "Torpedo shape" && where === "Open water") matches.push("Yellowtail");
   if(body === "Slim tuna shape" && where === "Surface feeding") matches.push("Bonito");
   if(body === "Deep reef fish" && colour === "Red / orange") matches.push("Red Roman");
-  if(body === "Deep reef fish" && colour === "Pink-red") matches.push("Snapper");
-  if(body === "Deep reef fish" && colour === "Pink-red") matches.push("Miss Lucy");
+  if(body === "Deep reef fish" && colour === "Pink-red") matches.push("Snapper", "Miss Lucy");
   if(colour === "Yellow belly") matches.push("Yellow Belly");
   if(colour === "Brown-grey" && where === "Deep structure") matches.push("Carpenter");
   if(body === "Compact reef fish" && where === "Shallow reef") matches.push("Hottentot");
@@ -1447,6 +1787,7 @@ document.getElementById("fishPhoto").addEventListener("change", function(){
   const file = this.files && this.files[0];
   const preview = document.getElementById("previewImg");
   if(!file) return;
+
   const reader = new FileReader();
   reader.onload = function(e){
     preview.src = e.target.result;
@@ -1495,55 +1836,6 @@ renderLog();
 <script>
 if("serviceWorker" in navigator){
   navigator.serviceWorker.register("sw.js");
-}
-  function getFishImage(species){
-
-const map={
-
-"Cape Cob":"fish-cape-cob.png",
-"Yellowtail":"fish-yellowtail.png",
-"Bonito":"fish-bonito.png",
-"Red Roman":"fish-red-roman.png",
-"Snapper":"fish-snapper.png",
-"Silverfish":"fish-silverfish.png",
-"Red Steenbras":"fish-red-steenbras.png",
-"Yellow Belly":"fish-yellow-belly.png",
-"Hottentot":"fish-hottentot.png",
-"Geelbek":"fish-geelbek.png",
-"Carpenter":"fish-carpenter.png",
-"Dageraad":"fish-dageraad.png",
-"Santer":"fish-santer.png",
-"Elf-Shad":"fish-elf-shad.png",
-"Miss Lucy":"fish-miss-lucy.png"
-
-};
-
-return map[species] || "";
-
-}
-
-function getRigImage(species){
-
-const map={
-
-"Cape Cob":"rig-cape-cob.png",
-"Yellowtail":"rig-yellowtail.png",
-"Red Roman":"rig-red-roman.png",
-"Snapper":"rig-snapper.png",
-"Silverfish":"rig-silverfish.png",
-"Red Steenbras":"rig-red-steenbras.png",
-"Yellow Belly":"rig-yellow-belly.png",
-"Hottentot":"rig-hottentot.png",
-"Carpenter":"rig-carpenter.png",
-"Dageraad":"rig-dageraad.png",
-"Santer":"rig-santer.png",
-"Elf-Shad":"rig-elf-shad.png",
-"Miss Lucy":"rig-miss-lucy.png"
-
-};
-
-return map[species] || "";
-
 }
 </script>
 </body>
