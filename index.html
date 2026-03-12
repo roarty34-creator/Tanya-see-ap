@@ -1050,6 +1050,7 @@ function getRigImage(species){
     "Silverfish": "rig-silverfish.png",
     "Red Steenbras": "rig-red-steenbras.png",
     "Yellow Belly": "rig-yellow-belly.png",
+    "Hottentot": "rig-hottentot.png",
     "Carpenter": "rig-carpenter.png",
     "Dageraad": "rig-dageraad.png",
     "Santer": "rig-santer.png",
@@ -1057,8 +1058,7 @@ function getRigImage(species){
     "Garrick / Leervis": "rig-garrick.png"
   };
   return map[species] || "";
-}
-
+    }
 function checkSizeWarning(){
   const species = document.getElementById("species").value;
   const size = Number(document.getElementById("sizeCaught").value || 0);
