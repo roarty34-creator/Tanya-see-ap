@@ -7,320 +7,397 @@
   <link rel="manifest" href="manifest.webmanifest" />
   <meta name="theme-color" content="#061225" />
 
-  <style>
-    :root{
-      --bg:#061225;
-      --card:#0f1c38;
-      --card2:#081632;
-      --accent:#2fa4ff;
-      --text:#ffffff;
-      --muted:#9fb0d0;
-      --ok:#39d98a;
-      --warn:#ff8c42;
-      --danger:#b23b4d;
-      --line:#1a2c52;
-      --blue:#0d2a52;
-      --green:#153924;
-      --orange:#4e2d14;
-      --purple:#35204f;
-      --teal:#133943;
-      --gold:#4b3b10;
-    }
+<style>
+  :root{
+    --bg:#061225;
+    --bg2:#0a1833;
+    --card:#102246;
+    --card2:#0b1b39;
+    --card3:#132a56;
+    --accent:#39b8ff;
+    --accent2:#6ed6ff;
+    --text:#ffffff;
+    --muted:#a9bddf;
+    --ok:#39d98a;
+    --warn:#ffb14a;
+    --danger:#c94b61;
+    --line:#1e3766;
+    --blue:#14305f;
+    --green:#163c2a;
+    --orange:#503015;
+    --purple:#3a2457;
+    --teal:#153f49;
+    --gold:#534112;
+    --shadow:0 10px 28px rgba(0,0,0,0.28);
+    --glow:0 0 0 1px rgba(110,214,255,0.10), 0 8px 24px rgba(0,0,0,0.22);
+  }
 
-    *{box-sizing:border-box}
+  *{box-sizing:border-box}
 
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:linear-gradient(#061225,#081b3d);
-      color:var(--text);
-      padding:16px;
-    }
+  body{
+    margin:0;
+    font-family:Arial,Helvetica,sans-serif;
+    background:
+      radial-gradient(circle at top right, rgba(57,184,255,0.10), transparent 22%),
+      radial-gradient(circle at top left, rgba(110,214,255,0.07), transparent 18%),
+      linear-gradient(180deg,#061225 0%, #081935 48%, #0a1d3c 100%);
+    color:var(--text);
+    padding:16px;
+  }
 
-    h1{margin:0 0 4px;font-size:28px}
+  h1{
+    margin:0 0 4px;
+    font-size:30px;
+    letter-spacing:.3px;
+    text-shadow:0 2px 10px rgba(0,0,0,0.25);
+  }
 
-    .mini{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
+  .mini{
+    font-size:12px;
+    color:var(--muted);
+    line-height:1.5;
+  }
 
-    .topnav{
-      display:flex;
-      gap:6px;
-      flex-wrap:wrap;
-      margin:14px 0;
-    }
+  .topnav{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    margin:16px 0 18px;
+  }
 
-    .navbtn{
-      background:#0f1c38;
-      border:none;
-      padding:10px 12px;
-      border-radius:10px;
-      color:#fff;
-      font-weight:bold;
-      cursor:pointer;
-    }
+  .navbtn{
+    background:linear-gradient(180deg,#13264d,#0c1b38);
+    border:1px solid rgba(255,255,255,0.06);
+    padding:11px 14px;
+    border-radius:14px;
+    color:#eaf4ff;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:var(--glow);
+    transition:.18s ease;
+  }
 
-    .navbtn.active{
-      background:var(--accent);
-      color:#001420;
-    }
+  .navbtn:active{
+    transform:scale(.98);
+  }
 
-    .card{
-      background:var(--card);
-      padding:14px;
-      border-radius:14px;
-      margin-bottom:12px;
-    }
+  .navbtn.active{
+    background:linear-gradient(180deg,var(--accent),#57c8ff);
+    color:#001420;
+    box-shadow:0 8px 22px rgba(57,184,255,0.28);
+  }
 
-    .sectionTitle{
-      font-size:12px;
-      color:var(--muted);
-      margin-bottom:10px;
-    }
+  .card{
+    background:linear-gradient(180deg,var(--card),#0c1d3c);
+    padding:16px;
+    border-radius:20px;
+    margin-bottom:14px;
+    border:1px solid rgba(255,255,255,0.06);
+    box-shadow:var(--shadow);
+  }
 
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-top:10px;
-      margin-bottom:4px;
-    }
+  .sectionTitle{
+    font-size:12px;
+    color:var(--accent2);
+    margin-bottom:12px;
+    text-transform:uppercase;
+    letter-spacing:.8px;
+    font-weight:bold;
+  }
 
-    input,select,textarea{
-      width:100%;
-      padding:10px;
-      border:none;
-      border-radius:10px;
-      background:var(--card2);
-      color:#fff;
-      font-size:15px;
-    }
+  label{
+    display:block;
+    font-size:12px;
+    color:var(--muted);
+    margin-top:12px;
+    margin-bottom:5px;
+    font-weight:bold;
+    letter-spacing:.2px;
+  }
 
-    textarea{
-      min-height:80px;
-      resize:vertical;
-    }
+  input,select,textarea{
+    width:100%;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.06);
+    border-radius:14px;
+    background:linear-gradient(180deg,#09162f,#0c1c39);
+    color:#fff;
+    font-size:15px;
+    outline:none;
+    box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);
+  }
 
-    button{
-      background:var(--accent);
-      border:none;
-      padding:10px 12px;
-      border-radius:10px;
-      color:#001420;
-      font-weight:bold;
-      cursor:pointer;
-    }
+  input:focus,select:focus,textarea:focus{
+    border-color:rgba(57,184,255,0.45);
+    box-shadow:0 0 0 3px rgba(57,184,255,0.14);
+  }
 
-    button.dark{
-      background:#17345e;
-      color:#fff;
-    }
+  textarea{
+    min-height:90px;
+    resize:vertical;
+  }
 
-    button.danger{
-      background:var(--danger);
-      color:#fff;
-    }
+  button{
+    background:linear-gradient(180deg,var(--accent),#58c9ff);
+    border:none;
+    padding:11px 13px;
+    border-radius:14px;
+    color:#001420;
+    font-weight:bold;
+    cursor:pointer;
+    box-shadow:0 8px 18px rgba(57,184,255,0.22);
+    transition:.18s ease;
+  }
 
-    .row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
+  button:active{
+    transform:scale(.98);
+  }
 
-    .row>*{
-      flex:1 1 140px;
-    }
+  button.dark{
+    background:linear-gradient(180deg,#21457b,#17345e);
+    color:#fff;
+    box-shadow:var(--glow);
+  }
 
-    section{
-      display:none;
-    }
+  button.danger{
+    background:linear-gradient(180deg,#cf566d,#b23b4d);
+    color:#fff;
+    box-shadow:0 8px 18px rgba(178,59,77,0.22);
+  }
 
-    .spotCard{
-      background:var(--card2);
-      padding:12px;
-      border-radius:12px;
-      margin-top:10px;
-    }
+  .row{
+    display:flex;
+    gap:8px;
+    flex-wrap:wrap;
+    align-items:center;
+  }
 
-    .spotTitle{
-      font-size:18px;
-      font-weight:bold;
-    }
+  .row>*{
+    flex:1 1 140px;
+  }
 
-    .spotSub{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
-    }
+  section{
+    display:none;
+    animation:fadeIn .22s ease;
+  }
 
-    .chip{
-      display:inline-block;
-      background:#10213f;
-      padding:7px 10px;
-      border-radius:999px;
-      font-size:12px;
-      margin:4px 4px 0 0;
-    }
+  @keyframes fadeIn{
+    from{opacity:.2; transform:translateY(6px)}
+    to{opacity:1; transform:translateY(0)}
+  }
 
-    .ok{color:var(--ok)}
-    .warnText{color:var(--warn)}
+  .spotCard{
+    background:linear-gradient(180deg,var(--card2),#0a1731);
+    padding:14px;
+    border-radius:18px;
+    margin-top:12px;
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:var(--glow);
+  }
 
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:10px;
-      font-size:13px;
-    }
+  .spotTitle{
+    font-size:18px;
+    font-weight:bold;
+    color:#fff;
+    margin-bottom:4px;
+  }
 
-    th,td{
-      border-bottom:1px solid var(--line);
-      padding:8px 6px;
-      text-align:left;
-      vertical-align:top;
-    }
+  .spotSub{
+    font-size:12px;
+    color:var(--muted);
+    margin-top:4px;
+    line-height:1.5;
+  }
 
-    th{
-      color:#cfe1ff;
-      background:#10213f;
-    }
+  .chip{
+    display:inline-block;
+    background:linear-gradient(180deg,#14305d,#10213f);
+    padding:8px 11px;
+    border-radius:999px;
+    font-size:12px;
+    margin:4px 4px 0 0;
+    color:#dff2ff;
+    border:1px solid rgba(255,255,255,0.06);
+  }
 
-    .goodSea{
-      color:var(--ok);
-      font-weight:bold;
-    }
+  .ok{color:var(--ok)}
+  .warnText{color:var(--warn)}
 
-    .badSea{
-      color:var(--warn);
-      font-weight:bold;
-    }
+  table{
+    width:100%;
+    border-collapse:collapse;
+    margin-top:12px;
+    font-size:13px;
+    overflow:hidden;
+    border-radius:16px;
+  }
 
-    pre.rig{
-      background:#081632;
-      color:#d7e6ff;
-      padding:14px;
-      border-radius:12px;
-      overflow:auto;
-      font-size:15px;
-      line-height:1.5;
-      white-space:pre-wrap;
-      margin-top:8px;
-    }
+  th,td{
+    border-bottom:1px solid var(--line);
+    padding:10px 8px;
+    text-align:left;
+    vertical-align:top;
+  }
 
-    .fishMainTitle{
-      font-size:24px;
-      font-weight:bold;
-      margin-bottom:6px;
-    }
+  th{
+    color:#dff1ff;
+    background:#10213f;
+  }
 
-    .fishSub{
-      font-size:14px;
-      color:#cfe1ff;
-      margin-bottom:12px;
-      line-height:1.6;
-    }
+  td{
+    background:rgba(8,23,49,0.55);
+  }
 
-    .identifyBox{
-      background:#0c2344;
-      padding:16px;
-      border-radius:14px;
-      margin-top:12px;
-    }
+  .goodSea{
+    color:var(--ok);
+    font-weight:bold;
+  }
 
-    .identifyTitle{
-      font-size:20px;
-      font-weight:bold;
-      margin-bottom:10px;
-    }
+  .badSea{
+    color:var(--warn);
+    font-weight:bold;
+  }
 
-    .bigText{
-      font-size:15px;
-      line-height:1.7;
-    }
+  pre.rig{
+    background:linear-gradient(180deg,#07142b,#081632);
+    color:#d7e6ff;
+    padding:15px;
+    border-radius:16px;
+    overflow:auto;
+    font-size:15px;
+    line-height:1.5;
+    white-space:pre-wrap;
+    margin-top:10px;
+    border:1px solid rgba(255,255,255,0.05);
+  }
 
-    .infoGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px;
-      margin-top:12px;
-    }
+  .fishMainTitle{
+    font-size:26px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#ffffff;
+  }
 
-    .infoBox{
-      padding:14px;
-      border-radius:14px;
-      font-size:15px;
-      line-height:1.6;
-    }
+  .fishSub{
+    font-size:14px;
+    color:#d8e9ff;
+    margin-bottom:12px;
+    line-height:1.7;
+  }
 
-    .infoBox b{
-      display:block;
-      font-size:16px;
-      margin-bottom:6px;
-    }
+  .identifyBox{
+    background:linear-gradient(180deg,#132b57,#0d2347);
+    padding:16px;
+    border-radius:18px;
+    margin-top:12px;
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:var(--glow);
+  }
 
-    .infoBlue{background:var(--blue)}
-    .infoGreen{background:var(--green)}
-    .infoOrange{background:var(--orange)}
-    .infoPurple{background:var(--purple)}
-    .infoTeal{background:var(--teal)}
-    .infoGold{background:var(--gold)}
+  .identifyTitle{
+    font-size:22px;
+    font-weight:bold;
+    margin-bottom:10px;
+    color:#ffffff;
+  }
 
-    .guideGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px;
-      margin-top:10px;
-    }
+  .bigText{
+    font-size:15px;
+    line-height:1.8;
+  }
 
-    .guideCard{
-      background:#0b2244;
-      border-radius:12px;
-      padding:12px;
-    }
+  .infoGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:10px;
+    margin-top:12px;
+  }
 
-    .guideName{
-      font-size:17px;
-      font-weight:bold;
-      margin-bottom:6px;
-    }
+  .infoBox{
+    padding:15px;
+    border-radius:18px;
+    font-size:15px;
+    line-height:1.6;
+    border:1px solid rgba(255,255,255,0.04);
+    box-shadow:var(--glow);
+  }
 
-    .guideHint{
-      font-size:13px;
-      line-height:1.6;
-      color:#d9e6ff;
-    }
+  .infoBox b{
+    display:block;
+    font-size:16px;
+    margin-bottom:6px;
+    color:#fff;
+  }
 
-    .previewImg{
-      width:100%;
-      max-width:320px;
-      border-radius:12px;
-      margin-top:12px;
-      display:none;
-    }
+  .infoBlue{background:linear-gradient(180deg,#14305f,#102548)}
+  .infoGreen{background:linear-gradient(180deg,#1a4732,#153924)}
+  .infoOrange{background:linear-gradient(180deg,#61401d,#4e2d14)}
+  .infoPurple{background:linear-gradient(180deg,#4a2d6d,#35204f)}
+  .infoTeal{background:linear-gradient(180deg,#1b4f5b,#133943)}
+  .infoGold{background:linear-gradient(180deg,#675319,#4b3b10)}
 
-    .suggestionCard{
-      background:#10213f;
-      border-radius:12px;
-      padding:12px;
-      margin-top:10px;
-      font-size:14px;
-      line-height:1.6;
-    }
+  .guideGrid{
+    display:grid;
+    grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+    gap:12px;
+    margin-top:10px;
+  }
 
-    .rigTab{
-      background:#17345e;
-      padding:14px;
-      border-radius:14px;
-      margin-top:12px;
-    }
-  </style>
+  .guideCard{
+    background:linear-gradient(180deg,#0e244a,#0a1b39);
+    border-radius:18px;
+    padding:12px;
+    border:1px solid rgba(255,255,255,0.05);
+    box-shadow:var(--glow);
+  }
+
+  .guideName{
+    font-size:18px;
+    font-weight:bold;
+    margin-bottom:6px;
+    color:#fff;
+  }
+
+  .guideHint{
+    font-size:13px;
+    line-height:1.7;
+    color:#d9e6ff;
+  }
+
+  .previewImg{
+    width:100%;
+    max-width:320px;
+    border-radius:16px;
+    margin-top:12px;
+    display:none;
+    border:1px solid rgba(255,255,255,0.07);
+    box-shadow:var(--shadow);
+  }
+
+  .suggestionCard{
+    background:linear-gradient(180deg,#12284f,#10213f);
+    border-radius:16px;
+    padding:13px;
+    margin-top:10px;
+    font-size:14px;
+    line-height:1.7;
+    border:1px solid rgba(255,255,255,0.05);
+  }
+
+  .rigTab{
+    background:linear-gradient(180deg,#21457b,#17345e);
+    padding:14px;
+    border-radius:18px;
+    margin-top:12px;
+    box-shadow:var(--shadow);
+  }
+    </style>
+
 </head>
 <body>
 
-  <h1>Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V108 Clean Fixed</div>
+<h1>🎣 Tanya Deep Sea Fishing App</h1>
+<div class="mini">V108 Clean • Stilbaai Offshore Edition</div>
 
   <div class="topnav">
     <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
@@ -567,10 +644,10 @@
     </div>
   </section>
 
-  <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;">
-    Tanya Deep Sea Fishing App<br>
-    Build version: V108 Clean Fixed
-  </div>
+<div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;background:rgba(255,255,255,0.03);padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);">
+  🎣 Tanya Deep Sea Fishing App<br>
+  Build version: V108 Clean
+</div>
 
 <script>
 const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
