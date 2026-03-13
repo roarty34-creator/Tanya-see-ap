@@ -448,93 +448,94 @@
   <button class="navbtn" onclick="showTab('fishGuideTab')">📷 Fish ID Guide</button>
   <button class="navbtn" onclick="showTab('rulesTab')">📘 Rules</button>
 </div>
+
+<section id="spotsTab" style="display:block;">
+  <div class="card pageSpots">
+    <div class="sectionTitle"><b>Spots</b> • Garmin style coordinate list</div>
+
+    <div class="identifyBox">
+      <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
+      <div class="bigText">
+        Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
+        Harbour reference point in this build: <b>-34.385542, 21.425433</b><br><br>
+        Sandbanks, rocks and the channel can change. Do not rely on this app alone for a safe launch route.
+      </div>
+    </div>
+
+    <div id="spotList"></div>
   </div>
+</section>
+
 <section id="addTab">
   <div class="card pageCatch">
-<section id="spotsTab" style="display:block;">
-<div class="card pageSpots">
-      <div class="identifyBox">
-        <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
-        <div class="bigText">
-          Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
-          Harbour reference point in this build: <b>-34.385542, 21.425433</b><br><br>
-          Sandbanks, rocks and the channel can change. Do not rely on this app alone for a safe launch route.
-        </div>
-      </div>
+    <div class="sectionTitle"><b>Add Catch</b></div>
 
-      <div id="spotList"></div>
-    </div>
-  </section>
+    <label>Species</label>
+    <select id="species">
+      <option value="">Choose...</option>
+    </select>
 
+    <label>Best Depth</label>
+    <input id="bestDepth" readonly />
+    <div id="bestDepthNote" class="mini">Choose species to load best depth suggestion.</div>
 
-      <div class="sectionTitle"><b>Add Catch</b></div>
+    <label>Minimum Size</label>
+    <input id="minSize" readonly />
+    <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
 
-      <label>Species</label>
-      <select id="species">
-        <option value="">Choose...</option>
-      </select>
+    <label>Size Caught (cm)</label>
+    <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
+    <div id="sizeWarning" class="mini"></div>
 
-      <label>Best Depth</label>
-      <input id="bestDepth" readonly />
-      <div id="bestDepthNote" class="mini">Choose species to load best depth suggestion.</div>
+    <label>Preferred Bait / Lure Used</label>
+    <select id="bait">
+      <option value="">Choose...</option>
+    </select>
+    <div id="baitAutoNote" class="mini">Favourite bait will auto-fill when you choose a species.</div>
 
-      <label>Minimum Size</label>
-      <input id="minSize" readonly />
-      <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
+    <label>Local Area</label>
+    <select id="area" onchange="fillFromArea()">
+      <option value="">Choose saved area...</option>
+    </select>
 
-      <label>Size Caught (cm)</label>
-      <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
-      <div id="sizeWarning" class="mini"></div>
+    <label>Coordinates</label>
+    <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
 
-      <label>Preferred Bait / Lure Used</label>
-      <select id="bait">
-        <option value="">Choose...</option>
-      </select>
-      <div id="baitAutoNote" class="mini">Favourite bait will auto-fill when you choose a species.</div>
+    <label>Where Caught</label>
+    <input id="whereCaught" placeholder="Auto-filled from Local Area, or edit manually" />
 
-      <label>Local Area</label>
-      <select id="area" onchange="fillFromArea()">
-        <option value="">Choose saved area...</option>
-      </select>
+    <div id="coordAreaText" class="mini" style="margin-top:8px;"></div>
 
-      <label>Coordinates</label>
-      <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
+    <label>Notes</label>
+    <textarea id="notes" placeholder="Optional notes"></textarea>
 
-      <label>Where Caught</label>
-      <input id="whereCaught" placeholder="Auto-filled from Local Area, or edit manually" />
-
-      <div id="coordAreaText" class="mini" style="margin-top:8px;"></div>
-
-      <label>Notes</label>
-      <textarea id="notes" placeholder="Optional notes"></textarea>
-
-      <label>Fish Photo</label>
-      <div class="row">
-        <button type="button" onclick="openCatchCamera()">Take Fish Photo</button>
-        <button type="button" class="dark" onclick="openCatchGallery()">Choose Fish Photo</button>
-      </div>
-
-      <input type="file" id="catchPhoto" accept="image/*" capture="environment" style="display:none">
-      <img id="catchPreview" class="previewImg" alt="Catch preview" />
-      <div class="mini" id="catchPhotoText" style="margin-top:8px;">No fish photo selected yet.</div>
-
-      <div class="row" style="margin-top:12px;">
-        <button onclick="saveCatch()">Save Catch</button>
-        <button class="danger" onclick="clearCatchForm()">Clear</button>
-      </div>
-
-      <div class="row" style="margin-top:8px;">
-        <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
-      </div>
-
-      <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
+    <label>Fish Photo</label>
+    <div class="row">
+      <button type="button" onclick="openCatchCamera()">Take Fish Photo</button>
+      <button type="button" class="dark" onclick="openCatchGallery()">Choose Fish Photo</button>
     </div>
 
-    <div class="card">
-      <div class="sectionTitle"><b>Saved Catches</b></div>
-      <div id="logBox"></div>
+    <input type="file" id="catchPhoto" accept="image/*" capture="environment" style="display:none">
+    <img id="catchPreview" class="previewImg" alt="Catch preview" />
+    <div class="mini" id="catchPhotoText" style="margin-top:8px;">No fish photo selected yet.</div>
+
+    <div class="row" style="margin-top:12px;">
+      <button onclick="saveCatch()">Save Catch</button>
+      <button class="danger" onclick="clearCatchForm()">Clear</button>
     </div>
-  </section>
+
+    <div class="row" style="margin-top:8px;">
+      <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
+    </div>
+
+    <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
+  </div>
+
+  <div class="card">
+    <div class="sectionTitle"><b>Saved Catches</b></div>
+    <div id="logBox"></div>
+  </div>
+</section>
 
 <section id="weatherTab">
   <div class="card pageWeather">
@@ -565,9 +566,9 @@
     </div>
   </section>
 
-<section id="fishInfoTab">
-<div class="card pageInfo">
-      <div class="sectionTitle"><b>Fish Info</b></div>
+<section id="fishGuideTab">
+  <div class="card pageGuide">
+    <div class="sectionTitle"><b>Fish ID Guide</b></div>
 
       <label>Species</label>
       <select id="fishSelect" onchange="renderFishInfo()"></select>
