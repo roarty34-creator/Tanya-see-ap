@@ -391,6 +391,58 @@
     margin-top:12px;
     box-shadow:var(--shadow);
   }
+  .topnav{
+  display:grid;
+  grid-template-columns:repeat(2,minmax(0,1fr));
+  gap:10px;
+  margin:18px 0 18px;
+}
+
+.navbtn{
+  background:linear-gradient(180deg,#16305f,#0d1f3e);
+  border:1px solid rgba(255,255,255,0.07);
+  padding:13px 12px;
+  border-radius:16px;
+  color:#eef7ff;
+  font-weight:bold;
+  font-size:14px;
+  cursor:pointer;
+  box-shadow:0 8px 22px rgba(0,0,0,0.22);
+  transition:.18s ease;
+}
+
+.navbtn.active{
+  background:linear-gradient(180deg,#43c3ff,#2fa4ff);
+  color:#001420;
+  box-shadow:0 10px 24px rgba(47,164,255,0.30);
+}
+
+.navbtn:active{
+  transform:scale(.98);
+  .pageSpots{
+  background:linear-gradient(180deg,#11264d,#0c1d3c);
+}
+
+.pageCatch{
+  background:linear-gradient(180deg,#17304a,#0d1d34);
+}
+
+.pageWeather{
+  background:linear-gradient(180deg,#15345a,#0c213f);
+}
+
+.pageInfo{
+  background:linear-gradient(180deg,#2b2450,#171f3b);
+}
+
+.pageGuide{
+  background:linear-gradient(180deg,#15384a,#0d2230);
+}
+
+.pageRules{
+  background:linear-gradient(180deg,#3a2a16,#24180d);
+
+}
     </style>
 
 </head>
@@ -400,18 +452,17 @@
 <div class="mini">V108 Clean • Stilbaai Offshore Edition</div>
 
   <div class="topnav">
-    <button class="navbtn active" onclick="showTab('spotsTab')">Spots</button>
-    <button class="navbtn" onclick="showTab('addTab')">Add Catch</button>
-    <button class="navbtn" onclick="showTab('weatherTab')">Weather</button>
-    <button class="navbtn" onclick="showTab('fishInfoTab')">Fish Info</button>
-    <button class="navbtn" onclick="showTab('fishGuideTab')">Fish ID Guide</button>
-    <button class="navbtn" onclick="showTab('rulesTab')">Rules</button>
+  <button class="navbtn active" onclick="showTab('spotsTab')">📍 Spots</button>
+  <button class="navbtn" onclick="showTab('addTab')">📝 Add Catch</button>
+  <button class="navbtn" onclick="showTab('weatherTab')">🌊 Weather</button>
+  <button class="navbtn" onclick="showTab('fishInfoTab')">🐟 Fish Info</button>
+  <button class="navbtn" onclick="showTab('fishGuideTab')">📷 Fish ID Guide</button>
+  <button class="navbtn" onclick="showTab('rulesTab')">📘 Rules</button>
   </div>
-
-  <section id="spotsTab" style="display:block;">
-    <div class="card">
-      <div class="sectionTitle"><b>Spots</b> • Garmin style coordinate list</div>
-
+<section id="addTab">
+  <div class="card pageCatch">
+<section id="spotsTab" style="display:block;">
+  <div class="card pageSpots">
       <div class="identifyBox">
         <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
         <div class="bigText">
@@ -425,8 +476,7 @@
     </div>
   </section>
 
-  <section id="addTab">
-    <div class="card">
+
       <div class="sectionTitle"><b>Add Catch</b></div>
 
       <label>Species</label>
@@ -496,8 +546,8 @@
     </div>
   </section>
 
-  <section id="weatherTab">
-    <div class="card">
+<section id="weatherTab">
+  <div class="card pageWeather">
       <div class="sectionTitle"><b>Weather</b></div>
 
       <div class="identifyBox">
@@ -525,8 +575,8 @@
     </div>
   </section>
 
-  <section id="fishInfoTab">
-    <div class="card">
+<section id="fishInfoTab">
+  <div class="card pageInfo">
       <div class="sectionTitle"><b>Fish Info</b></div>
 
       <label>Species</label>
@@ -544,8 +594,8 @@
     </div>
   </section>
 
-  <section id="fishGuideTab">
-    <div class="card">
+<section id="fishGuideTab">
+  <div class="card pageGuide">
       <div class="sectionTitle"><b>Fish ID Guide</b></div>
 
       <div class="identifyBox">
@@ -633,7 +683,7 @@
   </section>
 
   <section id="rulesTab">
-    <div class="card">
+  <div class="card pageRules">
       <div class="sectionTitle"><b>Rules & Notes</b></div>
       <div class="mini">
         Bag limit: check current permit.<br><br>
