@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v108-clean";
+const CACHE_NAME = "tanya-deep-sea-v108-clean-fixed";
 
 const FILES_TO_CACHE = [
   "./",
