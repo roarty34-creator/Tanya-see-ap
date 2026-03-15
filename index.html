@@ -1,573 +1,119 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Deep Sea Fishing App</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#061225" />
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tanya Deep Sea Fishing App</title>
 
-  <style>
-    :root{
-      --bg:#061225;
-      --bg2:#0a1833;
-      --card:#102246;
-      --card2:#0b1b39;
-      --card3:#132a56;
-      --accent:#39b8ff;
-      --accent2:#6ed6ff;
-      --text:#ffffff;
-      --muted:#a9bddf;
-      --ok:#39d98a;
-      --warn:#ffb14a;
-      --danger:#c94b61;
-      --line:#1e3766;
-      --blue:#14305f;
-      --green:#163c2a;
-      --orange:#503015;
-      --purple:#3a2457;
-      --teal:#153f49;
-      --gold:#534112;
-      --shadow:0 10px 28px rgba(0,0,0,0.28);
-      --glow:0 0 0 1px rgba(110,214,255,0.10), 0 8px 24px rgba(0,0,0,0.22);
-    }
+<style>
 
-    *{box-sizing:border-box}
-
-    body{
-      margin:0;
-      font-family:Arial,Helvetica,sans-serif;
-      background:
-        radial-gradient(circle at top right, rgba(57,184,255,0.10), transparent 22%),
-        radial-gradient(circle at top left, rgba(110,214,255,0.07), transparent 18%),
-        linear-gradient(180deg,#061225 0%, #081935 48%, #0a1d3c 100%);
-      color:var(--text);
-      padding:16px;
-    }
-
-    h1{
-      margin:0 0 4px;
-      font-size:30px;
-      letter-spacing:.3px;
-      text-shadow:0 2px 10px rgba(0,0,0,0.25);
-    }
-
-    .mini{
-      font-size:12px;
-      color:var(--muted);
-      line-height:1.5;
-    }
-
-    .topnav{
-      display:grid;
-      grid-template-columns:repeat(2,minmax(0,1fr));
-      gap:10px;
-      margin:18px 0 18px;
-    }
-
-    .navbtn{
-      background:linear-gradient(180deg,#16305f,#0d1f3e);
-      border:1px solid rgba(255,255,255,0.07);
-      padding:13px 12px;
-      border-radius:16px;
-      color:#eef7ff;
-      font-weight:bold;
-      font-size:14px;
-      cursor:pointer;
-      box-shadow:0 8px 22px rgba(0,0,0,0.22);
-      transition:.18s ease;
-    }
-
-    .navbtn:active{
-      transform:scale(.98);
-    }
-
-    .navbtn.active{
-      background:linear-gradient(180deg,#43c3ff,#2fa4ff);
-      color:#001420;
-      box-shadow:0 10px 24px rgba(47,164,255,0.30);
-    }
-
-    .card{
-      background:linear-gradient(180deg,var(--card),#0c1d3c);
-      padding:16px;
-      border-radius:20px;
-      margin-bottom:14px;
-      border:1px solid rgba(255,255,255,0.06);
-      box-shadow:var(--shadow);
-    }
-
-    .pageSpots{ background:linear-gradient(180deg,#11264d,#0c1d3c); }
-    .pageCatch{ background:linear-gradient(180deg,#17304a,#0d1d34); }
-    .pageWeather{ background:linear-gradient(180deg,#15345a,#0c213f); }
-    .pageInfo{ background:linear-gradient(180deg,#2b2450,#171f3b); }
-    .pageGuide{ background:linear-gradient(180deg,#15384a,#0d2230); }
-    .pageRules{ background:linear-gradient(180deg,#3a2a16,#24180d); }
-
-    .sectionTitle{
-      font-size:12px;
-      color:var(--accent2);
-      margin-bottom:12px;
-      text-transform:uppercase;
-      letter-spacing:.8px;
-      font-weight:bold;
-    }
-
-    label{
-      display:block;
-      font-size:12px;
-      color:var(--muted);
-      margin-top:12px;
-      margin-bottom:5px;
-      font-weight:bold;
-      letter-spacing:.2px;
-    }
-
-    input,select,textarea{
-      width:100%;
-      padding:12px;
-      border:1px solid rgba(255,255,255,0.06);
-      border-radius:14px;
-      background:linear-gradient(180deg,#09162f,#0c1c39);
-      color:#fff;
-      font-size:15px;
-      outline:none;
-      box-shadow:inset 0 1px 0 rgba(255,255,255,0.03);
-    }
-
-    input:focus,select:focus,textarea:focus{
-      border-color:rgba(57,184,255,0.45);
-      box-shadow:0 0 0 3px rgba(57,184,255,0.14);
-    }
-
-    textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    button{
-      background:linear-gradient(180deg,var(--accent),#58c9ff);
-      border:none;
-      padding:11px 13px;
-      border-radius:14px;
-      color:#001420;
-      font-weight:bold;
-      cursor:pointer;
-      box-shadow:0 8px 18px rgba(57,184,255,0.22);
-      transition:.18s ease;
-    }
-
-    button:active{
-      transform:scale(.98);
-    }
-
-    button.dark{
-      background:linear-gradient(180deg,#21457b,#17345e);
-      color:#fff;
-      box-shadow:var(--glow);
-    }
-
-    button.danger{
-      background:linear-gradient(180deg,#cf566d,#b23b4d);
-      color:#fff;
-      box-shadow:0 8px 18px rgba(178,59,77,0.22);
-    }
-
-    .row{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      align-items:center;
-    }
-
-    .row>*{
-      flex:1 1 140px;
-    }
-
-    section{
-      display:none;
-      animation:fadeIn .22s ease;
-    }
-
-    @keyframes fadeIn{
-      from{opacity:.2; transform:translateY(6px)}
-      to{opacity:1; transform:translateY(0)}
-    }
-
-    .spotCard{
-      background:linear-gradient(180deg,var(--card2),#0a1731);
-      padding:14px;
-      border-radius:18px;
-      margin-top:12px;
-      border:1px solid rgba(255,255,255,0.05);
-      box-shadow:var(--glow);
-    }
-
-    .spotTitle{
-      font-size:18px;
-      font-weight:bold;
-      color:#fff;
-      margin-bottom:4px;
-    }
-
-    .spotSub{
-      font-size:12px;
-      color:var(--muted);
-      margin-top:4px;
-      line-height:1.5;
-    }
-
-    .chip{
-      display:inline-block;
-      background:linear-gradient(180deg,#14305d,#10213f);
-      padding:8px 11px;
-      border-radius:999px;
-      font-size:12px;
-      margin:4px 4px 0 0;
-      color:#dff2ff;
-      border:1px solid rgba(255,255,255,0.06);
-    }
-
-    .ok{color:var(--ok)}
-    .warnText{color:var(--warn)}
-
-    table{
-      width:100%;
-      border-collapse:collapse;
-      margin-top:12px;
-      font-size:13px;
-      overflow:hidden;
-      border-radius:16px;
-    }
-
-    th,td{
-      border-bottom:1px solid var(--line);
-      padding:10px 8px;
-      text-align:left;
-      vertical-align:top;
-    }
-
-    th{
-      color:#dff1ff;
-      background:#10213f;
-    }
-
-    td{
-      background:rgba(8,23,49,0.55);
-    }
-
-    .goodSea{
-      color:var(--ok);
-      font-weight:bold;
-    }
-
-    .badSea{
-      color:var(--warn);
-      font-weight:bold;
-    }
-
-    pre.rig{
-      background:linear-gradient(180deg,#07142b,#081632);
-      color:#d7e6ff;
-      padding:15px;
-      border-radius:16px;
-      overflow:auto;
-      font-size:15px;
-      line-height:1.5;
-      white-space:pre-wrap;
-      margin-top:10px;
-      border:1px solid rgba(255,255,255,0.05);
-    }
-
-    .fishMainTitle{
-      font-size:26px;
-      font-weight:bold;
-      margin-bottom:6px;
-      color:#ffffff;
-    }
-
-    .fishSub{
-      font-size:14px;
-      color:#d8e9ff;
-      margin-bottom:12px;
-      line-height:1.7;
-    }
-
-    .identifyBox{
-      position:relative;
-      overflow:hidden;
-      background:linear-gradient(180deg,#132b57,#0d2347);
-      padding:16px;
-      border-radius:18px;
-      margin-top:12px;
-      border:1px solid rgba(255,255,255,0.05);
-      box-shadow:var(--glow);
-    }
-
-    .identifyBox::before{
-      content:"";
-      position:absolute;
-      top:0;
-      left:0;
-      right:0;
-      height:3px;
-      background:linear-gradient(90deg,#39b8ff,#6ed6ff,#39d98a);
-      opacity:.9;
-    }
-
-    .identifyTitle{
-      font-size:22px;
-      font-weight:bold;
-      margin-bottom:10px;
-      color:#ffffff;
-    }
-
-    .bigText{
-      font-size:15px;
-      line-height:1.8;
-    }
-
-    .bigText b{
-      color:#ffffff;
-    }
-
-    .infoGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:10px;
-      margin-top:12px;
-    }
-
-    .infoBox{
-      padding:15px;
-      border-radius:18px;
-      font-size:15px;
-      line-height:1.6;
-      border:1px solid rgba(255,255,255,0.04);
-      box-shadow:var(--glow);
-    }
-
-    .infoBox b{
-      display:block;
-      font-size:16px;
-      margin-bottom:6px;
-      color:#fff;
-    }
-
-    .infoBlue{background:linear-gradient(180deg,#14305f,#102548)}
-    .infoGreen{background:linear-gradient(180deg,#1a4732,#153924)}
-    .infoOrange{background:linear-gradient(180deg,#61401d,#4e2d14)}
-    .infoPurple{background:linear-gradient(180deg,#4a2d6d,#35204f)}
-    .infoTeal{background:linear-gradient(180deg,#1b4f5b,#133943)}
-    .infoGold{background:linear-gradient(180deg,#675319,#4b3b10)}
-
-    .guideGrid{
-      display:grid;
-      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
-      gap:12px;
-      margin-top:10px;
-    }
-
-    .guideCard{
-      background:linear-gradient(180deg,#0e244a,#0a1b39);
-      border-radius:18px;
-      padding:12px;
-      border:1px solid rgba(255,255,255,0.05);
-      box-shadow:var(--glow);
-    }
-
-    .guideName{
-      font-size:18px;
-      font-weight:bold;
-      margin-bottom:6px;
-      color:#fff;
-    }
-
-    .guideHint{
-      font-size:13px;
-      line-height:1.7;
-      color:#d9e6ff;
-    }
-
-    .previewImg{
-      width:100%;
-      max-width:320px;
-      border-radius:16px;
-      margin-top:12px;
-      display:none;
-      border:1px solid rgba(255,255,255,0.07);
-      box-shadow:var(--shadow);
-    }
-
-    .suggestionCard{
-      background:linear-gradient(180deg,#12284f,#10213f);
-      border-radius:16px;
-      padding:13px;
-      margin-top:10px;
-      font-size:14px;
-      line-height:1.7;
-      border:1px solid rgba(255,255,255,0.05);
-    }
-
-    .rigTab{
-      background:linear-gradient(180deg,#21457b,#17345e);
-      padding:14px;
-      border-radius:18px;
-      margin-top:12px;
-      box-shadow:var(--shadow);
-    }
-.heroBadge{
-  display:inline-block;
-  margin-top:10px;
-  padding:8px 14px;
-  border-radius:999px;
-  background:linear-gradient(180deg,#14305d,#10213f);
-  color:#dff2ff;
-  font-size:12px;
-  font-weight:bold;
-  letter-spacing:.3px;
-  border:1px solid rgba(255,255,255,0.08);
-  box-shadow:0 8px 18px rgba(0,0,0,0.20);
+body{
+margin:0;
+font-family:Arial;
+background:#061225;
+color:white;
+padding:16px;
 }
-  
-    }
-  </style>
+
+h1{
+margin:0;
+font-size:28px;
+}
+
+.mini{
+font-size:12px;
+opacity:0.7;
+}
+
+.heroBadge{
+display:inline-block;
+margin-top:10px;
+padding:8px 14px;
+border-radius:999px;
+background:#14305d;
+font-size:12px;
+font-weight:bold;
+}
+
+.card{
+background:#0c1d3c;
+padding:16px;
+border-radius:14px;
+margin-top:14px;
+}
+
+.navbtn{
+padding:10px;
+border-radius:10px;
+background:#1a3566;
+border:none;
+color:white;
+margin:4px;
+}
+
+table{
+width:100%;
+border-collapse:collapse;
+margin-top:10px;
+}
+
+th,td{
+border-bottom:1px solid #1e3766;
+padding:10px;
+text-align:left;
+}
+
+.identifyBox{
+background:#132b57;
+padding:16px;
+border-radius:12px;
+margin-top:12px;
+}
+
+.identifyTitle{
+font-weight:bold;
+margin-bottom:10px;
+font-size:18px;
+}
+
+</style>
 </head>
+
 <body>
 
-  <h1>🎣 Tanya Deep Sea Fishing App</h1>
-  <div class="mini">V108 Clean • Stilbaai Offshore Edition</div>
-  <div class="heroBadge">Spots • Catches • Weather • Fish Info • Fish ID</div>
+<h1>🎣 Tanya Deep Sea Fishing App</h1>
+<div class="mini">V108 Clean • Stilbaai Offshore Edition</div>
+<div class="heroBadge">Spots • Catches • Weather • Fish Info • Fish ID</div>
 
-  <div class="topnav">
-    <button class="navbtn active" onclick="showTab('spotsTab')">📍 Spots</button>
-    <button class="navbtn" onclick="showTab('addTab')">📝 Add Catch</button>
-    <button class="navbtn" onclick="showTab('weatherTab')">🌊 Weather</button>
-    <button class="navbtn" onclick="showTab('fishInfoTab')">🐟 Fish Info</button>
-    <button class="navbtn" onclick="showTab('fishGuideTab')">📷 Fish ID Guide</button>
-    <button class="navbtn" onclick="showTab('rulesTab')">📘 Rules</button>
-  </div>
 
-  <section id="spotsTab" style="display:block;">
-    <div class="card pageSpots">
-      <div class="sectionTitle"><b>Spots</b> • Garmin style coordinate list</div>
+<div class="card">
 
-      <div class="identifyBox">
-        <div class="identifyTitle">Stilbaai Harbour Launch Note</div>
-        <div class="bigText">
-          Use local harbour guidance, marks and current chartplotter data when leaving the harbour.<br><br>
-          Harbour reference point in this build: <b>-34.385542, 21.425433</b><br><br>
-          Sandbanks, rocks and the channel can change. Do not rely on this app alone for a safe launch route.
-        </div>
-      </div>
+<button class="navbtn" onclick="showTab('weatherTab')">🌊 Weather</button>
 
-      <div id="spotList"></div>
-    </div>
-  </section>
+</div>
 
-  <section id="addTab">
-    <div class="card pageCatch">
-      <div class="sectionTitle"><b>Add Catch</b></div>
 
-      <label>Species</label>
-      <select id="species">
-        <option value="">Choose...</option>
-      </select>
+<section id="weatherTab">
 
-      <label>Best Depth</label>
-      <input id="bestDepth" readonly />
-      <div id="bestDepthNote" class="mini">Choose species to load best depth suggestion.</div>
+<div class="card">
 
-      <label>Minimum Size</label>
-      <input id="minSize" readonly />
-      <div id="minSizeNote" class="mini">Choose species to load minimum size.</div>
+<div class="identifyBox">
 
-      <label>Size Caught (cm)</label>
-      <input id="sizeCaught" type="number" placeholder="Enter size in cm" />
-      <div id="sizeWarning" class="mini"></div>
+<div class="identifyTitle">Real Tide Times</div>
 
-      <label>Preferred Bait / Lure Used</label>
-      <select id="bait">
-        <option value="">Choose...</option>
-      </select>
-      <div id="baitAutoNote" class="mini">Favourite bait will auto-fill when you choose a species.</div>
+<div id="tideBox">
+Loading tide data...
+</div>
 
-      <label>Local Area</label>
-      <select id="area" onchange="fillFromArea()">
-        <option value="">Choose saved area...</option>
-      </select>
+</div>
 
-      <label>Coordinates</label>
-      <input id="coords" placeholder="Leave coordinates blank if you are not sure" />
 
-      <label>Where Caught</label>
-      <input id="whereCaught" placeholder="Auto-filled from Local Area, or edit manually" />
+<div class="identifyBox">
 
-      <div id="coordAreaText" class="mini" style="margin-top:8px;"></div>
-
-      <label>Notes</label>
-      <textarea id="notes" placeholder="Optional notes"></textarea>
-
-      <label>Fish Photo</label>
-      <div class="row">
-        <button type="button" onclick="openCatchCamera()">Take Fish Photo</button>
-        <button type="button" class="dark" onclick="openCatchGallery()">Choose Fish Photo</button>
-      </div>
-
-      <input type="file" id="catchPhoto" accept="image/*" capture="environment" style="display:none">
-      <img id="catchPreview" class="previewImg" alt="Catch preview" />
-      <div class="mini" id="catchPhotoText" style="margin-top:8px;">No fish photo selected yet.</div>
-
-      <div class="row" style="margin-top:12px;">
-        <button onclick="saveCatch()">Save Catch</button>
-        <button class="danger" onclick="clearCatchForm()">Clear</button>
-      </div>
-
-      <div class="row" style="margin-top:8px;">
-        <button class="danger" onclick="clearAllLogs()">Clear All Saved Catches</button>
-      </div>
-
-      <div id="saveMsg" class="mini ok" style="margin-top:8px;"></div>
-    </div>
-
-    <div class="card">
-      <div class="sectionTitle"><b>Saved Catches</b></div>
-      <div id="logBox"></div>
-    </div>
-  </section>
-
-  <section id="weatherTab">
-    <div class="card pageWeather">
-      <div class="sectionTitle"><b>Weather</b></div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">7-Day Wind Forecast</div>
-        <div class="bigText">Use this together with swell, current and launch conditions.</div>
-      </div>
-
-      <div class="mini">
-        Good wind: under 15 km/h comfortable, 15–25 km/h workable, above 25 km/h rougher, above 30 km/h poor boat day.<br><br>
-        Good swell: under 1.5 m comfortable, 1.5–2.5 m workable, above 2.5 m rough, above 3 m usually poor for bottom fishing.
-      </div>
-
-      <div id="weekForecast"></div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">Real Tide Times</div>
-        <div class="bigText mini">Powered by tide API</div>
-        <div id="tideBox" class="bigText">Loading tide times...</div>
-      </div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">Fishing Window Note</div>
-        <div id="fishingWindowBox" class="bigText">Loading fishing note...</div>
-      </div>
-    </div>
-    <div class="identifyBox">
-
-<div class="identifyTitle">Tide Times</div>
+<div class="identifyTitle">Tide Table</div>
 
 <table>
+
 <tr>
 <th>Tide</th>
 <th>Time</th>
@@ -587,1442 +133,187 @@
 </tr>
 
 <tr>
-<td>Neap / Spring</td>
+<td>Tide Phase</td>
 <td id="tideType">--</td>
-<td>Moon phase</td>
+<td id="tideRangeNote">--</td>
 </tr>
 
 </table>
 
-    </div>
-  </section>
-
-  <section id="fishInfoTab">
-    <div class="card pageInfo">
-      <div class="sectionTitle"><b>Fish Info</b></div>
-
-      <label>Species</label>
-      <select id="fishSelect" onchange="renderFishInfo()"></select>
-
-      <label>Filter</label>
-      <select id="fishInfoFilter" onchange="renderFishInfo()">
-        <option value="all">All</option>
-        <option value="bait">Natural Bait Only</option>
-        <option value="lures">Lures Only</option>
-        <option value="rig">Rig Only</option>
-      </select>
-
-      <div id="fishInfoBox"></div>
-    </div>
-  </section>
-
-  <section id="fishGuideTab">
-    <div class="card pageGuide">
-      <div class="sectionTitle"><b>Fish ID Guide</b></div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">Identify Unknown Fish</div>
-
-        <div class="row">
-          <button onclick="openCamera()">Use Camera</button>
-          <button onclick="openGallery()">Use Photo</button>
-        </div>
-
-        <input type="file" id="fishPhoto" accept="image/*" capture="environment" style="display:none">
-
-        <div id="uploadPreview" class="mini" style="margin-top:10px;">
-          Take a photo or upload one, then compare it with the guide below.
-        </div>
-
-        <img id="previewImg" class="previewImg" alt="Fish preview" />
-
-        <div class="row" style="margin-top:12px;">
-          <button class="dark" onclick="showGuideHint()">Compare with Fish ID Guide</button>
-          <button class="dark" onclick="sendToChatGPTHint()">Open ChatGPT</button>
-        </div>
-
-        <div class="suggestionCard">
-          <b>Compare with Fish ID Guide</b><br>
-          Look at body shape, colour, tail shape, mouth, and where it was caught.
-        </div>
-
-        <div class="suggestionCard">
-          <b>Open ChatGPT</b><br>
-          Open ChatGPT, upload the fish photo manually, and ask:<br>
-          <b>Identify this fish from the photo</b>
-        </div>
-      </div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">Fish ID Wizard</div>
-
-        <label>Body Shape</label>
-        <select id="wizBody">
-          <option value="">Choose...</option>
-          <option>Long predator</option>
-          <option>Torpedo shape</option>
-          <option>Deep reef fish</option>
-          <option>Compact reef fish</option>
-          <option>Slim tuna shape</option>
-        </select>
-
-        <label>Colour</label>
-        <select id="wizColour">
-          <option value="">Choose...</option>
-          <option>Silver-grey</option>
-          <option>Blue-green</option>
-          <option>Red / orange</option>
-          <option>Pink-red</option>
-          <option>Yellow belly</option>
-          <option>Brown-grey</option>
-          <option>Bright silver</option>
-        </select>
-
-        <label>Where Found</label>
-        <select id="wizWhere">
-          <option value="">Choose...</option>
-          <option>Reef edge</option>
-          <option>Shallow reef</option>
-          <option>Deep structure</option>
-          <option>Open water</option>
-          <option>Surface feeding</option>
-          <option>Channels</option>
-        </select>
-
-        <div class="row" style="margin-top:12px;">
-          <button onclick="runFishWizard()">Find Match</button>
-          <button class="dark" onclick="clearFishWizard()">Clear</button>
-        </div>
-
-        <div id="fishWizardResult" class="suggestionCard" style="display:none;"></div>
-      </div>
-
-      <div class="identifyBox">
-        <div class="identifyTitle">Visual Fish ID Guide</div>
-        <div id="fishGuideList" class="guideGrid"></div>
-      </div>
-    </div>
-  </section>
-
-  <section id="rulesTab">
-    <div class="card pageRules">
-      <div class="sectionTitle"><b>Rules & Notes</b></div>
-      <div class="mini">
-        Bag limit: check current permit.<br><br>
-        Mixed species total: check current permit.<br><br>
-        Red Steenbras is a sensitive species. Closed season shown in fish info section.<br><br>
-        Use local harbour guidance, marks and current chartplotter data when leaving the harbour.
-      </div>
-    </div>
-  </section>
-
-  <div style="text-align:center;margin-top:20px;font-size:11px;color:#9fb0d0;background:rgba(255,255,255,0.03);padding:14px;border-radius:16px;border:1px solid rgba(255,255,255,0.05);">
-    🎣 Tanya Deep Sea Fishing App<br>
-    Build version: V108 Clean
-  </div>
-
-  <script>
-    const HARBOUR = { lat:-34.385542, lon:21.425433, name:"Stilbaai Harbour" };
-    const MARINE_LINE_LON = HARBOUR.lon;
-    const KEY_LOG = "tanya_master_log";
-    const TIDE_API_KEY = "PASTE_YOUR_WORLDTIDES_KEY_HERE";
-
-    const BEST_DEPTH = {
-      "Cape Cob":"25–45 m • Reef edges • Sand channels",
-      "Yellowtail":"Surface to mid-water • Bait balls • Current lines",
-      "Bonito":"Surface to mid-water • Feeding schools • Birds working",
-      "Red Roman":"20–60 m • Reef structure • Broken reef",
-      "Snapper":"25–60 m • Bottom structure • Broken reef",
-      "Silverfish":"20–45 m • Reef patches • Calm workable reef",
-      "Red Steenbras":"35–80 m • Deeper bottom structure",
-      "Yellow Belly":"25–55 m • Reef patches • Current edges",
-      "Hottentot":"10–35 m • Shallow reef",
-      "Geelbek":"30–70 m • Reefs • Channels • Water column",
-      "Carpenter":"25–60 m • Hard reef structure",
-      "Dageraad":"30–70 m • Deep reef and structure",
-      "Santer":"20–50 m • Reef and broken structure",
-      "Elf-Shad":"Surface to mid-water • Bait activity",
-      "Miss Lucy":"25–60 m • Reef structure • Broken reef"
-    };
-
-    const MIN_SIZE = {
-      "Cape Cob":60,
-      "Yellowtail":60,
-      "Bonito":0,
-      "Red Roman":30,
-      "Snapper":30,
-      "Silverfish":25,
-      "Red Steenbras":60,
-      "Yellow Belly":30,
-      "Hottentot":22,
-      "Geelbek":60,
-      "Carpenter":40,
-      "Dageraad":40,
-      "Santer":30,
-      "Elf-Shad":30,
-      "Miss Lucy":30
-    };
-
-    const RIG_HOW_TO = {
-      "Cape Cob": [
-        "Tie your main line to a strong swivel.",
-        "Use a heavy nylon leader around 0.80–1.0 mm.",
-        "Add strong hooks on short hook traces.",
-        "Bait the hooks with whole or cut baitfish.",
-        "Add a 6–8 oz sinker on the bottom.",
-        "Fish it close to reef edges and sandy channels."
-      ],
-      "Yellowtail": [
-        "Tie braid to a swivel.",
-        "Add a 1–1.5 m leader.",
-        "Use a strong live bait hook or lure clip.",
-        "Keep the setup light.",
-        "Fish around bait balls and current lines."
-      ],
-      "Bonito": [
-        "Use a light fast setup.",
-        "Run a feather lure or spoon.",
-        "Keep the lure moving quickly.",
-        "Work surface feeding activity."
-      ],
-      "Red Roman": [
-        "Tie main line to a swivel.",
-        "Use short hook traces.",
-        "Bait with chokka, pilchard, squid or octopus.",
-        "Hold bottom close to reef."
-      ],
-      "Snapper": [
-        "Tie main line to a swivel.",
-        "Use a 1.0–1.2 mm leader.",
-        "Rig one or two hooks with sardine or chokka.",
-        "Keep the bait close to the bottom.",
-        "Use an 8–10 oz sinker."
-      ],
-      "Silverfish": [
-        "Tie main line to a swivel.",
-        "Use a double dropper loop setup.",
-        "Use a 0.60–0.70 mm leader.",
-        "Rig smaller 2/0–3/0 hooks.",
-        "Use prawn or small bait."
-      ],
-      "Red Steenbras": [
-        "Tie main line to a strong swivel.",
-        "Use a 1.0–1.2 mm leader.",
-        "Rig a strong hook with octopus or sardine.",
-        "Keep the bait bulky and neat.",
-        "Use a heavy 8–10 oz sinker."
-      ],
-      "Yellow Belly": [
-        "Tie main line to a swivel.",
-        "Use a double dropper loop setup.",
-        "Use a 0.60–0.70 mm leader.",
-        "Rig 2/0–3/0 hooks with prawn or chokka.",
-        "Fish reef patches and current edges."
-      ],
-      "Hottentot": [
-        "Use a light reef rig.",
-        "Use small hooks and small neat bait.",
-        "Fish shallow reef structure."
-      ],
-      "Geelbek": [
-        "Tie braid to a swivel.",
-        "Add about a 1 m leader.",
-        "Use a strong single hook.",
-        "Drift or fish slightly off bottom."
-      ],
-      "Carpenter": [
-        "Tie main line to a swivel.",
-        "Use a strong bottom trace.",
-        "Rig 3/0–4/0 hooks with prawn or squid bait.",
-        "Keep the trace short and strong.",
-        "Use a 6–8 oz sinker."
-      ],
-      "Dageraad": [
-        "Tie the main line to a strong swivel.",
-        "Use a double dropper loop style setup.",
-        "Use a strong hook with chokka or prawn bait.",
-        "Keep the bait neat and compact.",
-        "Add an 8–10 oz sinker."
-      ],
-      "Santer": [
-        "Tie main line to a swivel.",
-        "Use a short trace with 2/0–3/0 hooks.",
-        "Bait with sardine or chokka.",
-        "Keep the bait neat and compact.",
-        "Use a 6–8 oz sinker."
-      ],
-      "Elf-Shad": [
-        "Tie main line to a swivel.",
-        "Use a wire trace around 0.60–0.70 mm.",
-        "Rig a 4/0–5/0 hook.",
-        "Use whole or cut baitfish.",
-        "Add a 4–6 oz sinker."
-      ],
-      "Miss Lucy": [
-        "Tie main line to a swivel.",
-        "Use short strong hook traces.",
-        "Bait with chokka, pilchard, sardine or squid.",
-        "Keep the bait neat and close to the bottom.",
-        "Fish reef structure with a 6–8 oz sinker."
-      ]
-    };
-
-    const SPOTS = [
-      { name:"Skulpbank", coord:"-34.3905,20.8602" },
-      { name:"Blinde Rif", coord:"-34.4015,20.8801" },
-      { name:"Roman Bank", coord:"-34.4200,20.8650" },
-      { name:"Kabeljou Ridge", coord:"-34.3750,20.8700" },
-      { name:"Die Gat", coord:"-34.3955,20.8450" },
-      { name:"Stilbaai Reef", coord:"-34.3888,20.8570" },
-      { name:"East Reef 1", coord:"-34.3898,21.4305" },
-      { name:"East Reef 2", coord:"-34.3925,21.4360" },
-      { name:"East Dropoff", coord:"-34.3980,21.4425" },
-      { name:"East Channel Edge", coord:"-34.3868,21.4288" },
-      { name:"East Deep Line", coord:"-34.4050,21.4500" },
-      { name:"Marine Side Reef", coord:"-34.3945,21.4385" },
-      { name:"East Bank 1", coord:"-34.4008,21.4465" },
-      { name:"East Bank 2", coord:"-34.4082,21.4521" },
-      { name:"West Bank 1", coord:"-34.3892,21.4105" },
-      { name:"West Bank 2", coord:"-34.3921,21.4058" },
-      { name:"West Reef 1", coord:"-34.3950,21.3990" },
-      { name:"West Reef 2", coord:"-34.4012,21.3920" },
-      { name:"Jongensfontein Edge 1", coord:"-34.4050,21.3840" },
-      { name:"Jongensfontein Edge 2", coord:"-34.4108,21.3775" },
-      { name:"Deep Channel 1", coord:"-34.3995,21.4212" },
-      { name:"Deep Channel 2", coord:"-34.4042,21.4248" },
-      { name:"South Ridge 1", coord:"-34.4120,21.4315" },
-      { name:"South Ridge 2", coord:"-34.4188,21.4372" },
-      { name:"South Bank 1", coord:"-34.4215,21.4200" },
-      { name:"South Bank 2", coord:"-34.4258,21.4125" },
-      { name:"Outer Reef 1", coord:"-34.4305,21.4455" },
-      { name:"Outer Reef 2", coord:"-34.4362,21.4380" },
-      { name:"Outer Bank 1", coord:"-34.4395,21.4210" },
-      { name:"Outer Bank 2", coord:"-34.4420,21.4065" }
-    ];
-
-    const BAIT_BY_SPECIES = {
-      "Cape Cob":[
-        "Chokka","Chokka strip","Chokka head","Chokka + Pilchard combo",
-        "Live Makriel","Live bait","Pilchard","Pilchard strip","Pilchard belly","Pilchard fillet",
-        "Sardine","Sardine strip","Sardine fillet","Mullet strip","Redbait","Squid","Octopus",
-        "Yo-Zuri minnow","Yo-Zuri deep diver","Soft plastic paddle tail",
-        "Soft plastic jerkbait","Deep diving plug","Stickbait"
-      ],
-      "Yellowtail":[
-        "Live Makriel","Live bait","Pilchard strip","Sardine","Sardine fillet",
-        "Metal spoon","Surface plug","Popper","Stickbait",
-        "Paddle tail soft plastic","Soft plastic jerkbait",
-        "Yo-Zuri minnow","Yo-Zuri deep diver","Trolling lure"
-      ],
-      "Bonito":[
-        "Pilchard strip","Sardine strip","Makriel","Live bait",
-        "Feather lure","Small spoon","Yo-Zuri minnow","Small plug","Trolling lure"
-      ],
-      "Red Roman":[
-        "Chokka","Pilchard","Octopus","Squid","Sardine","Redbait","Mussel"
-      ],
-      "Snapper":[
-        "Chokka","Pilchard","Redbait","Squid","Sardine","Mussel","Chokka + Pilchard combo"
-      ],
-      "Silverfish":[
-        "Chokka strip","Pilchard strip","Pilchard","Small sardine strip","Mussel","Redbait"
-      ],
-      "Red Steenbras":[
-        "Chokka","Pilchard","Redbait","Squid","Sardine","Big chokka bait","Octopus"
-      ],
-      "Yellow Belly":[
-        "Chokka","Pilchard","Sardine","Squid","Redbait"
-      ],
-      "Hottentot":[
-        "Chokka","Small chokka strip","Pilchard","Redbait","Mussel","Sardine piece"
-      ],
-      "Geelbek":[
-        "Chokka","Sardine","Pilchard","Live bait","Live Makriel",
-        "Yo-Zuri minnow","Yo-Zuri deep diver","Stickbait"
-      ],
-      "Carpenter":[
-        "Chokka","Squid","Pilchard","Octopus","Redbait"
-      ],
-      "Dageraad":[
-        "Chokka","Pilchard","Redbait","Squid","Big bait","Octopus"
-      ],
-      "Santer":[
-        "Chokka","Sardine","Pilchard strip","Pilchard","Small squid strip"
-      ],
-      "Elf-Shad":[
-        "Sardine","Pilchard","Spoon","Surface lure","Plug","Small stickbait"
-      ],
-      "Miss Lucy":[
-        "Chokka","Pilchard","Sardine","Squid","Redbait"
-      ]
-    };
-
-    function fullInfo(speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, hookTrace, rigType, season, closed, make, why, sketch, identifier){
-      return { speciesNote, bestBait, favoriteBait, status, naturalBait, lures, hook, sinker, hookTrace, rigType, season, closed, make, why, sketch, identifier };
-    }
-
-    const FISH_INFO = {
-      "Cape Cob": fullInfo(
-        "Best from spring to autumn. Stronger on warmer water, lower light, pushing tide, reef edges and sandy channels.",
-        "Chokka, Chokka + Pilchard combo, Live Makriel, Sardine, Pilchard belly, Mullet strip",
-        "Chokka + Pilchard combo",
-        "Check current permit / stock status",
-        "Chokka, Chokka strip, Chokka head, Chokka + Pilchard combo, Live Makriel, Pilchard belly, Sardine, Mullet strip, Redbait, Squid, Octopus",
-        "Yo-Zuri minnow, Yo-Zuri deep diver, Soft plastic paddle tail, Soft plastic jerkbait, Deep diving plug, Stickbait",
-        "Top hook 7/0, bottom hook 8/0 or 9/0",
-        "6 oz to 8 oz grapnel or bottle sinker",
-        "0.80 – 1.0 mm nylon, ± 80 cm",
-        "Big Cob Double Hook Rig",
-        "Spring to Autumn",
-        "Check permit rules",
-        "1. Tie braid to a strong barrel swivel.\n2. Add 0.80 - 1.0 mm nylon leader.\n3. Tie the top hook 7/0.\n4. Tie the bottom hook 8/0 or 9/0.\n5. Add a 6-8 oz grapnel or bottle sinker.",
-        "Cob often takes bait hanging just above the bottom.\nTwo hooks keep the bait straight and reduce spinning in current.",
-        "BIG COB DOUBLE HOOK RIG\n\nMain line\n40-50 lb braid\n  |\nStrong barrel swivel\n  |\nLeader\n0.80 - 1.0 mm nylon\n± 80 cm long\n  |\nTop hook trace ---- 7/0 hook\n  |\nBottom hook trace - 8/0 or 9/0 hook\n  |\n6-8 oz grapnel / bottle sinker",
-        { body:"Long strong predator body", colour:"Silver-grey with darker back", tail:"Strong tail", found:"Reef edges and sandy channels", giveaway:"Big mouth and classic cob shape" }
-      ),
-      "Yellowtail": fullInfo(
-        "Best from summer to autumn when warm water pushes bait to the surface.",
-        "Live Makriel, Sardine strip, Yo-Zuri minnow, Metal spoon",
-        "Live Makriel",
-        "Check current permit",
-        "Live Makriel, Live bait, Pilchard strip, Sardine",
-        "Yo-Zuri minnow, Yo-Zuri deep diver, Metal spoon, Stickbait, Popper",
-        "4/0 – 6/0",
-        "Usually none",
-        "0.60 – 0.70 mm nylon ± 1 – 1.5 m",
-        "Yellowtail live bait rig",
-        "Summer to Autumn",
-        "Check permit rules",
-        "1. Tie braid to swivel.\n2. Add leader.\n3. Use live bait hook or lure clip.\n4. Keep the setup light.",
-        "Yellowtail hunts fast and likes lively bait or fast moving lures.",
-        "YELLOWTAIL RIG\n\nMain line\n40-50 lb braid\n  |\nSwivel\n  |\nLeader 1 - 1.5 m\n  |\n4/0 - 6/0 hook\n\nNo sinker",
-        { body:"Long torpedo shaped body", colour:"Blue-green back with silver sides", tail:"Strong forked tail", found:"Open water around bait balls", giveaway:"Fast swimming pelagic fish" }
-      ),
-      "Bonito": fullInfo(
-        "Best from summer to autumn when birds and bait balls are active.",
-        "Feather lure, Sardine strip, Pilchard strip, Yo-Zuri minnow",
-        "Feather lure",
-        "Check current permit",
-        "Pilchard strip, Sardine strip, Makriel",
-        "Feather lure, Small spoon, Yo-Zuri minnow, Trolling lure",
-        "3/0 – 4/0",
-        "None",
-        "0.60 mm nylon ± 1 m",
-        "Bonito trolling rig",
-        "Summer to Autumn",
-        "Check permit rules",
-        "1. Use light fast setup.\n2. Run feather or spoon.\n3. Keep lure moving.",
-        "Bonito feeds fast near surface and reacts well to moving lures.",
-        "BONITO RIG\n\nMain line\n30-40 lb braid\n  |\nSwivel\n  |\nLeader 1 m\n  |\nFeather / small lure",
-        { body:"Slim tuna shaped body", colour:"Dark back with silver sides", tail:"Forked tail", found:"Surface feeding schools", giveaway:"Very fast surface hunter" }
-      ),
-      "Red Roman": fullInfo(
-        "Good all year. Prefers reef structure and bottom bait presentation.",
-        "Chokka, Pilchard, Octopus, Squid",
-        "Chokka",
-        "Sensitive species",
-        "Chokka, Pilchard, Octopus, Squid, Sardine",
-        "Usually natural bait",
-        "4/0 – 6/0",
-        "6 oz – 8 oz",
-        "Short hook traces 20 – 30 cm",
-        "2 hook reef bottom rig",
-        "All year",
-        "Check permit rules",
-        "1. Keep traces short.\n2. Present bait close to reef.\n3. Hold bottom.",
-        "Roman stays tight to reef and likes natural bait near structure.",
-        "RED ROMAN RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook trace\n  |\nSinker 6-8 oz",
-        { body:"Deep reef fish body", colour:"Red to orange", tail:"Rounded reef fish tail", found:"Rocky reef areas", giveaway:"Deep red colour" }
-      ),
-      "Snapper": fullInfo(
-        "Good all year. Mostly structure dependent.",
-        "Chokka, Pilchard, Redbait, Squid",
-        "Chokka",
-        "Sensitive species",
-        "Chokka, Pilchard, Redbait, Squid",
-        "Mostly natural bait",
-        "4/0 – 6/0",
-        "6 oz – 8 oz",
-        "20 – 40 cm",
-        "Bottom bait rig",
-        "All year",
-        "Check permit rules",
-        "1. Use short bottom trace.\n2. Keep bait neat.\n3. Fish over reef.",
-        "Snapper bites well on clean natural bait close to bottom.",
-        "SNAPPER RIG\n\nMain line\n  |\nSwivel\n  |\nHook trace\n  |\nSinker",
-        { body:"Medium reef fish", colour:"Pink red", tail:"Compact tail", found:"Reef structure", giveaway:"Classic snapper head shape" }
-      ),
-      "Silverfish": fullInfo(
-        "Good all year. Often over reef in calmer conditions.",
-        "Chokka strip, Pilchard strip, Mussel",
-        "Chokka strip",
-        "Check permit",
-        "Chokka strip, Pilchard strip, Mussel",
-        "Rarely used",
-        "2/0 – 4/0",
-        "4 oz – 6 oz",
-        "20 – 30 cm",
-        "Light bottom rig",
-        "All year",
-        "Check permit rules",
-        "1. Use light rig.\n2. Smaller bait.\n3. Stay near bottom.",
-        "Light presentation suits smaller fish feeding over reef.",
-        "SILVERFISH RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook trace\n  |\nSmall sinker",
-        { body:"Small streamlined body", colour:"Bright silver", tail:"Small forked tail", found:"Over reef", giveaway:"Bright silver body" }
-      ),
-      "Red Steenbras": fullInfo(
-        "Sensitive species. Closed season 1 Sep – 30 Nov.",
-        "Big chokka bait, Pilchard, Redbait",
-        "Big chokka bait",
-        "Protected species",
-        "Chokka, Pilchard, Redbait",
-        "Natural bait preferred",
-        "6/0 – 8/0",
-        "7 oz – 9 oz",
-        "70 – 120 cm",
-        "Strong bottom rig",
-        "All year except closed season",
-        "Closed season 1 Sep – 30 Nov",
-        "1. Use heavy swivel and strong leader.\n2. Use strong hook.\n3. Match sinker to current.",
-        "This species needs stronger tackle and careful handling.",
-        "RED STEENBRAS RIG\n\nMain line\n  |\nHeavy swivel\n  |\nLong hook trace\n  |\nHeavy sinker",
-        { body:"Large powerful body", colour:"Silver pink", tail:"Strong tail", found:"Deeper bottom structure", giveaway:"Large powerful fish" }
-      ),
-      "Yellow Belly": fullInfo(
-        "Good all year. Focus on reef patches and current.",
-        "Chokka, Pilchard, Sardine",
-        "Chokka",
-        "Check permit",
-        "Chokka, Pilchard, Sardine",
-        "Mostly natural bait",
-        "4/0 – 6/0",
-        "6 oz – 8 oz",
-        "30 – 50 cm",
-        "Bottom rig",
-        "All year",
-        "Check permit rules",
-        "1. Simple bottom rig.\n2. Keep bait clean.\n3. Fish reef edges.",
-        "Bottom bait presentation works best over reef patches.",
-        "YELLOW BELLY RIG\n\nMain line\n  |\nSwivel\n  |\nHook trace\n  |\nSinker",
-        { body:"Deep reef body", colour:"Yellow belly underside", tail:"Compact tail", found:"Reef patches", giveaway:"Yellow belly colour" }
-      ),
-      "Hottentot": fullInfo(
-        "Good all year. Small bait works best.",
-        "Mussel, Redbait, Chokka strip",
-        "Mussel",
-        "Check permit",
-        "Chokka strip, Pilchard, Mussel, Redbait",
-        "Natural bait preferred",
-        "2/0 – 3/0",
-        "4 oz – 5 oz",
-        "0.50 – 0.60 mm nylon ± 60 cm",
-        "Light reef rig",
-        "All year",
-        "Check permit rules",
-        "1. Small hook.\n2. Small neat bait.\n3. Fish shallow reef.",
-        "Small mouth fish respond better to small natural baits.",
-        "HOTTENTOT RIG\n\nMain line\n  |\nSmall swivel\n  |\nShort hook trace\n  |\nLight sinker",
-        { body:"Short compact body", colour:"Grey silver", tail:"Small tail", found:"Shallow reef", giveaway:"Small mouth reef fish" }
-      ),
-      "Geelbek": fullInfo(
-        "Often caught over reef and channels when baitfish are present.",
-        "Chokka, Sardine, Pilchard, Live Makriel",
-        "Chokka",
-        "Check current permit",
-        "Chokka, Sardine, Pilchard, Live bait, Live Makriel",
-        "Yo-Zuri minnow, Deep diver, Stickbait",
-        "6/0 - 8/0",
-        "Light to medium depending on current",
-        "0.70 - 0.80 mm leader, ± 1 m",
-        "Single hook drift / bait rig",
-        "Good in active bait periods",
-        "Check permit rules",
-        "1. Tie braid to swivel.\n2. Add ±1 m leader.\n3. Use strong single hook.\n4. Drift or fish slightly off bottom.",
-        "Geelbek often responds to natural bait in the water column around active structure.",
-        "GEELBEK RIG\n\nMain line\n  |\nSwivel\n  |\nLeader 1 m\n  |\nSingle hook",
-        { body:"Long streamlined predator", colour:"Silver with darker back", tail:"Forked tail", found:"Reefs, channels, deeper water column", giveaway:"Strong streamlined body and pelagic look" }
-      ),
-      "Carpenter": fullInfo(
-        "Strong reef fish that prefers structure and tough bait.",
-        "Chokka, Squid, Pilchard, Octopus",
-        "Chokka",
-        "Check permit",
-        "Chokka, Squid, Pilchard, Octopus",
-        "Mostly natural bait",
-        "6/0 - 7/0",
-        "7 oz - 8 oz",
-        "0.80 - 1.0 mm, short strong trace",
-        "Strong reef bottom rig",
-        "All year on reef",
-        "Check permit rules",
-        "1. Use heavy reef trace.\n2. Short strong leader.\n3. Fish directly over reef.",
-        "Carpenter hits hard and needs strong tackle on structure.",
-        "CARPENTER RIG\n\nMain line\n  |\nHeavy swivel\n  |\nShort strong hook trace\n  |\nSinker",
-        { body:"Deep powerful reef body", colour:"Brown-grey reef tones", tail:"Strong reef fish tail", found:"Hard reef and structure", giveaway:"Powerful reef fish profile" }
-      ),
-      "Dageraad": fullInfo(
-        "Large reef species that prefers bigger bait and stable conditions.",
-        "Chokka, Pilchard, Redbait, Squid",
-        "Chokka",
-        "Check permit carefully",
-        "Chokka, Pilchard, Redbait, Squid, Big bait",
-        "Natural bait preferred",
-        "7/0 - 9/0",
-        "6 oz - 8 oz",
-        "0.90 - 1.0 mm trace",
-        "Heavy bottom rig",
-        "Stable sea conditions",
-        "Check permit rules",
-        "1. Use strong swivel.\n2. Strong short trace.\n3. Fish bigger bait on structure.",
-        "Dageraad is a stronger reef fish and responds to larger clean bait.",
-        "DAGERAAD RIG\n\nMain line\n  |\nStrong swivel\n  |\nHeavy hook trace\n  |\nSinker",
-        { body:"Large deep reef body", colour:"Pale pink to silver reef fish tone", tail:"Strong tail", found:"Deeper reef and structure", giveaway:"Large heavy reef fish build" }
-      ),
-      "Santer": fullInfo(
-        "Common reef fish around structure and reef patches.",
-        "Chokka, Sardine, Pilchard strip",
-        "Chokka",
-        "Check permit",
-        "Chokka, Sardine, Pilchard strip",
-        "Mostly natural bait",
-        "4/0 - 5/0",
-        "5 oz - 6 oz",
-        "Short trace ± 60 cm",
-        "Short reef rig",
-        "All year on reef",
-        "Check permit rules",
-        "1. Use short trace.\n2. Present neat bait.\n3. Keep it close to structure.",
-        "Santer feeds well on compact bait close to reef.",
-        "SANTER RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook trace\n  |\nSinker",
-        { body:"Medium reef body", colour:"Silver-red reef tones", tail:"Compact tail", found:"Reef and broken structure", giveaway:"Compact reef fish profile" }
-      ),
-      "Elf-Shad": fullInfo(
-        "Fast predator that hunts baitfish in current and surface activity.",
-        "Sardine, Pilchard, Spoon, Surface lure",
-        "Sardine",
-        "Check permit",
-        "Sardine, Pilchard",
-        "Spoon, Surface lure, Plug",
-        "4/0 - 6/0",
-        "Usually none or light",
-        "Wire or heavier leader if needed",
-        "Casting / bait rig",
-        "Active bait periods",
-        "Check permit rules",
-        "1. Use light casting setup.\n2. Cast lures or fish sardine naturally.\n3. Retrieve actively.",
-        "Elf-Shad reacts to movement and baitfish activity.",
-        "ELF-SHAD RIG\n\nMain line\n  |\nLeader\n  |\nLure / hook",
-        { body:"Long slim predator body", colour:"Silver with darker back", tail:"Forked tail", found:"Bait activity and moving water", giveaway:"Sharp predatory look" }
-      ),
-      "Miss Lucy": fullInfo(
-        "Strong reef fish found over structure and broken reef.",
-        "Chokka, Pilchard, Sardine, Squid, Redbait",
-        "Chokka",
-        "Check permit",
-        "Chokka, Pilchard, Sardine, Squid, Redbait",
-        "Mostly natural bait",
-        "4/0 - 6/0",
-        "6 oz - 8 oz",
-        "20 – 40 cm",
-        "Bottom reef rig",
-        "All year",
-        "Check permit rules",
-        "1. Use a swivel and short strong traces.\n2. Keep bait neat and close to structure.\n3. Fish directly over reef.",
-        "Miss Lucy feeds tight to reef and likes compact natural bait presentations.",
-        "MISS LUCY RIG\n\nMain line\n  |\nSwivel\n  |\nShort hook trace\n  |\nSinker",
-        { body:"Compact deep reef fish", colour:"Pink-red reef colour", tail:"Compact tail", found:"Reef structure", giveaway:"Strong reef fish profile" }
-      )
-    };
-
-    const FISH_GUIDE = [
-      {name:"Cape Cob", body:"Long predator", colour:"Silver-grey", tail:"Strong", found:"Reef edges / channels", clue:"Big mouth"},
-      {name:"Yellowtail", body:"Torpedo shape", colour:"Blue-green back", tail:"Forked", found:"Open water", clue:"Fast pelagic fish"},
-      {name:"Bonito", body:"Slim tuna shape", colour:"Dark back", tail:"Forked", found:"Surface schools", clue:"Fast surface hunter"},
-      {name:"Red Roman", body:"Deep reef fish", colour:"Red", tail:"Rounded", found:"Rocky reef", clue:"Deep red profile"},
-      {name:"Snapper", body:"Reef fish", colour:"Pink-red", tail:"Compact", found:"Bottom structure", clue:"Snapper face"},
-      {name:"Silverfish", body:"Small streamlined body", colour:"Bright silver", tail:"Small forked", found:"Reef", clue:"Bright silver body"},
-      {name:"Red Steenbras", body:"Large powerful body", colour:"Silver pink", tail:"Strong", found:"Deep structure", clue:"Large powerful fish"},
-      {name:"Yellow Belly", body:"Deep reef body", colour:"Yellow belly", tail:"Compact", found:"Reef patches", clue:"Yellow underside"},
-      {name:"Hottentot", body:"Compact short body", colour:"Grey-silver", tail:"Small", found:"Shallow reef", clue:"Small mouth"},
-      {name:"Geelbek", body:"Long streamlined predator", colour:"Silver", tail:"Forked", found:"Reefs / channels", clue:"Pelagic look"},
-      {name:"Carpenter", body:"Deep powerful reef body", colour:"Brown-grey", tail:"Strong", found:"Hard reef", clue:"Heavy reef fish"},
-      {name:"Dageraad", body:"Large deep reef body", colour:"Pink-silver", tail:"Strong", found:"Deep structure", clue:"Large heavy build"},
-      {name:"Santer", body:"Medium reef body", colour:"Silver-red", tail:"Compact", found:"Reef", clue:"Compact reef fish"},
-      {name:"Elf-Shad", body:"Long slim predator", colour:"Silver", tail:"Forked", found:"Moving water", clue:"Fast bait hunter"},
-      {name:"Miss Lucy", body:"Compact reef fish", colour:"Pink-red", tail:"Compact", found:"Reef structure", clue:"Strong reef profile"}
-    ];
-
-    let currentCatchPhoto = "";
-
-    function getLog(){
-      try{
-        return JSON.parse(localStorage.getItem(KEY_LOG) || "[]");
-      }catch(e){
-        return [];
-      }
-    }
-
-    function saveLog(list){
-      localStorage.setItem(KEY_LOG, JSON.stringify(list));
-    }
-
-    function getTopBaits(species){
-      const log = getLog();
-      const counts = {};
-
-      log.forEach(c => {
-        if(c.species === species && c.bait){
-          counts[c.bait] = (counts[c.bait] || 0) + 1;
-        }
-      });
-
-      const sorted = Object.entries(counts)
-        .sort((a,b) => b[1] - a[1])
-        .slice(0,3);
-
-      if(sorted.length === 0) return "No bait history yet";
-      return sorted.map(([bait,count]) => `${bait} (${count})`).join("<br>");
-    }
-
-    function getFishImage(species){
-      const map = {
-        "Cape Cob":"fish-cape-cob.png",
-        "Yellowtail":"fish-yellowtail.png",
-        "Bonito":"fish-bonito.png",
-        "Red Roman":"fish-red-roman.png",
-        "Snapper":"fish-snapper.png",
-        "Silverfish":"fish-silverfish.png",
-        "Red Steenbras":"fish-red-steenbras.png",
-        "Yellow Belly":"fish-yellow-belly.png",
-        "Hottentot":"fish-hottentot.png",
-        "Geelbek":"fish-geelbek.png",
-        "Carpenter":"fish-carpenter.png",
-        "Dageraad":"fish-dageraad.png",
-        "Santer":"fish-santer.png",
-        "Elf-Shad":"fish-elf-shad.png",
-        "Miss Lucy":"fish-miss-lucy.png"
-      };
-      return map[species] || "";
-    }
-
-    function getRigImage(species){
-      const map = {
-        "Cape Cob":"rig-cape-cob.png",
-        "Yellowtail":"rig-yellowtail.png",
-        "Red Roman":"rig-red-roman.png",
-        "Snapper":"rig-snapper.png",
-        "Silverfish":"rig-silverfish.png",
-        "Red Steenbras":"rig-red-steenbras.png",
-        "Yellow Belly":"rig-yellow-belly.png",
-        "Hottentot":"rig-hottentot.png",
-        "Carpenter":"rig-carpenter.png",
-        "Dageraad":"rig-dageraad.png",
-        "Santer":"rig-santer.png",
-        "Elf-Shad":"rig-elf-shad.png",
-        "Miss Lucy":"rig-miss-lucy.png"
-      };
-      return map[species] || "";
-    }
-
-    function showTab(id){
-      document.querySelectorAll("section").forEach(s => s.style.display = "none");
-      const tab = document.getElementById(id);
-      if(tab) tab.style.display = "block";
-
-      document.querySelectorAll(".navbtn").forEach(btn => btn.classList.remove("active"));
-      const ids = ["spotsTab","addTab","weatherTab","fishInfoTab","fishGuideTab","rulesTab"];
-      const idx = ids.indexOf(id);
-      if(idx >= 0){
-        const btns = document.querySelectorAll(".navbtn");
-        if(btns[idx]) btns[idx].classList.add("active");
-      }
-
-      if(id === "weatherTab"){
-        loadWeekForecast();
-        loadTides();
-        loadFishingWindow();
-      }
-      if(id === "fishInfoTab") renderFishInfo();
-      if(id === "fishGuideTab") renderFishGuide();
-      if(id === "addTab") renderLog();
-    }
-
-    function getAreaSideFromCoord(coordStr){
-      if(!coordStr || !coordStr.includes(",")) return "Area";
-      const p = coordStr.split(",");
-      const lon = Number(p[1]);
-      if(!Number.isFinite(lon)) return "Area";
-      return lon > MARINE_LINE_LON ? "East" : "West";
-    }
-
-    function describeSeaAreaFromLon(lon){
-      if(lon > MARINE_LINE_LON) return "East towards marine area";
-      if(lon < MARINE_LINE_LON) return "West towards Jongensfontein area";
-      return "On harbour line";
-    }
-
-    function describeSeaAreaFromCoord(coordStr){
-      if(!coordStr || !coordStr.includes(",")) return "";
-      const p = coordStr.split(",");
-      const lon = Number(p[1]);
-      if(!Number.isFinite(lon)) return "";
-      return describeSeaAreaFromLon(lon);
-    }
-
-    function copyCoord(text){
-      navigator.clipboard.writeText(text);
-      alert("Coordinates copied");
-    }
-
-    function renderSpotList(){
-      let html = "";
-      SPOTS.forEach(s => {
-        const side = getAreaSideFromCoord(s.coord);
-        html += `
-          <div class="spotCard">
-            <div class="spotTitle">${side} - ${s.name}</div>
-            <div class="spotSub">${describeSeaAreaFromCoord(s.coord)}</div>
-            <div style="margin-top:6px;"><span class="chip">${s.coord}</span></div>
-            <div class="row" style="margin-top:10px;">
-              <button onclick="copyCoord('${s.coord}')">Copy Coordinates</button>
-              <button class="dark" onclick="useSpotInCatch('${s.name.replaceAll("'","&#39;")}','${s.coord}')">Use In Catch</button>
-            </div>
-          </div>
-        `;
-      });
-      document.getElementById("spotList").innerHTML = html;
-    }
-
-    function fillSpecies(){
-      const species = document.getElementById("species");
-      const fishSelect = document.getElementById("fishSelect");
-      species.innerHTML = '<option value="">Choose...</option>';
-      fishSelect.innerHTML = "";
-
-      Object.keys(FISH_INFO).forEach(sp => {
-        species.innerHTML += `<option>${sp}</option>`;
-        fishSelect.innerHTML += `<option>${sp}</option>`;
-      });
-    }
-
-    function fillAreaDropdown(){
-      const area = document.getElementById("area");
-      area.innerHTML = '<option value="">Choose saved area...</option>';
-
-      SPOTS.forEach(s => {
-        const side = getAreaSideFromCoord(s.coord);
-        const label = `${side} - ${s.name}`;
-        const opt = document.createElement("option");
-        opt.value = label;
-        opt.textContent = label;
-        opt.dataset.coords = s.coord;
-        area.appendChild(opt);
-      });
-    }
-
-    function fillBaitOptions(){
-      const species = document.getElementById("species").value;
-      const bait = document.getElementById("bait");
-      bait.innerHTML = '<option value="">Choose...</option>';
-
-      if(!species || !BAIT_BY_SPECIES[species]) return;
-
-      BAIT_BY_SPECIES[species].forEach(item => {
-        bait.innerHTML += `<option>${item}</option>`;
-      });
-
-      const autoFav = FISH_INFO[species]?.favoriteBait || "";
-      if(autoFav) bait.value = autoFav;
-    }
-
-    function updateBestDepth(){
-      const species = document.getElementById("species").value;
-      const box = document.getElementById("bestDepth");
-      const note = document.getElementById("bestDepthNote");
-
-      if(!species){
-        box.value = "";
-        note.textContent = "Choose species to load best depth suggestion.";
-        return;
-      }
-
-      box.value = BEST_DEPTH[species] || "";
-      note.textContent = BEST_DEPTH[species] ? "Best depth suggestion loaded." : "No depth suggestion loaded.";
-    }
-
-    function updateMinSize(){
-      const species = document.getElementById("species").value;
-      const minSizeEl = document.getElementById("minSize");
-      const note = document.getElementById("minSizeNote");
-
-      if(!species){
-        minSizeEl.value = "";
-        note.textContent = "Choose species to load minimum size.";
-        return;
-      }
-
-      const min = MIN_SIZE[species] ?? "";
-      minSizeEl.value = min;
-      note.textContent = min === 0 ? "No minimum size set in app for this species." : "Minimum size loaded for selected species.";
-    }
-
-    function checkSizeWarning(){
-      const species = document.getElementById("species").value;
-      const size = Number(document.getElementById("sizeCaught").value || 0);
-      const min = Number(document.getElementById("minSize").value || 0);
-      const box = document.getElementById("sizeWarning");
-
-      if(!species || !size){
-        box.textContent = "";
-        box.className = "mini";
-        return;
-      }
-
-      if(min > 0 && size < min){
-        box.textContent = `Warning: undersize fish. Minimum size for ${species} is ${min} cm.`;
-        box.className = "mini warnText";
-      } else if(min > 0){
-        box.textContent = `Size is above minimum (${min} cm).`;
-        box.className = "mini ok";
-      } else {
-        box.textContent = "No minimum size loaded for this species.";
-        box.className = "mini";
-      }
-    }
-
-    function tryAutoMatchAreaFromCoords(coordStr){
-      const normalized = coordStr.replace(/\s+/g,"").trim();
-      const match = SPOTS.find(s => s.coord.replace(/\s+/g,"").trim() === normalized);
-      if(match){
-        const side = getAreaSideFromCoord(match.coord);
-        const label = `${side} - ${match.name}`;
-        document.getElementById("area").value = label;
-        if(!document.getElementById("whereCaught").value.trim()){
-          document.getElementById("whereCaught").value = label;
-        }
-      }
-    }
-
-    function fillFromArea(){
-      const area = document.getElementById("area");
-      const selected = area.options[area.selectedIndex];
-
-      if(selected.value){
-        document.getElementById("whereCaught").value = selected.value;
-      }
-      if(selected.dataset.coords){
-        document.getElementById("coords").value = selected.dataset.coords;
-        document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(selected.dataset.coords);
-      }
-    }
-
-    function useSpotInCatch(name, coord){
-      showTab("addTab");
-      const side = getAreaSideFromCoord(coord);
-      const label = `${side} - ${name}`;
-      document.getElementById("area").value = label;
-      document.getElementById("coords").value = coord;
-      document.getElementById("whereCaught").value = label;
-      document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
-    }
-
-    function saveCatch(){
-      const species = document.getElementById("species").value;
-      const bait = document.getElementById("bait").value;
-      const sizeCaught = document.getElementById("sizeCaught").value;
-      const coords = document.getElementById("coords").value.trim();
-      const whereCaught = document.getElementById("whereCaught").value.trim();
-      const area = document.getElementById("area").value;
-      const bestDepth = document.getElementById("bestDepth").value;
-      const minSize = document.getElementById("minSize").value;
-      const notes = document.getElementById("notes").value.trim();
-
-      if(!species){
-        alert("Choose species first.");
-        return;
-      }
-
-      const catchData = {
-        species,
-        bait,
-        bestDepth,
-        minSize,
-        sizeCaught,
-        coords,
-        area,
-        whereCaught,
-        seaArea: coords ? describeSeaAreaFromCoord(coords) : "",
-        notes,
-        photo: currentCatchPhoto || "",
-        date: new Date().toLocaleString()
-      };
-
-      const log = getLog();
-      log.unshift(catchData);
-      saveLog(log);
-
-      renderLog();
-      document.getElementById("saveMsg").textContent = "Catch saved to log.";
-    }
-
-    function renderLog(){
-      const box = document.getElementById("logBox");
-      const list = getLog();
-
-      if(!list.length){
-        box.innerHTML = '<div class="mini" style="margin-top:10px;">No catches saved yet.</div>';
-        return;
-      }
-
-      let html = "";
-      list.forEach(c => {
-        html += `
-          <div class="spotCard">
-            <b>${c.species}</b><br>
-            <span class="mini">Best Depth: ${c.bestDepth || "-"}</span><br>
-            <span class="mini">Min Size: ${c.minSize || "-"}</span><br>
-            <span class="mini">Size Caught: ${c.sizeCaught || "-"} cm</span><br>
-            <span class="mini">Preferred Bait / Lure: ${c.bait || "-"}</span><br>
-            <span class="mini">Local Area: ${c.area || "-"}</span><br>
-            <span class="mini">Where Caught: ${c.whereCaught || "-"}</span><br>
-            <span class="mini">Sea Area: ${c.seaArea || "-"}</span><br>
-            <span class="mini">Coords: ${c.coords || "-"}</span><br>
-            ${c.notes ? `<span class="mini">Notes: ${c.notes}</span><br>` : ""}
-            ${c.photo ? `<img src="${c.photo}" class="previewImg" style="display:block;max-width:220px;">` : ""}
-            <span class="mini">${c.date}</span>
-          </div>
-        `;
-      });
-
-      box.innerHTML = html;
-    }
-
-    function clearAllLogs(){
-      if(confirm("Delete all saved catches?")){
-        localStorage.removeItem(KEY_LOG);
-        renderLog();
-        document.getElementById("saveMsg").textContent = "All saved catches deleted.";
-      }
-    }
-
-    function clearCatchForm(){
-      document.getElementById("species").value = "";
-      document.getElementById("bestDepth").value = "";
-      document.getElementById("minSize").value = "";
-      document.getElementById("sizeCaught").value = "";
-      document.getElementById("sizeWarning").textContent = "";
-      document.getElementById("bait").innerHTML = '<option value="">Choose...</option>';
-      document.getElementById("area").value = "";
-      document.getElementById("coords").value = "";
-      document.getElementById("whereCaught").value = "";
-      document.getElementById("coordAreaText").textContent = "";
-      document.getElementById("notes").value = "";
-      document.getElementById("saveMsg").textContent = "";
-      document.getElementById("bestDepthNote").textContent = "Choose species to load best depth suggestion.";
-      document.getElementById("minSizeNote").textContent = "Choose species to load minimum size.";
-      document.getElementById("baitAutoNote").textContent = "Favourite bait will auto-fill when you choose a species.";
-      currentCatchPhoto = "";
-      document.getElementById("catchPreview").src = "";
-      document.getElementById("catchPreview").style.display = "none";
-      document.getElementById("catchPhoto").value = "";
-      document.getElementById("catchPhotoText").textContent = "No fish photo selected yet.";
-    }
-
-    async function loadWeekForecast(){
-      try{
-        const url = `https://api.open-meteo.com/v1/forecast?latitude=${HARBOUR.lat}&longitude=${HARBOUR.lon}&daily=temperature_2m_max,temperature_2m_min,wind_speed_10m_max&forecast_days=7&timezone=Africa%2FJohannesburg`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        const days = data?.daily?.time || [];
-        const maxs = data?.daily?.temperature_2m_max || [];
-        const mins = data?.daily?.temperature_2m_min || [];
-        const winds = data?.daily?.wind_speed_10m_max || [];
-
-        let html = `<table>
-          <thead>
-            <tr>
-              <th>Day</th>
-              <th>Max</th>
-              <th>Min</th>
-              <th>Wind</th>
-              <th>Sea Day</th>
-            </tr>
-          </thead>
-          <tbody>`;
-
-        for(let i = 0; i < days.length; i++){
-          const date = new Date(days[i]);
-          const label = date.toLocaleDateString(undefined, { weekday:"short", day:"numeric", month:"short" });
-          const wind = Math.round(winds[i] || 0);
-          const seaGood = wind <= 20 ? `<span class="goodSea">Good</span>` : `<span class="badSea">Not ideal</span>`;
-
-          html += `
-            <tr>
-              <td>${label}</td>
-              <td>${Math.round(maxs[i])}°C</td>
-              <td>${Math.round(mins[i])}°C</td>
-              <td>${wind} km/h</td>
-              <td>${seaGood}</td>
-            </tr>
-          `;
-        }
-
-        html += `</tbody></table>`;
-        document.getElementById("weekForecast").innerHTML = html;
-      }catch{
-        document.getElementById("weekForecast").innerHTML = "Could not load 7 day forecast.";
-      }
-    }
-
-    async function loadTides(){
-      const tideBox = document.getElementById("tideBox");
-
-      if(!TIDE_API_KEY || TIDE_API_KEY.includes("PASTE_YOUR_WORLDTIDES_KEY_HERE")){
-        tideBox.innerHTML = `
-          <b>High Tide:</b> Add WorldTides API key<br>
-          <b>Low Tide:</b> Add WorldTides API key<br>
-          <b>Next Tide:</b> Add WorldTides API key
-        `;
-        return;
-      }
-
-      try{
-        const url = `https://www.worldtides.info/api/v3?heights&extremes&lat=${HARBOUR.lat}&lon=${HARBOUR.lon}&days=1&key=${TIDE_API_KEY}`;
-        const res = await fetch(url);
-        const data = await res.json();
-
-        const extremes = data.extremes || [];
-        if(!extremes.length){
-          tideBox.innerHTML = "No tide data returned.";
-          return;
-        }
-
-        const now = Date.now();
-        const next = extremes.find(t => (t.dt * 1000) > now);
-        const highs = extremes.filter(t => t.type === "High");
-        const lows = extremes.filter(t => t.type === "Low");
-        const fmt = unix => new Date(unix * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-
-        tideBox.innerHTML = `
-          <b>High Tide:</b> ${highs[0] ? fmt(highs[0].dt) : "--"}${highs[0]?.height ? ` (${highs[0].height.toFixed(1)} m)` : ""}<br>
-          <b>Low Tide:</b> ${lows[0] ? fmt(lows[0].dt) : "--"}${lows[0]?.height ? ` (${lows[0].height.toFixed(1)} m)` : ""}<br>
-          <b>Next Tide:</b> ${next ? `${next.type} at ${fmt(next.dt)}` : "--"}
-        `;
-      }catch{
-        tideBox.innerHTML = "Could not load tide times.";
-      }
-    }
-
-    function loadFishingWindow(){
-      const month = new Date().getMonth() + 1;
-      const warmSeason = (month >= 9 || month <= 4);
-
-      let seasonNote = "General fishing note: match weather, current, water colour and bait activity.";
-      if(warmSeason){
-        seasonNote = "Warmer water season note: cob, yellowtail and bonito can improve when bait and current line up.";
-      }
-
-      document.getElementById("fishingWindowBox").innerHTML = `
-        <b>Moon / window note:</b> ${seasonNote}<br><br>
-        <b>Cape Cob:</b> Better on lower light, pushing tide, reef edges and sandy channels.<br><br>
-        <b>Yellowtail:</b> Better when warm clean water pushes bait up, with birds, bait balls and current lines.<br><br>
-        <b>Bonito:</b> Better when surface bait is active and birds are working.<br><br>
-        <b>Red Roman:</b> More reef and structure dependent than season dependent. Focus on clean bait and workable current.<br><br>
-        <b>Snapper:</b> Better over broken reef with neat natural bait close to bottom.<br><br>
-        <b>Silverfish:</b> Better in calmer workable reef conditions with lighter presentation.<br><br>
-        <b>Red Steenbras:</b> If legally targeted, focus on deeper structure, clean bait and moderate current.<br><br>
-        <b>Yellow Belly:</b> Better around reef patches and current edges.<br><br>
-        <b>Hottentot:</b> Better on shallow reef with small neat bait.<br><br>
-        <b>Geelbek:</b> Better when baitfish hold over reefs and channels, slightly off bottom or in the water column.<br><br>
-        <b>Carpenter:</b> Better on strong reef structure with tougher bait and stronger tackle.<br><br>
-        <b>Dageraad:</b> Better on reef and deeper structure with larger natural bait and stable conditions.<br><br>
-        <b>Santer:</b> Better over reef with short traces and neat chokka or sardine bait.<br><br>
-        <b>Elf-Shad:</b> Better with bait movement, current lines and active baitfish.<br><br>
-        <b>Miss Lucy:</b> Better over reef structure with neat natural bait close to bottom.
-      `;
-    }
-
-    function renderFishInfo(){
-      const species = document.getElementById("fishSelect").value;
-      const filter = document.getElementById("fishInfoFilter")?.value || "all";
-      const info = FISH_INFO[species];
-      const rigSteps = RIG_HOW_TO[species] || [];
-
-      if(!info){
-        document.getElementById("fishInfoBox").innerHTML = `<div class="spotCard">More fish info can be added here.</div>`;
-        return;
-      }
-
-      let baitBlock = "";
-      let lureBlock = "";
-      let rigBlock = "";
-
-      if(filter === "all" || filter === "bait"){
-        baitBlock = `
-          <div class="infoGrid">
-            <div class="infoBox infoGreen"><b>Best Bait</b>${info.bestBait || "-"}</div>
-            <div class="infoBox infoBlue"><b>Top Logged Baits</b>${getTopBaits(species)}</div>
-            <div class="infoBox infoTeal"><b>Natural Bait</b>${info.naturalBait || "-"}</div>
-          </div>
-        `;
-      }
-
-      if(filter === "all" || filter === "lures"){
-        lureBlock = `
-          <div class="infoGrid">
-            <div class="infoBox infoTeal"><b>Lures</b>${info.lures || "-"}</div>
-          </div>
-        `;
-      }
-
-      if(filter === "all" || filter === "rig"){
-        rigBlock = `
-          <div class="rigTab">
-            <div class="identifyTitle">Rig Tab</div>
-
-            <div class="infoGrid">
-              <div class="infoBox infoOrange"><b>Hook Size</b>${info.hook || "-"}</div>
-              <div class="infoBox infoPurple"><b>Sinker Weight</b>${info.sinker || "-"}</div>
-              <div class="infoBox infoGold"><b>Hook Trace Length</b>${info.hookTrace || "-"}</div>
-              <div class="infoBox infoBlue"><b>Rig Setup</b>${info.rigType || "-"}</div>
-              <div class="infoBox infoOrange"><b>Best Season</b>${info.season || "-"}</div>
-              <div class="infoBox infoPurple"><b>Closed Season</b>${info.closed || "-"}</div>
-              <div class="infoBox infoBlue"><b>Best Depth</b>${BEST_DEPTH[species] || "-"}</div>
-            </div>
-
-            <div class="identifyBox">
-              <div class="identifyTitle">How to Make It</div>
-              <div class="bigText">${(info.make || "").replace(/\n/g,"<br>")}</div>
-            </div>
-
-            <div class="identifyBox">
-              <div class="identifyTitle">How to Rig</div>
-              <div class="bigText">
-                ${rigSteps.length ? rigSteps.map((step, i) => `<b>Step ${i+1}:</b> ${step}`).join("<br><br>") : (info.make || "").replace(/\n/g,"<br>")}
-              </div>
-            </div>
-
-            <div class="identifyBox">
-              <div class="identifyTitle">Why This Rig Works</div>
-              <div class="bigText">${(info.why || "").replace(/\n/g,"<br>")}</div>
-            </div>
-
-            <div class="identifyBox">
-              <div class="identifyTitle">Rig Diagram</div>
-              <pre class="rig">${info.sketch || ""}</pre>
-              <img src="${getRigImage(species)}"
-                   style="width:100%;border-radius:12px;margin-top:12px;"
-                   onerror="this.style.display='none'">
-            </div>
-          </div>
-        `;
-      }
-
-      document.getElementById("fishInfoBox").innerHTML = `
-        <div class="spotCard">
-          <div class="fishMainTitle">${species}</div>
-          <div class="fishSub">${info.speciesNote || ""}</div>
-
-          <div class="identifyBox">
-            <div class="identifyTitle">Fish Identifier</div>
-            <img src="${getFishImage(species)}"
-                 style="width:100%;max-width:320px;border-radius:12px;margin:8px 0 10px 0;"
-                 onerror="this.style.display='none'">
-            <div class="bigText">
-              <b>Body Shape:</b> ${info.identifier?.body || "-"}<br>
-              <b>Colour:</b> ${info.identifier?.colour || "-"}<br>
-              <b>Tail Shape:</b> ${info.identifier?.tail || "-"}<br>
-              <b>Where Usually Found:</b> ${info.identifier?.found || "-"}<br>
-              <b>Key Giveaway:</b> ${info.identifier?.giveaway || "-"}<br><br>
-              <b>Best Depth:</b> ${BEST_DEPTH[species] || "-"}
-            </div>
-          </div>
-
-          <div class="infoGrid">
-            <div class="infoBox infoBlue"><b>Status</b>${info.status || "-"}</div>
-          </div>
-
-          ${baitBlock}
-          ${lureBlock}
-          ${rigBlock}
-        </div>
-      `;
-    }
-
-    function renderFishGuide(){
-      let html = "";
-      FISH_GUIDE.forEach(f => {
-        html += `
-          <div class="guideCard">
-            <div class="guideName">${f.name}</div>
-
-            <img src="${getFishImage(f.name)}"
-                 style="width:100%;border-radius:12px;margin:8px 0 10px 0;"
-                 onerror="this.style.display='none'">
-
-            <div class="guideHint">
-              <b>Body:</b> ${f.body}<br>
-              <b>Colour:</b> ${f.colour}<br>
-              <b>Tail:</b> ${f.tail}<br>
-              <b>Found:</b> ${f.found}<br>
-              <b>Key clue:</b> ${f.clue}
-            </div>
-          </div>
-        `;
-      });
-      document.getElementById("fishGuideList").innerHTML = html;
-    }
-
-    function runFishWizard(){
-      const body = document.getElementById("wizBody").value;
-      const colour = document.getElementById("wizColour").value;
-      const where = document.getElementById("wizWhere").value;
-      const result = document.getElementById("fishWizardResult");
-
-      const matches = [];
-
-      if(body === "Long predator" && colour === "Silver-grey") matches.push("Cape Cob");
-      if(body === "Torpedo shape" && where === "Open water") matches.push("Yellowtail");
-      if(body === "Slim tuna shape" && where === "Surface feeding") matches.push("Bonito");
-      if(body === "Deep reef fish" && colour === "Red / orange") matches.push("Red Roman");
-      if(body === "Deep reef fish" && colour === "Pink-red") matches.push("Snapper");
-      if(colour === "Yellow belly") matches.push("Yellow Belly");
-      if(colour === "Brown-grey" && where === "Deep structure") matches.push("Carpenter");
-      if(body === "Compact reef fish" && where === "Shallow reef") matches.push("Hottentot");
-      if(where === "Channels" && colour === "Silver-grey") matches.push("Geelbek");
-      if(body === "Compact reef fish" && colour === "Pink-red") matches.push("Miss Lucy");
-
-      result.style.display = "block";
-      result.innerHTML = matches.length
-        ? `<b>Best match:</b><br>${matches.join("<br>")}`
-        : `<b>No strong match yet.</b><br>Try a different body shape, colour or area.`;
-    }
-
-    function clearFishWizard(){
-      document.getElementById("wizBody").value = "";
-      document.getElementById("wizColour").value = "";
-      document.getElementById("wizWhere").value = "";
-      const result = document.getElementById("fishWizardResult");
-      result.style.display = "none";
-      result.innerHTML = "";
-    }
-
-    function openCamera(){
-      const el = document.getElementById("fishPhoto");
-      el.setAttribute("capture","environment");
-      el.click();
-    }
-
-    function openGallery(){
-      const el = document.getElementById("fishPhoto");
-      el.removeAttribute("capture");
-      el.click();
-    }
-
-    function showGuideHint(){
-      document.getElementById("uploadPreview").textContent =
-        "Compare the fish photo with the guide below, or open ChatGPT and upload the same photo there manually for identification.";
-    }
-
-    function sendToChatGPTHint(){
-      alert("ChatGPT will open now. Upload the fish photo there manually, then ask: Identify this fish from the photo.");
-      window.open("https://chatgpt.com", "_blank");
-    }
-
-    function openCatchCamera(){
-      const el = document.getElementById("catchPhoto");
-      el.setAttribute("capture","environment");
-      el.click();
-    }
-
-    function openCatchGallery(){
-      const el = document.getElementById("catchPhoto");
-      el.removeAttribute("capture");
-      el.click();
-    }
-
-    document.getElementById("catchPhoto").addEventListener("change", function(){
-      const file = this.files && this.files[0];
-      const preview = document.getElementById("catchPreview");
-      if(!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e){
-        const img = new Image();
-        img.onload = function(){
-          const canvas = document.createElement("canvas");
-          const maxWidth = 600;
-          const scale = Math.min(1, maxWidth / img.width);
-          canvas.width = Math.round(img.width * scale);
-          canvas.height = Math.round(img.height * scale);
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          currentCatchPhoto = canvas.toDataURL("image/jpeg", 0.55);
-          preview.src = currentCatchPhoto;
-          preview.style.display = "block";
-          document.getElementById("catchPhotoText").textContent = file.name + " compressed and loaded.";
-        };
-        img.src = e.target.result;
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById("fishPhoto").addEventListener("change", function(){
-      const file = this.files && this.files[0];
-      const preview = document.getElementById("previewImg");
-      if(!file) return;
-
-      const reader = new FileReader();
-      reader.onload = function(e){
-        preview.src = e.target.result;
-        preview.style.display = "block";
-      };
-      reader.readAsDataURL(file);
-    });
-
-    document.getElementById("species").addEventListener("change", () => {
-      fillBaitOptions();
-      updateBestDepth();
-      updateMinSize();
-      checkSizeWarning();
-
-      const species = document.getElementById("species").value;
-      const info = FISH_INFO[species];
-      const note = document.getElementById("baitAutoNote");
-
-      if(info?.favoriteBait){
-        note.textContent = `Auto favourite bait: ${info.favoriteBait}. You can still change it manually.`;
-      } else {
-        note.textContent = "Favourite bait will auto-fill when you choose a species.";
-      }
-    });
-
-    document.getElementById("sizeCaught").addEventListener("input", checkSizeWarning);
-
-    document.getElementById("coords").addEventListener("input", () => {
-      const coord = document.getElementById("coords").value.trim();
-      document.getElementById("coordAreaText").textContent = describeSeaAreaFromCoord(coord);
-      if(coord) tryAutoMatchAreaFromCoords(coord);
-    });
-
-    renderSpotList();
-    fillSpecies();
-    fillAreaDropdown();
-    fillBaitOptions();
-    updateBestDepth();
-    updateMinSize();
-    checkSizeWarning();
-    renderFishInfo();
-    renderFishGuide();
-    renderLog();
-  </script>
-
-  <script>
-    if("serviceWorker" in navigator){
-      navigator.serviceWorker.register("sw.js");
-    }
-  </script>
+</div>
+
+</div>
+
+</section>
+
+
+
+<script>
+
+const HARBOUR = {
+lat:-34.385542,
+lon:21.425433
+};
+
+const TIDE_API_KEY = "PASTE_YOUR_WORLDTIDES_KEY_HERE";
+
+function showTab(id){
+
+document.querySelectorAll("section").forEach(s=>{
+s.style.display="none";
+});
+
+document.getElementById(id).style.display="block";
+
+if(id==="weatherTab"){
+loadTides();
+}
+
+}
+
+
+
+async function loadTides(){
+
+const tideBox = document.getElementById("tideBox");
+
+const highTideTime = document.getElementById("highTideTime");
+const highTideHeight = document.getElementById("highTideHeight");
+
+const lowTideTime = document.getElementById("lowTideTime");
+const lowTideHeight = document.getElementById("lowTideHeight");
+
+const tideType = document.getElementById("tideType");
+const tideRangeNote = document.getElementById("tideRangeNote");
+
+
+if(!TIDE_API_KEY || TIDE_API_KEY.includes("PASTE")){
+
+tideBox.innerHTML =
+"Add your WorldTides API key";
+
+return;
+
+}
+
+
+try{
+
+const url =
+`https://www.worldtides.info/api/v3?extremes&heights&lat=${HARBOUR.lat}&lon=${HARBOUR.lon}&days=1&key=${TIDE_API_KEY}`;
+
+const res = await fetch(url);
+
+const data = await res.json();
+
+const extremes = data.extremes || [];
+
+if(!extremes.length){
+
+tideBox.innerHTML="No tide data";
+
+return;
+
+}
+
+
+const highs = extremes.filter(t=>t.type==="High");
+const lows = extremes.filter(t=>t.type==="Low");
+
+const fmt = unix => new Date(unix*1000).toLocaleTimeString([],{
+hour:'2-digit',
+minute:'2-digit'
+});
+
+
+const high = highs[0];
+const low = lows[0];
+
+
+if(high){
+
+highTideTime.textContent = fmt(high.dt);
+
+highTideHeight.textContent =
+high.height.toFixed(1)+" m";
+
+}
+
+
+if(low){
+
+lowTideTime.textContent = fmt(low.dt);
+
+lowTideHeight.textContent =
+low.height.toFixed(1)+" m";
+
+}
+
+
+let range = null;
+
+if(high?.height && low?.height){
+
+range = Math.abs(high.height - low.height);
+
+}
+
+
+let phase="Moderate";
+let rangeText="--";
+
+
+if(range){
+
+rangeText = range.toFixed(1)+" m range";
+
+if(range <=1){
+
+phase="Neap Tide";
+
+}
+else if(range >=2){
+
+phase="Spring Tide";
+
+}
+else{
+
+phase="Mid Tide";
+
+}
+
+}
+
+
+tideType.textContent = phase;
+
+tideRangeNote.textContent = rangeText;
+
+
+
+tideBox.innerHTML =
+`
+High Tide: ${fmt(high.dt)} (${high.height.toFixed(1)}m)<br>
+Low Tide: ${fmt(low.dt)} (${low.height.toFixed(1)}m)
+`;
+
+
+
+}catch{
+
+tideBox.innerHTML="Could not load tide data";
+
+}
+
+}
+
+
+
+showTab("weatherTab");
+
+</script>
+
 
 </body>
-          </html>
+</html>
