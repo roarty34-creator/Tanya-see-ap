@@ -1,4 +1,4 @@
-const CACHE_NAME = "tanya-deep-sea-v108-clean-fixed";
+const CACHE_NAME = "tanya-deep-sea-v108-clean-fixed-3";
 
 const FILES_TO_CACHE = [
   "./",
@@ -8,16 +8,13 @@ const FILES_TO_CACHE = [
   "./icon-512.png"
 ];
 
-// INSTALL
 self.addEventListener("install", event => {
   event.waitUntil(
-    caches.open(CACHE_NAME)
-      .then(cache => cache.addAll(FILES_TO_CACHE))
+    caches.open(CACHE_NAME).then(cache => cache.addAll(FILES_TO_CACHE))
   );
   self.skipWaiting();
 });
 
-// ACTIVATE
 self.addEventListener("activate", event => {
   event.waitUntil(
     caches.keys().then(keys =>
@@ -33,10 +30,12 @@ self.addEventListener("activate", event => {
   self.clients.claim();
 });
 
-// FETCH
 self.addEventListener("fetch", event => {
+  if (event.request.method !== "GET") return;
+
   event.respondWith(
-    caches.match(event.request)
-      .then(response => response || fetch(event.request))
+    caches.match(event.request).then(cached => {
+      return cached || fetch(event.request).catch(() => caches.match("./index.html"));
+    })
   );
 });
