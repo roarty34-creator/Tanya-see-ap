@@ -99,20 +99,35 @@ font-size:18px;
 
 <div class="identifyBox">
 
-<div class="identifyTitle">Real Tide Times</div>
-
-<div id="tideBox">
-Loading tide data...
-</div>
-
-</div>
-
-
 <div class="identifyBox">
+  <div class="identifyTitle">Tide Times</div>
 
-<div class="identifyTitle">Tide Table</div>
+  <table>
+    <tr>
+      <th>Tide</th>
+      <th>Time</th>
+      <th>Height</th>
+    </tr>
 
-<table>
+    <tr>
+      <td>High Tide</td>
+      <td id="highTideTime">--</td>
+      <td id="highTideHeight">--</td>
+    </tr>
+
+    <tr>
+      <td>Low Tide</td>
+      <td id="lowTideTime">--</td>
+      <td id="lowTideHeight">--</td>
+    </tr>
+
+    <tr>
+      <td>Tide Phase</td>
+      <td id="tideType">--</td>
+      <td>Moon range</td>
+    </tr>
+  </table>
+</div>
 
 <tr>
 <th>Tide</th>
