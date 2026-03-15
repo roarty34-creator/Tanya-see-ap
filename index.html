@@ -170,145 +170,83 @@ loadTides();
 }
 
 }
-
-
-
 async function loadTides(){
+  const tideBox = document.getElementById("tideBox");
 
-const tideBox = document.getElementById("tideBox");
+  const highTideTime = document.getElementById("highTideTime");
+  const highTideHeight = document.getElementById("highTideHeight");
+  const lowTideTime = document.getElementById("lowTideTime");
+  const lowTideHeight = document.getElementById("lowTideHeight");
+  const tideType = document.getElementById("tideType");
 
-const highTideTime = document.getElementById("highTideTime");
-const highTideHeight = document.getElementById("highTideHeight");
+  if(!TIDE_API_KEY || TIDE_API_KEY.includes("PASTE_YOUR_WORLDTIDES_KEY_HERE")){
+    tideBox.innerHTML = `
+      <b>High Tide:</b> Add WorldTides API key<br>
+      <b>Low Tide:</b> Add WorldTides API key<br>
+      <b>Next Tide:</b> Add WorldTides API key
+    `;
+    if(highTideTime) highTideTime.textContent = "--";
+    if(highTideHeight) highTideHeight.textContent = "--";
+    if(lowTideTime) lowTideTime.textContent = "--";
+    if(lowTideHeight) lowTideHeight.textContent = "--";
+    if(tideType) tideType.textContent = "Add API key";
+    return;
+  }
 
-const lowTideTime = document.getElementById("lowTideTime");
-const lowTideHeight = document.getElementById("lowTideHeight");
+  try{
+    const url = `https://www.worldtides.info/api/v3?heights&extremes&lat=${HARBOUR.lat}&lon=${HARBOUR.lon}&days=1&key=${TIDE_API_KEY}`;
+    const res = await fetch(url);
+    const data = await res.json();
 
-const tideType = document.getElementById("tideType");
-const tideRangeNote = document.getElementById("tideRangeNote");
+    const extremes = data.extremes || [];
+    if(!extremes.length){
+      tideBox.innerHTML = "No tide data returned.";
+      if(highTideTime) highTideTime.textContent = "--";
+      if(highTideHeight) highTideHeight.textContent = "--";
+      if(lowTideTime) lowTideTime.textContent = "--";
+      if(lowTideHeight) lowTideHeight.textContent = "--";
+      if(tideType) tideType.textContent = "No data";
+      return;
+    }
 
+    const now = Date.now();
+    const next = extremes.find(t => (t.dt * 1000) > now);
+    const highs = extremes.filter(t => t.type === "High");
+    const lows = extremes.filter(t => t.type === "Low");
+    const fmt = unix => new Date(unix * 1000).toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
 
-if(!TIDE_API_KEY || TIDE_API_KEY.includes("PASTE")){
+    const high = highs[0] || null;
+    const low = lows[0] || null;
 
-tideBox.innerHTML =
-"Add your WorldTides API key";
+    tideBox.innerHTML = `
+      <b>High Tide:</b> ${high ? fmt(high.dt) : "--"}${high?.height ? ` (${high.height.toFixed(1)} m)` : ""}<br>
+      <b>Low Tide:</b> ${low ? fmt(low.dt) : "--"}${low?.height ? ` (${low.height.toFixed(1)} m)` : ""}<br>
+      <b>Next Tide:</b> ${next ? `${next.type} at ${fmt(next.dt)}` : "--"}
+    `;
 
-return;
+    if(highTideTime) highTideTime.textContent = high ? fmt(high.dt) : "--";
+    if(highTideHeight) highTideHeight.textContent = high?.height ? `${high.height.toFixed(1)} m` : "--";
 
+    if(lowTideTime) lowTideTime.textContent = low ? fmt(low.dt) : "--";
+    if(lowTideHeight) lowTideHeight.textContent = low?.height ? `${low.height.toFixed(1)} m` : "--";
+
+    let tidePhase = "--";
+    if(high?.height != null && low?.height != null){
+      const range = Math.abs(high.height - low.height);
+      tidePhase = range < 1.0 ? "Neap Tide" : range > 1.8 ? "Spring Tide" : "Mid Tide";
+    }
+    if(tideType) tideType.textContent = tidePhase;
+
+  }catch(err){
+    tideBox.innerHTML = "Could not load tide times.";
+    if(highTideTime) highTideTime.textContent = "--";
+    if(highTideHeight) highTideHeight.textContent = "--";
+    if(lowTideTime) lowTideTime.textContent = "--";
+    if(lowTideHeight) lowTideHeight.textContent = "--";
+    if(tideType) tideType.textContent = "Error";
+    console.log(err);
+  }
 }
-
-
-try{
-
-const url =
-`https://www.worldtides.info/api/v3?extremes&heights&lat=${HARBOUR.lat}&lon=${HARBOUR.lon}&days=1&key=${TIDE_API_KEY}`;
-
-const res = await fetch(url);
-
-const data = await res.json();
-
-const extremes = data.extremes || [];
-
-if(!extremes.length){
-
-tideBox.innerHTML="No tide data";
-
-return;
-
-}
-
-
-const highs = extremes.filter(t=>t.type==="High");
-const lows = extremes.filter(t=>t.type==="Low");
-
-const fmt = unix => new Date(unix*1000).toLocaleTimeString([],{
-hour:'2-digit',
-minute:'2-digit'
-});
-
-
-const high = highs[0];
-const low = lows[0];
-
-
-if(high){
-
-highTideTime.textContent = fmt(high.dt);
-
-highTideHeight.textContent =
-high.height.toFixed(1)+" m";
-
-}
-
-
-if(low){
-
-lowTideTime.textContent = fmt(low.dt);
-
-lowTideHeight.textContent =
-low.height.toFixed(1)+" m";
-
-}
-
-
-let range = null;
-
-if(high?.height && low?.height){
-
-range = Math.abs(high.height - low.height);
-
-}
-
-
-let phase="Moderate";
-let rangeText="--";
-
-
-if(range){
-
-rangeText = range.toFixed(1)+" m range";
-
-if(range <=1){
-
-phase="Neap Tide";
-
-}
-else if(range >=2){
-
-phase="Spring Tide";
-
-}
-else{
-
-phase="Mid Tide";
-
-}
-
-}
-
-
-tideType.textContent = phase;
-
-tideRangeNote.textContent = rangeText;
-
-
-
-tideBox.innerHTML =
-`
-High Tide: ${fmt(high.dt)} (${high.height.toFixed(1)}m)<br>
-Low Tide: ${fmt(low.dt)} (${low.height.toFixed(1)}m)
-`;
-
-
-
-}catch{
-
-tideBox.innerHTML="Could not load tide data";
-
-}
-
-}
-
-
 
 showTab("weatherTab");
 
