@@ -276,7 +276,25 @@ document.getElementById("forecastBox").innerHTML="Weather unavailable"
 
 }
 
-
+function getRigImage(species){
+  const map = {
+    "Cape Cob":"rig-cape-cob.png",
+    "Yellowtail":"rig-yellowtail.png",
+    "Red Roman":"rig-red-roman.png",
+    "Snapper":"rig-snapper.png",
+    "Silverfish":"rig-silverfish.png",
+    "Red Steenbras":"rig-red-steenbras.png",
+    "Yellow Belly":"rig-yellow-belly.png",
+    "Hottentot":"rig-hottentot.png",
+    "Geelbek":"rig-geelbek.png",
+    "Carpenter":"rig-carpenter.png",
+    "Dageraad":"rig-dageraad.png",
+    "Santer":"rig-santer.png",
+    "Elf-Shad":"rig-elf-shad.png",
+    "Miss Lucy":"rig-miss-lucy.png"
+  };
+  return map[species] || "";
+}
 
 
 async function loadTides(){
