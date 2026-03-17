@@ -3,36 +3,38 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanya Fishing ULTRA PRO</title>
+<title>Tanya Fishing FINAL GOD MODE</title>
 
 <link rel="manifest" href="manifest.webmanifest">
+
+<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
 
 <style>
 body{margin:0;font-family:Arial;background:#061225;color:white;}
 header{padding:15px;text-align:center;background:#081632;font-size:20px;font-weight:bold;}
-.section{padding:15px;}
-.card{background:#0f1c38;padding:12px;margin-bottom:10px;border-radius:10px;}
+.card{background:#0f1c38;padding:12px;margin:10px;border-radius:10px;}
 input,select{width:100%;padding:10px;margin:5px 0;border-radius:6px;border:none;}
-button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white;margin-top:5px;}
+button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white;}
 .ok{color:#39d98a;} .danger{color:red;} .warn{color:orange;}
 #map{height:250px;border-radius:10px;}
 </style>
-
-<!-- Leaflet Map -->
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
-
 </head>
+
 <body>
 
-<header>🎣 Tanya Fishing ULTRA PRO</header>
-
-<div class="section">
+<header>🎣 FINAL GOD MODE</header>
 
 <!-- 🌊 SEA -->
 <div class="card">
 <h3>🌊 Sea + Wind</h3>
 <div id="sea">Loading...</div>
+</div>
+
+<!-- 🌊 TIDE -->
+<div class="card">
+<h3>🌊 Tide</h3>
+<div id="tide">Loading...</div>
 </div>
 
 <!-- 📍 MAP -->
@@ -41,9 +43,9 @@ button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white
 <div id="map"></div>
 </div>
 
-<!-- 🐟 FISH -->
+<!-- 🐟 LEGAL -->
 <div class="card">
-<h3>🐟 Fish</h3>
+<h3>⚖️ Legal Checker</h3>
 <select id="fishName"></select>
 <input id="fishSize" placeholder="Size cm">
 <input id="fishCount" placeholder="Count">
@@ -51,7 +53,7 @@ button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white
 <div id="result"></div>
 </div>
 
-<!-- 🧠 BAIT AI -->
+<!-- 🧠 BAIT -->
 <div class="card">
 <h3>🧠 Bait Predictor</h3>
 <select id="baitFish"></select>
@@ -59,27 +61,36 @@ button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white
 <div id="baitResult"></div>
 </div>
 
+<!-- 🪱 BAIT TRACK -->
+<div class="card">
+<h3>🪱 Bait Tracker</h3>
+<input id="baitInput" placeholder="Bait used">
+<button onclick="saveBait()">Save</button>
+<div id="baitList"></div>
+</div>
+
 <!-- 📊 CATCH -->
 <div class="card">
 <h3>📊 Catch Log</h3>
 <select id="catchFish"></select>
-<input id="catchSize" placeholder="Size">
+<input id="catchSize" placeholder="Size cm">
 <button onclick="saveCatch()">Save</button>
 <div id="log"></div>
 <div id="stats"></div>
 </div>
 
-</div>
-
 <script>
 
-// 🌊 SEA + WIND
+// 🌊 SEA
 fetch("https://api.open-meteo.com/v1/forecast?latitude=-34.37&longitude=21.42&current=wind_speed_10m")
 .then(r=>r.json())
 .then(d=>{
-  document.getElementById("sea").innerHTML=
-  "Wind: "+d.current.wind_speed_10m+" km/h";
+sea.innerHTML="Wind: "+d.current.wind_speed_10m+" km/h";
 });
+
+// 🌊 TIDE (basic)
+let h=new Date().getHours();
+tide.innerHTML = h%12<6 ? "Rising tide" : "Falling tide";
 
 // 🐟 BIG DATABASE
 const fish=[
@@ -99,55 +110,62 @@ const fish=[
 
 // dropdowns
 fish.forEach(f=>{
-  fishName.innerHTML+=`<option>${f.name}</option>`;
-  catchFish.innerHTML+=`<option>${f.name}</option>`;
-  baitFish.innerHTML+=`<option>${f.name}</option>`;
+fishName.innerHTML+=`<option>${f.name}</option>`;
+baitFish.innerHTML+=`<option>${f.name}</option>`;
+catchFish.innerHTML+=`<option>${f.name}</option>`;
 });
 
-// ⚖️ CHECK
+// ⚖️ LEGAL
 function checkFish(){
-  let f=fish.find(x=>x.name==fishName.value);
-  let size=fishSize.value;
-  let count=fishCount.value;
+let f=fish.find(x=>x.name==fishName.value);
 
-  let msg="";
-  msg += size>=f.size ? "<div class='ok'>Size OK</div>" : "<div class='danger'>Too small</div>";
-  msg += count>f.bag ? "<div class='danger'>Over bag</div>" : "<div class='ok'>Bag OK</div>";
+let msg="";
+msg+=fishSize.value>=f.size?"<div class='ok'>Size OK</div>":"<div class='danger'>Too small</div>";
+msg+=fishCount.value>f.bag?"<div class='danger'>Over bag</div>":"<div class='ok'>Bag OK</div>";
 
-  result.innerHTML=msg;
+result.innerHTML=msg;
 }
 
 // 🧠 BAIT AI
 function predictBait(){
-  let f=baitFish.value;
+let f=baitFish.value;
+let bait="Chokka + Sardine";
 
-  let bait="Chokka + Sardine";
+if(f=="Yellowtail") bait="Live bait / spoon";
+if(f=="Galjoen") bait="Red bait";
+if(f=="Leervis") bait="Live mullet";
 
-  if(f=="Yellowtail") bait="Live bait / spoon";
-  if(f=="Galjoen") bait="Red bait";
-  if(f=="Leervis") bait="Live mullet";
+baitResult.innerHTML="Best bait: "+bait;
+}
 
-  baitResult.innerHTML="Best bait: "+bait;
+// 🪱 BAIT TRACK
+function saveBait(){
+let b=baitInput.value;
+let data=JSON.parse(localStorage.getItem("bait")||"{}");
+data[b]=(data[b]||0)+1;
+localStorage.setItem("bait",JSON.stringify(data));
+
+let html="";
+for(let k in data){html+=k+" ("+data[k]+")<br>";}
+baitList.innerHTML=html;
 }
 
 // 📊 CATCH
 function saveCatch(){
-  let list=JSON.parse(localStorage.getItem("catch")||"[]");
-  list.push({fish:catchFish.value,size:catchSize.value});
-  localStorage.setItem("catch",JSON.stringify(list));
-  loadCatch();
+let list=JSON.parse(localStorage.getItem("catch")||"[]");
+list.push({fish:catchFish.value,size:catchSize.value});
+localStorage.setItem("catch",JSON.stringify(list));
+loadCatch();
 }
 
 function loadCatch(){
-  let list=JSON.parse(localStorage.getItem("catch")||"[]");
-  log.innerHTML=list.map(c=>c.fish+" "+c.size+"cm").join("<br>");
+let list=JSON.parse(localStorage.getItem("catch")||"[]");
+log.innerHTML=list.map(c=>c.fish+" "+c.size+"cm").join("<br>");
 
-  // stats
-  let count={};
-  list.forEach(c=>count[c.fish]=(count[c.fish]||0)+1);
-  let top=Object.keys(count).sort((a,b)=>count[b]-count[a])[0];
-
-  stats.innerHTML="Top fish: "+(top||"-");
+let count={};
+list.forEach(c=>count[c.fish]=(count[c.fish]||0)+1);
+let top=Object.keys(count).sort((a,b)=>count[b]-count[a])[0];
+stats.innerHTML="Top fish: "+(top||"-");
 }
 loadCatch();
 
@@ -155,13 +173,21 @@ loadCatch();
 let map=L.map('map').setView([-34.37,21.42], 10);
 L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
 
-map.on('click', function(e){
-  let coords=e.latlng;
-  L.marker(coords).addTo(map);
+let spots=JSON.parse(localStorage.getItem("spots")||"[]");
 
-  let list=JSON.parse(localStorage.getItem("spots")||"[]");
-  list.push(coords.lat+","+coords.lng);
-  localStorage.setItem("spots",JSON.stringify(list));
+spots.forEach(s=>{
+L.marker([s.lat,s.lng]).addTo(map).bindPopup(s.name);
+});
+
+map.on('click', function(e){
+let name=prompt("Spot name?");
+if(!name) return;
+
+let obj={lat:e.latlng.lat,lng:e.latlng.lng,name:name};
+spots.push(obj);
+localStorage.setItem("spots",JSON.stringify(spots));
+
+L.marker(e.latlng).addTo(map).bindPopup(name);
 });
 
 </script>
