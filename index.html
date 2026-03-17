@@ -1,169 +1,180 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Tanya Fishing ULTIMATE</title>
-
-<link rel="manifest" href="manifest.webmanifest">
-<meta name="theme-color" content="#061225">
-
-<link rel="stylesheet" href="https://unpkg.com/leaflet/dist/leaflet.css"/>
+<title>Tanya Fishing App PRO</title>
 
 <style>
-body{margin:0;font-family:Arial;background:#061225;color:white;}
-header{padding:15px;text-align:center;background:#081632;font-size:20px;font-weight:bold;}
-.card{background:#0f1c38;padding:12px;margin:10px;border-radius:10px;}
-input,select{width:100%;padding:10px;margin:5px 0;border-radius:6px;border:none;}
-button{padding:10px;background:#2fa4ff;border:none;border-radius:8px;color:white;}
-.ok{color:#39d98a;} .danger{color:red;} .warn{color:orange;}
-#map{height:250px;border-radius:10px;}
+body{
+  margin:0;
+  font-family:Arial;
+  background:#061225;
+  color:white;
+}
+header{
+  background:#0a1835;
+  padding:15px;
+  text-align:center;
+  font-size:20px;
+}
+.card{
+  background:#0f1c38;
+  margin:10px;
+  padding:15px;
+  border-radius:12px;
+}
+button{
+  background:#2fa4ff;
+  border:none;
+  padding:10px;
+  border-radius:8px;
+  color:white;
+}
+input,select{
+  padding:8px;
+  border-radius:6px;
+  border:none;
+  width:100%;
+  margin-top:5px;
+}
+.tab{
+  display:flex;
+  justify-content:space-around;
+  background:#081632;
+  padding:10px;
+}
+.tab button{
+  flex:1;
+  margin:2px;
+}
+.hidden{display:none;}
 </style>
-</head>
 
+</head>
 <body>
 
-<header>🎣 Fishing ULTIMATE APP</header>
+<header>🎣 Tanya Fishing PRO</header>
 
-<div class="card">
-<h3>🌊 Live Sea + Wind</h3>
-<div id="sea">Loading...</div>
+<div class="tab">
+<button onclick="showTab('sw')">🌊 SW</button>
+<button onclick="showTab('mani')">📒 MANI</button>
+<button onclick="showTab('ai')">🧠 AI</button>
 </div>
 
-<div class="card">
-<h3>🌊 Real Tide (API Ready)</h3>
-<div id="tide">Loading...</div>
+<!-- SW TAB -->
+<div id="sw" class="card">
+
+<h3>🌊 Tide + Sea (Stilbaai)</h3>
+<p id="tide">Loading...</p>
+
+<h3>🌡 Sea Temp</h3>
+<p id="temp">Loading...</p>
+
+<h3>🌊 Wave Height</h3>
+<p id="wave">Loading...</p>
+
 </div>
 
-<div class="card">
-<h3>📍 Map (Save + Delete)</h3>
-<div id="map"></div>
-</div>
+<!-- MANI TAB -->
+<div id="mani" class="card hidden">
 
-<div class="card">
-<h3>⚖️ Legal Check</h3>
-<select id="fish"></select>
+<h3>📒 Catch Log</h3>
+
+<select id="fish">
+<option>Kob</option>
+<option>Yellowtail</option>
+<option>Hottentot</option>
+<option>Geelbek</option>
+</select>
+
 <input id="size" placeholder="Size cm">
-<input id="count" placeholder="Count">
-<button onclick="check()">Check</button>
-<div id="res"></div>
+<input id="bait" placeholder="Bait used">
+
+<button onclick="saveCatch()">Save</button>
+
+<h4>Logs:</h4>
+<ul id="log"></ul>
+
 </div>
 
-<div class="card">
-<h3>🧠 Bait Predictor</h3>
-<select id="baitFish"></select>
-<button onclick="predict()">Predict</button>
-<div id="bait"></div>
-</div>
+<!-- AI TAB -->
+<div id="ai" class="card hidden">
 
-<div class="card">
-<h3>📊 Catch Log + Stats</h3>
-<select id="cFish"></select>
-<input id="cSize" placeholder="Size">
-<button onclick="save()">Save</button>
-<div id="log"></div>
-<div id="stats"></div>
-</div>
+<h3>🧠 AI Bait Predictor</h3>
+<button onclick="predict()">Predict Best Bait</button>
+<p id="result"></p>
 
-<script src="https://unpkg.com/leaflet/dist/leaflet.js"></script>
+<h3>📊 Best Bait Used</h3>
+<p id="bestBait"></p>
+
+</div>
 
 <script>
 
-// 🌊 SEA
-fetch("https://api.open-meteo.com/v1/forecast?latitude=-34.37&longitude=21.42&current=wind_speed_10m")
-.then(r=>r.json())
-.then(d=>{
-sea.innerHTML="Wind: "+d.current.wind_speed_10m+" km/h";
-});
+// TAB SWITCH
+function showTab(tab){
+  document.getElementById("sw").classList.add("hidden");
+  document.getElementById("mani").classList.add("hidden");
+  document.getElementById("ai").classList.add("hidden");
 
-// 🌊 REAL TIDE (DEMO READY FOR API)
-let h=new Date().getHours();
-tide.innerHTML=h%12<6?"Rising tide":"Falling tide";
-
-// 🐟 DATA
-const fishData=[
-{name:"Kabeljou",size:60,bag:5},
-{name:"Yellowtail",size:60,bag:10},
-{name:"Galjoen",size:35,bag:2},
-{name:"Leervis",size:70,bag:2}
-];
-
-// fill
-fishData.forEach(f=>{
-fish.innerHTML+=`<option>${f.name}</option>`;
-baitFish.innerHTML+=`<option>${f.name}</option>`;
-cFish.innerHTML+=`<option>${f.name}</option>`;
-});
-
-// ⚖️ CHECK
-function check(){
-let f=fishData.find(x=>x.name==fish.value);
-res.innerHTML=
-(size.value>=f.size?"<div class='ok'>Size OK</div>":"<div class='danger'>Too small</div>")+
-(count.value>f.bag?"<div class='danger'>Over bag</div>":"<div class='ok'>Bag OK</div>");
+  document.getElementById(tab).classList.remove("hidden");
 }
 
-// 🧠 BAIT
+// OPEN METEO (STILBAAI)
+fetch("https://api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&hourly=wave_height,sea_surface_temperature,sea_level_height_msl")
+.then(res=>res.json())
+.then(data=>{
+  document.getElementById("wave").innerText = data.hourly.wave_height[0] + " m";
+  document.getElementById("temp").innerText = data.hourly.sea_surface_temperature[0] + " °C";
+
+  let tide = data.hourly.sea_level_height_msl[0];
+  document.getElementById("tide").innerText = tide > 0 ? "High Trend ↑" : "Low Trend ↓";
+});
+
+// SAVE CATCH
+function saveCatch(){
+  let fish = document.getElementById("fish").value;
+  let size = document.getElementById("size").value;
+  let bait = document.getElementById("bait").value;
+
+  let log = JSON.parse(localStorage.getItem("logs") || "[]");
+
+  log.push({fish,size,bait});
+  localStorage.setItem("logs",JSON.stringify(log));
+
+  renderLog();
+}
+
+// SHOW LOG
+function renderLog(){
+  let log = JSON.parse(localStorage.getItem("logs") || "[]");
+  let list = document.getElementById("log");
+  list.innerHTML = "";
+
+  log.forEach(l=>{
+    let li = document.createElement("li");
+    li.innerText = l.fish + " - " + l.size + "cm - " + l.bait;
+    list.appendChild(li);
+  });
+}
+renderLog();
+
+// AI PREDICT
 function predict(){
-let f=baitFish.value;
-let bait="Chokka + Sardine";
-if(f=="Yellowtail") bait="Live bait / spoon";
-if(f=="Galjoen") bait="Red bait";
-if(f=="Leervis") bait="Live mullet";
-document.getElementById("bait").innerHTML=bait;
-}
+  let log = JSON.parse(localStorage.getItem("logs") || "[]");
 
-// 📊 CATCH
-function save(){
-let data=JSON.parse(localStorage.getItem("catch")||"[]");
-data.push({fish:cFish.value,size:cSize.value});
-localStorage.setItem("catch",JSON.stringify(data));
-load();
-}
+  let baitCount = {};
 
-function load(){
-let data=JSON.parse(localStorage.getItem("catch")||"[]");
-log.innerHTML=data.map(d=>d.fish+" "+d.size+"cm").join("<br>");
+  log.forEach(l=>{
+    baitCount[l.bait] = (baitCount[l.bait]||0)+1;
+  });
 
-let count={};
-data.forEach(d=>count[d.fish]=(count[d.fish]||0)+1);
-let top=Object.keys(count).sort((a,b)=>count[b]-count[a])[0];
-stats.innerHTML="Top fish: "+(top||"-");
-}
-load();
+  let best = Object.keys(baitCount).sort((a,b)=>baitCount[b]-baitCount[a])[0];
 
-// 📍 MAP
-let map=L.map('map').setView([-34.37,21.42], 10);
-L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png').addTo(map);
-
-let spots=JSON.parse(localStorage.getItem("spots")||"[]");
-
-function renderSpots(){
-spots.forEach((s,i)=>{
-let m=L.marker([s.lat,s.lng]).addTo(map).bindPopup(s.name);
-m.on('click',()=>{
-if(confirm("Delete this spot?")){
-spots.splice(i,1);
-localStorage.setItem("spots",JSON.stringify(spots));
-location.reload();
-}
-});
-});
-}
-renderSpots();
-
-map.on('click', function(e){
-let name=prompt("Spot name?");
-if(!name) return;
-let obj={lat:e.latlng.lat,lng:e.latlng.lng,name:name};
-spots.push(obj);
-localStorage.setItem("spots",JSON.stringify(spots));
-location.reload();
-});
-
-// 🔌 SERVICE WORKER
-if ("serviceWorker" in navigator) {
-navigator.serviceWorker.register("sw.js");
+  document.getElementById("result").innerText = "Best bait: " + (best || "No data");
+  document.getElementById("bestBait").innerText = best || "No data";
 }
 
 </script>
