@@ -1,11 +1,11 @@
 {
-  "name": "Fishing Ultimate App",
-  "short_name": "Fishing",
+  "name": "Tanya Fishing App MAX",
+  "short_name": "Fishing MAX",
   "start_url": "./index.html",
   "display": "standalone",
   "background_color": "#061225",
   "theme_color": "#061225",
-  "orientation": "portrait",
+  "description": "Fishing app with marine data, logs, GPS spots, size checks, bag checks, bait analytics and rig guides.",
   "icons": [
     {
       "src": "icon-192.png",
