@@ -357,27 +357,14 @@
   </div>
 
   <main>
-    <!-- SW -->
     <section id="sw" class="panel active">
       <div class="card">
         <h2>🌊 Marine Dashboard</h2>
         <div class="stats">
-          <div class="stat">
-            <div class="small">Tide Trend</div>
-            <div class="big" id="tideTrend">Loading...</div>
-          </div>
-          <div class="stat">
-            <div class="small">Sea Temp</div>
-            <div class="big" id="seaTemp">--</div>
-          </div>
-          <div class="stat">
-            <div class="small">Wave Height</div>
-            <div class="big" id="waveHeight">--</div>
-          </div>
-          <div class="stat">
-            <div class="small">Fishing Score</div>
-            <div class="big" id="fishScore">--</div>
-          </div>
+          <div class="stat"><div class="small">Tide Trend</div><div class="big" id="tideTrend">Loading...</div></div>
+          <div class="stat"><div class="small">Sea Temp</div><div class="big" id="seaTemp">--</div></div>
+          <div class="stat"><div class="small">Wave Height</div><div class="big" id="waveHeight">--</div></div>
+          <div class="stat"><div class="small">Fishing Score</div><div class="big" id="fishScore">--</div></div>
         </div>
         <div class="actions">
           <button class="secondary" onclick="loadMarine()">Refresh Data</button>
@@ -401,7 +388,6 @@
       </div>
     </section>
 
-    <!-- LOG -->
     <section id="log" class="panel">
       <div class="card">
         <h2>📒 Catch Log</h2>
@@ -475,7 +461,6 @@
       </div>
     </section>
 
-    <!-- AI -->
     <section id="ai" class="panel">
       <div class="card">
         <h2>🧠 Catch Analytics</h2>
@@ -489,22 +474,10 @@
       <div class="card">
         <h3>📊 Stats</h3>
         <div class="stats">
-          <div class="stat">
-            <div class="small">Best Bait</div>
-            <div class="big" id="bestBait">--</div>
-          </div>
-          <div class="stat">
-            <div class="small">Top Species</div>
-            <div class="big" id="topSpecies">--</div>
-          </div>
-          <div class="stat">
-            <div class="small">Best Spot</div>
-            <div class="big" id="bestSpot">--</div>
-          </div>
-          <div class="stat">
-            <div class="small">Total Logs</div>
-            <div class="big" id="totalLogs">0</div>
-          </div>
+          <div class="stat"><div class="small">Best Bait</div><div class="big" id="bestBait">--</div></div>
+          <div class="stat"><div class="small">Top Species</div><div class="big" id="topSpecies">--</div></div>
+          <div class="stat"><div class="small">Best Spot</div><div class="big" id="bestSpot">--</div></div>
+          <div class="stat"><div class="small">Total Logs</div><div class="big" id="totalLogs">0</div></div>
         </div>
       </div>
 
@@ -569,7 +542,6 @@
       </div>
     </section>
 
-    <!-- MORE -->
     <section id="more" class="panel">
       <div class="card">
         <h2>📍 GPS Spots</h2>
@@ -671,35 +643,12 @@
     const speciesNames = Object.keys(speciesRules);
 
     function qs(id){ return document.getElementById(id); }
-
-    function getLogs(){
-      return JSON.parse(localStorage.getItem(STORAGE_LOGS) || "[]");
-    }
-
-    function setLogs(logs){
-      localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs));
-    }
-
-    function getSpots(){
-      return JSON.parse(localStorage.getItem(STORAGE_SPOTS) || "[]");
-    }
-
-    function setSpots(spots){
-      localStorage.setItem(STORAGE_SPOTS, JSON.stringify(spots));
-    }
-
-    function esc(s){
-      return String(s ?? "")
-        .replace(/&/g,"&amp;")
-        .replace(/</g,"&lt;")
-        .replace(/>/g,"&gt;")
-        .replace(/"/g,"&quot;");
-    }
-
-    function fmtDate(ts){
-      const d = new Date(ts);
-      return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"});
-    }
+    function getLogs(){ return JSON.parse(localStorage.getItem(STORAGE_LOGS) || "[]"); }
+    function setLogs(logs){ localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs)); }
+    function getSpots(){ return JSON.parse(localStorage.getItem(STORAGE_SPOTS) || "[]"); }
+    function setSpots(spots){ localStorage.setItem(STORAGE_SPOTS, JSON.stringify(spots)); }
+    function esc(s){ return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;"); }
+    function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
 
     document.querySelectorAll(".tabBtn").forEach(btn=>{
       btn.addEventListener("click", ()=>{
@@ -715,17 +664,9 @@
       const regFish = qs("regFish");
       fish.innerHTML = "";
       regFish.innerHTML = "";
-
       speciesNames.forEach(name=>{
-        const o1 = document.createElement("option");
-        o1.value = name;
-        o1.textContent = name;
-        fish.appendChild(o1);
-
-        const o2 = document.createElement("option");
-        o2.value = name;
-        o2.textContent = name;
-        regFish.appendChild(o2);
+        const o1 = document.createElement("option"); o1.value = name; o1.textContent = name; fish.appendChild(o1);
+        const o2 = document.createElement("option"); o2.value = name; o2.textContent = name; regFish.appendChild(o2);
       });
     }
 
@@ -744,26 +685,14 @@
       const q = qs("speciesSearch").value.trim().toLowerCase();
       const wrap = qs("speciesDb");
       wrap.innerHTML = "";
-
-      speciesNames
-        .filter(name => name.toLowerCase().includes(q))
-        .forEach(name=>{
-          const rule = speciesRules[name];
-          const div = document.createElement("div");
-          div.className = "species-item";
-          div.innerHTML = `
-            <strong>${esc(name)}</strong>
-            <div class="small" style="margin-top:6px;">Min size: ${rule.min} cm</div>
-            <div class="small">Bag limit: ${rule.bag}</div>
-            <div class="small">Suggested rig: ${esc(rule.rig)}</div>
-            <div style="margin-top:8px;">${rule.bait.map(b=>`<span class="pill">${esc(b)}</span>`).join("")}</div>
-          `;
-          wrap.appendChild(div);
-        });
-
-      if (!wrap.innerHTML) {
-        wrap.innerHTML = `<div class="species-item">No species found.</div>`;
-      }
+      speciesNames.filter(name => name.toLowerCase().includes(q)).forEach(name=>{
+        const rule = speciesRules[name];
+        const div = document.createElement("div");
+        div.className = "species-item";
+        div.innerHTML = `<strong>${esc(name)}</strong><div class="small" style="margin-top:6px;">Min size: ${rule.min} cm</div><div class="small">Bag limit: ${rule.bag}</div><div class="small">Suggested rig: ${esc(rule.rig)}</div><div style="margin-top:8px;">${rule.bait.map(b=>`<span class="pill">${esc(b)}</span>`).join("")}</div>`;
+        wrap.appendChild(div);
+      });
+      if (!wrap.innerHTML) wrap.innerHTML = `<div class="species-item">No species found.</div>`;
     }
 
     async function loadMarine(){
@@ -773,56 +702,33 @@
       qs("fishScore").textContent = "--";
       qs("marineSummary").textContent = "Loading live marine data…";
       qs("marineTags").innerHTML = "";
-
       try{
         const url = "https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&hourly=wave_height,sea_surface_temperature,sea_level_height_msl";
         const res = await fetch(url);
         const data = await res.json();
-
         const waves = data?.hourly?.wave_height || [];
         const temps = data?.hourly?.sea_surface_temperature || [];
         const seaLevels = data?.hourly?.sea_level_height_msl || [];
         const times = data?.hourly?.time || [];
-
-        const wave = waves[0];
-        const temp = temps[0];
-        const sea = seaLevels[0];
-
+        const wave = waves[0]; const temp = temps[0]; const sea = seaLevels[0];
         if (wave == null || temp == null || sea == null) throw new Error("No marine values");
-
-        latestMarine = {
-          wave, temp, sea,
-          waves: waves.slice(0, 12),
-          temps: temps.slice(0, 12),
-          seaLevels: seaLevels.slice(0, 12),
-          times: times.slice(0, 12)
-        };
-
+        latestMarine = { wave, temp, sea, waves:waves.slice(0,12), temps:temps.slice(0,12), seaLevels:seaLevels.slice(0,12), times:times.slice(0,12) };
         const tideText = sea > 0 ? "High ↑" : "Low ↓";
         qs("tideTrend").textContent = tideText;
         qs("seaTemp").textContent = `${temp}°C`;
         qs("waveHeight").textContent = `${wave}m`;
-
         let score = 50;
-        if (wave <= 1.5) score += 20;
-        else if (wave <= 2.5) score += 8;
-        else score -= 12;
-
-        if (temp >= 16 && temp <= 22) score += 15;
-        else score += 5;
-
+        if (wave <= 1.5) score += 20; else if (wave <= 2.5) score += 8; else score -= 12;
+        if (temp >= 16 && temp <= 22) score += 15; else score += 5;
         if (sea > 0) score += 8;
         score = Math.max(0, Math.min(100, Math.round(score)));
         qs("fishScore").textContent = `${score}/100`;
-
         const tags = [];
         tags.push(wave <= 1.5 ? ["Calmer sea","ok"] : wave <= 2.5 ? ["Fishable swell","warn"] : ["Rougher sea","dangerText"]);
         tags.push(temp >= 16 && temp <= 22 ? ["Good temp","ok"] : ["Watch temp","warn"]);
         tags.push(sea > 0 ? ["Higher tide trend","ok"] : ["Lower tide trend","warn"]);
-
         qs("marineTags").innerHTML = tags.map(([t,c])=>`<span class="tag ${c}">${t}</span>`).join("");
         qs("marineSummary").textContent = `Wave ${wave}m, sea temp ${temp}°C, tide trend ${tideText}. Fishing score ${score}/100.`;
-
         drawMarineChart();
       }catch(err){
         qs("tideTrend").textContent = "Offline";
@@ -832,415 +738,127 @@
     }
 
     function drawFallbackChart(){
-      const c = qs("marineChart");
-      const ctx = c.getContext("2d");
-      ctx.clearRect(0,0,c.width,c.height);
-      ctx.fillStyle = "#a8b8d8";
-      ctx.font = "16px Arial";
-      ctx.fillText("No live graph data available.", 30, 60);
+      const c = qs("marineChart"); const ctx = c.getContext("2d");
+      ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "#a8b8d8"; ctx.font = "16px Arial"; ctx.fillText("No live graph data available.", 30, 60);
     }
 
     function drawSeries(ctx, arr, maxVal, color, yBase, height){
       if (!arr.length) return;
       ctx.beginPath();
-      arr.forEach((v,i)=>{
-        const x = 40 + (i * ((820) / Math.max(arr.length - 1, 1)));
-        const y = yBase - ((v / maxVal) * height);
-        if (i === 0) ctx.moveTo(x,y);
-        else ctx.lineTo(x,y);
-      });
-      ctx.strokeStyle = color;
-      ctx.lineWidth = 3;
-      ctx.stroke();
+      arr.forEach((v,i)=>{ const x = 40 + (i * (820 / Math.max(arr.length - 1, 1))); const y = yBase - ((v / maxVal) * height); if (i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
+      ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
     }
 
     function drawMarineChart(){
-      const c = qs("marineChart");
-      const ctx = c.getContext("2d");
-      ctx.clearRect(0,0,c.width,c.height);
-
-      ctx.fillStyle = "#dce7ff";
-      ctx.font = "14px Arial";
-      ctx.fillText("Wave (blue) • Temp (green) • Tide trend (orange)", 30, 22);
-
+      const c = qs("marineChart"); const ctx = c.getContext("2d"); ctx.clearRect(0,0,c.width,c.height);
+      ctx.fillStyle = "#dce7ff"; ctx.font = "14px Arial"; ctx.fillText("Wave (blue) • Temp (green) • Tide trend (orange)", 30, 22);
       ctx.strokeStyle = "rgba(255,255,255,.12)";
-      for(let y=40; y<=260; y+=40){
-        ctx.beginPath();
-        ctx.moveTo(40,y);
-        ctx.lineTo(860,y);
-        ctx.stroke();
-      }
-
-      if (!latestMarine) {
-        drawFallbackChart();
-        return;
-      }
-
+      for(let y=40; y<=260; y+=40){ ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(860,y); ctx.stroke(); }
+      if (!latestMarine) return drawFallbackChart();
       const waves = latestMarine.waves.map(v => Math.max(0, Number(v || 0)));
       const temps = latestMarine.temps.map(v => Math.max(0, Number(v || 0)));
       const sea = latestMarine.seaLevels.map(v => Math.abs(Number(v || 0)));
-
-      const waveMax = Math.max(...waves, 1);
-      const tempMax = Math.max(...temps, 1);
-      const seaMax = Math.max(...sea, 1);
-
-      drawSeries(ctx, waves, waveMax, "#2fa4ff", 250, 170);
-      drawSeries(ctx, temps, tempMax, "#39d98a", 250, 170);
-      drawSeries(ctx, sea, seaMax, "#ffb020", 250, 170);
-
-      ctx.fillStyle = "#a8b8d8";
-      ctx.font = "12px Arial";
-      latestMarine.times.forEach((t,i)=>{
-        const x = 40 + (i * ((820) / Math.max(latestMarine.times.length - 1, 1)));
-        const hr = String(new Date(t).getHours()).padStart(2,"0") + ":00";
-        ctx.fillText(hr, x - 14, 280);
-      });
+      drawSeries(ctx, waves, Math.max(...waves,1), "#2fa4ff", 250, 170);
+      drawSeries(ctx, temps, Math.max(...temps,1), "#39d98a", 250, 170);
+      drawSeries(ctx, sea, Math.max(...sea,1), "#ffb020", 250, 170);
+      ctx.fillStyle = "#a8b8d8"; ctx.font = "12px Arial";
+      latestMarine.times.forEach((t,i)=>{ const x = 40 + (i * (820 / Math.max(latestMarine.times.length - 1, 1))); const hr = String(new Date(t).getHours()).padStart(2,"0") + ":00"; ctx.fillText(hr, x - 14, 280); });
     }
 
     function legalMessage(fish, size){
       const rule = speciesRules[fish];
       if (!rule) return { legal:false, html:"No species rule found." };
       if (Number.isNaN(size) || size <= 0) return { legal:false, html:"Enter a valid size in cm." };
-
-      if (size >= rule.min){
-        return {
-          legal:true,
-          html:`<span class="ok"><strong>Legal ✔</strong></span><br>${esc(fish)} minimum is ${rule.min} cm. Bag limit: ${rule.bag}.`
-        };
-      }
-
-      return {
-        legal:false,
-        html:`<span class="dangerText"><strong>Too small ✖</strong></span><br>${esc(fish)} minimum is ${rule.min} cm.`
-      };
+      if (size >= rule.min) return { legal:true, html:`<span class="ok"><strong>Legal ✔</strong></span><br>${esc(fish)} minimum is ${rule.min} cm. Bag limit: ${rule.bag}.` };
+      return { legal:false, html:`<span class="dangerText"><strong>Too small ✖</strong></span><br>${esc(fish)} minimum is ${rule.min} cm.` };
     }
 
-    function checkLegal(){
-      const fish = qs("regFish").value;
-      const size = parseInt(qs("regSize").value, 10);
-      qs("legalResult").innerHTML = legalMessage(fish, size).html;
-    }
-
-    function checkCurrentLegal(){
-      const fish = qs("fish").value;
-      const size = parseInt(qs("size").value, 10);
-      qs("instantLegal").innerHTML = legalMessage(fish, size).html;
-    }
+    function checkLegal(){ const fish = qs("regFish").value; const size = parseInt(qs("regSize").value, 10); qs("legalResult").innerHTML = legalMessage(fish, size).html; }
+    function checkCurrentLegal(){ const fish = qs("fish").value; const size = parseInt(qs("size").value, 10); qs("instantLegal").innerHTML = legalMessage(fish, size).html; }
 
     function checkBagLimit(){
-      const fish = qs("regFish").value;
-      const rule = speciesRules[fish];
-      const logs = getLogs();
-      let total = 0;
-
-      logs.forEach(l=>{
-        if(l.fish === fish) total += Number(l.count || 1);
-      });
-
-      if (total > rule.bag) {
-        qs("bagResult").innerHTML = `<span class="dangerText"><strong>Warning:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.`;
-      } else {
-        qs("bagResult").innerHTML = `<span class="ok"><strong>Okay:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.`;
-      }
+      const fish = qs("regFish").value; const rule = speciesRules[fish]; const logs = getLogs(); let total = 0;
+      logs.forEach(l=>{ if(l.fish === fish) total += Number(l.count || 1); });
+      qs("bagResult").innerHTML = total > rule.bag ? `<span class="dangerText"><strong>Warning:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.` : `<span class="ok"><strong>Okay:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.`;
     }
 
     function saveCatch(){
-      const fish = qs("fish").value;
-      const size = parseInt(qs("size").value, 10);
-      const count = parseInt(qs("count").value, 10) || 1;
-      const bait = qs("bait").value.trim();
-      const rig = qs("rig").value;
-      const spotName = qs("spotName").value.trim();
-      const depth = qs("depth").value.trim();
-      const notes = qs("notes").value.trim();
-
-      if (Number.isNaN(size) || size <= 0) {
-        qs("logMsg").innerHTML = `<span class="dangerText">Enter a valid size first.</span>`;
-        return;
-      }
-
+      const fish = qs("fish").value; const size = parseInt(qs("size").value, 10); const count = parseInt(qs("count").value, 10) || 1; const bait = qs("bait").value.trim(); const rig = qs("rig").value; const spotName = qs("spotName").value.trim(); const depth = qs("depth").value.trim(); const notes = qs("notes").value.trim();
+      if (Number.isNaN(size) || size <= 0) { qs("logMsg").innerHTML = `<span class="dangerText">Enter a valid size first.</span>`; return; }
       const logs = getLogs();
-      logs.unshift({
-        id: Date.now().toString(),
-        fish,
-        size,
-        count,
-        bait,
-        rig,
-        spotName,
-        depth,
-        notes,
-        time: Date.now()
-      });
+      logs.unshift({ id: Date.now().toString(), fish, size, count, bait, rig, spotName, depth, notes, time: Date.now() });
       setLogs(logs);
-
       const ruleCheck = legalMessage(fish, size);
-      qs("logMsg").innerHTML = ruleCheck.legal
-        ? `<span class="ok">Catch saved.</span>`
-        : `<span class="warn">Catch saved, but size looks under minimum.</span>`;
-
-      qs("size").value = "";
-      qs("count").value = "1";
-      qs("bait").value = "";
-      qs("spotName").value = "";
-      qs("depth").value = "";
-      qs("notes").value = "";
-
-      renderLogs();
-      refreshStats();
+      qs("logMsg").innerHTML = ruleCheck.legal ? `<span class="ok">Catch saved.</span>` : `<span class="warn">Catch saved, but size looks under minimum.</span>`;
+      qs("size").value = ""; qs("count").value = "1"; qs("bait").value = ""; qs("spotName").value = ""; qs("depth").value = ""; qs("notes").value = "";
+      renderLogs(); refreshStats();
     }
 
     function renderLogs(){
-      const list = qs("logList");
-      const logs = getLogs();
-      list.innerHTML = "";
-
-      if (!logs.length) {
-        list.innerHTML = `<li>No catch logs yet.</li>`;
-        return;
-      }
-
+      const list = qs("logList"); const logs = getLogs(); list.innerHTML = "";
+      if (!logs.length) { list.innerHTML = `<li>No catch logs yet.</li>`; return; }
       logs.forEach(l=>{
-        const rule = speciesRules[l.fish];
-        const legal = rule ? l.size >= rule.min : null;
-
+        const rule = speciesRules[l.fish]; const legal = rule ? l.size >= rule.min : null;
         const li = document.createElement("li");
-        li.innerHTML = `
-          <div class="split">
-            <div>
-              <strong>${esc(l.fish)}</strong>
-              ${legal === true ? '<span class="tag ok">Legal</span>' : legal === false ? '<span class="tag dangerText">Too small</span>' : ''}
-              <div class="small">${fmtDate(l.time)}</div>
-            </div>
-            <div>
-              <button class="danger" onclick="deleteLog('${l.id}')">Delete</button>
-            </div>
-          </div>
-
-          <div style="margin-top:8px;">
-            <div><strong>Size:</strong> ${esc(l.size)} cm</div>
-            <div><strong>Count:</strong> ${esc(l.count)}</div>
-            <div><strong>Bait:</strong> ${esc(l.bait || "-")}</div>
-            <div><strong>Rig:</strong> ${esc(l.rig || "-")}</div>
-            <div><strong>Spot:</strong> ${esc(l.spotName || "-")}</div>
-            <div><strong>Conditions:</strong> ${esc(l.depth || "-")}</div>
-            ${l.notes ? `<div><strong>Extra:</strong> ${esc(l.notes)}</div>` : ""}
-          </div>
-        `;
+        li.innerHTML = `<div class="split"><div><strong>${esc(l.fish)}</strong>${legal === true ? '<span class="tag ok">Legal</span>' : legal === false ? '<span class="tag dangerText">Too small</span>' : ''}<div class="small">${fmtDate(l.time)}</div></div><div><button class="danger" onclick="deleteLog('${l.id}')">Delete</button></div></div><div style="margin-top:8px;"><div><strong>Size:</strong> ${esc(l.size)} cm</div><div><strong>Count:</strong> ${esc(l.count)}</div><div><strong>Bait:</strong> ${esc(l.bait || "-")}</div><div><strong>Rig:</strong> ${esc(l.rig || "-")}</div><div><strong>Spot:</strong> ${esc(l.spotName || "-")}</div><div><strong>Conditions:</strong> ${esc(l.depth || "-")}</div>${l.notes ? `<div><strong>Extra:</strong> ${esc(l.notes)}</div>` : ""}</div>`;
         list.appendChild(li);
       });
     }
 
-    function deleteLog(id){
-      const logs = getLogs().filter(l => l.id !== id);
-      setLogs(logs);
-      renderLogs();
-      refreshStats();
-    }
-
-    function clearAllLogs(){
-      if(!confirm("Clear all saved catch logs?")) return;
-      localStorage.removeItem(STORAGE_LOGS);
-      renderLogs();
-      refreshStats();
-      qs("logMsg").textContent = "All logs cleared.";
-    }
-
-    function getTopKey(obj){
-      return Object.keys(obj).sort((a,b)=>obj[b]-obj[a])[0] || "--";
-    }
+    function deleteLog(id){ const logs = getLogs().filter(l => l.id !== id); setLogs(logs); renderLogs(); refreshStats(); }
+    function clearAllLogs(){ if(!confirm("Clear all saved catch logs?")) return; localStorage.removeItem(STORAGE_LOGS); renderLogs(); refreshStats(); qs("logMsg").textContent = "All logs cleared."; }
+    function getTopKey(obj){ return Object.keys(obj).sort((a,b)=>obj[b]-obj[a])[0] || "--"; }
 
     function refreshStats(){
-      const logs = getLogs();
-      qs("totalLogs").textContent = logs.length;
-
-      if (!logs.length) {
-        qs("bestBait").textContent = "--";
-        qs("topSpecies").textContent = "--";
-        qs("bestSpot").textContent = "--";
-        return;
-      }
-
-      const baitCount = {};
-      const speciesCount = {};
-      const spotCount = {};
-
-      logs.forEach(l=>{
-        const bait = (l.bait || "Unknown").trim() || "Unknown";
-        const species = (l.fish || "Unknown").trim() || "Unknown";
-        const spot = (l.spotName || "Unknown").trim() || "Unknown";
-
-        baitCount[bait] = (baitCount[bait] || 0) + Number(l.count || 1);
-        speciesCount[species] = (speciesCount[species] || 0) + Number(l.count || 1);
-        spotCount[spot] = (spotCount[spot] || 0) + Number(l.count || 1);
-      });
-
-      qs("bestBait").textContent = getTopKey(baitCount);
-      qs("topSpecies").textContent = getTopKey(speciesCount);
-      qs("bestSpot").textContent = getTopKey(spotCount);
+      const logs = getLogs(); qs("totalLogs").textContent = logs.length;
+      if (!logs.length) { qs("bestBait").textContent = "--"; qs("topSpecies").textContent = "--"; qs("bestSpot").textContent = "--"; return; }
+      const baitCount = {}, speciesCount = {}, spotCount = {};
+      logs.forEach(l=>{ const bait = (l.bait || "Unknown").trim() || "Unknown"; const species = (l.fish || "Unknown").trim() || "Unknown"; const spot = (l.spotName || "Unknown").trim() || "Unknown"; baitCount[bait] = (baitCount[bait] || 0) + Number(l.count || 1); speciesCount[species] = (speciesCount[species] || 0) + Number(l.count || 1); spotCount[spot] = (spotCount[spot] || 0) + Number(l.count || 1); });
+      qs("bestBait").textContent = getTopKey(baitCount); qs("topSpecies").textContent = getTopKey(speciesCount); qs("bestSpot").textContent = getTopKey(spotCount);
     }
 
     function runAI(){
-      const logs = getLogs();
-      if (!logs.length) {
-        qs("aiSummary").textContent = "No catch data yet. Save a few catches first.";
-        refreshStats();
-        return;
-      }
-
+      const logs = getLogs(); if (!logs.length) { qs("aiSummary").textContent = "No catch data yet. Save a few catches first."; refreshStats(); return; }
       refreshStats();
-
-      const bestBait = qs("bestBait").textContent;
-      const topSpecies = qs("topSpecies").textContent;
-      const bestSpot = qs("bestSpot").textContent;
-      const tideText = qs("tideTrend").textContent;
-
-      qs("aiSummary").innerHTML =
-        `Based on your logs, <strong>${esc(bestBait)}</strong> is your best bait so far. ` +
-        `Top species is <strong>${esc(topSpecies)}</strong>, and best spot is <strong>${esc(bestSpot)}</strong>. ` +
-        `Current tide trend is <strong>${esc(tideText)}</strong>.`;
+      qs("aiSummary").innerHTML = `Based on your logs, <strong>${esc(qs("bestBait").textContent)}</strong> is your best bait so far. Top species is <strong>${esc(qs("topSpecies").textContent)}</strong>, and best spot is <strong>${esc(qs("bestSpot").textContent)}</strong>. Current tide trend is <strong>${esc(qs("tideTrend").textContent)}</strong>.`;
     }
 
     function saveCurrentSpot(){
-      if (!navigator.geolocation) {
-        qs("gpsMsg").textContent = "Geolocation not supported on this device.";
-        return;
-      }
-
+      if (!navigator.geolocation) { qs("gpsMsg").textContent = "Geolocation not supported on this device."; return; }
       qs("gpsMsg").textContent = "Getting location...";
-
-      navigator.geolocation.getCurrentPosition(pos=>{
-        const spots = getSpots();
-        spots.unshift({
-          id: Date.now().toString(),
-          lat: pos.coords.latitude,
-          lon: pos.coords.longitude,
-          time: Date.now()
-        });
-        setSpots(spots);
-        renderSpots();
-        qs("gpsMsg").textContent = "Spot saved.";
-      }, ()=>{
-        qs("gpsMsg").textContent = "Could not get GPS location.";
-      }, {
-        enableHighAccuracy:true,
-        timeout:10000,
-        maximumAge:0
-      });
+      navigator.geolocation.getCurrentPosition(pos=>{ const spots = getSpots(); spots.unshift({ id: Date.now().toString(), lat: pos.coords.latitude, lon: pos.coords.longitude, time: Date.now() }); setSpots(spots); renderSpots(); qs("gpsMsg").textContent = "Spot saved."; }, ()=>{ qs("gpsMsg").textContent = "Could not get GPS location."; }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
     }
 
     function renderSpots(){
-      const list = qs("spotList");
-      const spots = getSpots();
-      list.innerHTML = "";
-
-      if (!spots.length) {
-        list.innerHTML = `<li>No GPS spots saved yet.</li>`;
-        return;
-      }
-
-      spots.forEach(s=>{
-        const mapsUrl = `https://maps.google.com/?q=${s.lat},${s.lon}`;
-        const li = document.createElement("li");
-        li.innerHTML = `
-          <div class="split">
-            <div>
-              <strong>📍 ${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}</strong>
-              <div class="small">${fmtDate(s.time)}</div>
-              <div style="margin-top:6px;"><a href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a></div>
-            </div>
-            <div>
-              <button class="danger" onclick="deleteSpot('${s.id}')">Delete</button>
-            </div>
-          </div>
-        `;
-        list.appendChild(li);
-      });
+      const list = qs("spotList"); const spots = getSpots(); list.innerHTML = "";
+      if (!spots.length) { list.innerHTML = `<li>No GPS spots saved yet.</li>`; return; }
+      spots.forEach(s=>{ const mapsUrl = `https://maps.google.com/?q=${s.lat},${s.lon}`; const li = document.createElement("li"); li.innerHTML = `<div class="split"><div><strong>📍 ${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}</strong><div class="small">${fmtDate(s.time)}</div><div style="margin-top:6px;"><a href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a></div></div><div><button class="danger" onclick="deleteSpot('${s.id}')">Delete</button></div></div>`; list.appendChild(li); });
     }
 
-    function deleteSpot(id){
-      const spots = getSpots().filter(s => s.id !== id);
-      setSpots(spots);
-      renderSpots();
-    }
-
-    function clearSpots(){
-      if(!confirm("Clear all GPS spots?")) return;
-      localStorage.removeItem(STORAGE_SPOTS);
-      renderSpots();
-      qs("gpsMsg").textContent = "All spots cleared.";
-    }
+    function deleteSpot(id){ const spots = getSpots().filter(s => s.id !== id); setSpots(spots); renderSpots(); }
+    function clearSpots(){ if(!confirm("Clear all GPS spots?")) return; localStorage.removeItem(STORAGE_SPOTS); renderSpots(); qs("gpsMsg").textContent = "All spots cleared."; }
 
     function exportData(){
-      const data = {
-        exportedAt: new Date().toISOString(),
-        logs: getLogs(),
-        spots: getSpots()
-      };
-
+      const data = { exportedAt: new Date().toISOString(), logs: getLogs(), spots: getSpots() };
       const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = "tanya-fishing-backup.json";
-      a.click();
-      URL.revokeObjectURL(url);
+      const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "tanya-fishing-backup.json"; a.click(); URL.revokeObjectURL(url);
     }
 
     qs("importFile").addEventListener("change", async (e)=>{
-      const file = e.target.files[0];
-      if (!file) return;
-
-      try{
-        const text = await file.text();
-        const data = JSON.parse(text);
-
-        if (Array.isArray(data.logs)) localStorage.setItem(STORAGE_LOGS, JSON.stringify(data.logs));
-        if (Array.isArray(data.spots)) localStorage.setItem(STORAGE_SPOTS, JSON.stringify(data.spots));
-
-        renderLogs();
-        renderSpots();
-        refreshStats();
-        alert("Backup imported.");
-      }catch(err){
-        alert("Import failed. File is not valid JSON backup.");
-      }
-
+      const file = e.target.files[0]; if (!file) return;
+      try{ const text = await file.text(); const data = JSON.parse(text); if (Array.isArray(data.logs)) localStorage.setItem(STORAGE_LOGS, JSON.stringify(data.logs)); if (Array.isArray(data.spots)) localStorage.setItem(STORAGE_SPOTS, JSON.stringify(data.spots)); renderLogs(); renderSpots(); refreshStats(); alert("Backup imported."); }catch(err){ alert("Import failed. File is not valid JSON backup."); }
       e.target.value = "";
     });
 
-    window.addEventListener("beforeinstallprompt", (e)=>{
-      e.preventDefault();
-      deferredPrompt = e;
-    });
-
-    async function installApp(){
-      if (!deferredPrompt) {
-        alert("Install prompt not ready yet. Use Add to Home Screen if needed.");
-        return;
-      }
-      deferredPrompt.prompt();
-      await deferredPrompt.userChoice;
-      deferredPrompt = null;
-    }
+    window.addEventListener("beforeinstallprompt", (e)=>{ e.preventDefault(); deferredPrompt = e; });
+    async function installApp(){ if (!deferredPrompt) { alert("Install prompt not ready yet. Use Add to Home Screen if needed."); return; } deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
 
     function init(){
-      populateSelects();
-      renderReefPills();
-      renderSpeciesDb();
-      renderLogs();
-      renderSpots();
-      refreshStats();
-      loadMarine();
-
-      if ("serviceWorker" in navigator) {
-        window.addEventListener("load", ()=>{
-          navigator.serviceWorker.register("./sw.js").catch(()=>{});
-        });
-      }
+      populateSelects(); renderReefPills(); renderSpeciesDb(); renderLogs(); renderSpots(); refreshStats(); loadMarine();
+      if ("serviceWorker" in navigator) window.addEventListener("load", ()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
     }
 
     init();
   </script>
 </body>
-            </html>
+  </html>
