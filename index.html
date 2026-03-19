@@ -4,6 +4,7 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Tanya Fishing Pro Ultimate</title>
+
   <style>
     :root{
       --bg:#07111f;
@@ -20,6 +21,7 @@
     }
 
     *{box-sizing:border-box}
+
     body{
       margin:0;
       font-family:Arial, Helvetica, sans-serif;
@@ -30,11 +32,11 @@
     header{
       padding:18px 14px;
       text-align:center;
-      background:rgba(7,17,31,.95);
+      background:rgba(7,17,31,.96);
       border-bottom:1px solid var(--line);
       position:sticky;
       top:0;
-      z-index:10;
+      z-index:20;
     }
 
     header h1{
@@ -52,7 +54,7 @@
 
     .container{
       padding:14px;
-      max-width:1100px;
+      max-width:1200px;
       margin:0 auto;
     }
 
@@ -94,6 +96,17 @@
       color:#dff5ff;
     }
 
+    .stat-badge{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#0b2943;
+      border:1px solid #1e547f;
+      font-size:12px;
+      margin:4px 6px 0 0;
+      color:#dff5ff;
+    }
+
     label{
       display:block;
       margin:8px 0 6px;
@@ -111,7 +124,10 @@
       outline:none;
     }
 
-    textarea{min-height:80px; resize:vertical;}
+    textarea{
+      min-height:80px;
+      resize:vertical;
+    }
 
     button{
       margin-top:10px;
@@ -125,7 +141,21 @@
       cursor:pointer;
     }
 
-    button:hover{filter:brightness(1.05)}
+    button:hover{
+      filter:brightness(1.05);
+    }
+
+    .toggle-btn{
+      margin-top:8px;
+      width:100%;
+      padding:10px;
+      border:none;
+      border-radius:10px;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      color:#04131f;
+      font-weight:700;
+      cursor:pointer;
+    }
 
     .result{
       margin-top:10px;
@@ -141,7 +171,9 @@
       padding:10px 0;
     }
 
-    .fish-item:last-child, .log-item:last-child{border-bottom:none}
+    .fish-item:last-child, .log-item:last-child{
+      border-bottom:none;
+    }
 
     .fish-top{
       display:flex;
@@ -156,10 +188,25 @@
       font-weight:700;
     }
 
-    .muted{color:var(--muted); font-size:13px;}
-    .good{color:var(--good); font-weight:700;}
-    .warn{color:var(--warn); font-weight:700;}
-    .bad{color:var(--bad); font-weight:700;}
+    .muted{
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .good{
+      color:var(--good);
+      font-weight:700;
+    }
+
+    .warn{
+      color:var(--warn);
+      font-weight:700;
+    }
+
+    .bad{
+      color:var(--bad);
+      font-weight:700;
+    }
 
     .small-grid{
       display:grid;
@@ -204,13 +251,21 @@
       margin-bottom:8px;
     }
 
-    .rig-sketch{
+    .rig-svg-wrap{
       width:100%;
-      height:180px;
-      border-radius:10px;
+      overflow:auto;
       background:#06101d;
       border:1px solid #18344e;
-      margin-bottom:10px;
+      border-radius:12px;
+      padding:8px;
+      margin:10px 0;
+    }
+
+    .rig-svg{
+      width:100%;
+      min-width:520px;
+      height:180px;
+      display:block;
     }
 
     .map-wrap iframe{
@@ -237,17 +292,43 @@
       transition:width .3s ease;
     }
 
-    .section-title{
-      margin:18px 0 10px;
-      color:#d9f3ff;
-      font-size:20px;
+    .preset-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(240px,1fr));
+      gap:12px;
+    }
+
+    .preset-card{
+      background:#091525;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
+    }
+
+    .preset-title{
+      font-size:16px;
+      font-weight:700;
+      color:#dff6ff;
+      margin-bottom:8px;
+    }
+
+    .preset-row{
+      margin:4px 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    @media (max-width:700px){
+      .small-grid{
+        grid-template-columns:1fr;
+      }
     }
   </style>
 </head>
 <body>
   <header>
     <h1>🎣 Tanya Fishing Pro Ultimate</h1>
-    <p>More species • size limits • rigs with sketches • legal check • bait • logs • sea theme</p>
+    <p>Presets • bait stats • species DB • legal checker • rigs with sketches • marine conditions</p>
   </header>
 
   <div class="container">
@@ -255,7 +336,7 @@
     <div class="grid">
       <div class="card">
         <h2>🌊 Marine Conditions</h2>
-        <div class="sub">Stilbaai area basic live marine pull</div>
+        <div class="sub">Stilbaai basic live marine pull</div>
         <div class="small-grid">
           <div class="metric">
             <div class="muted">Wave Height</div>
@@ -292,6 +373,17 @@
     </div>
 
     <div class="card">
+      <h2>📊 Quick Bait Stats</h2>
+      <div id="baitStats" class="result"></div>
+    </div>
+
+    <div class="card">
+      <h2>🎯 Species Presets</h2>
+      <div class="sub">Quick presets for bait, size, bag and rig</div>
+      <div id="presetList" class="preset-grid"></div>
+    </div>
+
+    <div class="card">
       <h2>🐟 Fish Species Database</h2>
       <div class="sub">Expanded list with size limit, bag limit, bait, season, habitat and status</div>
 
@@ -304,7 +396,7 @@
 
     <div class="card">
       <h2>🪝 Rig Library with Sketches</h2>
-      <div class="sub">Simple built-in sketches so niks is leeg nie</div>
+      <div class="sub">Tap button to open each rig sketch</div>
       <div id="rigList"></div>
     </div>
 
@@ -327,6 +419,7 @@
 
     <div class="card">
       <h2>📝 Session Logger</h2>
+
       <label>Date</label>
       <input type="date" id="logDate" />
 
@@ -474,7 +567,7 @@
         status:"🟢 Least Concern",
         habitat:"Shallow reef, kelp, rocky gullies",
         season:"Very common in workable reef conditions",
-        bait:"Red bait, chokka, prawn",
+        bait:"Red bait, prawn, chokka",
         rig:"Small double paternoster",
         notes:"Good starter reef fish, likes structure.",
         category:"Edible"
@@ -540,7 +633,7 @@
         habitat:"Surf, estuaries, river mouths",
         season:"Warm season runs",
         bait:"Sardine, spoon, plug, paddle tail",
-        rig:"Spinning / trace with wire if needed",
+        rig:"Spinning / trace",
         notes:"Aggressive predator; often on moving water.",
         category:"Edible / sport"
       },
@@ -587,6 +680,7 @@
 
     const rigs = [
       {
+        id:"kobrig",
         name:"Kob Running Sinker Rig",
         species:"Kob / Kabeljou",
         leader:"80–120 cm leader",
@@ -597,16 +691,18 @@
         notes:"Good for sand channels, gullies and tide push."
       },
       {
+        id:"yellowtailrig",
         name:"Yellowtail Drift Rig",
         species:"Yellowtail",
         leader:"100–150 cm fluorocarbon leader",
-        snoot:"Single live bait hook setup",
+        snoot:"Single live bait setup",
         hooks:"6/0 – 9/0",
         sinker:"Usually none / very light",
         bait:"Live bait, fillet strip, spoon",
-        notes:"Best for drift, working shoals and surface signs."
+        notes:"Best for drift, shoals and surface signs."
       },
       {
+        id:"romanrig",
         name:"Roman Double Paternoster",
         species:"Red Roman / Santer / Snapper",
         leader:"80–100 cm body trace",
@@ -617,6 +713,7 @@
         notes:"Classic reef rig for bottom species."
       },
       {
+        id:"hottentotrig",
         name:"Hottentot Small Paternoster",
         species:"Hottentot / Blacktail",
         leader:"60–80 cm body trace",
@@ -627,6 +724,7 @@
         notes:"Keep bait neat and close to structure."
       },
       {
+        id:"garrickrig",
         name:"Garrick Live Bait Rig",
         species:"Garrick / Leervis",
         leader:"100 cm abrasion-resistant leader",
@@ -684,6 +782,41 @@
       `).join("");
     }
 
+    function renderPresets() {
+      const presetList = document.getElementById("presetList");
+
+      presetList.innerHTML = fishDB.map(f => `
+        <div class="preset-card">
+          <div class="preset-title">${f.name}</div>
+          <div class="preset-row">
+            <span class="stat-badge">Size: ${f.min ? f.min + " cm" : "n/a"}</span>
+            <span class="stat-badge">Bag: ${f.bag}</span>
+          </div>
+          <div class="preset-row"><strong>Status:</strong> ${f.status}</div>
+          <div class="preset-row"><strong>Bait:</strong> ${f.bait}</div>
+          <div class="preset-row"><strong>Rig:</strong> ${f.rig}</div>
+          <div class="preset-row"><strong>Season:</strong> ${f.season}</div>
+          <div class="preset-row"><strong>Habitat:</strong> ${f.habitat}</div>
+        </div>
+      `).join("");
+    }
+
+    function renderBaitStats() {
+      const baitStats = document.getElementById("baitStats");
+
+      const chokkaCount = fishDB.filter(f => f.bait.toLowerCase().includes("chokka")).length;
+      const sardineCount = fishDB.filter(f => f.bait.toLowerCase().includes("sardine")).length;
+      const liveBaitCount = fishDB.filter(f => f.bait.toLowerCase().includes("live bait")).length;
+      const prawnCount = fishDB.filter(f => f.bait.toLowerCase().includes("prawn")).length;
+
+      baitStats.innerHTML = `
+        <span class="stat-badge">Chokka: ${chokkaCount}</span>
+        <span class="stat-badge">Sardine: ${sardineCount}</span>
+        <span class="stat-badge">Live bait: ${liveBaitCount}</span>
+        <span class="stat-badge">Prawn: ${prawnCount}</span>
+      `;
+    }
+
     function checkLegal() {
       const key = document.getElementById("speciesSelect").value;
       const size = Number(document.getElementById("fishSize").value);
@@ -700,9 +833,9 @@
         return;
       }
 
-      let verdict = size >= fish.min;
-      let cls = verdict ? "good" : "bad";
-      let text = verdict ? "✅ Legal size" : "❌ Undersize";
+      const verdict = size >= fish.min;
+      const cls = verdict ? "good" : "bad";
+      const text = verdict ? "✅ Legal size" : "❌ Undersize";
 
       result.innerHTML = `
         <div class="${cls}">${text}</div>
@@ -718,92 +851,129 @@
     function sketchSVG(type) {
       if (type.includes("Kob")) {
         return `
-          <svg viewBox="0 0 600 180" class="rig-sketch">
-            <rect width="600" height="180" fill="#06101d"/>
-            <line x1="70" y1="20" x2="70" y2="150" stroke="#7ee7ff" stroke-width="3"/>
-            <line x1="70" y1="150" x2="530" y2="150" stroke="#476d91" stroke-width="3"/>
-            <line x1="70" y1="70" x2="230" y2="70" stroke="#fff" stroke-width="2"/>
-            <path d="M230 70 q20 10 0 20" fill="none" stroke="#fff" stroke-width="2"/>
-            <line x1="70" y1="120" x2="150" y2="120" stroke="#7ee7ff" stroke-width="2"/>
-            <polygon points="70,150 55,170 85,170" fill="#f1c40f"/>
-            <text x="85" y="35" fill="#9edbff" font-size="14">Main line</text>
-            <text x="235" y="68" fill="#9edbff" font-size="14">6/0–8/0 hook</text>
-            <text x="92" y="116" fill="#9edbff" font-size="14">Sinker boom</text>
-            <text x="94" y="168" fill="#9edbff" font-size="14">4–6 oz sinker</text>
-            <text x="260" y="110" fill="#dff6ff" font-size="15">Kob running sinker rig</text>
-          </svg>
+          <div class="rig-svg-wrap">
+            <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="180" fill="#06101d"/>
+              <line x1="70" y1="20" x2="70" y2="150" stroke="#7ee7ff" stroke-width="3"/>
+              <line x1="70" y1="150" x2="530" y2="150" stroke="#476d91" stroke-width="3"/>
+              <line x1="70" y1="70" x2="230" y2="70" stroke="#ffffff" stroke-width="2"/>
+              <path d="M230 70 q20 10 0 20" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <line x1="70" y1="120" x2="150" y2="120" stroke="#7ee7ff" stroke-width="2"/>
+              <polygon points="70,150 55,170 85,170" fill="#f1c40f"/>
+              <text x="85" y="35" fill="#9edbff" font-size="14">Main line</text>
+              <text x="235" y="68" fill="#9edbff" font-size="14">6/0–8/0 hook</text>
+              <text x="92" y="116" fill="#9edbff" font-size="14">Sinker boom</text>
+              <text x="94" y="168" fill="#9edbff" font-size="14">4–6 oz sinker</text>
+              <text x="250" y="110" fill="#dff6ff" font-size="16">Kob running sinker rig</text>
+            </svg>
+          </div>
         `;
       }
 
       if (type.includes("Yellowtail")) {
         return `
-          <svg viewBox="0 0 600 180" class="rig-sketch">
-            <rect width="600" height="180" fill="#06101d"/>
-            <line x1="60" y1="30" x2="300" y2="90" stroke="#7ee7ff" stroke-width="3"/>
-            <line x1="300" y1="90" x2="500" y2="90" stroke="#fff" stroke-width="2"/>
-            <circle cx="300" cy="90" r="5" fill="#f1c40f"/>
-            <path d="M500 90 q18 10 0 22" fill="none" stroke="#fff" stroke-width="2"/>
-            <ellipse cx="410" cy="90" rx="40" ry="15" fill="none" stroke="#3fe0aa" stroke-width="2"/>
-            <polygon points="450,90 470,78 470,102" fill="none" stroke="#3fe0aa" stroke-width="2"/>
-            <text x="65" y="25" fill="#9edbff" font-size="14">Main line</text>
-            <text x="315" y="80" fill="#9edbff" font-size="14">Swivel</text>
-            <text x="360" y="68" fill="#9edbff" font-size="14">Live bait</text>
-            <text x="505" y="90" fill="#9edbff" font-size="14">Hook</text>
-            <text x="235" y="145" fill="#dff6ff" font-size="15">Yellowtail drift/live bait rig</text>
-          </svg>
+          <div class="rig-svg-wrap">
+            <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="180" fill="#06101d"/>
+              <line x1="60" y1="30" x2="300" y2="90" stroke="#7ee7ff" stroke-width="3"/>
+              <line x1="300" y1="90" x2="500" y2="90" stroke="#ffffff" stroke-width="2"/>
+              <circle cx="300" cy="90" r="5" fill="#f1c40f"/>
+              <path d="M500 90 q18 10 0 22" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <ellipse cx="410" cy="90" rx="40" ry="15" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+              <polygon points="450,90 470,78 470,102" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+              <text x="65" y="25" fill="#9edbff" font-size="14">Main line</text>
+              <text x="315" y="80" fill="#9edbff" font-size="14">Swivel</text>
+              <text x="360" y="68" fill="#9edbff" font-size="14">Live bait</text>
+              <text x="505" y="90" fill="#9edbff" font-size="14">Hook</text>
+              <text x="220" y="145" fill="#dff6ff" font-size="16">Yellowtail drift/live bait rig</text>
+            </svg>
+          </div>
         `;
       }
 
       if (type.includes("Roman")) {
         return `
-          <svg viewBox="0 0 600 180" class="rig-sketch">
-            <rect width="600" height="180" fill="#06101d"/>
-            <line x1="100" y1="20" x2="100" y2="145" stroke="#7ee7ff" stroke-width="3"/>
-            <line x1="100" y1="60" x2="230" y2="60" stroke="#fff" stroke-width="2"/>
-            <path d="M230 60 q16 10 0 18" fill="none" stroke="#fff" stroke-width="2"/>
-            <line x1="100" y1="100" x2="230" y2="100" stroke="#fff" stroke-width="2"/>
-            <path d="M230 100 q16 10 0 18" fill="none" stroke="#fff" stroke-width="2"/>
-            <polygon points="100,145 82,168 118,168" fill="#f1c40f"/>
-            <text x="120" y="30" fill="#9edbff" font-size="14">Main body trace</text>
-            <text x="240" y="60" fill="#9edbff" font-size="14">Hook 1</text>
-            <text x="240" y="100" fill="#9edbff" font-size="14">Hook 2</text>
-            <text x="122" y="167" fill="#9edbff" font-size="14">6–8 oz sinker</text>
-            <text x="260" y="145" fill="#dff6ff" font-size="15">Roman double paternoster</text>
-          </svg>
+          <div class="rig-svg-wrap">
+            <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="180" fill="#06101d"/>
+              <line x1="100" y1="20" x2="100" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+              <line x1="100" y1="60" x2="230" y2="60" stroke="#ffffff" stroke-width="2"/>
+              <path d="M230 60 q16 10 0 18" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <line x1="100" y1="100" x2="230" y2="100" stroke="#ffffff" stroke-width="2"/>
+              <path d="M230 100 q16 10 0 18" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <polygon points="100,145 82,168 118,168" fill="#f1c40f"/>
+              <text x="120" y="30" fill="#9edbff" font-size="14">Main body trace</text>
+              <text x="240" y="60" fill="#9edbff" font-size="14">Hook 1</text>
+              <text x="240" y="100" fill="#9edbff" font-size="14">Hook 2</text>
+              <text x="122" y="167" fill="#9edbff" font-size="14">6–8 oz sinker</text>
+              <text x="250" y="145" fill="#dff6ff" font-size="16">Roman double paternoster</text>
+            </svg>
+          </div>
         `;
       }
 
       if (type.includes("Hottentot")) {
         return `
-          <svg viewBox="0 0 600 180" class="rig-sketch">
-            <rect width="600" height="180" fill="#06101d"/>
-            <line x1="120" y1="20" x2="120" y2="145" stroke="#7ee7ff" stroke-width="3"/>
-            <line x1="120" y1="70" x2="200" y2="70" stroke="#fff" stroke-width="2"/>
-            <path d="M200 70 q12 8 0 14" fill="none" stroke="#fff" stroke-width="2"/>
-            <line x1="120" y1="100" x2="200" y2="100" stroke="#fff" stroke-width="2"/>
-            <path d="M200 100 q12 8 0 14" fill="none" stroke="#fff" stroke-width="2"/>
-            <polygon points="120,145 105,165 135,165" fill="#f1c40f"/>
-            <text x="215" y="72" fill="#9edbff" font-size="14">Small hook</text>
-            <text x="215" y="102" fill="#9edbff" font-size="14">Small hook</text>
-            <text x="155" y="165" fill="#9edbff" font-size="14">3–5 oz sinker</text>
-            <text x="245" y="145" fill="#dff6ff" font-size="15">Hottentot small paternoster</text>
-          </svg>
+          <div class="rig-svg-wrap">
+            <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="180" fill="#06101d"/>
+              <line x1="120" y1="20" x2="120" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+              <line x1="120" y1="70" x2="200" y2="70" stroke="#ffffff" stroke-width="2"/>
+              <path d="M200 70 q12 8 0 14" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <line x1="120" y1="100" x2="200" y2="100" stroke="#ffffff" stroke-width="2"/>
+              <path d="M200 100 q12 8 0 14" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <polygon points="120,145 105,165 135,165" fill="#f1c40f"/>
+              <text x="215" y="72" fill="#9edbff" font-size="14">Small hook</text>
+              <text x="215" y="102" fill="#9edbff" font-size="14">Small hook</text>
+              <text x="155" y="165" fill="#9edbff" font-size="14">3–5 oz sinker</text>
+              <text x="240" y="145" fill="#dff6ff" font-size="16">Hottentot paternoster</text>
+            </svg>
+          </div>
+        `;
+      }
+
+      if (type.includes("Garrick")) {
+        return `
+          <div class="rig-svg-wrap">
+            <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+              <rect width="600" height="180" fill="#06101d"/>
+              <line x1="70" y1="30" x2="290" y2="90" stroke="#7ee7ff" stroke-width="3"/>
+              <circle cx="290" cy="90" r="5" fill="#f1c40f"/>
+              <line x1="290" y1="90" x2="510" y2="90" stroke="#ffffff" stroke-width="2"/>
+              <ellipse cx="400" cy="90" rx="45" ry="16" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+              <polygon points="442,90 465,78 465,102" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+              <path d="M510 90 q18 10 0 20" fill="none" stroke="#ffffff" stroke-width="2"/>
+              <text x="78" y="25" fill="#9edbff" font-size="14">Main line</text>
+              <text x="305" y="80" fill="#9edbff" font-size="14">Swivel</text>
+              <text x="372" y="68" fill="#9edbff" font-size="14">Live mullet</text>
+              <text x="515" y="92" fill="#9edbff" font-size="14">Hook</text>
+              <text x="255" y="145" fill="#dff6ff" font-size="16">Garrick live bait rig</text>
+            </svg>
+          </div>
         `;
       }
 
       return `
-        <svg viewBox="0 0 600 180" class="rig-sketch">
-          <rect width="600" height="180" fill="#06101d"/>
-          <line x1="90" y1="25" x2="90" y2="145" stroke="#7ee7ff" stroke-width="3"/>
-          <line x1="90" y1="80" x2="240" y2="80" stroke="#fff" stroke-width="2"/>
-          <path d="M240 80 q14 9 0 16" fill="none" stroke="#fff" stroke-width="2"/>
-          <polygon points="90,145 75,165 105,165" fill="#f1c40f"/>
-          <text x="110" y="25" fill="#9edbff" font-size="14">Main line</text>
-          <text x="250" y="80" fill="#9edbff" font-size="14">Hook</text>
-          <text x="112" y="165" fill="#9edbff" font-size="14">Sinker</text>
-          <text x="230" y="145" fill="#dff6ff" font-size="15">General rig sketch</text>
-        </svg>
+        <div class="rig-svg-wrap">
+          <svg viewBox="0 0 600 180" class="rig-svg" xmlns="http://www.w3.org/2000/svg">
+            <rect width="600" height="180" fill="#06101d"/>
+            <line x1="90" y1="25" x2="90" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+            <line x1="90" y1="80" x2="240" y2="80" stroke="#ffffff" stroke-width="2"/>
+            <path d="M240 80 q14 9 0 16" fill="none" stroke="#ffffff" stroke-width="2"/>
+            <polygon points="90,145 75,165 105,165" fill="#f1c40f"/>
+            <text x="110" y="25" fill="#9edbff" font-size="14">Main line</text>
+            <text x="250" y="80" fill="#9edbff" font-size="14">Hook</text>
+            <text x="112" y="165" fill="#9edbff" font-size="14">Sinker</text>
+            <text x="230" y="145" fill="#dff6ff" font-size="16">General rig sketch</text>
+          </svg>
+        </div>
       `;
+    }
+
+    function toggleRig(id) {
+      const el = document.getElementById(id);
+      if (!el) return;
+      el.style.display = el.style.display === "none" ? "block" : "none";
     }
 
     function renderRigs() {
@@ -811,7 +981,6 @@
       rigList.innerHTML = rigs.map(r => `
         <div class="rig-card">
           <div class="rig-title">${r.name}</div>
-          ${sketchSVG(r.name)}
           <div class="muted"><strong>Target:</strong> ${r.species}</div>
           <div class="muted"><strong>Leader:</strong> ${r.leader}</div>
           <div class="muted"><strong>Snoot / dropper:</strong> ${r.snoot}</div>
@@ -819,6 +988,11 @@
           <div class="muted"><strong>Sinker:</strong> ${r.sinker}</div>
           <div class="muted"><strong>Bait:</strong> ${r.bait}</div>
           <div class="muted"><strong>Notes:</strong> ${r.notes}</div>
+
+          <button class="toggle-btn" onclick="toggleRig('${r.id}')">Open / Close Rig Sketch</button>
+          <div id="${r.id}" style="display:none;">
+            ${sketchSVG(r.name)}
+          </div>
         </div>
       `).join("");
     }
@@ -940,9 +1114,11 @@
 
     fillSelectors();
     renderFishDB();
+    renderPresets();
+    renderBaitStats();
     renderRigs();
     renderLogs();
     loadMarine();
   </script>
 </body>
-</html>
+        </html>
