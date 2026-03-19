@@ -1,192 +1,948 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fishing PRO</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tanya Fishing Pro Ultimate</title>
+  <style>
+    :root{
+      --bg:#07111f;
+      --panel:#0f1c2e;
+      --panel2:#13243a;
+      --line:#23415f;
+      --text:#eef6ff;
+      --muted:#9eb7cf;
+      --accent:#47c7ff;
+      --accent2:#18a0d8;
+      --good:#2ecc71;
+      --warn:#f1c40f;
+      --bad:#ff5f6d;
+    }
 
-<style>
-body{margin:0;font-family:Arial;background:#061225;color:white;}
-header{padding:15px;text-align:center;background:#0a1835;font-size:20px;}
-.card{background:#0f1c38;margin:10px;padding:15px;border-radius:12px;}
-button{padding:10px;background:#2fa4ff;border:none;color:white;border-radius:8px;}
-input,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
-.tab{display:flex;}
-.tab button{flex:1;margin:2px;}
-.hidden{display:none;}
-.ok{color:#39d98a;}
-.warn{color:#ff8c42;}
-</style>
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial, Helvetica, sans-serif;
+      background:linear-gradient(180deg,#06101d,#0a1830 40%,#07111f);
+      color:var(--text);
+    }
 
+    header{
+      padding:18px 14px;
+      text-align:center;
+      background:rgba(7,17,31,.95);
+      border-bottom:1px solid var(--line);
+      position:sticky;
+      top:0;
+      z-index:10;
+    }
+
+    header h1{
+      margin:0;
+      font-size:22px;
+      color:var(--accent);
+      letter-spacing:.5px;
+    }
+
+    header p{
+      margin:6px 0 0;
+      color:var(--muted);
+      font-size:13px;
+    }
+
+    .container{
+      padding:14px;
+      max-width:1100px;
+      margin:0 auto;
+    }
+
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:14px;
+    }
+
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:14px;
+      box-shadow:0 8px 20px rgba(0,0,0,.22);
+      margin-bottom:14px;
+    }
+
+    .card h2{
+      margin:0 0 12px;
+      color:var(--accent);
+      font-size:18px;
+    }
+
+    .sub{
+      color:var(--muted);
+      font-size:13px;
+      margin-bottom:10px;
+    }
+
+    .pill{
+      display:inline-block;
+      padding:5px 9px;
+      border-radius:999px;
+      background:#0b2943;
+      border:1px solid #1e547f;
+      margin:3px 4px 3px 0;
+      font-size:12px;
+      color:#dff5ff;
+    }
+
+    label{
+      display:block;
+      margin:8px 0 6px;
+      font-size:13px;
+      color:var(--muted);
+    }
+
+    input, select, textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#081321;
+      color:var(--text);
+      outline:none;
+    }
+
+    textarea{min-height:80px; resize:vertical;}
+
+    button{
+      margin-top:10px;
+      width:100%;
+      padding:11px 12px;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      color:#04131f;
+      font-weight:700;
+      cursor:pointer;
+    }
+
+    button:hover{filter:brightness(1.05)}
+
+    .result{
+      margin-top:10px;
+      padding:10px;
+      border-radius:12px;
+      background:#081321;
+      border:1px solid var(--line);
+      line-height:1.5;
+    }
+
+    .fish-item, .log-item{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      padding:10px 0;
+    }
+
+    .fish-item:last-child, .log-item:last-child{border-bottom:none}
+
+    .fish-top{
+      display:flex;
+      justify-content:space-between;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+    }
+
+    .fish-name{
+      font-size:16px;
+      font-weight:700;
+    }
+
+    .muted{color:var(--muted); font-size:13px;}
+    .good{color:var(--good); font-weight:700;}
+    .warn{color:var(--warn); font-weight:700;}
+    .bad{color:var(--bad); font-weight:700;}
+
+    .small-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
+      margin-top:8px;
+    }
+
+    .metric{
+      background:#081321;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      text-align:center;
+    }
+
+    .metric .big{
+      font-size:20px;
+      font-weight:700;
+      color:var(--accent);
+    }
+
+    .search-row{
+      display:grid;
+      grid-template-columns:1fr;
+      gap:10px;
+      margin-bottom:10px;
+    }
+
+    .rig-card{
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:10px;
+      margin-bottom:12px;
+      background:#091525;
+    }
+
+    .rig-title{
+      font-size:16px;
+      font-weight:700;
+      color:#dff6ff;
+      margin-bottom:8px;
+    }
+
+    .rig-sketch{
+      width:100%;
+      height:180px;
+      border-radius:10px;
+      background:#06101d;
+      border:1px solid #18344e;
+      margin-bottom:10px;
+    }
+
+    .map-wrap iframe{
+      width:100%;
+      height:240px;
+      border:0;
+      border-radius:12px;
+    }
+
+    .score-bar{
+      height:14px;
+      width:100%;
+      background:#081321;
+      border:1px solid var(--line);
+      border-radius:999px;
+      overflow:hidden;
+      margin-top:8px;
+    }
+
+    .score-fill{
+      height:100%;
+      width:0%;
+      background:linear-gradient(90deg,#24d17e,#f1c40f,#ff6b6b);
+      transition:width .3s ease;
+    }
+
+    .section-title{
+      margin:18px 0 10px;
+      color:#d9f3ff;
+      font-size:20px;
+    }
+  </style>
 </head>
 <body>
+  <header>
+    <h1>🎣 Tanya Fishing Pro Ultimate</h1>
+    <p>More species • size limits • rigs with sketches • legal check • bait • logs • sea theme</p>
+  </header>
 
-<header>🎣 Fishing PRO</header>
+  <div class="container">
 
-<div class="tab">
-<button onclick="show('sw')">🌊</button>
-<button onclick="show('log')">📒</button>
-<button onclick="show('ai')">🧠</button>
-<button onclick="show('gps')">📍</button>
-<button onclick="show('regs')">⚖️</button>
-</div>
+    <div class="grid">
+      <div class="card">
+        <h2>🌊 Marine Conditions</h2>
+        <div class="sub">Stilbaai area basic live marine pull</div>
+        <div class="small-grid">
+          <div class="metric">
+            <div class="muted">Wave Height</div>
+            <div class="big" id="waveHeight">--</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Wave Period</div>
+            <div class="big" id="wavePeriod">--</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Sea Temp</div>
+            <div class="big" id="seaTemp">--</div>
+          </div>
+          <div class="metric">
+            <div class="muted">Fishing Score</div>
+            <div class="big" id="fishingScore">--</div>
+          </div>
+        </div>
+        <div class="score-bar"><div class="score-fill" id="scoreFill"></div></div>
+        <div class="result" id="conditionsText">Loading marine conditions...</div>
+      </div>
 
-<!-- SW -->
-<div id="sw" class="card">
-<h3>Ocean Conditions</h3>
-<p id="wave">Wave: 1.2m</p>
-<p id="temp">Temp: 19°C</p>
-<p id="tide">Tide: Rising</p>
-<p id="score"></p>
-</div>
+      <div class="card">
+        <h2>⚖️ Legal Checker</h2>
+        <label for="speciesSelect">Species</label>
+        <select id="speciesSelect"></select>
 
-<!-- LOG -->
-<div id="log" class="card hidden">
-<select id="fish">
-<option>Kob</option>
-<option>Yellowtail</option>
-<option>Hottentot</option>
-<option>Roman</option>
-</select>
+        <label for="fishSize">Measured size (cm)</label>
+        <input type="number" id="fishSize" placeholder="Enter fish size in cm" />
 
-<input id="size" placeholder="Size cm">
-<input id="bait" placeholder="Bait">
+        <button onclick="checkLegal()">Check legality</button>
+        <div class="result" id="legalResult">Choose species and enter size.</div>
+      </div>
+    </div>
 
-<button onclick="save()">Save</button>
+    <div class="card">
+      <h2>🐟 Fish Species Database</h2>
+      <div class="sub">Expanded list with size limit, bag limit, bait, season, habitat and status</div>
 
-<ul id="list"></ul>
-</div>
+      <div class="search-row">
+        <input type="text" id="fishSearch" placeholder="Search fish species..." oninput="renderFishDB()" />
+      </div>
 
-<!-- AI -->
-<div id="ai" class="card hidden">
-<button onclick="ai()">Run AI</button>
-<p id="aiout"></p>
-</div>
+      <div id="fishList"></div>
+    </div>
 
-<!-- GPS -->
-<div id="gps" class="card hidden">
-<button onclick="gps()">Save Spot</button>
-<ul id="spots"></ul>
-</div>
+    <div class="card">
+      <h2>🪝 Rig Library with Sketches</h2>
+      <div class="sub">Simple built-in sketches so niks is leeg nie</div>
+      <div id="rigList"></div>
+    </div>
 
-<!-- REGS -->
-<div id="regs" class="card hidden">
-<select id="rfish">
-<option>Kob</option>
-<option>Hottentot</option>
-<option>Yellowtail</option>
-</select>
+    <div class="grid">
+      <div class="card">
+        <h2>🧠 Best Bait Helper</h2>
+        <label for="baitSpecies">Target species</label>
+        <select id="baitSpecies"></select>
+        <button onclick="showBaitAdvice()">Show bait advice</button>
+        <div class="result" id="baitAdvice">Pick a species for bait, rig and notes.</div>
+      </div>
 
-<input id="rsize" placeholder="Size cm">
-<button onclick="check()">Check</button>
-<p id="result"></p>
-</div>
+      <div class="card">
+        <h2>📍 Stilbaai Map</h2>
+        <div class="map-wrap">
+          <iframe src="https://maps.google.com/maps?q=Stilbaai&t=&z=12&ie=UTF8&iwloc=&output=embed"></iframe>
+        </div>
+      </div>
+    </div>
 
-<script>
+    <div class="card">
+      <h2>📝 Session Logger</h2>
+      <label>Date</label>
+      <input type="date" id="logDate" />
 
-// tabs
-function show(id){
-document.querySelectorAll('.card').forEach(c=>c.classList.add('hidden'));
-document.getElementById(id).classList.remove('hidden');
-}
+      <label>Spot</label>
+      <input type="text" id="logSpot" placeholder="e.g. Stilbaai Harbour / Reef Edge" />
 
-// fake ocean (WORKS ALWAYS)
-function load(){
-let wave = (Math.random()*2).toFixed(1);
-let temp = 16 + Math.floor(Math.random()*6);
-let tide = Math.random()>0.5 ? "Rising" : "Falling";
+      <label>Species</label>
+      <input type="text" id="logSpecies" placeholder="e.g. Kob" />
 
-waveEl.innerText="Wave: "+wave+"m";
-tempEl.innerText="Temp: "+temp+"°C";
-tideEl.innerText="Tide: "+tide;
+      <label>Size (cm)</label>
+      <input type="number" id="logSize" placeholder="e.g. 68" />
 
-let score=50;
-if(wave<1.5)score+=20;
-if(temp>17)score+=10;
-if(tide=="Rising")score+=10;
+      <label>Bait / Notes</label>
+      <textarea id="logNotes" placeholder="Bait used, tide, weather, catch notes..."></textarea>
 
-scoreEl.innerText="Fishing Score: "+score+"/100";
-}
+      <button onclick="saveLog()">Save session log</button>
+      <div class="result" id="logList">No logs yet.</div>
+    </div>
+  </div>
 
-let waveEl=document.getElementById("wave");
-let tempEl=document.getElementById("temp");
-let tideEl=document.getElementById("tide");
-let scoreEl=document.getElementById("score");
+  <script>
+    const fishDB = [
+      {
+        name:"Kob / Kabeljou",
+        key:"kob",
+        min:60,
+        bag:5,
+        status:"🟡 Near Threatened",
+        habitat:"Sand gullies, channels, estuaries, surf, reefs",
+        season:"Best in warmer months; good on tide changes",
+        bait:"Chokka, sardine, maasbanker, live bait",
+        rig:"Running sinker / slide / kob trace",
+        notes:"Target around dusk, night, tide push.",
+        category:"Edible"
+      },
+      {
+        name:"Yellowtail",
+        key:"yellowtail",
+        min:60,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Pelagic, reefs, offshore shoals",
+        season:"Best in clean water, active birds, bait balls",
+        bait:"Live bait, spoon, plug, fillet strip",
+        rig:"Drift/live bait rig",
+        notes:"Fast moving, aggressive, likes current lines.",
+        category:"Game"
+      },
+      {
+        name:"Bonito",
+        key:"bonito",
+        min:0,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Offshore surface feeders",
+        season:"Warm clear water",
+        bait:"Small feathers, spoons, live bait",
+        rig:"Light trolling / spinning rig",
+        notes:"Follows bait shoals and bird activity.",
+        category:"Game"
+      },
+      {
+        name:"Red Roman",
+        key:"redroman",
+        min:30,
+        bag:5,
+        status:"🟡 Near Threatened",
+        habitat:"Rocky reef",
+        season:"Reef feeding windows around dawn and dusk",
+        bait:"Chokka, sardine, red bait, octopus strip",
+        rig:"Double paternoster",
+        notes:"Classic reef species, structure-hugging fish.",
+        category:"Edible"
+      },
+      {
+        name:"Snapper",
+        key:"snapper",
+        min:30,
+        bag:5,
+        status:"🟡 Near Threatened",
+        habitat:"Reef and broken ground",
+        season:"Good in moderate conditions",
+        bait:"Chokka, sardine, red bait",
+        rig:"Paternoster",
+        notes:"Often caught mixed with reef species.",
+        category:"Edible"
+      },
+      {
+        name:"Silverfish",
+        key:"silverfish",
+        min:25,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Reef and shallow structure",
+        season:"General",
+        bait:"Chokka, sardine strips",
+        rig:"Small paternoster",
+        notes:"Use lighter hooks and neat bait presentation.",
+        category:"Edible"
+      },
+      {
+        name:"Red Steenbras",
+        key:"redsteenbras",
+        min:60,
+        bag:1,
+        status:"🔴⬛ Critically Endangered",
+        habitat:"Reef and sandy reef edges",
+        season:"Rare and highly protected concern",
+        bait:"Red bait, chokka, prawn",
+        rig:"Heavy bottom rig",
+        notes:"Extreme care. Check current regulations before keeping.",
+        category:"Protected concern"
+      },
+      {
+        name:"White Steenbras",
+        key:"whitesteenbras",
+        min:60,
+        bag:1,
+        status:"🟠 Vulnerable",
+        habitat:"Surf zone, sand banks, estuaries",
+        season:"Surf fishing windows",
+        bait:"Prawn, bloodworm, wonderworm, chokka",
+        rig:"Surf trace / running sinker",
+        notes:"Sensitive species. Handle carefully.",
+        category:"Edible"
+      },
+      {
+        name:"Yellow Belly",
+        key:"yellowbelly",
+        min:30,
+        bag:5,
+        status:"🟢 Least Concern",
+        habitat:"Reef",
+        season:"General reef fishing",
+        bait:"Chokka, sardine",
+        rig:"Paternoster",
+        notes:"Often on mixed reef marks.",
+        category:"Edible"
+      },
+      {
+        name:"Hottentot",
+        key:"hottentot",
+        min:22,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Shallow reef, kelp, rocky gullies",
+        season:"Very common in workable reef conditions",
+        bait:"Red bait, chokka, prawn",
+        rig:"Small double paternoster",
+        notes:"Good starter reef fish, likes structure.",
+        category:"Edible"
+      },
+      {
+        name:"Geelbek / Cape Salmon",
+        key:"geelbek",
+        min:60,
+        bag:5,
+        status:"🟡 Near Threatened",
+        habitat:"Offshore shoals, reefs, deeper channels",
+        season:"Night / low light can be excellent",
+        bait:"Sardine, chokka, live bait",
+        rig:"Drift / running / live bait rig",
+        notes:"Often responds to shoal movement and tide flow.",
+        category:"Edible"
+      },
+      {
+        name:"Carpenter",
+        key:"carpenter",
+        min:40,
+        bag:5,
+        status:"🟢 Least Concern",
+        habitat:"Deep reef",
+        season:"Better on offshore reef drifts",
+        bait:"Chokka, sardine, squid strip",
+        rig:"Bottom paternoster",
+        notes:"Found on deeper structure.",
+        category:"Edible"
+      },
+      {
+        name:"Dageraad",
+        key:"dageraad",
+        min:40,
+        bag:1,
+        status:"🔴 Endangered",
+        habitat:"Reef",
+        season:"Rare encounter",
+        bait:"Chokka, red bait",
+        rig:"Paternoster",
+        notes:"Protected concern. Verify regulations carefully.",
+        category:"Protected concern"
+      },
+      {
+        name:"Santer",
+        key:"santer",
+        min:30,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Reef, broken ground",
+        season:"General reef fishing",
+        bait:"Chokka, sardine, squid strip",
+        rig:"Double paternoster",
+        notes:"Reliable mixed-bag reef species.",
+        category:"Edible"
+      },
+      {
+        name:"Elf / Shad",
+        key:"shad",
+        min:30,
+        bag:4,
+        status:"🟡 Pressure",
+        habitat:"Surf, estuaries, river mouths",
+        season:"Warm season runs",
+        bait:"Sardine, spoon, plug, paddle tail",
+        rig:"Spinning / trace with wire if needed",
+        notes:"Aggressive predator; often on moving water.",
+        category:"Edible / sport"
+      },
+      {
+        name:"Garrick / Leervis",
+        key:"garrick",
+        min:70,
+        bag:2,
+        status:"🟡 Pressure",
+        habitat:"Estuary mouths, surf, channels",
+        season:"Warm months, baitfish presence",
+        bait:"Live mullet, plug, spoon, paddle tail",
+        rig:"Live bait / lure rig",
+        notes:"Powerful estuary and surf predator.",
+        category:"Sport / edible"
+      },
+      {
+        name:"Galjoen",
+        key:"galjoen",
+        min:35,
+        bag:2,
+        status:"🟠 Vulnerable",
+        habitat:"White water rocky shore",
+        season:"Winter often better",
+        bait:"Red bait, white mussel, prawn",
+        rig:"Short trace / direct surf rig",
+        notes:"National fish, often in turbulent white water.",
+        category:"Edible"
+      },
+      {
+        name:"Blacktail / Dassie",
+        key:"blacktail",
+        min:20,
+        bag:10,
+        status:"🟢 Least Concern",
+        habitat:"Rocky shore, gullies",
+        season:"General",
+        bait:"Red bait, prawn, chokka bits",
+        rig:"Small hook shore rig",
+        notes:"Common around rocks and shallow structure.",
+        category:"Edible"
+      }
+    ];
 
-load();
+    const rigs = [
+      {
+        name:"Kob Running Sinker Rig",
+        species:"Kob / Kabeljou",
+        leader:"80–120 cm leader",
+        snoot:"Single hook trace",
+        hooks:"6/0 – 8/0",
+        sinker:"4–6 oz",
+        bait:"Chokka + sardine combo / live bait",
+        notes:"Good for sand channels, gullies and tide push."
+      },
+      {
+        name:"Yellowtail Drift Rig",
+        species:"Yellowtail",
+        leader:"100–150 cm fluorocarbon leader",
+        snoot:"Single live bait hook setup",
+        hooks:"6/0 – 9/0",
+        sinker:"Usually none / very light",
+        bait:"Live bait, fillet strip, spoon",
+        notes:"Best for drift, working shoals and surface signs."
+      },
+      {
+        name:"Roman Double Paternoster",
+        species:"Red Roman / Santer / Snapper",
+        leader:"80–100 cm body trace",
+        snoot:"2 droppers, 15–20 cm each",
+        hooks:"3/0 – 5/0",
+        sinker:"6–8 oz",
+        bait:"Chokka, squid strip, sardine",
+        notes:"Classic reef rig for bottom species."
+      },
+      {
+        name:"Hottentot Small Paternoster",
+        species:"Hottentot / Blacktail",
+        leader:"60–80 cm body trace",
+        snoot:"2 short droppers",
+        hooks:"1/0 – 2/0",
+        sinker:"3–5 oz",
+        bait:"Red bait, prawn, chokka bits",
+        notes:"Keep bait neat and close to structure."
+      },
+      {
+        name:"Garrick Live Bait Rig",
+        species:"Garrick / Leervis",
+        leader:"100 cm abrasion-resistant leader",
+        snoot:"Single live bait connection",
+        hooks:"6/0 – 8/0 circle/live bait",
+        sinker:"None / small depending current",
+        bait:"Live mullet",
+        notes:"Ideal in estuary mouths and baitfish zones."
+      }
+    ];
 
-// log
-function save(){
-let log=JSON.parse(localStorage.getItem("log")||"[]");
-log.push({
-fish:fish.value,
-size:size.value,
-bait:bait.value
-});
-localStorage.setItem("log",JSON.stringify(log));
-render();
-}
+    let logs = [];
 
-function render(){
-let log=JSON.parse(localStorage.getItem("log")||"[]");
-list.innerHTML="";
-log.forEach(l=>{
-let li=document.createElement("li");
-li.innerText=l.fish+" "+l.size+"cm ("+l.bait+")";
-list.appendChild(li);
-});
-}
-render();
+    function fillSelectors() {
+      const speciesSelect = document.getElementById("speciesSelect");
+      const baitSpecies = document.getElementById("baitSpecies");
 
-// AI
-function ai(){
-let log=JSON.parse(localStorage.getItem("log")||"[]");
-let count={};
+      speciesSelect.innerHTML = fishDB.map(f => `<option value="${f.key}">${f.name}</option>`).join("");
+      baitSpecies.innerHTML = fishDB.map(f => `<option value="${f.key}">${f.name}</option>`).join("");
+    }
 
-log.forEach(l=>{
-count[l.bait]=(count[l.bait]||0)+1;
-});
+    function renderFishDB() {
+      const q = document.getElementById("fishSearch").value.trim().toLowerCase();
+      const list = document.getElementById("fishList");
 
-let best=Object.keys(count).sort((a,b)=>count[b]-count[a])[0];
+      const filtered = fishDB.filter(f =>
+        f.name.toLowerCase().includes(q) ||
+        f.habitat.toLowerCase().includes(q) ||
+        f.bait.toLowerCase().includes(q) ||
+        f.rig.toLowerCase().includes(q)
+      );
 
-aiout.innerText="Best bait: "+(best||"No data");
-}
+      if (!filtered.length) {
+        list.innerHTML = `<div class="result">No species found.</div>`;
+        return;
+      }
 
-// GPS
-function gps(){
-navigator.geolocation.getCurrentPosition(pos=>{
-let s=JSON.parse(localStorage.getItem("spots")||"[]");
-s.push(pos.coords.latitude+","+pos.coords.longitude);
-localStorage.setItem("spots",JSON.stringify(s));
-renderSpots();
-});
-}
+      list.innerHTML = filtered.map(f => `
+        <div class="fish-item">
+          <div class="fish-top">
+            <div class="fish-name">${f.name}</div>
+            <div class="pill">${f.status}</div>
+          </div>
+          <div class="small-grid">
+            <div><span class="muted">Min size:</span> <strong>${f.min ? f.min + " cm" : "No minimum set here"}</strong></div>
+            <div><span class="muted">Bag limit:</span> <strong>${f.bag}</strong></div>
+            <div><span class="muted">Category:</span> <strong>${f.category}</strong></div>
+            <div><span class="muted">Rig:</span> <strong>${f.rig}</strong></div>
+          </div>
+          <div class="muted" style="margin-top:8px;"><strong>Habitat:</strong> ${f.habitat}</div>
+          <div class="muted"><strong>Season:</strong> ${f.season}</div>
+          <div class="muted"><strong>Best bait:</strong> ${f.bait}</div>
+          <div class="muted"><strong>Notes:</strong> ${f.notes}</div>
+        </div>
+      `).join("");
+    }
 
-function renderSpots(){
-let s=JSON.parse(localStorage.getItem("spots")||"[]");
-spots.innerHTML="";
-s.forEach(x=>{
-let li=document.createElement("li");
-li.innerText=x;
-spots.appendChild(li);
-});
-}
-renderSpots();
+    function checkLegal() {
+      const key = document.getElementById("speciesSelect").value;
+      const size = Number(document.getElementById("fishSize").value);
+      const result = document.getElementById("legalResult");
+      const fish = fishDB.find(f => f.key === key);
 
-// regs
-let rules={Kob:60,Hottentot:22,Yellowtail:60};
+      if (!fish) {
+        result.innerHTML = "Species not found.";
+        return;
+      }
 
-function check(){
-let s=parseInt(rsize.value);
-let f=rfish.value;
+      if (!size) {
+        result.innerHTML = "Please enter measured size.";
+        return;
+      }
 
-if(s>=rules[f]){
-result.innerHTML="<span class='ok'>Legal ✔</span>";
-}else{
-result.innerHTML="<span class='warn'>Too small ✖</span>";
-}
-}
+      let verdict = size >= fish.min;
+      let cls = verdict ? "good" : "bad";
+      let text = verdict ? "✅ Legal size" : "❌ Undersize";
 
-</script>
+      result.innerHTML = `
+        <div class="${cls}">${text}</div>
+        <div><strong>Species:</strong> ${fish.name}</div>
+        <div><strong>Your size:</strong> ${size} cm</div>
+        <div><strong>Minimum:</strong> ${fish.min} cm</div>
+        <div><strong>Bag limit:</strong> ${fish.bag}</div>
+        <div><strong>Status:</strong> ${fish.status}</div>
+        <div class="muted" style="margin-top:8px;">Always verify current local regulations before keeping fish.</div>
+      `;
+    }
 
+    function sketchSVG(type) {
+      if (type.includes("Kob")) {
+        return `
+          <svg viewBox="0 0 600 180" class="rig-sketch">
+            <rect width="600" height="180" fill="#06101d"/>
+            <line x1="70" y1="20" x2="70" y2="150" stroke="#7ee7ff" stroke-width="3"/>
+            <line x1="70" y1="150" x2="530" y2="150" stroke="#476d91" stroke-width="3"/>
+            <line x1="70" y1="70" x2="230" y2="70" stroke="#fff" stroke-width="2"/>
+            <path d="M230 70 q20 10 0 20" fill="none" stroke="#fff" stroke-width="2"/>
+            <line x1="70" y1="120" x2="150" y2="120" stroke="#7ee7ff" stroke-width="2"/>
+            <polygon points="70,150 55,170 85,170" fill="#f1c40f"/>
+            <text x="85" y="35" fill="#9edbff" font-size="14">Main line</text>
+            <text x="235" y="68" fill="#9edbff" font-size="14">6/0–8/0 hook</text>
+            <text x="92" y="116" fill="#9edbff" font-size="14">Sinker boom</text>
+            <text x="94" y="168" fill="#9edbff" font-size="14">4–6 oz sinker</text>
+            <text x="260" y="110" fill="#dff6ff" font-size="15">Kob running sinker rig</text>
+          </svg>
+        `;
+      }
+
+      if (type.includes("Yellowtail")) {
+        return `
+          <svg viewBox="0 0 600 180" class="rig-sketch">
+            <rect width="600" height="180" fill="#06101d"/>
+            <line x1="60" y1="30" x2="300" y2="90" stroke="#7ee7ff" stroke-width="3"/>
+            <line x1="300" y1="90" x2="500" y2="90" stroke="#fff" stroke-width="2"/>
+            <circle cx="300" cy="90" r="5" fill="#f1c40f"/>
+            <path d="M500 90 q18 10 0 22" fill="none" stroke="#fff" stroke-width="2"/>
+            <ellipse cx="410" cy="90" rx="40" ry="15" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+            <polygon points="450,90 470,78 470,102" fill="none" stroke="#3fe0aa" stroke-width="2"/>
+            <text x="65" y="25" fill="#9edbff" font-size="14">Main line</text>
+            <text x="315" y="80" fill="#9edbff" font-size="14">Swivel</text>
+            <text x="360" y="68" fill="#9edbff" font-size="14">Live bait</text>
+            <text x="505" y="90" fill="#9edbff" font-size="14">Hook</text>
+            <text x="235" y="145" fill="#dff6ff" font-size="15">Yellowtail drift/live bait rig</text>
+          </svg>
+        `;
+      }
+
+      if (type.includes("Roman")) {
+        return `
+          <svg viewBox="0 0 600 180" class="rig-sketch">
+            <rect width="600" height="180" fill="#06101d"/>
+            <line x1="100" y1="20" x2="100" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+            <line x1="100" y1="60" x2="230" y2="60" stroke="#fff" stroke-width="2"/>
+            <path d="M230 60 q16 10 0 18" fill="none" stroke="#fff" stroke-width="2"/>
+            <line x1="100" y1="100" x2="230" y2="100" stroke="#fff" stroke-width="2"/>
+            <path d="M230 100 q16 10 0 18" fill="none" stroke="#fff" stroke-width="2"/>
+            <polygon points="100,145 82,168 118,168" fill="#f1c40f"/>
+            <text x="120" y="30" fill="#9edbff" font-size="14">Main body trace</text>
+            <text x="240" y="60" fill="#9edbff" font-size="14">Hook 1</text>
+            <text x="240" y="100" fill="#9edbff" font-size="14">Hook 2</text>
+            <text x="122" y="167" fill="#9edbff" font-size="14">6–8 oz sinker</text>
+            <text x="260" y="145" fill="#dff6ff" font-size="15">Roman double paternoster</text>
+          </svg>
+        `;
+      }
+
+      if (type.includes("Hottentot")) {
+        return `
+          <svg viewBox="0 0 600 180" class="rig-sketch">
+            <rect width="600" height="180" fill="#06101d"/>
+            <line x1="120" y1="20" x2="120" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+            <line x1="120" y1="70" x2="200" y2="70" stroke="#fff" stroke-width="2"/>
+            <path d="M200 70 q12 8 0 14" fill="none" stroke="#fff" stroke-width="2"/>
+            <line x1="120" y1="100" x2="200" y2="100" stroke="#fff" stroke-width="2"/>
+            <path d="M200 100 q12 8 0 14" fill="none" stroke="#fff" stroke-width="2"/>
+            <polygon points="120,145 105,165 135,165" fill="#f1c40f"/>
+            <text x="215" y="72" fill="#9edbff" font-size="14">Small hook</text>
+            <text x="215" y="102" fill="#9edbff" font-size="14">Small hook</text>
+            <text x="155" y="165" fill="#9edbff" font-size="14">3–5 oz sinker</text>
+            <text x="245" y="145" fill="#dff6ff" font-size="15">Hottentot small paternoster</text>
+          </svg>
+        `;
+      }
+
+      return `
+        <svg viewBox="0 0 600 180" class="rig-sketch">
+          <rect width="600" height="180" fill="#06101d"/>
+          <line x1="90" y1="25" x2="90" y2="145" stroke="#7ee7ff" stroke-width="3"/>
+          <line x1="90" y1="80" x2="240" y2="80" stroke="#fff" stroke-width="2"/>
+          <path d="M240 80 q14 9 0 16" fill="none" stroke="#fff" stroke-width="2"/>
+          <polygon points="90,145 75,165 105,165" fill="#f1c40f"/>
+          <text x="110" y="25" fill="#9edbff" font-size="14">Main line</text>
+          <text x="250" y="80" fill="#9edbff" font-size="14">Hook</text>
+          <text x="112" y="165" fill="#9edbff" font-size="14">Sinker</text>
+          <text x="230" y="145" fill="#dff6ff" font-size="15">General rig sketch</text>
+        </svg>
+      `;
+    }
+
+    function renderRigs() {
+      const rigList = document.getElementById("rigList");
+      rigList.innerHTML = rigs.map(r => `
+        <div class="rig-card">
+          <div class="rig-title">${r.name}</div>
+          ${sketchSVG(r.name)}
+          <div class="muted"><strong>Target:</strong> ${r.species}</div>
+          <div class="muted"><strong>Leader:</strong> ${r.leader}</div>
+          <div class="muted"><strong>Snoot / dropper:</strong> ${r.snoot}</div>
+          <div class="muted"><strong>Hooks:</strong> ${r.hooks}</div>
+          <div class="muted"><strong>Sinker:</strong> ${r.sinker}</div>
+          <div class="muted"><strong>Bait:</strong> ${r.bait}</div>
+          <div class="muted"><strong>Notes:</strong> ${r.notes}</div>
+        </div>
+      `).join("");
+    }
+
+    function showBaitAdvice() {
+      const key = document.getElementById("baitSpecies").value;
+      const fish = fishDB.find(f => f.key === key);
+      const box = document.getElementById("baitAdvice");
+
+      if (!fish) {
+        box.innerHTML = "Species not found.";
+        return;
+      }
+
+      box.innerHTML = `
+        <div><strong>${fish.name}</strong></div>
+        <div><strong>Best bait:</strong> ${fish.bait}</div>
+        <div><strong>Suggested rig:</strong> ${fish.rig}</div>
+        <div><strong>Habitat:</strong> ${fish.habitat}</div>
+        <div><strong>Season / timing:</strong> ${fish.season}</div>
+        <div class="muted" style="margin-top:8px;">Tip: match bait size to hook size and keep presentation neat.</div>
+      `;
+    }
+
+    function saveLog() {
+      const date = document.getElementById("logDate").value;
+      const spot = document.getElementById("logSpot").value.trim();
+      const species = document.getElementById("logSpecies").value.trim();
+      const size = document.getElementById("logSize").value.trim();
+      const notes = document.getElementById("logNotes").value.trim();
+
+      if (!date || !spot || !species) {
+        alert("Please fill in at least date, spot and species.");
+        return;
+      }
+
+      logs.unshift({date, spot, species, size, notes});
+      renderLogs();
+
+      document.getElementById("logSpot").value = "";
+      document.getElementById("logSpecies").value = "";
+      document.getElementById("logSize").value = "";
+      document.getElementById("logNotes").value = "";
+    }
+
+    function renderLogs() {
+      const box = document.getElementById("logList");
+
+      if (!logs.length) {
+        box.innerHTML = "No logs yet.";
+        return;
+      }
+
+      box.innerHTML = logs.map(l => `
+        <div class="log-item">
+          <div><strong>${l.date}</strong> — ${l.spot}</div>
+          <div class="muted"><strong>Species:</strong> ${l.species}${l.size ? ` | <strong>Size:</strong> ${l.size} cm` : ""}</div>
+          <div class="muted"><strong>Notes:</strong> ${l.notes || "-"}</div>
+        </div>
+      `).join("");
+    }
+
+    async function loadMarine() {
+      const waveHeight = document.getElementById("waveHeight");
+      const wavePeriod = document.getElementById("wavePeriod");
+      const seaTemp = document.getElementById("seaTemp");
+      const fishingScore = document.getElementById("fishingScore");
+      const scoreFill = document.getElementById("scoreFill");
+      const conditionsText = document.getElementById("conditionsText");
+
+      try {
+        const url = "https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&current=wave_height,wave_period,sea_surface_temperature";
+        const res = await fetch(url);
+        const data = await res.json();
+
+        const wh = data?.current?.wave_height ?? null;
+        const wp = data?.current?.wave_period ?? null;
+        const st = data?.current?.sea_surface_temperature ?? null;
+
+        waveHeight.textContent = wh !== null ? wh + " m" : "--";
+        wavePeriod.textContent = wp !== null ? wp + " s" : "--";
+        seaTemp.textContent = st !== null ? st + "°C" : "--";
+
+        let score = 50;
+        if (wh !== null) {
+          if (wh <= 1.2) score += 20;
+          else if (wh <= 2) score += 10;
+          else score -= 10;
+        }
+        if (wp !== null) {
+          if (wp >= 8) score += 10;
+          else score -= 5;
+        }
+        if (st !== null) {
+          if (st >= 16 && st <= 22) score += 10;
+        }
+
+        score = Math.max(5, Math.min(95, score));
+
+        fishingScore.textContent = score + "/100";
+        scoreFill.style.width = score + "%";
+
+        let mood = "Fair";
+        if (score >= 75) mood = "Very good";
+        else if (score >= 60) mood = "Good";
+        else if (score < 45) mood = "Tough";
+
+        conditionsText.innerHTML = `
+          <strong>${mood} fishing conditions.</strong><br>
+          Wave: ${wh !== null ? wh + " m" : "--"} |
+          Period: ${wp !== null ? wp + " s" : "--"} |
+          Temp: ${st !== null ? st + "°C" : "--"}<br>
+          <span class="muted">Basic score only. Add wind, tide and moon later for better AI.</span>
+        `;
+      } catch (e) {
+        conditionsText.innerHTML = "Could not load marine data right now.";
+      }
+    }
+
+    fillSelectors();
+    renderFishDB();
+    renderRigs();
+    renderLogs();
+    loadMarine();
+  </script>
 </body>
 </html>
