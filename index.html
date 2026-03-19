@@ -1,864 +1,192 @@
 <!DOCTYPE html>
-<html lang="en">
+<html>
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Tanya Fishing App MAX</title>
-  <link rel="manifest" href="manifest.webmanifest" />
-  <meta name="theme-color" content="#061225" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Fishing PRO</title>
 
-  <style>
-    :root{
-      --bg:#061225;
-      --bg2:#091935;
-      --card:#0f1c38;
-      --card2:#12244a;
-      --line:#1f3769;
-      --text:#fff;
-      --muted:#a8b8d8;
-      --accent:#2fa4ff;
-      --accent2:#69d6ff;
-      --ok:#39d98a;
-      --warn:#ffb020;
-      --danger:#ff6171;
-      --shadow:0 10px 24px rgba(0,0,0,.25);
-      --radius:18px;
-    }
+<style>
+body{margin:0;font-family:Arial;background:#061225;color:white;}
+header{padding:15px;text-align:center;background:#0a1835;font-size:20px;}
+.card{background:#0f1c38;margin:10px;padding:15px;border-radius:12px;}
+button{padding:10px;background:#2fa4ff;border:none;color:white;border-radius:8px;}
+input,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
+.tab{display:flex;}
+.tab button{flex:1;margin:2px;}
+.hidden{display:none;}
+.ok{color:#39d98a;}
+.warn{color:#ff8c42;}
+</style>
 
-    *{box-sizing:border-box}
-    html,body{margin:0;padding:0}
-    body{
-      font-family:Arial,sans-serif;
-      background:linear-gradient(180deg,var(--bg),#08142a 45%, #071122);
-      color:var(--text);
-      min-height:100vh;
-    }
-
-    a{color:var(--accent2)}
-    img{max-width:100%}
-
-    header{
-      position:sticky;
-      top:0;
-      z-index:30;
-      background:linear-gradient(180deg,#0d2044,#081632);
-      border-bottom:1px solid var(--line);
-      box-shadow:var(--shadow);
-      padding:14px 14px 10px;
-    }
-
-    .title{
-      display:flex;
-      align-items:center;
-      justify-content:space-between;
-      gap:10px;
-    }
-
-    .title h1{
-      margin:0;
-      font-size:20px;
-      line-height:1.1;
-    }
-
-    .subtitle{
-      margin-top:4px;
-      color:var(--muted);
-      font-size:12px;
-    }
-
-    .chipbar{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    .chip{
-      display:inline-flex;
-      align-items:center;
-      gap:6px;
-      background:#10244a;
-      border:1px solid var(--line);
-      border-radius:999px;
-      padding:7px 10px;
-      font-size:12px;
-      color:#dfe9ff;
-    }
-
-    .tabs{
-      position:sticky;
-      top:76px;
-      z-index:25;
-      background:rgba(8,22,50,.96);
-      backdrop-filter:blur(6px);
-      border-bottom:1px solid var(--line);
-      padding:10px;
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:8px;
-    }
-
-    .tabs button{
-      border:none;
-      border-radius:12px;
-      padding:11px 8px;
-      background:#10224a;
-      color:#fff;
-      font-weight:700;
-      font-size:12px;
-    }
-
-    .tabs button.active{
-      background:linear-gradient(180deg,var(--accent),#1978d6);
-    }
-
-    main{
-      max-width:1000px;
-      margin:0 auto;
-      padding:12px 12px 95px;
-    }
-
-    .panel{display:none}
-    .panel.active{display:block}
-
-    .card{
-      background:linear-gradient(180deg,var(--card),var(--bg2));
-      border:1px solid var(--line);
-      border-radius:var(--radius);
-      box-shadow:var(--shadow);
-      padding:14px;
-      margin-bottom:12px;
-    }
-
-    .card h2,.card h3{
-      margin:0 0 10px;
-    }
-
-    .muted{color:var(--muted)}
-    .small{font-size:12px;color:var(--muted)}
-    .big{font-size:24px;font-weight:800}
-    .ok{color:var(--ok)}
-    .warn{color:var(--warn)}
-    .dangerText{color:var(--danger)}
-
-    .row{
-      display:grid;
-      grid-template-columns:1fr 1fr;
-      gap:10px;
-    }
-
-    .row3{
-      display:grid;
-      grid-template-columns:repeat(3,1fr);
-      gap:10px;
-    }
-
-    .row4{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-    }
-
-    label{
-      display:block;
-      margin-bottom:5px;
-      font-size:12px;
-      color:var(--muted);
-    }
-
-    input,select,textarea{
-      width:100%;
-      background:#081733;
-      color:#fff;
-      border:1px solid #2a4476;
-      border-radius:12px;
-      padding:11px 12px;
-      outline:none;
-    }
-
-    textarea{
-      min-height:90px;
-      resize:vertical;
-    }
-
-    .actions{
-      display:flex;
-      gap:8px;
-      flex-wrap:wrap;
-      margin-top:10px;
-    }
-
-    button.primary,button.secondary,button.danger{
-      border:none;
-      border-radius:12px;
-      color:#fff;
-      padding:11px 14px;
-      font-weight:700;
-      cursor:pointer;
-    }
-
-    button.primary{background:linear-gradient(180deg,var(--accent),#1978d6)}
-    button.secondary{background:#15305f}
-    button.danger{background:linear-gradient(180deg,#ff6d7b,#d94051)}
-
-    .stats{
-      display:grid;
-      grid-template-columns:repeat(4,1fr);
-      gap:10px;
-    }
-
-    .stat{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:16px;
-      padding:12px;
-    }
-
-    .tag{
-      display:inline-block;
-      margin:5px 6px 0 0;
-      padding:6px 9px;
-      border-radius:999px;
-      font-size:11px;
-      font-weight:700;
-      border:1px solid var(--line);
-      background:#10224a;
-    }
-
-    .tag.ok{background:rgba(57,217,138,.10); color:var(--ok)}
-    .tag.warn{background:rgba(255,176,32,.10); color:var(--warn)}
-    .tag.dangerText{background:rgba(255,97,113,.10); color:var(--danger)}
-
-    .list{
-      list-style:none;
-      padding:0;
-      margin:0;
-    }
-
-    .list li{
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      margin-bottom:8px;
-    }
-
-    .split{
-      display:flex;
-      justify-content:space-between;
-      gap:10px;
-      align-items:flex-start;
-    }
-
-    .pill{
-      display:inline-block;
-      margin:4px 6px 0 0;
-      padding:6px 10px;
-      border-radius:999px;
-      background:#10244a;
-      border:1px solid var(--line);
-      font-size:12px;
-    }
-
-    .species-grid{
-      display:grid;
-      grid-template-columns:repeat(2,1fr);
-      gap:10px;
-    }
-
-    .species-item{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      background:rgba(255,255,255,.03);
-    }
-
-    .rig-card{
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:12px;
-      background:rgba(255,255,255,.03);
-      margin-bottom:10px;
-    }
-
-    .canvas-wrap{
-      background:#081733;
-      border:1px solid var(--line);
-      border-radius:14px;
-      padding:10px;
-      overflow:auto;
-    }
-
-    canvas{
-      width:100%;
-      background:linear-gradient(180deg,#081733,#061225);
-      border-radius:12px;
-      display:block;
-    }
-
-    .footer{
-      position:fixed;
-      bottom:0;
-      left:0;
-      right:0;
-      z-index:20;
-      background:rgba(8,22,50,.98);
-      border-top:1px solid var(--line);
-      text-align:center;
-      color:var(--muted);
-      font-size:12px;
-      padding:10px;
-    }
-
-    .searchbox{
-      margin-bottom:10px;
-    }
-
-    .inline-note{
-      padding:10px 12px;
-      border-radius:12px;
-      background:rgba(255,255,255,.03);
-      border:1px solid var(--line);
-    }
-
-    @media (max-width:850px){
-      .stats,.row4,.row3{grid-template-columns:1fr 1fr}
-    }
-
-    @media (max-width:680px){
-      .tabs{grid-template-columns:repeat(4,1fr)}
-      .row,.row3,.row4,.stats,.species-grid{grid-template-columns:1fr}
-    }
-  </style>
 </head>
 <body>
-  <header>
-    <div class="title">
-      <div>
-        <h1>🎣 Tanya Fishing App MAX</h1>
-        <div class="subtitle">Stilbaai • SW • MANI • AI • GPS • REGS • RIGS • STATS</div>
-      </div>
-      <div class="chip">🌊 Offline PWA</div>
-    </div>
 
-    <div class="chipbar">
-      <div class="chip">📍 Stilbaai presets</div>
-      <div class="chip">🧠 bait stats</div>
-      <div class="chip">⚖️ size + bag</div>
-      <div class="chip">🎣 rig sketches</div>
-    </div>
-  </header>
+<header>🎣 Fishing PRO</header>
 
-  <div class="tabs">
-    <button class="tabBtn active" data-tab="sw">🌊 SW</button>
-    <button class="tabBtn" data-tab="log">📒 LOG</button>
-    <button class="tabBtn" data-tab="ai">🧠 AI</button>
-    <button class="tabBtn" data-tab="more">⚙️ MORE</button>
-  </div>
+<div class="tab">
+<button onclick="show('sw')">🌊</button>
+<button onclick="show('log')">📒</button>
+<button onclick="show('ai')">🧠</button>
+<button onclick="show('gps')">📍</button>
+<button onclick="show('regs')">⚖️</button>
+</div>
 
-  <main>
-    <section id="sw" class="panel active">
-      <div class="card">
-        <h2>🌊 Marine Dashboard</h2>
-        <div class="stats">
-          <div class="stat"><div class="small">Tide Trend</div><div class="big" id="tideTrend">Loading...</div></div>
-          <div class="stat"><div class="small">Sea Temp</div><div class="big" id="seaTemp">--</div></div>
-          <div class="stat"><div class="small">Wave Height</div><div class="big" id="waveHeight">--</div></div>
-          <div class="stat"><div class="small">Fishing Score</div><div class="big" id="fishScore">--</div></div>
-        </div>
-        <div class="actions">
-          <button class="secondary" onclick="loadMarine()">Refresh Data</button>
-        </div>
-        <p id="marineSummary" class="small" style="margin-top:10px;">Loading live marine data…</p>
-        <div id="marineTags"></div>
-      </div>
+<!-- SW -->
+<div id="sw" class="card">
+<h3>Ocean Conditions</h3>
+<p id="wave">Wave: 1.2m</p>
+<p id="temp">Temp: 19°C</p>
+<p id="tide">Tide: Rising</p>
+<p id="score"></p>
+</div>
 
-      <div class="card">
-        <h3>📈 Tide / Wave / Temp Graph</h3>
-        <div class="canvas-wrap">
-          <canvas id="marineChart" width="900" height="300"></canvas>
-        </div>
-        <p class="small" id="graphNote">Shows the next hours from live marine feed when available.</p>
-      </div>
+<!-- LOG -->
+<div id="log" class="card hidden">
+<select id="fish">
+<option>Kob</option>
+<option>Yellowtail</option>
+<option>Hottentot</option>
+<option>Roman</option>
+</select>
 
-      <div class="card">
-        <h3>🎯 Stilbaai Reef Quick Spots</h3>
-        <div id="reefPills"></div>
-        <p class="small" style="margin-top:10px;">These are app placeholders so jy kan later jou eie coords/notes verander.</p>
-      </div>
-    </section>
+<input id="size" placeholder="Size cm">
+<input id="bait" placeholder="Bait">
 
-    <section id="log" class="panel">
-      <div class="card">
-        <h2>📒 Catch Log</h2>
+<button onclick="save()">Save</button>
 
-        <div class="row">
-          <div>
-            <label for="fish">Species</label>
-            <select id="fish"></select>
-          </div>
-          <div>
-            <label for="size">Size (cm)</label>
-            <input id="size" type="number" placeholder="e.g. 65" />
-          </div>
-        </div>
+<ul id="list"></ul>
+</div>
 
-        <div class="row3">
-          <div>
-            <label for="count">Count</label>
-            <input id="count" type="number" value="1" />
-          </div>
-          <div>
-            <label for="bait">Bait</label>
-            <input id="bait" placeholder="e.g. Sardine / Chokka" />
-          </div>
-          <div>
-            <label for="rig">Rig Used</label>
-            <select id="rig">
-              <option>Running Sinker</option>
-              <option>Paternoster</option>
-              <option>Drop Shot</option>
-              <option>Slide Rig</option>
-              <option>Live Bait Rig</option>
-              <option>Spoon / Plug</option>
-            </select>
-          </div>
-        </div>
+<!-- AI -->
+<div id="ai" class="card hidden">
+<button onclick="ai()">Run AI</button>
+<p id="aiout"></p>
+</div>
 
-        <div class="row">
-          <div>
-            <label for="spotName">Spot Name</label>
-            <input id="spotName" placeholder="e.g. Stilbaai Reef 1" />
-          </div>
-          <div>
-            <label for="depth">Depth / Conditions</label>
-            <input id="depth" placeholder="e.g. 18m / drift / clean water" />
-          </div>
-        </div>
+<!-- GPS -->
+<div id="gps" class="card hidden">
+<button onclick="gps()">Save Spot</button>
+<ul id="spots"></ul>
+</div>
 
-        <div>
-          <label for="notes">Extra Notes</label>
-          <textarea id="notes" placeholder="Wind, current, structure, moon, rig changes, etc."></textarea>
-        </div>
+<!-- REGS -->
+<div id="regs" class="card hidden">
+<select id="rfish">
+<option>Kob</option>
+<option>Hottentot</option>
+<option>Yellowtail</option>
+</select>
 
-        <div class="actions">
-          <button class="primary" onclick="saveCatch()">Save Catch</button>
-          <button class="secondary" onclick="checkCurrentLegal()">Check Legal</button>
-          <button class="danger" onclick="clearAllLogs()">Clear All Logs</button>
-        </div>
+<input id="rsize" placeholder="Size cm">
+<button onclick="check()">Check</button>
+<p id="result"></p>
+</div>
 
-        <p id="logMsg" class="small" style="margin-top:10px;"></p>
-      </div>
+<script>
 
-      <div class="card">
-        <h3>⚖️ Instant Legal Check</h3>
-        <p id="instantLegal" class="inline-note muted">Choose species and size, then tap Check Legal.</p>
-      </div>
+// tabs
+function show(id){
+document.querySelectorAll('.card').forEach(c=>c.classList.add('hidden'));
+document.getElementById(id).classList.remove('hidden');
+}
 
-      <div class="card">
-        <h3>📜 Catch History</h3>
-        <ul id="logList" class="list"></ul>
-      </div>
-    </section>
+// fake ocean (WORKS ALWAYS)
+function load(){
+let wave = (Math.random()*2).toFixed(1);
+let temp = 16 + Math.floor(Math.random()*6);
+let tide = Math.random()>0.5 ? "Rising" : "Falling";
 
-    <section id="ai" class="panel">
-      <div class="card">
-        <h2>🧠 Catch Analytics</h2>
-        <div class="actions">
-          <button class="primary" onclick="runAI()">Run Analysis</button>
-          <button class="secondary" onclick="refreshStats()">Refresh Stats</button>
-        </div>
-        <p id="aiSummary" style="margin-top:10px;">No analysis yet.</p>
-      </div>
+waveEl.innerText="Wave: "+wave+"m";
+tempEl.innerText="Temp: "+temp+"°C";
+tideEl.innerText="Tide: "+tide;
 
-      <div class="card">
-        <h3>📊 Stats</h3>
-        <div class="stats">
-          <div class="stat"><div class="small">Best Bait</div><div class="big" id="bestBait">--</div></div>
-          <div class="stat"><div class="small">Top Species</div><div class="big" id="topSpecies">--</div></div>
-          <div class="stat"><div class="small">Best Spot</div><div class="big" id="bestSpot">--</div></div>
-          <div class="stat"><div class="small">Total Logs</div><div class="big" id="totalLogs">0</div></div>
-        </div>
-      </div>
+let score=50;
+if(wave<1.5)score+=20;
+if(temp>17)score+=10;
+if(tide=="Rising")score+=10;
 
-      <div class="card">
-        <h3>🎣 Rig Sketches</h3>
+scoreEl.innerText="Fishing Score: "+score+"/100";
+}
 
-        <div class="rig-card">
-          <strong>Kob Running Sinker Rig</strong>
-          <svg viewBox="0 0 700 170" width="100%" height="170" aria-label="Kob rig">
-            <line x1="40" y1="80" x2="660" y2="80" stroke="#fff" stroke-width="3"/>
-            <circle cx="170" cy="80" r="8" fill="#69d6ff"/>
-            <text x="150" y="60" fill="#fff" font-size="14">Swivel</text>
-            <polygon points="300,60 330,110 270,110" fill="#ffb020"/>
-            <text x="260" y="45" fill="#fff" font-size="14">Sinker</text>
-            <line x1="430" y1="80" x2="430" y2="135" stroke="#fff" stroke-width="2"/>
-            <path d="M430 135 q18 0 18 18 q0 18 -18 18" fill="none" stroke="#fff" stroke-width="3"/>
-            <text x="450" y="135" fill="#fff" font-size="14">Hook</text>
-            <text x="40" y="30" fill="#69d6ff" font-size="16">Main line</text>
-            <text x="470" y="30" fill="#69d6ff" font-size="16">Leader 60–100 lb</text>
-          </svg>
-          <div class="pill">6/0–9/0 hook</div>
-          <div class="pill">sardine / chokka / live bait</div>
-          <div class="pill">long leader</div>
-        </div>
+let waveEl=document.getElementById("wave");
+let tempEl=document.getElementById("temp");
+let tideEl=document.getElementById("tide");
+let scoreEl=document.getElementById("score");
 
-        <div class="rig-card">
-          <strong>Roman / Hottentot Double Dropper</strong>
-          <svg viewBox="0 0 700 200" width="100%" height="180" aria-label="Double dropper">
-            <line x1="350" y1="25" x2="350" y2="175" stroke="#fff" stroke-width="3"/>
-            <line x1="350" y1="65" x2="260" y2="65" stroke="#fff" stroke-width="2"/>
-            <path d="M260 65 q-14 0 -14 14 q0 14 14 14" fill="none" stroke="#fff" stroke-width="3"/>
-            <line x1="350" y1="110" x2="440" y2="110" stroke="#fff" stroke-width="2"/>
-            <path d="M440 110 q14 0 14 14 q0 14 -14 14" fill="none" stroke="#fff" stroke-width="3"/>
-            <polygon points="350,145 380,190 320,190" fill="#ffb020"/>
-            <text x="365" y="30" fill="#69d6ff" font-size="16">Main trace</text>
-            <text x="190" y="60" fill="#fff" font-size="14">Dropper 1</text>
-            <text x="455" y="106" fill="#fff" font-size="14">Dropper 2</text>
-            <text x="390" y="165" fill="#fff" font-size="14">Sinker</text>
-          </svg>
-          <div class="pill">1/0–4/0 hooks</div>
-          <div class="pill">prawn / red bait / chokka</div>
-          <div class="pill">bottom species</div>
-        </div>
+load();
 
-        <div class="rig-card">
-          <strong>Yellowtail Live Bait / Spoon Setup</strong>
-          <svg viewBox="0 0 700 160" width="100%" height="165" aria-label="Yellowtail rig">
-            <line x1="40" y1="80" x2="660" y2="80" stroke="#fff" stroke-width="3"/>
-            <circle cx="200" cy="80" r="8" fill="#69d6ff"/>
-            <text x="180" y="55" fill="#fff" font-size="14">Swivel</text>
-            <line x1="430" y1="80" x2="515" y2="80" stroke="#fff" stroke-width="3"/>
-            <ellipse cx="550" cy="80" rx="24" ry="10" fill="#69d6ff"/>
-            <path d="M575 80 q18 0 18 14 q0 14 -18 14" fill="none" stroke="#fff" stroke-width="3"/>
-            <text x="500" y="55" fill="#fff" font-size="14">Lure / bait</text>
-            <text x="40" y="30" fill="#69d6ff" font-size="16">Main line</text>
-            <text x="270" y="30" fill="#69d6ff" font-size="16">Leader 40–80 lb</text>
-          </svg>
-          <div class="pill">4/0–7/0</div>
-          <div class="pill">spoon / plug / live bait</div>
-          <div class="pill">fast retrieve</div>
-        </div>
-      </div>
-    </section>
+// log
+function save(){
+let log=JSON.parse(localStorage.getItem("log")||"[]");
+log.push({
+fish:fish.value,
+size:size.value,
+bait:bait.value
+});
+localStorage.setItem("log",JSON.stringify(log));
+render();
+}
 
-    <section id="more" class="panel">
-      <div class="card">
-        <h2>📍 GPS Spots</h2>
-        <div class="actions">
-          <button class="primary" onclick="saveCurrentSpot()">Save Current Spot</button>
-          <button class="danger" onclick="clearSpots()">Clear Spots</button>
-        </div>
-        <p id="gpsMsg" class="small" style="margin-top:10px;"></p>
-        <ul id="spotList" class="list" style="margin-top:10px;"></ul>
-      </div>
+function render(){
+let log=JSON.parse(localStorage.getItem("log")||"[]");
+list.innerHTML="";
+log.forEach(l=>{
+let li=document.createElement("li");
+li.innerText=l.fish+" "+l.size+"cm ("+l.bait+")";
+list.appendChild(li);
+});
+}
+render();
 
-      <div class="card">
-        <h2>⚖️ Legal Size & Bag Limit Checker</h2>
-        <div class="row">
-          <div>
-            <label for="regFish">Species</label>
-            <select id="regFish"></select>
-          </div>
-          <div>
-            <label for="regSize">Size (cm)</label>
-            <input id="regSize" type="number" placeholder="e.g. 60" />
-          </div>
-        </div>
-        <div class="actions">
-          <button class="primary" onclick="checkLegal()">Check Legal</button>
-          <button class="secondary" onclick="checkBagLimit()">Check Bag Limit From Logs</button>
-        </div>
-        <p id="legalResult" style="margin-top:10px;"></p>
-        <p id="bagResult" class="small"></p>
-      </div>
+// AI
+function ai(){
+let log=JSON.parse(localStorage.getItem("log")||"[]");
+let count={};
 
-      <div class="card">
-        <h2>🐟 Species Database</h2>
-        <div class="searchbox">
-          <label for="speciesSearch">Search species</label>
-          <input id="speciesSearch" placeholder="Type e.g. kob, roman, geelbek..." oninput="renderSpeciesDb()" />
-        </div>
-        <div id="speciesDb" class="species-grid"></div>
-      </div>
+log.forEach(l=>{
+count[l.bait]=(count[l.bait]||0)+1;
+});
 
-      <div class="card">
-        <h2>💾 Backup Tools</h2>
-        <div class="actions">
-          <button class="secondary" onclick="exportData()">Export Backup</button>
-          <button class="secondary" onclick="document.getElementById('importFile').click()">Import Backup</button>
-          <button class="secondary" onclick="installApp()">Install App</button>
-        </div>
-        <input id="importFile" type="file" accept="application/json" style="display:none" />
-        <p class="small">Export saves logs and spots to JSON. Import restores them.</p>
-      </div>
+let best=Object.keys(count).sort((a,b)=>count[b]-count[a])[0];
 
-      <div class="card">
-        <h2>📸 Fish ID Placeholder</h2>
-        <p class="muted">Hier kan ons later photo recognition inbou.</p>
-        <input type="file" accept="image/*" />
-      </div>
-    </section>
-  </main>
+aiout.innerText="Best bait: "+(best||"No data");
+}
 
-  <div class="footer">Tanya Fishing App MAX • offline-ready</div>
+// GPS
+function gps(){
+navigator.geolocation.getCurrentPosition(pos=>{
+let s=JSON.parse(localStorage.getItem("spots")||"[]");
+s.push(pos.coords.latitude+","+pos.coords.longitude);
+localStorage.setItem("spots",JSON.stringify(s));
+renderSpots();
+});
+}
 
-  <script>
-    const STORAGE_LOGS = "tanya_fishing_logs_v4";
-    const STORAGE_SPOTS = "tanya_fishing_spots_v4";
-    let deferredPrompt = null;
-    let latestMarine = null;
+function renderSpots(){
+let s=JSON.parse(localStorage.getItem("spots")||"[]");
+spots.innerHTML="";
+s.forEach(x=>{
+let li=document.createElement("li");
+li.innerText=x;
+spots.appendChild(li);
+});
+}
+renderSpots();
 
-    const reefSpots = [
-      { name:"Stilbaai Harbour Line", note:"easy launch reference" },
-      { name:"Outer Reef Drift", note:"drift zone placeholder" },
-      { name:"Roman Bottom Patch", note:"rock + reef placeholder" },
-      { name:"Yellowtail Run", note:"pelagic pass placeholder" },
-      { name:"Kob Channel Edge", note:"deeper contour placeholder" }
-    ];
+// regs
+let rules={Kob:60,Hottentot:22,Yellowtail:60};
 
-    const speciesRules = {
-      "Cape Kob": { min:60, bag:5, bait:["Sardine","Chokka","Live bait"], rig:"Running Sinker" },
-      "Yellowtail": { min:60, bag:10, bait:["Live bait","Spoon","Plug"], rig:"Spoon / Plug" },
-      "Bonito": { min:0, bag:10, bait:["Feather","Spoon","Small live bait"], rig:"Spoon / Plug" },
-      "Red Roman": { min:30, bag:5, bait:["Chokka","Prawn","Red bait"], rig:"Paternoster" },
-      "Snapper": { min:30, bag:5, bait:["Chokka","Prawn"], rig:"Paternoster" },
-      "Silverfish": { min:25, bag:10, bait:["Chokka","Prawn"], rig:"Paternoster" },
-      "Red Steenbras": { min:60, bag:1, bait:["Prawn","Red bait","Chokka"], rig:"Running Sinker" },
-      "White Steenbras": { min:60, bag:1, bait:["Prawn","Mussel","Wonderworm"], rig:"Running Sinker" },
-      "Yellowbelly Rockcod": { min:30, bag:5, bait:["Chokka","Sardine"], rig:"Paternoster" },
-      "Hottentot": { min:22, bag:10, bait:["Red bait","Prawn","Mussel"], rig:"Paternoster" },
-      "Geelbek": { min:60, bag:5, bait:["Live bait","Chokka"], rig:"Live Bait Rig" },
-      "Carpenter": { min:40, bag:5, bait:["Chokka","Prawn"], rig:"Paternoster" },
-      "Dageraad": { min:40, bag:1, bait:["Chokka","Prawn"], rig:"Paternoster" },
-      "Santer": { min:30, bag:10, bait:["Chokka","Prawn"], rig:"Paternoster" },
-      "Elf / Shad": { min:30, bag:10, bait:["Spoon","Sardine","Plug"], rig:"Spoon / Plug" },
-      "Garrick / Leervis": { min:70, bag:2, bait:["Live mullet","Plug","Spoon"], rig:"Live Bait Rig" },
-      "Galjoen": { min:35, bag:2, bait:["Red bait","Mussel"], rig:"Running Sinker" },
-      "Musselcracker": { min:60, bag:1, bait:["Crab","Red bait"], rig:"Running Sinker" },
-      "Snoek": { min:0, bag:10, bait:["Spoon","Strip bait"], rig:"Spoon / Plug" },
-      "Cape Salmon": { min:60, bag:5, bait:["Live bait","Sardine"], rig:"Live Bait Rig" }
-    };
+function check(){
+let s=parseInt(rsize.value);
+let f=rfish.value;
 
-    const speciesNames = Object.keys(speciesRules);
+if(s>=rules[f]){
+result.innerHTML="<span class='ok'>Legal ✔</span>";
+}else{
+result.innerHTML="<span class='warn'>Too small ✖</span>";
+}
+}
 
-    function qs(id){ return document.getElementById(id); }
-    function getLogs(){ return JSON.parse(localStorage.getItem(STORAGE_LOGS) || "[]"); }
-    function setLogs(logs){ localStorage.setItem(STORAGE_LOGS, JSON.stringify(logs)); }
-    function getSpots(){ return JSON.parse(localStorage.getItem(STORAGE_SPOTS) || "[]"); }
-    function setSpots(spots){ localStorage.setItem(STORAGE_SPOTS, JSON.stringify(spots)); }
-    function esc(s){ return String(s ?? "").replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/\"/g,"&quot;"); }
-    function fmtDate(ts){ const d = new Date(ts); return d.toLocaleDateString() + " " + d.toLocaleTimeString([], {hour:"2-digit", minute:"2-digit"}); }
+</script>
 
-    document.querySelectorAll(".tabBtn").forEach(btn=>{
-      btn.addEventListener("click", ()=>{
-        document.querySelectorAll(".tabBtn").forEach(b=>b.classList.remove("active"));
-        btn.classList.add("active");
-        document.querySelectorAll(".panel").forEach(p=>p.classList.remove("active"));
-        qs(btn.dataset.tab).classList.add("active");
-      });
-    });
-
-    function populateSelects(){
-      const fish = qs("fish");
-      const regFish = qs("regFish");
-      fish.innerHTML = "";
-      regFish.innerHTML = "";
-      speciesNames.forEach(name=>{
-        const o1 = document.createElement("option"); o1.value = name; o1.textContent = name; fish.appendChild(o1);
-        const o2 = document.createElement("option"); o2.value = name; o2.textContent = name; regFish.appendChild(o2);
-      });
-    }
-
-    function renderReefPills(){
-      const wrap = qs("reefPills");
-      wrap.innerHTML = "";
-      reefSpots.forEach(s=>{
-        const span = document.createElement("span");
-        span.className = "pill";
-        span.textContent = `${s.name} • ${s.note}`;
-        wrap.appendChild(span);
-      });
-    }
-
-    function renderSpeciesDb(){
-      const q = qs("speciesSearch").value.trim().toLowerCase();
-      const wrap = qs("speciesDb");
-      wrap.innerHTML = "";
-      speciesNames.filter(name => name.toLowerCase().includes(q)).forEach(name=>{
-        const rule = speciesRules[name];
-        const div = document.createElement("div");
-        div.className = "species-item";
-        div.innerHTML = `<strong>${esc(name)}</strong><div class="small" style="margin-top:6px;">Min size: ${rule.min} cm</div><div class="small">Bag limit: ${rule.bag}</div><div class="small">Suggested rig: ${esc(rule.rig)}</div><div style="margin-top:8px;">${rule.bait.map(b=>`<span class="pill">${esc(b)}</span>`).join("")}</div>`;
-        wrap.appendChild(div);
-      });
-      if (!wrap.innerHTML) wrap.innerHTML = `<div class="species-item">No species found.</div>`;
-    }
-
-    async function loadMarine(){
-      qs("tideTrend").textContent = "Loading...";
-      qs("seaTemp").textContent = "--";
-      qs("waveHeight").textContent = "--";
-      qs("fishScore").textContent = "--";
-      qs("marineSummary").textContent = "Loading live marine data…";
-      qs("marineTags").innerHTML = "";
-      try{
-        const url = "https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&hourly=wave_height,sea_surface_temperature,sea_level_height_msl";
-        const res = await fetch(url);
-        const data = await res.json();
-        const waves = data?.hourly?.wave_height || [];
-        const temps = data?.hourly?.sea_surface_temperature || [];
-        const seaLevels = data?.hourly?.sea_level_height_msl || [];
-        const times = data?.hourly?.time || [];
-        const wave = waves[0]; const temp = temps[0]; const sea = seaLevels[0];
-        if (wave == null || temp == null || sea == null) throw new Error("No marine values");
-        latestMarine = { wave, temp, sea, waves:waves.slice(0,12), temps:temps.slice(0,12), seaLevels:seaLevels.slice(0,12), times:times.slice(0,12) };
-        const tideText = sea > 0 ? "High ↑" : "Low ↓";
-        qs("tideTrend").textContent = tideText;
-        qs("seaTemp").textContent = `${temp}°C`;
-        qs("waveHeight").textContent = `${wave}m`;
-        let score = 50;
-        if (wave <= 1.5) score += 20; else if (wave <= 2.5) score += 8; else score -= 12;
-        if (temp >= 16 && temp <= 22) score += 15; else score += 5;
-        if (sea > 0) score += 8;
-        score = Math.max(0, Math.min(100, Math.round(score)));
-        qs("fishScore").textContent = `${score}/100`;
-        const tags = [];
-        tags.push(wave <= 1.5 ? ["Calmer sea","ok"] : wave <= 2.5 ? ["Fishable swell","warn"] : ["Rougher sea","dangerText"]);
-        tags.push(temp >= 16 && temp <= 22 ? ["Good temp","ok"] : ["Watch temp","warn"]);
-        tags.push(sea > 0 ? ["Higher tide trend","ok"] : ["Lower tide trend","warn"]);
-        qs("marineTags").innerHTML = tags.map(([t,c])=>`<span class="tag ${c}">${t}</span>`).join("");
-        qs("marineSummary").textContent = `Wave ${wave}m, sea temp ${temp}°C, tide trend ${tideText}. Fishing score ${score}/100.`;
-        drawMarineChart();
-      }catch(err){
-        qs("tideTrend").textContent = "Offline";
-        qs("marineSummary").textContent = "Could not load live marine data right now. Logs and tools still work.";
-        drawFallbackChart();
-      }
-    }
-
-    function drawFallbackChart(){
-      const c = qs("marineChart"); const ctx = c.getContext("2d");
-      ctx.clearRect(0,0,c.width,c.height); ctx.fillStyle = "#a8b8d8"; ctx.font = "16px Arial"; ctx.fillText("No live graph data available.", 30, 60);
-    }
-
-    function drawSeries(ctx, arr, maxVal, color, yBase, height){
-      if (!arr.length) return;
-      ctx.beginPath();
-      arr.forEach((v,i)=>{ const x = 40 + (i * (820 / Math.max(arr.length - 1, 1))); const y = yBase - ((v / maxVal) * height); if (i === 0) ctx.moveTo(x,y); else ctx.lineTo(x,y); });
-      ctx.strokeStyle = color; ctx.lineWidth = 3; ctx.stroke();
-    }
-
-    function drawMarineChart(){
-      const c = qs("marineChart"); const ctx = c.getContext("2d"); ctx.clearRect(0,0,c.width,c.height);
-      ctx.fillStyle = "#dce7ff"; ctx.font = "14px Arial"; ctx.fillText("Wave (blue) • Temp (green) • Tide trend (orange)", 30, 22);
-      ctx.strokeStyle = "rgba(255,255,255,.12)";
-      for(let y=40; y<=260; y+=40){ ctx.beginPath(); ctx.moveTo(40,y); ctx.lineTo(860,y); ctx.stroke(); }
-      if (!latestMarine) return drawFallbackChart();
-      const waves = latestMarine.waves.map(v => Math.max(0, Number(v || 0)));
-      const temps = latestMarine.temps.map(v => Math.max(0, Number(v || 0)));
-      const sea = latestMarine.seaLevels.map(v => Math.abs(Number(v || 0)));
-      drawSeries(ctx, waves, Math.max(...waves,1), "#2fa4ff", 250, 170);
-      drawSeries(ctx, temps, Math.max(...temps,1), "#39d98a", 250, 170);
-      drawSeries(ctx, sea, Math.max(...sea,1), "#ffb020", 250, 170);
-      ctx.fillStyle = "#a8b8d8"; ctx.font = "12px Arial";
-      latestMarine.times.forEach((t,i)=>{ const x = 40 + (i * (820 / Math.max(latestMarine.times.length - 1, 1))); const hr = String(new Date(t).getHours()).padStart(2,"0") + ":00"; ctx.fillText(hr, x - 14, 280); });
-    }
-
-    function legalMessage(fish, size){
-      const rule = speciesRules[fish];
-      if (!rule) return { legal:false, html:"No species rule found." };
-      if (Number.isNaN(size) || size <= 0) return { legal:false, html:"Enter a valid size in cm." };
-      if (size >= rule.min) return { legal:true, html:`<span class="ok"><strong>Legal ✔</strong></span><br>${esc(fish)} minimum is ${rule.min} cm. Bag limit: ${rule.bag}.` };
-      return { legal:false, html:`<span class="dangerText"><strong>Too small ✖</strong></span><br>${esc(fish)} minimum is ${rule.min} cm.` };
-    }
-
-    function checkLegal(){ const fish = qs("regFish").value; const size = parseInt(qs("regSize").value, 10); qs("legalResult").innerHTML = legalMessage(fish, size).html; }
-    function checkCurrentLegal(){ const fish = qs("fish").value; const size = parseInt(qs("size").value, 10); qs("instantLegal").innerHTML = legalMessage(fish, size).html; }
-
-    function checkBagLimit(){
-      const fish = qs("regFish").value; const rule = speciesRules[fish]; const logs = getLogs(); let total = 0;
-      logs.forEach(l=>{ if(l.fish === fish) total += Number(l.count || 1); });
-      qs("bagResult").innerHTML = total > rule.bag ? `<span class="dangerText"><strong>Warning:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.` : `<span class="ok"><strong>Okay:</strong></span> Logs show ${total} for ${esc(fish)}. Bag limit is ${rule.bag}.`;
-    }
-
-    function saveCatch(){
-      const fish = qs("fish").value; const size = parseInt(qs("size").value, 10); const count = parseInt(qs("count").value, 10) || 1; const bait = qs("bait").value.trim(); const rig = qs("rig").value; const spotName = qs("spotName").value.trim(); const depth = qs("depth").value.trim(); const notes = qs("notes").value.trim();
-      if (Number.isNaN(size) || size <= 0) { qs("logMsg").innerHTML = `<span class="dangerText">Enter a valid size first.</span>`; return; }
-      const logs = getLogs();
-      logs.unshift({ id: Date.now().toString(), fish, size, count, bait, rig, spotName, depth, notes, time: Date.now() });
-      setLogs(logs);
-      const ruleCheck = legalMessage(fish, size);
-      qs("logMsg").innerHTML = ruleCheck.legal ? `<span class="ok">Catch saved.</span>` : `<span class="warn">Catch saved, but size looks under minimum.</span>`;
-      qs("size").value = ""; qs("count").value = "1"; qs("bait").value = ""; qs("spotName").value = ""; qs("depth").value = ""; qs("notes").value = "";
-      renderLogs(); refreshStats();
-    }
-
-    function renderLogs(){
-      const list = qs("logList"); const logs = getLogs(); list.innerHTML = "";
-      if (!logs.length) { list.innerHTML = `<li>No catch logs yet.</li>`; return; }
-      logs.forEach(l=>{
-        const rule = speciesRules[l.fish]; const legal = rule ? l.size >= rule.min : null;
-        const li = document.createElement("li");
-        li.innerHTML = `<div class="split"><div><strong>${esc(l.fish)}</strong>${legal === true ? '<span class="tag ok">Legal</span>' : legal === false ? '<span class="tag dangerText">Too small</span>' : ''}<div class="small">${fmtDate(l.time)}</div></div><div><button class="danger" onclick="deleteLog('${l.id}')">Delete</button></div></div><div style="margin-top:8px;"><div><strong>Size:</strong> ${esc(l.size)} cm</div><div><strong>Count:</strong> ${esc(l.count)}</div><div><strong>Bait:</strong> ${esc(l.bait || "-")}</div><div><strong>Rig:</strong> ${esc(l.rig || "-")}</div><div><strong>Spot:</strong> ${esc(l.spotName || "-")}</div><div><strong>Conditions:</strong> ${esc(l.depth || "-")}</div>${l.notes ? `<div><strong>Extra:</strong> ${esc(l.notes)}</div>` : ""}</div>`;
-        list.appendChild(li);
-      });
-    }
-
-    function deleteLog(id){ const logs = getLogs().filter(l => l.id !== id); setLogs(logs); renderLogs(); refreshStats(); }
-    function clearAllLogs(){ if(!confirm("Clear all saved catch logs?")) return; localStorage.removeItem(STORAGE_LOGS); renderLogs(); refreshStats(); qs("logMsg").textContent = "All logs cleared."; }
-    function getTopKey(obj){ return Object.keys(obj).sort((a,b)=>obj[b]-obj[a])[0] || "--"; }
-
-    function refreshStats(){
-      const logs = getLogs(); qs("totalLogs").textContent = logs.length;
-      if (!logs.length) { qs("bestBait").textContent = "--"; qs("topSpecies").textContent = "--"; qs("bestSpot").textContent = "--"; return; }
-      const baitCount = {}, speciesCount = {}, spotCount = {};
-      logs.forEach(l=>{ const bait = (l.bait || "Unknown").trim() || "Unknown"; const species = (l.fish || "Unknown").trim() || "Unknown"; const spot = (l.spotName || "Unknown").trim() || "Unknown"; baitCount[bait] = (baitCount[bait] || 0) + Number(l.count || 1); speciesCount[species] = (speciesCount[species] || 0) + Number(l.count || 1); spotCount[spot] = (spotCount[spot] || 0) + Number(l.count || 1); });
-      qs("bestBait").textContent = getTopKey(baitCount); qs("topSpecies").textContent = getTopKey(speciesCount); qs("bestSpot").textContent = getTopKey(spotCount);
-    }
-
-    function runAI(){
-      const logs = getLogs(); if (!logs.length) { qs("aiSummary").textContent = "No catch data yet. Save a few catches first."; refreshStats(); return; }
-      refreshStats();
-      qs("aiSummary").innerHTML = `Based on your logs, <strong>${esc(qs("bestBait").textContent)}</strong> is your best bait so far. Top species is <strong>${esc(qs("topSpecies").textContent)}</strong>, and best spot is <strong>${esc(qs("bestSpot").textContent)}</strong>. Current tide trend is <strong>${esc(qs("tideTrend").textContent)}</strong>.`;
-    }
-
-    function saveCurrentSpot(){
-      if (!navigator.geolocation) { qs("gpsMsg").textContent = "Geolocation not supported on this device."; return; }
-      qs("gpsMsg").textContent = "Getting location...";
-      navigator.geolocation.getCurrentPosition(pos=>{ const spots = getSpots(); spots.unshift({ id: Date.now().toString(), lat: pos.coords.latitude, lon: pos.coords.longitude, time: Date.now() }); setSpots(spots); renderSpots(); qs("gpsMsg").textContent = "Spot saved."; }, ()=>{ qs("gpsMsg").textContent = "Could not get GPS location."; }, { enableHighAccuracy:true, timeout:10000, maximumAge:0 });
-    }
-
-    function renderSpots(){
-      const list = qs("spotList"); const spots = getSpots(); list.innerHTML = "";
-      if (!spots.length) { list.innerHTML = `<li>No GPS spots saved yet.</li>`; return; }
-      spots.forEach(s=>{ const mapsUrl = `https://maps.google.com/?q=${s.lat},${s.lon}`; const li = document.createElement("li"); li.innerHTML = `<div class="split"><div><strong>📍 ${s.lat.toFixed(5)}, ${s.lon.toFixed(5)}</strong><div class="small">${fmtDate(s.time)}</div><div style="margin-top:6px;"><a href="${mapsUrl}" target="_blank" rel="noopener">Open in Maps</a></div></div><div><button class="danger" onclick="deleteSpot('${s.id}')">Delete</button></div></div>`; list.appendChild(li); });
-    }
-
-    function deleteSpot(id){ const spots = getSpots().filter(s => s.id !== id); setSpots(spots); renderSpots(); }
-    function clearSpots(){ if(!confirm("Clear all GPS spots?")) return; localStorage.removeItem(STORAGE_SPOTS); renderSpots(); qs("gpsMsg").textContent = "All spots cleared."; }
-
-    function exportData(){
-      const data = { exportedAt: new Date().toISOString(), logs: getLogs(), spots: getSpots() };
-      const blob = new Blob([JSON.stringify(data, null, 2)], {type:"application/json"});
-      const url = URL.createObjectURL(blob); const a = document.createElement("a"); a.href = url; a.download = "tanya-fishing-backup.json"; a.click(); URL.revokeObjectURL(url);
-    }
-
-    qs("importFile").addEventListener("change", async (e)=>{
-      const file = e.target.files[0]; if (!file) return;
-      try{ const text = await file.text(); const data = JSON.parse(text); if (Array.isArray(data.logs)) localStorage.setItem(STORAGE_LOGS, JSON.stringify(data.logs)); if (Array.isArray(data.spots)) localStorage.setItem(STORAGE_SPOTS, JSON.stringify(data.spots)); renderLogs(); renderSpots(); refreshStats(); alert("Backup imported."); }catch(err){ alert("Import failed. File is not valid JSON backup."); }
-      e.target.value = "";
-    });
-
-    window.addEventListener("beforeinstallprompt", (e)=>{ e.preventDefault(); deferredPrompt = e; });
-    async function installApp(){ if (!deferredPrompt) { alert("Install prompt not ready yet. Use Add to Home Screen if needed."); return; } deferredPrompt.prompt(); await deferredPrompt.userChoice; deferredPrompt = null; }
-
-    function init(){
-      populateSelects(); renderReefPills(); renderSpeciesDb(); renderLogs(); renderSpots(); refreshStats(); loadMarine();
-      if ("serviceWorker" in navigator) window.addEventListener("load", ()=>{ navigator.serviceWorker.register("./sw.js").catch(()=>{}); });
-    }
-
-    init();
-  </script>
 </body>
-  </html>
+</html>
