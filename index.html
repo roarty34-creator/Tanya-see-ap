@@ -1,85 +1,428 @@
-<!DOCTYPE html>
-<html>
+
+<!DOCTYPE html><html lang="af">
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fishing PRO</title>
-
-<style>
-body{background:#07111f;color:white;font-family:Arial;margin:0;padding:10px;}
-.card{background:#0f1c2e;padding:12px;border-radius:12px;margin-bottom:12px;}
-button{padding:10px;width:100%;margin-top:8px;background:#47c7ff;border:none;border-radius:8px;font-weight:bold;}
-input,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
-.photo-preview img{width:100%;max-height:240px;object-fit:cover;border-radius:12px;}
-</style>
-
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>See App Simple Fix</title>
+  <style>
+    body {
+      margin: 0;
+      font-family: Arial, sans-serif;
+      background: #0b1f2e;
+      color: white;
+    }
+    header {
+      background: #12344a;
+      padding: 16px;
+      text-align: center;
+      font-size: 22px;
+      font-weight: bold;
+      position: sticky;
+      top: 0;
+      z-index: 10;
+    }
+    nav {
+      display: grid;
+      grid-template-columns: repeat(6, 1fr);
+      gap: 6px;
+      padding: 10px;
+      background: #0f2c3e;
+      position: sticky;
+      top: 58px;
+      z-index: 9;
+    }
+    nav button {
+      padding: 10px 6px;
+      border: none;
+      border-radius: 8px;
+      background: #194760;
+      color: white;
+      font-size: 12px;
+      font-weight: bold;
+    }
+    nav button.active {
+      background: #27b3ff;
+      color: #062033;
+    }
+    .wrap {
+      padding: 14px;
+      max-width: 900px;
+      margin: 0 auto;
+      padding-bottom: 40px;
+    }
+    .screen {
+      display: none;
+    }
+    .screen.active {
+      display: block;
+    }
+    .card {
+      background: #14384f;
+      border-radius: 12px;
+      padding: 14px;
+      margin-bottom: 14px;
+    }
+    h2 {
+      margin-top: 0;
+      font-size: 18px;
+    }
+    select, input, button, textarea {
+      width: 100%;
+      padding: 10px;
+      margin-top: 8px;
+      border-radius: 8px;
+      border: none;
+      box-sizing: border-box;
+      font-size: 15px;
+    }
+    .action {
+      background: #27b3ff;
+      color: #062033;
+      font-weight: bold;
+    }
+    .small {
+      color: #c7d7e2;
+      font-size: 14px;
+      line-height: 1.5;
+    }
+    .item {
+      padding: 8px 0;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+    .item:last-child {
+      border-bottom: none;
+    }
+    .grid2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+    }
+    .stat {
+      background: #0f2f42;
+      border-radius: 10px;
+      padding: 12px;
+      text-align: center;
+    }
+    .big {
+      font-size: 24px;
+      font-weight: bold;
+      margin-top: 6px;
+    }
+    .mapbox {
+      position: relative;
+      width: 100%;
+      height: 340px;
+      border-radius: 12px;
+      overflow: hidden;
+      background: linear-gradient(180deg, #1a5a7a, #0b3043);
+    }
+    .land {
+      position: absolute;
+      left: 0;
+      top: 0;
+      width: 38%;
+      height: 100%;
+      background: #b99d73;
+      clip-path: polygon(0 0, 100% 0, 78% 18%, 85% 35%, 68% 55%, 80% 70%, 63% 100%, 0 100%);
+    }
+    .river {
+      position: absolute;
+      left: 24%;
+      top: 2%;
+      width: 14%;
+      height: 96%;
+      background: rgba(122, 218, 255, 0.6);
+      border-radius: 50px;
+      transform: rotate(5deg);
+    }
+    .marker {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      background: #ffd15a;
+      color: #062033;
+      padding: 4px 8px;
+      border-radius: 20px;
+      font-size: 11px;
+      font-weight: bold;
+      white-space: nowrap;
+    }
+    .fishEmoji {
+      font-size: 70px;
+      text-align: center;
+      margin: 10px 0;
+    }
+    canvas {
+      width: 100%;
+      max-width: 100%;
+      background: #0f2f42;
+      border-radius: 12px;
+      display: block;
+    }
+    @media (max-width: 700px) {
+      nav {
+        grid-template-columns: repeat(3, 1fr);
+      }
+      .grid2 {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
 </head>
 <body>
-
-<h2>🎣 Fishing PRO</h2>
-
-<div class="card">
-<h3>📷 Fish Helper</h3>
-
-<input type="file" accept="image/*" onchange="previewFishPhoto(event)">
-
-<div id="fishPhotoPreview" class="photo-preview">
-No photo selected
+  <header>🎣 See App</header>  <nav id="tabs">
+    <button class="active" onclick="openScreen('home', this)">Home</button>
+    <button onclick="openScreen('tide', this)">Tide</button>
+    <button onclick="openScreen('map', this)">Map</button>
+    <button onclick="openScreen('fish', this)">Fish</button>
+    <button onclick="openScreen('smart', this)">Smart</button>
+    <button onclick="openScreen('stats', this)">Stats</button>
+  </nav>  <div class="wrap">
+    <div id="home" class="screen active">
+      <div class="card">
+        <h2>Welkom</h2>
+        <div class="small">Nou werk die hoof dele weer: <strong>Tide</strong>, <strong>Map</strong>, <strong>Fish ID</strong>, <strong>Smart tip</strong> en <strong>Stats</strong>.</div>
+      </div>
+      <div class="grid2">
+        <div class="card stat">
+          <div class="small">Fishing score</div>
+          <div class="big" id="homeScore">--</div>
+        </div>
+        <div class="card stat">
+          <div class="small">Saved catches</div>
+          <div class="big" id="homeCatches">0</div>
+        </div>
+      </div>
+    </div><div id="tide" class="screen">
+  <div class="card">
+    <h2>Tide</h2>
+    <div class="small">Simple tide estimator volgens tyd van die dag.</div>
+    <button class="action" onclick="updateTide()">Refresh tide</button>
+    <div id="tideInfo" class="small" style="margin-top:12px;"></div>
+  </div>
 </div>
 
-<select id="fishMatchSelect"></select>
-
-<button onclick="showFish()">Identify</button>
-
-<div id="fishInfo"></div>
-
+<div id="map" class="screen">
+  <div class="card">
+    <h2>Stilbaai Map</h2>
+    <div class="mapbox">
+      <div class="land"></div>
+      <div class="river"></div>
+      <div class="marker" style="left:38%;top:36%;">Hawe mond</div>
+      <div class="marker" style="left:48%;top:45%;">Lappiesbaai</div>
+      <div class="marker" style="left:59%;top:58%;">Preekstoel</div>
+      <div class="marker" style="left:72%;top:72%;">Jongensfontein</div>
+      <div class="marker" style="left:64%;top:33%;">Morris Point</div>
+      <div class="marker" style="left:58%;top:40%;">Die Gat</div>
+    </div>
+  </div>
 </div>
 
-<script>
+<div id="fish" class="screen">
+  <div class="card">
+    <h2>Fish ID</h2>
+    <select id="fishSelect" onchange="showFish()">
+      <option>Kabeljou</option>
+      <option>Galjoen</option>
+      <option>Red Roman</option>
+      <option>Hottentot</option>
+      <option>Yellowtail</option>
+      <option>Elf</option>
+    </select>
+    <div id="fishEmoji" class="fishEmoji">🐟</div>
+    <div id="fishInfo" class="small"></div>
+  </div>
+</div>
 
-// SIMPLE DB
-const fishDB=[
-{name:"Kob",key:"kob",min:60,bag:5,bait:"Chokka"},
-{name:"Yellowtail",key:"yellowtail",min:60,bag:10,bait:"Live bait"},
-{name:"Hottentot",key:"hottentot",min:22,bag:10,bait:"Red bait"},
-{name:"Shad",key:"shad",min:30,bag:4,bait:"Sardine"}
-];
+<div id="smart" class="screen">
+  <div class="card">
+    <h2>Smart</h2>
+    <div class="small">Gee ’n eenvoudige voorstel volgens tyd van die dag.</div>
+    <button class="action" onclick="showSmart()">Wys smart tip</button>
+    <div id="smartBox" class="small" style="margin-top:12px;"></div>
+  </div>
+</div>
 
-// LOAD DROPDOWN
-function loadFish(){
-fishMatchSelect.innerHTML=fishDB.map(f=>`
-<option value="${f.key}">${f.name}</option>
-`).join("");
-}
+<div id="stats" class="screen">
+  <div class="card">
+    <h2>Catch Log</h2>
+    <input id="logFish" placeholder="Fish naam" />
+    <input id="logSize" type="number" placeholder="Size in cm" />
+    <button class="action" onclick="saveLog()">Save catch</button>
+    <div id="logList" class="small" style="margin-top:10px;"></div>
+  </div>
+  <div class="card">
+    <h2>Stats</h2>
+    <canvas id="statsChart" width="800" height="300"></canvas>
+  </div>
+</div>
 
-// PREVIEW IMAGE
-function previewFishPhoto(event){
-const file=event.target.files[0];
-if(!file)return;
+  </div>  <script>
+    const fishData = {
+      "Kabeljou": {
+        emoji: "🐟",
+        info: "Cape Kob | Min size: 60 cm | Bag: 5 | Bait: Chokka + sardine | Area: sandbanks en channels"
+      },
+      "Galjoen": {
+        emoji: "🐡",
+        info: "Galjoen | Min size: 35 cm | Bag: 2 | Bait: Mussel of red bait | Area: white water en rotse"
+      },
+      "Red Roman": {
+        emoji: "🐠",
+        info: "Red Roman | Min size: 30 cm | Bag: 5 | Bait: Squid | Area: diep rif"
+      },
+      "Hottentot": {
+        emoji: "🐟",
+        info: "Hottentot | Min size: 22 cm | Bag: 10 | Bait: Prawn of mussel | Area: vlak rif"
+      },
+      "Yellowtail": {
+        emoji: "🐠",
+        info: "Yellowtail | Min size: 60 cm | Bag: 10 | Bait: live bait of lure | Area: oop see"
+      },
+      "Elf": {
+        emoji: "🐟",
+        info: "Elf / Shad | Min size: 30 cm | Bag: 4 | Bait: Sardine of spoon | Area: mond en branders"
+      }
+    };
 
-const reader=new FileReader();
-reader.onload=function(e){
-fishPhotoPreview.innerHTML=`<img src="${e.target.result}">`;
-};
-reader.readAsDataURL(file);
-}
+    function openScreen(id, btn) {
+      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
+      document.getElementById(id).classList.add('active');
+      document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
+      btn.classList.add('active');
+    }
 
-// SHOW INFO
-function showFish(){
-const key=fishMatchSelect.value;
-const f=fishDB.find(x=>x.key===key);
+    function showFish() {
+      const fish = document.getElementById('fishSelect').value;
+      document.getElementById('fishEmoji').textContent = fishData[fish].emoji;
+      document.getElementById('fishInfo').textContent = fishData[fish].info;
+    }
 
-fishInfo.innerHTML=`
-<b>${f.name}</b><br>
-Min: ${f.min}cm<br>
-Bag: ${f.bag}<br>
-Bait: ${f.bait}
-`;
-}
+    function updateTide() {
+      const now = new Date();
+      const hour = now.getHours();
+      let state = '';
+      let next = '';
 
-// INIT
-loadFish();
+      if (hour < 6) {
+        state = 'Rising tide';
+        next = 'High tide later this morning';
+      } else if (hour < 12) {
+        state = 'High tide window';
+        next = 'Dropping later';
+      } else if (hour < 18) {
+        state = 'Dropping tide';
+        next = 'Low tide towards evening';
+      } else {
+        state = 'Low tide window';
+        next = 'Rising again later tonight';
+      }
 
-</script>
+      document.getElementById('tideInfo').innerHTML = '<strong>' + state + '</strong><br>' + next + '<br>Updated: ' + now.toLocaleTimeString();
+    }
 
-</body>
+    function showSmart() {
+      const hour = new Date().getHours();
+      let text = '';
+      let score = 60;
+
+      if (hour < 8) {
+        text = 'Early morning: probeer spoon of sardine vir Elf by die mond.';
+        score = 82;
+      } else if (hour < 14) {
+        text = 'Midday: gaan dieper rif toe vir Roman met squid.';
+        score = 68;
+      } else if (hour < 19) {
+        text = 'Late afternoon: gooi chokka + sardine vir Kabeljou op sandbanke.';
+        score = 86;
+      } else {
+        text = 'Night session: fokus op Kabeljou in channels en vuil water.';
+        score = 74;
+      }
+
+      document.getElementById('smartBox').innerHTML = '<strong>Fishing score: ' + score + '/100</strong><br>' + text;
+      document.getElementById('homeScore').textContent = score + '/100';
+    }
+
+    function saveLog() {
+      const fish = document.getElementById('logFish').value.trim();
+      const size = document.getElementById('logSize').value.trim();
+      if (!fish || !size) return;
+
+      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
+      logs.unshift({ fish, size: Number(size) });
+      localStorage.setItem('seeSimpleLogs', JSON.stringify(logs));
+
+      document.getElementById('logFish').value = '';
+      document.getElementById('logSize').value = '';
+
+      renderLogs();
+      drawChart();
+      updateHomeCount();
+    }
+
+    function renderLogs() {
+      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
+      const box = document.getElementById('logList');
+      if (!logs.length) {
+        box.innerHTML = 'Nog geen catches gestoor nie.';
+        return;
+      }
+      box.innerHTML = logs.map(log => '<div class="item"><strong>' + log.fish + '</strong> — ' + log.size + ' cm</div>').join('');
+    }
+
+    function updateHomeCount() {
+      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
+      document.getElementById('homeCatches').textContent = logs.length;
+    }
+
+    function drawChart() {
+      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
+      const counts = {};
+      logs.forEach(log => {
+        counts[log.fish] = (counts[log.fish] || 0) + 1;
+      });
+
+      const canvas = document.getElementById('statsChart');
+      const ctx = canvas.getContext('2d');
+      ctx.clearRect(0, 0, canvas.width, canvas.height);
+
+      ctx.fillStyle = '#c7d7e2';
+      ctx.font = '18px Arial';
+      ctx.fillText('Catches per fish', 20, 30);
+
+      const keys = Object.keys(counts);
+      if (!keys.length) {
+        ctx.fillText('No data yet', 20, 70);
+        return;
+      }
+
+      const max = Math.max(...Object.values(counts));
+      const barWidth = 70;
+      const gap = 30;
+      const startX = 40;
+      const baseY = 250;
+
+      keys.forEach((key, i) => {
+        const value = counts[key];
+        const height = (value / max) * 140;
+        const x = startX + i * (barWidth + gap);
+        const y = baseY - height;
+
+        ctx.fillStyle = '#27b3ff';
+        ctx.fillRect(x, y, barWidth, height);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '14px Arial';
+        ctx.fillText(String(value), x + 28, y - 8);
+        ctx.fillText(key, x, baseY + 20);
+      });
+    }
+
+    showFish();
+    updateTide();
+    showSmart();
+    renderLogs();
+    drawChart();
+    updateHomeCount();
+  </script></body>
 </html>
