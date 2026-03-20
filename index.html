@@ -1,428 +1,456 @@
-
-<!DOCTYPE html><html lang="af">
+<!DOCTYPE html>
+<html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>See App Simple Fix</title>
+  <title>Tanya Fishing PRO</title>
   <style>
-    body {
-      margin: 0;
-      font-family: Arial, sans-serif;
-      background: #0b1f2e;
-      color: white;
+    :root{
+      --bg:#08111d;
+      --panel:#102033;
+      --panel2:#132840;
+      --line:#214563;
+      --text:#eef7ff;
+      --muted:#9fb6cc;
+      --accent:#52c9ff;
+      --accent2:#1ea7df;
+      --good:#35d07f;
+      --bad:#ff6666;
     }
-    header {
-      background: #12344a;
-      padding: 16px;
-      text-align: center;
-      font-size: 22px;
-      font-weight: bold;
-      position: sticky;
-      top: 0;
-      z-index: 10;
+    *{box-sizing:border-box}
+    body{
+      margin:0;
+      font-family:Arial,Helvetica,sans-serif;
+      background:linear-gradient(180deg,#07101c,#0c1930 42%,#08111d);
+      color:var(--text);
     }
-    nav {
-      display: grid;
-      grid-template-columns: repeat(6, 1fr);
-      gap: 6px;
-      padding: 10px;
-      background: #0f2c3e;
-      position: sticky;
-      top: 58px;
-      z-index: 9;
+    header{
+      position:sticky; top:0; z-index:50;
+      background:rgba(8,17,29,.97);
+      border-bottom:1px solid var(--line);
+      padding:14px 10px 12px;
     }
-    nav button {
-      padding: 10px 6px;
-      border: none;
-      border-radius: 8px;
-      background: #194760;
-      color: white;
-      font-size: 12px;
-      font-weight: bold;
+    header h1{
+      margin:0;
+      font-size:22px;
+      color:var(--accent);
+      text-align:center;
     }
-    nav button.active {
-      background: #27b3ff;
-      color: #062033;
+    header p{
+      margin:6px 0 0;
+      text-align:center;
+      color:var(--muted);
+      font-size:12px;
     }
-    .wrap {
-      padding: 14px;
-      max-width: 900px;
-      margin: 0 auto;
-      padding-bottom: 40px;
+    .tabs{
+      display:grid;
+      grid-template-columns:repeat(5,1fr);
+      gap:6px;
+      margin-top:10px;
     }
-    .screen {
-      display: none;
+    .tab-btn{
+      border:none;
+      border-radius:10px;
+      padding:10px 6px;
+      background:#0a2138;
+      color:#dff4ff;
+      font-weight:700;
+      font-size:12px;
     }
-    .screen.active {
-      display: block;
+    .tab-btn.active{
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      color:#03121d;
     }
-    .card {
-      background: #14384f;
-      border-radius: 12px;
-      padding: 14px;
-      margin-bottom: 14px;
+    .container{padding:12px;max-width:1100px;margin:0 auto}
+    .tab{display:none}
+    .tab.active{display:block}
+    .grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(280px,1fr));
+      gap:12px;
     }
-    h2 {
-      margin-top: 0;
-      font-size: 18px;
+    .card{
+      background:linear-gradient(180deg,var(--panel),var(--panel2));
+      border:1px solid var(--line);
+      border-radius:16px;
+      padding:12px;
+      margin-bottom:12px;
+      box-shadow:0 8px 20px rgba(0,0,0,.22);
     }
-    select, input, button, textarea {
-      width: 100%;
-      padding: 10px;
-      margin-top: 8px;
-      border-radius: 8px;
-      border: none;
-      box-sizing: border-box;
-      font-size: 15px;
+    h2{margin:0 0 10px;color:var(--accent);font-size:18px}
+    .sub{color:var(--muted);font-size:12px;margin-bottom:10px}
+    label{display:block;margin:8px 0 6px;color:var(--muted);font-size:13px}
+    input,select,textarea{
+      width:100%;
+      padding:10px 12px;
+      border-radius:10px;
+      border:1px solid var(--line);
+      background:#081321;
+      color:var(--text);
+      outline:none;
     }
-    .action {
-      background: #27b3ff;
-      color: #062033;
-      font-weight: bold;
+    textarea{min-height:80px;resize:vertical}
+    button.main{
+      width:100%;
+      padding:11px 12px;
+      margin-top:8px;
+      border:none;
+      border-radius:12px;
+      background:linear-gradient(180deg,var(--accent),var(--accent2));
+      color:#04131f;
+      font-weight:700;
+      cursor:pointer;
     }
-    .small {
-      color: #c7d7e2;
-      font-size: 14px;
-      line-height: 1.5;
+    .result{
+      margin-top:10px;
+      padding:10px;
+      border-radius:12px;
+      background:#081321;
+      border:1px solid var(--line);
+      line-height:1.5;
     }
-    .item {
-      padding: 8px 0;
-      border-bottom: 1px solid rgba(255,255,255,0.1);
+    .metric{
+      background:#081321;
+      border:1px solid var(--line);
+      border-radius:12px;
+      padding:10px;
+      text-align:center;
     }
-    .item:last-child {
-      border-bottom: none;
+    .metric .big{
+      font-size:20px;
+      font-weight:700;
+      color:var(--accent);
     }
-    .grid2 {
-      display: grid;
-      grid-template-columns: 1fr 1fr;
-      gap: 12px;
+    .small-grid{
+      display:grid;
+      grid-template-columns:1fr 1fr;
+      gap:8px;
     }
-    .stat {
-      background: #0f2f42;
-      border-radius: 10px;
-      padding: 12px;
-      text-align: center;
+    .badge{
+      display:inline-block;
+      padding:4px 8px;
+      border-radius:999px;
+      background:#0b2943;
+      border:1px solid #1e547f;
+      color:#dff5ff;
+      font-size:12px;
+      margin:3px 5px 0 0;
     }
-    .big {
-      font-size: 24px;
-      font-weight: bold;
-      margin-top: 6px;
+    .fish-item,.log-item{
+      border-bottom:1px solid rgba(255,255,255,.08);
+      padding:10px 0;
     }
-    .mapbox {
-      position: relative;
-      width: 100%;
-      height: 340px;
-      border-radius: 12px;
-      overflow: hidden;
-      background: linear-gradient(180deg, #1a5a7a, #0b3043);
+    .fish-item:last-child,.log-item:last-child{border-bottom:none}
+    .fish-name{font-size:16px;font-weight:700;color:#dff6ff}
+    .muted{color:var(--muted);font-size:13px}
+    .good{color:var(--good);font-weight:700}
+    .bad{color:var(--bad);font-weight:700}
+    .gallery-grid,.rig-grid{
+      display:grid;
+      grid-template-columns:repeat(auto-fit,minmax(220px,1fr));
+      gap:12px;
     }
-    .land {
-      position: absolute;
-      left: 0;
-      top: 0;
-      width: 38%;
-      height: 100%;
-      background: #b99d73;
-      clip-path: polygon(0 0, 100% 0, 78% 18%, 85% 35%, 68% 55%, 80% 70%, 63% 100%, 0 100%);
+    .gallery-card,.rig-card{
+      background:#091525;
+      border:1px solid var(--line);
+      border-radius:14px;
+      padding:12px;
     }
-    .river {
-      position: absolute;
-      left: 24%;
-      top: 2%;
-      width: 14%;
-      height: 96%;
-      background: rgba(122, 218, 255, 0.6);
-      border-radius: 50px;
-      transform: rotate(5deg);
+    .gallery-art{
+      height:120px;
+      border-radius:12px;
+      border:1px solid #18344e;
+      background:radial-gradient(circle at top,#17456b,#0a1728 65%);
+      display:flex;
+      align-items:center;
+      justify-content:center;
+      font-size:42px;
+      margin-bottom:10px;
     }
-    .marker {
-      position: absolute;
-      transform: translate(-50%, -50%);
-      background: #ffd15a;
-      color: #062033;
-      padding: 4px 8px;
-      border-radius: 20px;
-      font-size: 11px;
-      font-weight: bold;
-      white-space: nowrap;
+    .rig-svg-wrap{
+      width:100%;
+      overflow:auto;
+      background:#06101d;
+      border:1px solid #18344e;
+      border-radius:12px;
+      padding:8px;
+      margin:10px 0;
     }
-    .fishEmoji {
-      font-size: 70px;
-      text-align: center;
-      margin: 10px 0;
-    }
-    canvas {
-      width: 100%;
-      max-width: 100%;
-      background: #0f2f42;
-      border-radius: 12px;
-      display: block;
-    }
-    @media (max-width: 700px) {
-      nav {
-        grid-template-columns: repeat(3, 1fr);
-      }
-      .grid2 {
-        grid-template-columns: 1fr;
-      }
+    .rig-svg{width:100%;min-width:520px;height:180px;display:block}
+    @media (max-width:700px){
+      .tabs{grid-template-columns:repeat(3,1fr)}
+      .small-grid{grid-template-columns:1fr}
     }
   </style>
 </head>
 <body>
-  <header>🎣 See App</header>  <nav id="tabs">
-    <button class="active" onclick="openScreen('home', this)">Home</button>
-    <button onclick="openScreen('tide', this)">Tide</button>
-    <button onclick="openScreen('map', this)">Map</button>
-    <button onclick="openScreen('fish', this)">Fish</button>
-    <button onclick="openScreen('smart', this)">Smart</button>
-    <button onclick="openScreen('stats', this)">Stats</button>
-  </nav>  <div class="wrap">
-    <div id="home" class="screen active">
-      <div class="card">
-        <h2>Welkom</h2>
-        <div class="small">Nou werk die hoof dele weer: <strong>Tide</strong>, <strong>Map</strong>, <strong>Fish ID</strong>, <strong>Smart tip</strong> en <strong>Stats</strong>.</div>
-      </div>
-      <div class="grid2">
-        <div class="card stat">
-          <div class="small">Fishing score</div>
-          <div class="big" id="homeScore">--</div>
-        </div>
-        <div class="card stat">
-          <div class="small">Saved catches</div>
-          <div class="big" id="homeCatches">0</div>
-        </div>
-      </div>
-    </div><div id="tide" class="screen">
-  <div class="card">
-    <h2>Tide</h2>
-    <div class="small">Simple tide estimator volgens tyd van die dag.</div>
-    <button class="action" onclick="updateTide()">Refresh tide</button>
-    <div id="tideInfo" class="small" style="margin-top:12px;"></div>
-  </div>
-</div>
-
-<div id="map" class="screen">
-  <div class="card">
-    <h2>Stilbaai Map</h2>
-    <div class="mapbox">
-      <div class="land"></div>
-      <div class="river"></div>
-      <div class="marker" style="left:38%;top:36%;">Hawe mond</div>
-      <div class="marker" style="left:48%;top:45%;">Lappiesbaai</div>
-      <div class="marker" style="left:59%;top:58%;">Preekstoel</div>
-      <div class="marker" style="left:72%;top:72%;">Jongensfontein</div>
-      <div class="marker" style="left:64%;top:33%;">Morris Point</div>
-      <div class="marker" style="left:58%;top:40%;">Die Gat</div>
+  <header>
+    <h1>🎣 Tanya Fishing PRO</h1>
+    <p>Dashboard • fish • legal • logs • rigs</p>
+    <div class="tabs">
+      <button class="tab-btn active" onclick="showTab('home', this)">Home</button>
+      <button class="tab-btn" onclick="showTab('fish', this)">Fish</button>
+      <button class="tab-btn" onclick="showTab('legal', this)">Legal</button>
+      <button class="tab-btn" onclick="showTab('rigs', this)">Rigs</button>
+      <button class="tab-btn" onclick="showTab('logs', this)">Logs</button>
     </div>
-  </div>
-</div>
+  </header>
 
-<div id="fish" class="screen">
-  <div class="card">
-    <h2>Fish ID</h2>
-    <select id="fishSelect" onchange="showFish()">
-      <option>Kabeljou</option>
-      <option>Galjoen</option>
-      <option>Red Roman</option>
-      <option>Hottentot</option>
-      <option>Yellowtail</option>
-      <option>Elf</option>
-    </select>
-    <div id="fishEmoji" class="fishEmoji">🐟</div>
-    <div id="fishInfo" class="small"></div>
-  </div>
-</div>
+  <div class="container">
 
-<div id="smart" class="screen">
-  <div class="card">
-    <h2>Smart</h2>
-    <div class="small">Gee ’n eenvoudige voorstel volgens tyd van die dag.</div>
-    <button class="action" onclick="showSmart()">Wys smart tip</button>
-    <div id="smartBox" class="small" style="margin-top:12px;"></div>
-  </div>
-</div>
+    <section id="home" class="tab active">
+      <div class="grid">
+        <div class="card">
+          <h2>🎯 What to use NOW</h2>
+          <div class="sub">Simple smart recommendation</div>
+          <button class="main" onclick="smart()">Get advice</button>
+          <div id="ai" class="result">Tap for a recommendation.</div>
+        </div>
 
-<div id="stats" class="screen">
-  <div class="card">
-    <h2>Catch Log</h2>
-    <input id="logFish" placeholder="Fish naam" />
-    <input id="logSize" type="number" placeholder="Size in cm" />
-    <button class="action" onclick="saveLog()">Save catch</button>
-    <div id="logList" class="small" style="margin-top:10px;"></div>
-  </div>
-  <div class="card">
-    <h2>Stats</h2>
-    <canvas id="statsChart" width="800" height="300"></canvas>
-  </div>
-</div>
+        <div class="card">
+          <h2>📊 Conditions</h2>
+          <div class="small-grid">
+            <div class="metric">
+              <div class="muted">Wave Height</div>
+              <div class="big" id="waveHeight">--</div>
+            </div>
+            <div class="metric">
+              <div class="muted">Score</div>
+              <div class="big" id="score">--</div>
+            </div>
+          </div>
+          <div id="scoreText" class="result">Loading...</div>
+        </div>
+      </div>
 
-  </div>  <script>
-    const fishData = {
-      "Kabeljou": {
-        emoji: "🐟",
-        info: "Cape Kob | Min size: 60 cm | Bag: 5 | Bait: Chokka + sardine | Area: sandbanks en channels"
-      },
-      "Galjoen": {
-        emoji: "🐡",
-        info: "Galjoen | Min size: 35 cm | Bag: 2 | Bait: Mussel of red bait | Area: white water en rotse"
-      },
-      "Red Roman": {
-        emoji: "🐠",
-        info: "Red Roman | Min size: 30 cm | Bag: 5 | Bait: Squid | Area: diep rif"
-      },
-      "Hottentot": {
-        emoji: "🐟",
-        info: "Hottentot | Min size: 22 cm | Bag: 10 | Bait: Prawn of mussel | Area: vlak rif"
-      },
-      "Yellowtail": {
-        emoji: "🐠",
-        info: "Yellowtail | Min size: 60 cm | Bag: 10 | Bait: live bait of lure | Area: oop see"
-      },
-      "Elf": {
-        emoji: "🐟",
-        info: "Elf / Shad | Min size: 30 cm | Bag: 4 | Bait: Sardine of spoon | Area: mond en branders"
-      }
-    };
+      <div class="card">
+        <h2>📅 Forecast</h2>
+        <div id="forecast" class="result">Loading forecast...</div>
+      </div>
 
-    function openScreen(id, btn) {
-      document.querySelectorAll('.screen').forEach(screen => screen.classList.remove('active'));
-      document.getElementById(id).classList.add('active');
-      document.querySelectorAll('nav button').forEach(button => button.classList.remove('active'));
-      btn.classList.add('active');
+      <div class="card">
+        <h2>🌊 Tide planner</h2>
+        <div id="tide" class="result"></div>
+      </div>
+    </section>
+
+    <section id="fish" class="tab">
+      <div class="card">
+        <h2>🐟 Fish Gallery</h2>
+        <div id="gallery" class="gallery-grid"></div>
+      </div>
+
+      <div class="card">
+        <h2>🐟 Fish Database</h2>
+        <input id="search" placeholder="Search fish..." oninput="renderFish()">
+        <div id="fishList"></div>
+      </div>
+    </section>
+
+    <section id="legal" class="tab">
+      <div class="card">
+        <h2>⚖️ Legal Checker</h2>
+        <label>Species</label>
+        <select id="species"></select>
+        <label>Size (cm)</label>
+        <input id="size" type="number" placeholder="Enter size cm">
+        <button class="main" onclick="check()">Check</button>
+        <div id="legalResult" class="result">Choose species and enter size.</div>
+      </div>
+    </section>
+
+    <section id="rigs" class="tab">
+      <div class="card">
+        <h2>🪝 Rigs</h2>
+        <div id="rigList" class="rig-grid"></div>
+      </div>
+    </section>
+
+    <section id="logs" class="tab">
+      <div class="card">
+        <h2>📝 Session Log</h2>
+        <label>Date</label>
+        <input id="date" type="date">
+        <label>Spot</label>
+        <input id="spot" placeholder="Spot">
+        <label>Species</label>
+        <input id="sp" placeholder="Species">
+        <label>Notes</label>
+        <textarea id="notes" placeholder="Notes"></textarea>
+        <button class="main" onclick="saveLog()">Save</button>
+        <div id="logs"></div>
+      </div>
+    </section>
+
+  </div>
+
+  <script>
+    const fish = [
+      {name:"Kob",emoji:"🐟",min:60,bag:5,bait:"Chokka",rig:"Running sinker",notes:"Good in gullies and dusk."},
+      {name:"Yellowtail",emoji:"🐠",min:60,bag:10,bait:"Live bait",rig:"Drift rig",notes:"Best offshore around birds."},
+      {name:"Hottentot",emoji:"🐟",min:22,bag:10,bait:"Red bait",rig:"Small paternoster",notes:"Shallow reef fish."},
+      {name:"Shad",emoji:"🐟",min:30,bag:4,bait:"Sardine",rig:"Spinning trace",notes:"Fast retrieve predator."},
+      {name:"Geelbek",emoji:"🐟",min:60,bag:5,bait:"Sardine",rig:"Drift rig",notes:"Great in low light."},
+      {name:"Red Roman",emoji:"🐟",min:30,bag:5,bait:"Chokka",rig:"Double paternoster",notes:"Classic reef species."}
+    ];
+
+    const rigs = [
+      {id:"kobrig",name:"Kob Running Sinker",hooks:"6/0–8/0",leader:"80–120cm",sinker:"4–6oz",bait:"Chokka + Sardine"},
+      {id:"yellowtailrig",name:"Yellowtail Drift Rig",hooks:"6/0–9/0",leader:"100–150cm",sinker:"Light / none",bait:"Live bait"},
+      {id:"romanrig",name:"Roman Double Paternoster",hooks:"2 x 3/0–5/0",leader:"80–100cm",sinker:"6–8oz",bait:"Chokka"},
+      {id:"shadrig",name:"Shad Spinning Trace",hooks:"Treble / lure",leader:"40–60cm",sinker:"None",bait:"Spoon / plug"}
+    ];
+
+    function showTab(id, btn){
+      document.querySelectorAll(".tab").forEach(t => t.classList.remove("active"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+      btn.classList.add("active");
     }
 
-    function showFish() {
-      const fish = document.getElementById('fishSelect').value;
-      document.getElementById('fishEmoji').textContent = fishData[fish].emoji;
-      document.getElementById('fishInfo').textContent = fishData[fish].info;
+    species.innerHTML = fish.map(f => `<option>${f.name}</option>`).join("");
+
+    function renderGallery(){
+      gallery.innerHTML = fish.map(f => `
+        <div class="gallery-card">
+          <div class="gallery-art">${f.emoji}</div>
+          <div class="fish-name">${f.name}</div>
+          <div><span class="badge">Min ${f.min}cm</span><span class="badge">Bag ${f.bag}</span></div>
+          <div class="muted">Bait: ${f.bait}</div>
+        </div>
+      `).join("");
     }
 
-    function updateTide() {
-      const now = new Date();
-      const hour = now.getHours();
-      let state = '';
-      let next = '';
-
-      if (hour < 6) {
-        state = 'Rising tide';
-        next = 'High tide later this morning';
-      } else if (hour < 12) {
-        state = 'High tide window';
-        next = 'Dropping later';
-      } else if (hour < 18) {
-        state = 'Dropping tide';
-        next = 'Low tide towards evening';
-      } else {
-        state = 'Low tide window';
-        next = 'Rising again later tonight';
-      }
-
-      document.getElementById('tideInfo').innerHTML = '<strong>' + state + '</strong><br>' + next + '<br>Updated: ' + now.toLocaleTimeString();
+    function renderFish(){
+      const q = search.value.toLowerCase();
+      fishList.innerHTML = fish.filter(f => f.name.toLowerCase().includes(q) || f.bait.toLowerCase().includes(q) || f.rig.toLowerCase().includes(q)).map(f => `
+        <div class="fish-item">
+          <div class="fish-name">${f.emoji} ${f.name}</div>
+          <div><span class="badge">Min ${f.min}cm</span><span class="badge">Bag ${f.bag}</span></div>
+          <div class="muted"><strong>Bait:</strong> ${f.bait}</div>
+          <div class="muted"><strong>Rig:</strong> ${f.rig}</div>
+          <div class="muted"><strong>Notes:</strong> ${f.notes}</div>
+        </div>
+      `).join("");
     }
 
-    function showSmart() {
-      const hour = new Date().getHours();
-      let text = '';
-      let score = 60;
-
-      if (hour < 8) {
-        text = 'Early morning: probeer spoon of sardine vir Elf by die mond.';
-        score = 82;
-      } else if (hour < 14) {
-        text = 'Midday: gaan dieper rif toe vir Roman met squid.';
-        score = 68;
-      } else if (hour < 19) {
-        text = 'Late afternoon: gooi chokka + sardine vir Kabeljou op sandbanke.';
-        score = 86;
-      } else {
-        text = 'Night session: fokus op Kabeljou in channels en vuil water.';
-        score = 74;
-      }
-
-      document.getElementById('smartBox').innerHTML = '<strong>Fishing score: ' + score + '/100</strong><br>' + text;
-      document.getElementById('homeScore').textContent = score + '/100';
+    function check(){
+      const f = fish.find(x => x.name === species.value);
+      legalResult.innerHTML = size.value >= f.min
+        ? `<span class="good">✅ Legal size</span><br>${f.name}<br>Bag limit: ${f.bag}`
+        : `<span class="bad">❌ Too small</span><br>${f.name}<br>Minimum: ${f.min}cm`;
     }
 
-    function saveLog() {
-      const fish = document.getElementById('logFish').value.trim();
-      const size = document.getElementById('logSize').value.trim();
-      if (!fish || !size) return;
+    let logsData = JSON.parse(localStorage.getItem("logs") || "[]");
 
-      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
-      logs.unshift({ fish, size: Number(size) });
-      localStorage.setItem('seeSimpleLogs', JSON.stringify(logs));
-
-      document.getElementById('logFish').value = '';
-      document.getElementById('logSize').value = '';
-
+    function saveLog(){
+      logsData.unshift({
+        date:date.value,
+        spot:spot.value,
+        species:sp.value,
+        notes:notes.value
+      });
+      localStorage.setItem("logs", JSON.stringify(logsData));
       renderLogs();
-      drawChart();
-      updateHomeCount();
+      spot.value = "";
+      sp.value = "";
+      notes.value = "";
     }
 
-    function renderLogs() {
-      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
-      const box = document.getElementById('logList');
-      if (!logs.length) {
-        box.innerHTML = 'Nog geen catches gestoor nie.';
-        return;
-      }
-      box.innerHTML = logs.map(log => '<div class="item"><strong>' + log.fish + '</strong> — ' + log.size + ' cm</div>').join('');
+    function del(i){
+      logsData.splice(i,1);
+      localStorage.setItem("logs", JSON.stringify(logsData));
+      renderLogs();
     }
 
-    function updateHomeCount() {
-      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
-      document.getElementById('homeCatches').textContent = logs.length;
+    function renderLogs(){
+      logs.innerHTML = logsData.length ? logsData.map((l,i) => `
+        <div class="log-item">
+          <div><strong>${l.date}</strong> — ${l.spot}</div>
+          <div class="muted">${l.species}</div>
+          <div class="muted">${l.notes || ""}</div>
+          <button class="main" onclick="del(${i})">Delete</button>
+        </div>
+      `).join("") : `<div class="result">No logs yet.</div>`;
     }
 
-    function drawChart() {
-      const logs = JSON.parse(localStorage.getItem('seeSimpleLogs') || '[]');
-      const counts = {};
-      logs.forEach(log => {
-        counts[log.fish] = (counts[log.fish] || 0) + 1;
+    function smart(){
+      const f = fish[Math.floor(Math.random() * fish.length)];
+      ai.innerHTML = `Try target: <strong>${f.name}</strong><br>Bait: ${f.bait}<br>Rig: ${f.rig}`;
+    }
+
+    function sketchSVG(name){
+      if(name.includes("Kob")) return `
+        <div class="rig-svg-wrap"><svg viewBox="0 0 600 180" class="rig-svg">
+          <line x1="80" y1="20" x2="80" y2="150" stroke="cyan" stroke-width="3"/>
+          <line x1="80" y1="90" x2="240" y2="90" stroke="white" stroke-width="2"/>
+          <polygon points="80,150 60,175 100,175" fill="yellow"/>
+          <text x="250" y="90" fill="white">Hook</text>
+        </svg></div>`;
+      if(name.includes("Yellowtail")) return `
+        <div class="rig-svg-wrap"><svg viewBox="0 0 600 180" class="rig-svg">
+          <line x1="60" y1="90" x2="300" y2="90" stroke="cyan" stroke-width="3"/>
+          <circle cx="300" cy="90" r="5" fill="yellow"/>
+          <line x1="300" y1="90" x2="500" y2="90" stroke="white" stroke-width="2"/>
+          <text x="510" y="90" fill="white">Hook</text>
+        </svg></div>`;
+      return `
+        <div class="rig-svg-wrap"><svg viewBox="0 0 600 180" class="rig-svg">
+          <line x1="100" y1="20" x2="100" y2="150" stroke="cyan" stroke-width="3"/>
+          <line x1="100" y1="80" x2="230" y2="80" stroke="white" stroke-width="2"/>
+          <line x1="100" y1="110" x2="230" y2="110" stroke="white" stroke-width="2"/>
+          <polygon points="100,150 80,175 120,175" fill="yellow"/>
+        </svg></div>`;
+    }
+
+    function toggleRig(id){
+      const el = document.getElementById(id);
+      el.style.display = el.style.display === "none" ? "block" : "none";
+    }
+
+    function renderRigs(){
+      rigList.innerHTML = rigs.map(r => `
+        <div class="rig-card">
+          <div class="fish-name">${r.name}</div>
+          <div class="muted">Hooks: ${r.hooks}</div>
+          <div class="muted">Leader: ${r.leader}</div>
+          <div class="muted">Sinker: ${r.sinker}</div>
+          <div class="muted">Bait: ${r.bait}</div>
+          <button class="main" onclick="toggleRig('${r.id}')">Open rig</button>
+          <div id="${r.id}" style="display:none;">${sketchSVG(r.name)}</div>
+        </div>
+      `).join("");
+    }
+
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=-34.37&longitude=21.42&daily=temperature_2m_max,wind_speed_10m_max&timezone=auto")
+      .then(r => r.json())
+      .then(d => {
+        forecast.innerHTML = d.daily.time.slice(0,3).map((day,i) =>
+          `${day}<br>Temp: ${d.daily.temperature_2m_max[i]}°C<br>Wind: ${d.daily.wind_speed_10m_max[i]} km/h<br><br>`
+        ).join("");
+      })
+      .catch(() => forecast.innerHTML = "Forecast not loading.");
+
+    fetch("https://marine-api.open-meteo.com/v1/marine?latitude=-34.37&longitude=21.42&current=wave_height")
+      .then(r => r.json())
+      .then(d => {
+        const h = d.current.wave_height;
+        waveHeight.textContent = h + "m";
+        const scoreVal = h < 1.5 ? 82 : h < 2 ? 64 : 38;
+        score.textContent = scoreVal + "/100";
+        scoreText.innerHTML = scoreVal >= 70 ? "🔥 Good fishing conditions" : "⚠️ Average conditions";
+      })
+      .catch(() => {
+        scoreText.innerHTML = "Marine data not loading.";
       });
 
-      const canvas = document.getElementById('statsChart');
-      const ctx = canvas.getContext('2d');
-      ctx.clearRect(0, 0, canvas.width, canvas.height);
+    const hr = new Date().getHours();
+    tide.innerHTML = hr % 2 === 0 ? "Next tide change: High tide phase" : "Next tide change: Low tide phase";
 
-      ctx.fillStyle = '#c7d7e2';
-      ctx.font = '18px Arial';
-      ctx.fillText('Catches per fish', 20, 30);
-
-      const keys = Object.keys(counts);
-      if (!keys.length) {
-        ctx.fillText('No data yet', 20, 70);
-        return;
-      }
-
-      const max = Math.max(...Object.values(counts));
-      const barWidth = 70;
-      const gap = 30;
-      const startX = 40;
-      const baseY = 250;
-
-      keys.forEach((key, i) => {
-        const value = counts[key];
-        const height = (value / max) * 140;
-        const x = startX + i * (barWidth + gap);
-        const y = baseY - height;
-
-        ctx.fillStyle = '#27b3ff';
-        ctx.fillRect(x, y, barWidth, height);
-
-        ctx.fillStyle = '#ffffff';
-        ctx.font = '14px Arial';
-        ctx.fillText(String(value), x + 28, y - 8);
-        ctx.fillText(key, x, baseY + 20);
-      });
-    }
-
-    showFish();
-    updateTide();
-    showSmart();
+    renderGallery();
+    renderFish();
     renderLogs();
-    drawChart();
-    updateHomeCount();
-  </script></body>
+    renderRigs();
+  </script>
+</body>
 </html>
