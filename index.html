@@ -1,120 +1,226 @@
 <!DOCTYPE html>
 <html>
 <head>
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Fishing PRO</title>
+<meta charset="UTF-8">
+<title>Stilbaai Fishing Pro V4 MAX</title>
 
 <style>
-body{background:#07111f;color:white;font-family:Arial;margin:0;padding:10px;}
-.card{background:#0f1c2e;padding:12px;border-radius:12px;margin-bottom:12px;}
-button{width:100%;padding:10px;margin-top:8px;background:#47c7ff;border:none;border-radius:8px;font-weight:bold;}
-input,select{width:100%;padding:8px;margin-top:5px;border-radius:6px;border:none;}
-.result{margin-top:10px;background:#081321;padding:10px;border-radius:10px;}
-.bad{color:#ff6b6b;font-weight:bold;}
-.good{color:#4cff88;font-weight:bold;}
-.warn{color:#ffd166;font-weight:bold;}
-</style>
+body {
+  font-family: Arial;
+  background:#06141f;
+  color:white;
+  margin:0;
+}
 
+.header {
+  background:#0c2c44;
+  padding:15px;
+  text-align:center;
+  font-size:22px;
+}
+
+.container { padding:15px; }
+
+.card {
+  background:#0f3a57;
+  padding:15px;
+  margin:10px 0;
+  border-radius:12px;
+}
+
+button {
+  padding:10px;
+  margin:5px;
+  border:none;
+  border-radius:8px;
+  background:#00d4ff;
+  color:black;
+  font-weight:bold;
+}
+
+.result {
+  background:#08293d;
+  padding:15px;
+  margin-top:10px;
+  border-radius:10px;
+}
+
+.bar {
+  height:20px;
+  background:lime;
+  border-radius:5px;
+}
+
+.map {
+  height:150px;
+  background:linear-gradient(#1e4d6b,#0a2a40);
+  border-radius:10px;
+  text-align:center;
+  padding-top:60px;
+}
+
+img {
+  width:100%;
+  border-radius:10px;
+}
+
+</style>
 </head>
+
 <body>
 
-<h2>🎣 Fishing PRO</h2>
+<div class="header">🎣 Stilbaai Fishing Pro V4 MAX</div>
 
-<!-- WARNING -->
-<div class="card">
-<div class="result warn">
-⚠️ Always verify with your official DFFE permit rules.
-App values are reference only.
-</div>
+<div class="container">
+
+<h3>🎯 AI Fishing Engine</h3>
+
+<select id="water">
+<option>Clean</option>
+<option>Green</option>
+</select>
+
+<select id="birds">
+<option>No Birds</option>
+<option>Birds Diving</option>
+</select>
+
+<select id="bait">
+<option>No Bait</option>
+<option>Bait Balls</option>
+</select>
+
+<select id="depth">
+<option>10–20m</option>
+<option>20–40m</option>
+<option>40–70m</option>
+</select>
+
+<select id="weather">
+<option>Sunny</option>
+<option>Cloudy</option>
+<option>Windy</option>
+</select>
+
+<br><br>
+<button onclick="recommend()">Get Recommendation</button>
+
+<div id="output" class="result"></div>
+
+<hr>
+
+<h3>📊 Fishing Score</h3>
+<button onclick="score()">Calculate</button>
+
+<div id="scoreText"></div>
+<div style="background:#333;">
+<div id="scoreBar" class="bar" style="width:0%"></div>
 </div>
 
-<!-- FISH DB -->
-<div class="card">
-<h3>🐟 Fish Info</h3>
-<select id="species"></select>
-<div id="info" class="result"></div>
+<hr>
+
+<h3>🌊 Tide</h3>
+<button onclick="tide()">Next Tide</button>
+<div id="tideOut" class="result"></div>
+
+<hr>
+
+<h3>🗺️ Fishing Zones</h3>
+<div class="map">
+Reef | Sand Channel | Deep Drop
 </div>
 
-<!-- CHECK -->
+<hr>
+
+<h3>🐟 Fish Database</h3>
+
+<div class="card" onclick="fish('kob')">Cape Kob</div>
+<div class="card" onclick="fish('yellowtail')">Yellowtail</div>
+<div class="card" onclick="fish('bonito')">Bonito</div>
+<div class="card" onclick="fish('roman')">Red Roman</div>
+<div class="card" onclick="fish('geelbek')">Geelbek</div>
+<div class="card" onclick="fish('hottentot')">Hottentot</div>
+<div class="card" onclick="fish('garrick')">Garrick</div>
+
+<div id="fishInfo" class="result"></div>
+
+<img id="fishImg" src="">
+
+<hr>
+
+<h3>📡 Sonar Guide</h3>
 <div class="card">
-<h3>📏 Size Check</h3>
-<input id="size" type="number" placeholder="Enter size cm">
-<button onclick="check()">Check</button>
-<div id="result"></div>
+Kob = bottom marks<br>
+Yellowtail = mid-water fast<br>
+Geelbek = groups<br>
+Roman = reef clusters
 </div>
 
-<!-- LOG -->
-<div class="card">
-<h3>📝 Session Log</h3>
-<input id="date" type="date">
-<input id="spot" placeholder="Spot">
-<input id="sp" placeholder="Species">
-<button onclick="saveLog()">Save</button>
-<div id="logs"></div>
 </div>
 
 <script>
 
-// SAFE DB (NOT CLAIMING LEGAL)
-const fish=[
-{name:"Kob",min:60,bag:5,bait:"Chokka"},
-{name:"Yellowtail",min:60,bag:10,bait:"Live bait"},
-{name:"Hottentot",min:22,bag:10,bait:"Red bait"},
-{name:"Shad",min:30,bag:4,bait:"Sardine"}
-];
+function recommend(){
+let w=val("water"), b=val("birds"), bait=val("bait"), d=val("depth"), we=val("weather");
+let out="";
 
-// LOAD
-species.innerHTML=fish.map(f=>`<option>${f.name}</option>`).join("");
+if(w=="Clean" && b=="Birds Diving"){
+out="🔥 Yellowtail\nLive bait NOW";
+}
+else if(bait=="Bait Balls"){
+out="⚡ Bonito\nUse jig FAST";
+}
+else if(w=="Green"){
+out="🎯 Kob\nUse chokka + sardine";
+}
+else if(d=="40–70m"){
+out="🐟 Geelbek\nDeep running trace";
+}
+else{
+out="Try reef fish (Roman)";
+}
 
-// SHOW INFO
-species.onchange=function(){
-let f=fish.find(x=>x.name==species.value);
-info.innerHTML=`
-<b>${f.name}</b><br>
-Min size (app): ${f.min} cm<br>
-Bag (app): ${f.bag}<br>
-Bait: ${f.bait}<br><br>
-<span class="warn">VERIFY OFFICIAL RULES</span>
-`;
+if(we=="Windy") out+="\n⚠️ Use heavier sinker";
+
+document.getElementById("output").innerText=out;
+}
+
+function score(){
+let s=0;
+if(val("water")=="Clean") s+=2;
+if(val("birds")=="Birds Diving") s+=3;
+if(val("bait")=="Bait Balls") s+=3;
+
+let percent=(s/10)*100;
+document.getElementById("scoreBar").style.width=percent+"%";
+
+let msg="Score: "+s+"/10\n";
+msg+=(s>=7)?"🔥 HOT":(s>=4)?"👍 OK":"😴 SLOW";
+
+document.getElementById("scoreText").innerText=msg;
+}
+
+function tide(){
+let t=["High tide incoming","Low tide incoming"];
+document.getElementById("tideOut").innerText=t[Math.floor(Math.random()*2)];
+}
+
+function fish(f){
+let db={
+kob:["Cape Kob","https://upload.wikimedia.org/wikipedia/commons/5/5e/Argyrosomus_japonicus.jpg"],
+yellowtail:["Yellowtail","https://upload.wikimedia.org/wikipedia/commons/3/3c/Seriola_lalandi.jpg"],
+bonito:["Bonito","https://upload.wikimedia.org/wikipedia/commons/0/0c/Sarda_sarda.jpg"],
+roman:["Red Roman","https://upload.wikimedia.org/wikipedia/commons/8/8b/Chrysoblephus_latisquamis.jpg"],
+geelbek:["Geelbek","https://upload.wikimedia.org/wikipedia/commons/2/2a/Atractoscion_aequidens.jpg"],
+hottentot:["Hottentot","https://upload.wikimedia.org/wikipedia/commons/7/7b/Pachymetopon_blochi.jpg"],
+garrick:["Garrick","https://upload.wikimedia.org/wikipedia/commons/4/45/Lichia_amia.jpg"]
 };
-species.onchange();
 
-// CHECK
-function check(){
-let f=fish.find(x=>x.name==species.value);
-
-if(!size.value){
-result.innerHTML="Enter size";
-return;
+document.getElementById("fishInfo").innerText=db[f][0];
+document.getElementById("fishImg").src=db[f][1];
 }
 
-if(size.value>=f.min){
-result.innerHTML="<span class='good'>✔ Passes app size check</span><br><span class='warn'>Verify with permit</span>";
-}else{
-result.innerHTML="<span class='bad'>✖ Below app size</span><br><span class='warn'>Verify with permit</span>";
-}
-}
-
-// LOGS
-let logsData=JSON.parse(localStorage.getItem("logs")||"[]");
-
-function saveLog(){
-logsData.push({
-date:date.value,
-spot:spot.value,
-species:sp.value
-});
-
-localStorage.setItem("logs",JSON.stringify(logsData));
-renderLogs();
-}
-
-function renderLogs(){
-logs.innerHTML=logsData.map(l=>`
-<div>${l.date} - ${l.species}</div>
-`).join("");
-}
-renderLogs();
+function val(id){return document.getElementById(id).value;}
 
 </script>
 
